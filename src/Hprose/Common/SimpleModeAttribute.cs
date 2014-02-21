@@ -9,16 +9,27 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * HproseResultMode.cs                                    *
+ * SimpleModeAttribute.cs                                 *
  *                                                        *
- * hprose result mode enum for C#.                        *
+ * SimpleMode Attribute for C#.                           *
  *                                                        *
  * LastModified: Feb 21, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
+using System;
+using System.Reflection;
+
 namespace Hprose.Common {
-    public enum HproseResultMode {
-        Normal, Serialized, Raw, RawWithEndTag
+	[AttributeUsage(AttributeTargets.Method, AllowMultiple=false)]
+    public class SimpleModeAttribute : System.Attribute {
+    	private bool simple;
+    	public SimpleModeAttribute(bool simple) {
+    		this.simple = simple;
+    	}
+    	public bool Value {
+    		get { return simple; }
+    		set { simple = value; }
+    	}
     }
 }

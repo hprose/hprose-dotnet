@@ -20,8 +20,13 @@ namespace SilverlightHproseClient
 {
     public interface ISendUsers
     {
+        [ResultMode(HproseResultMode.Serialized)]
+        [MethodName("SendUsers")]
+        byte[] SendUsersRaw(List<User> users);
         List<User> SendUsers(List<User> users);
         void SendUsers(List<User> users, HproseCallback1<List<User>> callback);
+        [SimpleMode(true)]
+        string Hello(string name);
     }
     public partial class MainPage : UserControl
     {
@@ -67,8 +72,7 @@ namespace SilverlightHproseClient
             AsyncSendUsers(users, callback);
             new Thread(() =>
             {
-                MemoryStream s = HproseFormatter.Serialize(proxyObject.SendUsers(users));
-                byte[] b = s.ToArray();
+                byte[] b = proxyObject.SendUsersRaw(users);
                 Dispatcher.BeginInvoke(() =>
                 {
                     System.Windows.Browser.HtmlPage.Window.Eval("alert('" + UTF8Encoding.UTF8.GetString(b, 0, b.Length) + "')");
@@ -79,6 +83,11 @@ namespace SilverlightHproseClient
                 Dispatcher.BeginInvoke(() =>
                 {
                     System.Windows.Browser.HtmlPage.Window.Eval("alert('" + UTF8Encoding.UTF8.GetString(bb, 0, bb.Length) + "')");
+                });
+                string result = proxyObject.Hello("World");
+                Dispatcher.BeginInvoke(() =>
+                {
+                    System.Windows.Browser.HtmlPage.Window.Eval("alert('" + result + "')");
                 });
             }).Start();
         }

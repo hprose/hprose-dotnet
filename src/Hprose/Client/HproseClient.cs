@@ -13,7 +13,7 @@
  *                                                        *
  * hprose client class for C#.                            *
  *                                                        *
- * LastModified: Feb 19, 2014                             *
+ * LastModified: Feb 22, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -156,8 +156,8 @@ namespace Hprose.Client {
 #if !(dotNET10 || dotNET11 || dotNETCF10)
         private class AsyncInvokeContext<T> : AsyncInvokeContextBase {
             private HproseCallback<T> callback;
-            internal AsyncInvokeContext(HproseClient client, string functionName, object[] arguments, HproseCallback<T> callback, HproseErrorEvent errorCallback, bool byRef, bool simple) :
-                base(client, functionName, arguments, errorCallback, typeof(T), byRef, HproseResultMode.Normal, simple) {
+            internal AsyncInvokeContext(HproseClient client, string functionName, object[] arguments, HproseCallback<T> callback, HproseErrorEvent errorCallback, bool byRef, HproseResultMode resultMode, bool simple) :
+                base(client, functionName, arguments, errorCallback, typeof(T), byRef, resultMode, simple) {
                 this.callback = callback;
             }
 
@@ -174,8 +174,8 @@ namespace Hprose.Client {
         }
         private class AsyncInvokeContext1<T> : AsyncInvokeContextBase {
             private HproseCallback1<T> callback;
-            internal AsyncInvokeContext1(HproseClient client, string functionName, object[] arguments, HproseCallback1<T> callback, HproseErrorEvent errorCallback, bool simple) :
-                base(client, functionName, arguments, errorCallback, typeof(T), false, HproseResultMode.Normal, simple) {
+            internal AsyncInvokeContext1(HproseClient client, string functionName, object[] arguments, HproseCallback1<T> callback, HproseErrorEvent errorCallback, HproseResultMode resultMode, bool simple) :
+                base(client, functionName, arguments, errorCallback, typeof(T), false, resultMode, simple) {
                 this.callback = callback;
             }
 
@@ -290,14 +290,26 @@ namespace Hprose.Client {
         public T Invoke<T>(string functionName) {
             return (T)Invoke(functionName, nullArgs, typeof(T), false, HproseResultMode.Normal, false);
         }
+        public T Invoke<T>(string functionName, HproseResultMode resultMode) {
+            return (T)Invoke(functionName, nullArgs, typeof(T), false, resultMode, false);
+        }
         public T Invoke<T>(string functionName, object[] arguments) {
             return (T)Invoke(functionName, arguments, typeof(T), false, HproseResultMode.Normal, false);
+        }
+        public T Invoke<T>(string functionName, object[] arguments, HproseResultMode resultMode) {
+            return (T)Invoke(functionName, arguments, typeof(T), false, resultMode, false);
         }
         public T Invoke<T>(string functionName, object[] arguments, bool byRef) {
             return (T)Invoke(functionName, arguments, typeof(T), byRef, HproseResultMode.Normal, false);
         }
+        public T Invoke<T>(string functionName, object[] arguments, bool byRef, HproseResultMode resultMode) {
+            return (T)Invoke(functionName, arguments, typeof(T), byRef, resultMode, false);
+        }
         public T Invoke<T>(string functionName, object[] arguments, bool byRef, bool simple) {
             return (T)Invoke(functionName, arguments, typeof(T), byRef, HproseResultMode.Normal, simple);
+        }
+        public T Invoke<T>(string functionName, object[] arguments, bool byRef, HproseResultMode resultMode, bool simple) {
+            return (T)Invoke(functionName, arguments, typeof(T), byRef, resultMode, simple);
         }
 #endif
         public object Invoke(string functionName) {
@@ -338,8 +350,18 @@ namespace Hprose.Client {
         public object Invoke(string functionName, object[] arguments, bool byRef, HproseResultMode resultMode, bool simple) {
             return Invoke(functionName, arguments, (Type)null, byRef, resultMode, simple);
         }
+
+        public object Invoke(string functionName, Type returnType, HproseResultMode resultMode) {
+            return Invoke(functionName, nullArgs, returnType, false, resultMode, false);
+        }
+        public object Invoke(string functionName, object[] arguments, Type returnType, HproseResultMode resultMode) {
+            return Invoke(functionName, arguments, returnType, false, resultMode, false);
+        }
+        public object Invoke(string functionName, object[] arguments, Type returnType, bool byRef, HproseResultMode resultMode) {
+            return Invoke(functionName, arguments, returnType, byRef, resultMode, false);
+        }
 #if !(SILVERLIGHT || WINDOWS_PHONE || Core)
-        private object Invoke(string functionName, object[] arguments, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
+        public object Invoke(string functionName, object[] arguments, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
             object context = GetInvokeContext();
             Stream ostream = GetOutputStream(context);
             bool success = false;
@@ -366,7 +388,7 @@ namespace Hprose.Client {
             return result;
         }
 #else
-        private object Invoke(string functionName, object[] arguments, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
+        public object Invoke(string functionName, object[] arguments, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
             object result = null;
             Exception error = null;
             AutoResetEvent done = new AutoResetEvent(false);
@@ -413,7 +435,7 @@ namespace Hprose.Client {
                             result = hproseReader.Unserialize(returnType);
                         }
                         else if (resultMode == HproseResultMode.Serialized) {
-                            result = hproseReader.ReadRaw();
+                            memstream = hproseReader.ReadRaw();
                         }
                         else {
                             memstream.WriteByte(HproseTags.TagResult);
@@ -447,12 +469,21 @@ namespace Hprose.Client {
                         throw new HproseException("Wrong Resoponse: \r\n" + HproseHelper.ReadWrongInfo(istream, tag));
                 }
             }
-            if (resultMode == HproseResultMode.RawWithEndTag || resultMode == HproseResultMode.Raw) {
+            if (resultMode != HproseResultMode.Normal) {
                 if (resultMode == HproseResultMode.RawWithEndTag) {
                     memstream.WriteByte(HproseTags.TagEnd);
                 }
-                memstream.Position = 0;
-                result = memstream;
+                if (returnType == typeof(byte[])) {
+                    result = memstream.ToArray();
+                } else if (returnType == null ||
+                           returnType == typeof(object) ||
+                           returnType == typeof(MemoryStream) ||
+                           returnType == typeof(Stream)) {
+                    memstream.Position = 0;
+                    result = memstream;
+                } else {
+                    throw new HproseException("Can't Convert MemoryStream to Type: " + returnType.ToString());
+                }
             }
             return result;
         }
@@ -474,42 +505,75 @@ namespace Hprose.Client {
 
 #if !(dotNET10 || dotNET11 || dotNETCF10)
         public void Invoke<T>(string functionName, HproseCallback<T> callback) {
-            Invoke(functionName, nullArgs, callback, null, false, false);
+            Invoke(functionName, nullArgs, callback, null, false, HproseResultMode.Normal, false);
+        }
+        public void Invoke<T>(string functionName, HproseCallback<T> callback, HproseResultMode resultMode) {
+            Invoke(functionName, nullArgs, callback, null, false, resultMode, false);
         }
         public void Invoke<T>(string functionName, object[] arguments, HproseCallback<T> callback) {
-            Invoke(functionName, arguments, callback, null, false, false);
+            Invoke(functionName, arguments, callback, null, false, HproseResultMode.Normal, false);
+        }
+        public void Invoke<T>(string functionName, object[] arguments, HproseCallback<T> callback, HproseResultMode resultMode) {
+            Invoke(functionName, arguments, callback, null, false, resultMode, false);
         }
         public void Invoke<T>(string functionName, object[] arguments, HproseCallback<T> callback, bool byRef) {
-            Invoke(functionName, arguments, callback, null, byRef, false);
+            Invoke(functionName, arguments, callback, null, byRef, HproseResultMode.Normal, false);
+        }
+        public void Invoke<T>(string functionName, object[] arguments, HproseCallback<T> callback, bool byRef, HproseResultMode resultMode) {
+            Invoke(functionName, arguments, callback, null, byRef, resultMode, false);
         }
         public void Invoke<T>(string functionName, object[] arguments, HproseCallback<T> callback, bool byRef, bool simple) {
-            Invoke(functionName, arguments, callback, null, byRef, simple);
+            Invoke(functionName, arguments, callback, null, byRef, HproseResultMode.Normal, simple);
+        }
+        public void Invoke<T>(string functionName, object[] arguments, HproseCallback<T> callback, bool byRef, HproseResultMode resultMode, bool simple) {
+            Invoke(functionName, arguments, callback, null, byRef, resultMode, simple);
         }
 
         public void Invoke<T>(string functionName, HproseCallback1<T> callback) {
-            Invoke(functionName, nullArgs, callback, null, false);
+            Invoke(functionName, nullArgs, callback, null, HproseResultMode.Normal, false);
+        }
+        public void Invoke<T>(string functionName, HproseCallback1<T> callback, HproseResultMode resultMode) {
+            Invoke(functionName, nullArgs, callback, null, resultMode, false);
         }
         public void Invoke<T>(string functionName, object[] arguments, HproseCallback1<T> callback) {
-            Invoke(functionName, arguments, callback, null, false);
+            Invoke(functionName, arguments, callback, null, HproseResultMode.Normal, false);
+        }
+        public void Invoke<T>(string functionName, object[] arguments, HproseCallback1<T> callback, HproseResultMode resultMode) {
+            Invoke(functionName, arguments, callback, null, resultMode, false);
         }
         public void Invoke<T>(string functionName, object[] arguments, HproseCallback1<T> callback, bool simple) {
-            Invoke(functionName, arguments, callback, null, simple);
+            Invoke(functionName, arguments, callback, null, HproseResultMode.Normal, simple);
+        }
+        public void Invoke<T>(string functionName, object[] arguments, HproseCallback1<T> callback, HproseResultMode resultMode, bool simple) {
+            Invoke(functionName, arguments, callback, null, resultMode, simple);
         }
 
         public void Invoke<T>(string functionName, HproseCallback<T> callback, HproseErrorEvent errorEvent) {
-            Invoke(functionName, nullArgs, callback, errorEvent, false, false);
+            Invoke(functionName, nullArgs, callback, errorEvent, false, HproseResultMode.Normal, false);
+        }
+        public void Invoke<T>(string functionName, HproseCallback<T> callback, HproseErrorEvent errorEvent, HproseResultMode resultMode) {
+            Invoke(functionName, nullArgs, callback, errorEvent, false, resultMode, false);
         }
         public void Invoke<T>(string functionName, object[] arguments, HproseCallback<T> callback, HproseErrorEvent errorEvent) {
-            Invoke(functionName, arguments, callback, errorEvent, false, false);
+            Invoke(functionName, arguments, callback, errorEvent, false, HproseResultMode.Normal, false);
+        }
+        public void Invoke<T>(string functionName, object[] arguments, HproseCallback<T> callback, HproseErrorEvent errorEvent, HproseResultMode resultMode) {
+            Invoke(functionName, arguments, callback, errorEvent, false, resultMode, false);
         }
         public void Invoke<T>(string functionName, object[] arguments, HproseCallback<T> callback, HproseErrorEvent errorEvent, bool byRef) {
-            Invoke(functionName, arguments, callback, errorEvent, byRef, false);
+            Invoke(functionName, arguments, callback, errorEvent, byRef, HproseResultMode.Normal, false);
+        }
+        public void Invoke<T>(string functionName, object[] arguments, HproseCallback<T> callback, HproseErrorEvent errorEvent, bool byRef, HproseResultMode resultMode) {
+            Invoke(functionName, arguments, callback, errorEvent, byRef, resultMode, false);
         }
         public void Invoke<T>(string functionName, object[] arguments, HproseCallback<T> callback, HproseErrorEvent errorEvent, bool byRef, bool simple) {
+            Invoke(functionName, arguments, callback, errorEvent, byRef, HproseResultMode.Normal, simple);
+        }
+        public void Invoke<T>(string functionName, object[] arguments, HproseCallback<T> callback, HproseErrorEvent errorEvent, bool byRef, HproseResultMode resultMode, bool simple) {
             if (errorEvent == null) {
                 errorEvent = OnError;
             }
-            AsyncInvokeContext<T> context = new AsyncInvokeContext<T>(this, functionName, arguments, callback, errorEvent, byRef, simple);
+            AsyncInvokeContext<T> context = new AsyncInvokeContext<T>(this, functionName, arguments, callback, errorEvent, byRef, resultMode, simple);
             try {
                 BeginGetOutputStream(new AsyncCallback(context.GetOutputStream), GetInvokeContext());
             }
@@ -521,16 +585,25 @@ namespace Hprose.Client {
         }
 
         public void Invoke<T>(string functionName, HproseCallback1<T> callback, HproseErrorEvent errorEvent) {
-            Invoke(functionName, nullArgs, callback, errorEvent, false);
+            Invoke(functionName, nullArgs, callback, errorEvent, HproseResultMode.Normal, false);
+        }
+        public void Invoke<T>(string functionName, HproseCallback1<T> callback, HproseErrorEvent errorEvent, HproseResultMode resultMode) {
+            Invoke(functionName, nullArgs, callback, errorEvent, resultMode, false);
         }
         public void Invoke<T>(string functionName, object[] arguments, HproseCallback1<T> callback, HproseErrorEvent errorEvent) {
-            Invoke(functionName, arguments, callback, errorEvent, false);
+            Invoke(functionName, arguments, callback, errorEvent, HproseResultMode.Normal, false);
+        }
+        public void Invoke<T>(string functionName, object[] arguments, HproseCallback1<T> callback, HproseErrorEvent errorEvent, HproseResultMode resultMode) {
+            Invoke(functionName, arguments, callback, errorEvent, resultMode, false);
         }
         public void Invoke<T>(string functionName, object[] arguments, HproseCallback1<T> callback, HproseErrorEvent errorEvent, bool simple) {
+            Invoke(functionName, arguments, callback, errorEvent, HproseResultMode.Normal, simple);
+        }
+        public void Invoke<T>(string functionName, object[] arguments, HproseCallback1<T> callback, HproseErrorEvent errorEvent, HproseResultMode resultMode, bool simple) {
             if (errorEvent == null) {
                 errorEvent = OnError;
             }
-            AsyncInvokeContext1<T> context = new AsyncInvokeContext1<T>(this, functionName, arguments, callback, errorEvent, simple);
+            AsyncInvokeContext1<T> context = new AsyncInvokeContext1<T>(this, functionName, arguments, callback, errorEvent, resultMode, simple);
             try {
                 BeginGetOutputStream(new AsyncCallback(context.GetOutputStream), GetInvokeContext());
             }
@@ -657,6 +730,29 @@ namespace Hprose.Client {
             Invoke(functionName, arguments, callback, null, null, resultMode, simple);
         }
 
+        public void Invoke(string functionName, HproseCallback callback, Type returnType, HproseResultMode resultMode) {
+            Invoke(functionName, nullArgs, callback, null, returnType, false, resultMode, false);
+        }
+        public void Invoke(string functionName, object[] arguments, HproseCallback callback, Type returnType, HproseResultMode resultMode) {
+            Invoke(functionName, arguments, callback, null, returnType, false, resultMode, false);
+        }
+        public void Invoke(string functionName, object[] arguments, HproseCallback callback, Type returnType, bool byRef, HproseResultMode resultMode) {
+            Invoke(functionName, arguments, callback, null, returnType, byRef, resultMode, false);
+        }
+        public void Invoke(string functionName, object[] arguments, HproseCallback callback, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
+            Invoke(functionName, arguments, callback, null, returnType, byRef, resultMode, simple);
+        }
+
+        public void Invoke(string functionName, HproseCallback1 callback, Type returnType, HproseResultMode resultMode) {
+            Invoke(functionName, nullArgs, callback, null, returnType, resultMode, false);
+        }
+        public void Invoke(string functionName, object[] arguments, HproseCallback1 callback, Type returnType, HproseResultMode resultMode) {
+            Invoke(functionName, arguments, callback, null, returnType, resultMode, false);
+        }
+        public void Invoke(string functionName, object[] arguments, HproseCallback1 callback, Type returnType, HproseResultMode resultMode, bool simple) {
+            Invoke(functionName, arguments, callback, null, returnType, resultMode, simple);
+        }
+
         public void Invoke(string functionName, HproseCallback callback, HproseErrorEvent errorEvent, HproseResultMode resultMode) {
             Invoke(functionName, nullArgs, callback, errorEvent, null, false, resultMode, false);
         }
@@ -680,7 +776,16 @@ namespace Hprose.Client {
             Invoke(functionName, arguments, callback, errorEvent, null, resultMode, simple);
         }
 
-        private void Invoke(string functionName, object[] arguments, HproseCallback callback, HproseErrorEvent errorEvent, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
+        public void Invoke(string functionName, HproseCallback callback, HproseErrorEvent errorEvent, Type returnType, HproseResultMode resultMode) {
+            Invoke(functionName, nullArgs, callback, errorEvent, returnType, false, resultMode, false);
+        }
+        public void Invoke(string functionName, object[] arguments, HproseCallback callback, HproseErrorEvent errorEvent, Type returnType, HproseResultMode resultMode) {
+            Invoke(functionName, arguments, callback, errorEvent, returnType, false, resultMode, false);
+        }
+        public void Invoke(string functionName, object[] arguments, HproseCallback callback, HproseErrorEvent errorEvent, Type returnType, bool byRef, HproseResultMode resultMode) {
+            Invoke(functionName, arguments, callback, errorEvent, returnType, byRef, resultMode, false);
+        }
+        public void Invoke(string functionName, object[] arguments, HproseCallback callback, HproseErrorEvent errorEvent, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
             if (errorEvent == null) {
                 errorEvent = OnError;
             }
@@ -695,7 +800,13 @@ namespace Hprose.Client {
             }
         }
 
-        private void Invoke(string functionName, object[] arguments, HproseCallback1 callback, HproseErrorEvent errorEvent, Type returnType, HproseResultMode resultMode, bool simple) {
+        public void Invoke(string functionName, HproseCallback1 callback, HproseErrorEvent errorEvent, Type returnType, HproseResultMode resultMode) {
+            Invoke(functionName, nullArgs, callback, errorEvent, returnType, resultMode, false);
+        }
+        public void Invoke(string functionName, object[] arguments, HproseCallback1 callback, HproseErrorEvent errorEvent, Type returnType, HproseResultMode resultMode) {
+            Invoke(functionName, arguments, callback, errorEvent, returnType, resultMode, false);
+        }
+        public void Invoke(string functionName, object[] arguments, HproseCallback1 callback, HproseErrorEvent errorEvent, Type returnType, HproseResultMode resultMode, bool simple) {
             if (errorEvent == null) {
                 errorEvent = OnError;
             }

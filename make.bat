@@ -100,6 +100,9 @@ set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\HproseInvoker.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\HproseInvocationHandler.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\IHproseFilter.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\InvokeHelper.cs
+set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\MethodNameAttribute.cs
+set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\ResultModeAttribute.cs
+set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\SimpleModeAttribute.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Reflection\Proxy.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Reflection\IInvocationHandler.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Reflection\CtorAccessor.cs
@@ -213,6 +216,7 @@ set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Text.Encoding.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Text.Encoding.Extensions.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Threading.dll"
+
 C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.5\Core\Hprose.Client.dll -define:dotNET4;dotNET45;Core;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET 4.5.1

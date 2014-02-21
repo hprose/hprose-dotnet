@@ -25,6 +25,10 @@ namespace HproseServer
             }
             return users;
         }
+        public string Hello(string name)
+        {
+            return "Hello " + name + "!";
+        }
     }
     class Program
     {
@@ -32,7 +36,9 @@ namespace HproseServer
         {
             ClassManager.Register(typeof(User), "User");
             HproseHttpListenerServer server = new HproseHttpListenerServer("http://localhost:2012/");
-            server.Methods.AddInstanceMethods(new TestService());
+            TestService ts = new TestService();
+            server.Methods.AddMethod("Hello", ts, true);
+            server.Methods.AddMethod("SendUsers", ts);
             server.IsCrossDomainEnabled = true;
             server.CrossDomainXmlFile = "crossdomain.xml";
             server.Start();

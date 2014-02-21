@@ -337,12 +337,12 @@ namespace Hprose.Common {
                 return invoker.Invoke<TResult>(methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16 });
             };
         }
-        private static void AsyncInvoke<TCallback>(HproseInvoker invoker, string methodName, object[] args, TCallback callback) {
+        private static void AsyncInvoke<TCallback>(HproseInvoker invoker, string methodName, object[] args, TCallback callback, HproseErrorEvent errorEvent) {
             if (callback is HproseCallback) {
-                invoker.Invoke(methodName, args, callback as HproseCallback);
+                invoker.Invoke(methodName, args, callback as HproseCallback, errorEvent);
             }
             else if (callback is HproseCallback1) {
-                invoker.Invoke(methodName, args, callback as HproseCallback1);
+                invoker.Invoke(methodName, args, callback as HproseCallback1, errorEvent);
             }
             else {
 #if Core
@@ -350,12 +350,12 @@ namespace Hprose.Common {
                 if (type.IsGenericType) {
                     if (type.GetGenericTypeDefinition() == typeof(HproseCallback<>)) {
                         IInvokeHelper helper = Activator.CreateInstance(typeof(InvokeHelper<>).MakeGenericType(type.GenericTypeArguments)) as IInvokeHelper;
-                        helper.Invoke(invoker, methodName, args, callback as Delegate, false);
+                        helper.Invoke(invoker, methodName, args, callback as Delegate, errorEvent, false, HproseResultMode.Normal, false);
                         return;
                     }
                     else if (type.GetGenericTypeDefinition() == typeof(HproseCallback1<>)) {
                         IInvokeHelper1 helper = Activator.CreateInstance(typeof(InvokeHelper1<>).MakeGenericType(type.GenericTypeArguments)) as IInvokeHelper1;
-                        helper.Invoke(invoker, methodName, args, callback as Delegate);
+                        helper.Invoke(invoker, methodName, args, callback as Delegate, errorEvent, HproseResultMode.Normal, false);
                         return;
                     }
                 }
@@ -364,12 +364,12 @@ namespace Hprose.Common {
                 if (type.IsGenericType) {
                     if (type.GetGenericTypeDefinition() == typeof(HproseCallback<>)) {
                         IInvokeHelper helper = Activator.CreateInstance(typeof(InvokeHelper<>).MakeGenericType(type.GetGenericArguments())) as IInvokeHelper;
-                        helper.Invoke(invoker, methodName, args, callback as Delegate, false);
+                        helper.Invoke(invoker, methodName, args, callback as Delegate, errorEvent, false, HproseResultMode.Normal, false);
                         return;
                     }
                     else if (type.GetGenericTypeDefinition() == typeof(HproseCallback1<>)) {
                         IInvokeHelper1 helper = Activator.CreateInstance(typeof(InvokeHelper1<>).MakeGenericType(type.GetGenericArguments())) as IInvokeHelper1;
-                        helper.Invoke(invoker, methodName, args, callback as Delegate);
+                        helper.Invoke(invoker, methodName, args, callback as Delegate, errorEvent, HproseResultMode.Normal, false);
                         return;
                     }
                 }
@@ -383,7 +383,7 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(TCallback callback) {
-                AsyncInvoke(invoker, methodName, nullArgs, callback);
+                AsyncInvoke(invoker, methodName, nullArgs, callback, null);
             };
         }
         public static Action<T1, TCallback> GetAsyncAction<T1, TCallback>(
@@ -392,7 +392,7 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(T1 a1, TCallback callback) {
-                AsyncInvoke(invoker, methodName, new object[] { a1 }, callback);
+                AsyncInvoke(invoker, methodName, new object[] { a1 }, callback, null);
             };
         }
         public static Action<T1, T2, TCallback> GetAsyncAction<T1, T2, TCallback>(
@@ -401,7 +401,7 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(T1 a1, T2 a2, TCallback callback) {
-                AsyncInvoke(invoker, methodName, new object[] { a1, a2 }, callback);
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2 }, callback, null);
             };
         }
         public static Action<T1, T2, T3, TCallback> GetAsyncAction<T1, T2, T3, TCallback>(
@@ -410,7 +410,7 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(T1 a1, T2 a2, T3 a3, TCallback callback) {
-                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3 }, callback);
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3 }, callback, null);
             };
         }
         public static Action<T1, T2, T3, T4, TCallback> GetAsyncAction<T1, T2, T3, T4, TCallback>(
@@ -419,7 +419,7 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(T1 a1, T2 a2, T3 a3, T4 a4, TCallback callback) {
-                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4 }, callback);
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4 }, callback, null);
             };
         }
         public static Action<T1, T2, T3, T4, T5, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, TCallback>(
@@ -428,7 +428,7 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, TCallback callback) {
-                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5 }, callback);
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5 }, callback, null);
             };
         }
         public static Action<T1, T2, T3, T4, T5, T6, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, TCallback>(
@@ -437,7 +437,7 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, TCallback callback) {
-                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6 }, callback);
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6 }, callback, null);
             };
         }
         public static Action<T1, T2, T3, T4, T5, T6, T7, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, TCallback>(
@@ -446,7 +446,7 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, TCallback callback) {
-                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7 }, callback);
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7 }, callback, null);
             };
         }
         public static Action<T1, T2, T3, T4, T5, T6, T7, T8, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, TCallback>(
@@ -455,7 +455,7 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, TCallback callback) {
-                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8 }, callback);
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8 }, callback, null);
             };
         }
         public static Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, T9, TCallback>(
@@ -464,7 +464,7 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, T9 a9, TCallback callback) {
-                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9 }, callback);
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9 }, callback, null);
             };
         }
         public static Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TCallback>(
@@ -473,7 +473,7 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, T9 a9, T10 a10, TCallback callback) {
-                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 }, callback);
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 }, callback, null);
             };
         }
         public static Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TCallback>(
@@ -482,7 +482,7 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, T9 a9, T10 a10, T11 a11, TCallback callback) {
-                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11 }, callback);
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11 }, callback, null);
             };
         }
         public static Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TCallback>(
@@ -491,7 +491,7 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, T9 a9, T10 a10, T11 a11, T12 a12, TCallback callback) {
-                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12 }, callback);
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12 }, callback, null);
             };
         }
         public static Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, TCallback>(
@@ -500,7 +500,7 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, T9 a9, T10 a10, T11 a11, T12 a12, T13 a13, TCallback callback) {
-                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13 }, callback);
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13 }, callback, null);
             };
         }
         public static Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, TCallback>(
@@ -509,7 +509,7 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, T9 a9, T10 a10, T11 a11, T12 a12, T13 a13, T14 a14, TCallback callback) {
-                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14 }, callback);
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14 }, callback, null);
             };
         }
         public static Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, TCallback>(
@@ -518,9 +518,155 @@ namespace Hprose.Common {
 #endif
         HproseInvoker invoker, string methodName) {
             return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, T9 a9, T10 a10, T11 a11, T12 a12, T13 a13, T14 a14, T15 a15, TCallback callback) {
-                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15 }, callback);
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15 }, callback, null);
             };
         }
+
+        public static Action<TCallback> GetAsyncAction<TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(TCallback callback) {
+                AsyncInvoke(invoker, methodName, nullArgs, callback, errorEvent);
+            };
+        }
+        public static Action<T1, TCallback> GetAsyncAction<T1, TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(T1 a1, TCallback callback) {
+                AsyncInvoke(invoker, methodName, new object[] { a1 }, callback, errorEvent);
+            };
+        }
+        public static Action<T1, T2, TCallback> GetAsyncAction<T1, T2, TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(T1 a1, T2 a2, TCallback callback) {
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2 }, callback, errorEvent);
+            };
+        }
+        public static Action<T1, T2, T3, TCallback> GetAsyncAction<T1, T2, T3, TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(T1 a1, T2 a2, T3 a3, TCallback callback) {
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3 }, callback, errorEvent);
+            };
+        }
+        public static Action<T1, T2, T3, T4, TCallback> GetAsyncAction<T1, T2, T3, T4, TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(T1 a1, T2 a2, T3 a3, T4 a4, TCallback callback) {
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4 }, callback, errorEvent);
+            };
+        }
+        public static Action<T1, T2, T3, T4, T5, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, TCallback callback) {
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5 }, callback, errorEvent);
+            };
+        }
+        public static Action<T1, T2, T3, T4, T5, T6, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, TCallback callback) {
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6 }, callback, errorEvent);
+            };
+        }
+        public static Action<T1, T2, T3, T4, T5, T6, T7, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, TCallback callback) {
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7 }, callback, errorEvent);
+            };
+        }
+        public static Action<T1, T2, T3, T4, T5, T6, T7, T8, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, TCallback callback) {
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8 }, callback, errorEvent);
+            };
+        }
+        public static Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, T9, TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, T9 a9, TCallback callback) {
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9 }, callback, errorEvent);
+            };
+        }
+        public static Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, T9 a9, T10 a10, TCallback callback) {
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 }, callback, errorEvent);
+            };
+        }
+        public static Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, T9 a9, T10 a10, T11 a11, TCallback callback) {
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11 }, callback, errorEvent);
+            };
+        }
+        public static Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, T9 a9, T10 a10, T11 a11, T12 a12, TCallback callback) {
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12 }, callback, errorEvent);
+            };
+        }
+        public static Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, T9 a9, T10 a10, T11 a11, T12 a12, T13 a13, TCallback callback) {
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13 }, callback, errorEvent);
+            };
+        }
+        public static Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, T9 a9, T10 a10, T11 a11, T12 a12, T13 a13, T14 a14, TCallback callback) {
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14 }, callback, errorEvent);
+            };
+        }
+        public static Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, TCallback> GetAsyncAction<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, TCallback>(
+#if !NET_2_0
+        this
+#endif
+        HproseInvoker invoker, string methodName, HproseErrorEvent errorEvent) {
+            return delegate(T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8, T9 a9, T10 a10, T11 a11, T12 a12, T13 a13, T14 a14, T15 a15, TCallback callback) {
+                AsyncInvoke(invoker, methodName, new object[] { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15 }, callback, errorEvent);
+            };
+        }
+
     }
 }
 #endif

@@ -9,16 +9,27 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * HproseResultMode.cs                                    *
+ * ResultModeAttribute.cs                                 *
  *                                                        *
- * hprose result mode enum for C#.                        *
+ * ResultMode Attribute for C#.                           *
  *                                                        *
  * LastModified: Feb 21, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
+using System;
+using System.Reflection;
+
 namespace Hprose.Common {
-    public enum HproseResultMode {
-        Normal, Serialized, Raw, RawWithEndTag
+	[AttributeUsage(AttributeTargets.Method, AllowMultiple=false)]
+    public class ResultModeAttribute : System.Attribute {
+    	private HproseResultMode mode;
+    	public ResultModeAttribute(HproseResultMode mode) {
+    		this.mode = mode;
+    	}
+    	public HproseResultMode Value {
+    		get { return mode; }
+    		set { mode = value; }
+    	}
     }
 }
