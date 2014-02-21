@@ -137,12 +137,12 @@ c:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\Csc.exe -out:dist\1.1\Hprose.Client
 c:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\Csc.exe -out:dist\1.1\Hprose.dll -define:dotNET11 -filealign:512 -target:library -optimize+ -debug- %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET 2.0
-c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\Csc.exe -out:dist\2.0\Hprose.Client.dll -define:dotNET2;ClientOnly -filealign:512 -target:library -optimize+ -debug- %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
-c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\Csc.exe -out:dist\2.0\Hprose.dll -define:dotNET2 -filealign:512 -target:library -optimize+ -debug- %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\Csc.exe -keyfile:HproseKeys.snk -out:dist\2.0\Hprose.Client.dll -define:dotNET2;ClientOnly -filealign:512 -target:library -optimize+ -debug- %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\Csc.exe -keyfile:HproseKeys.snk -out:dist\2.0\Hprose.dll -define:dotNET2 -filealign:512 -target:library -optimize+ -debug- %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET 3.5
-C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -out:dist\3.5\Hprose.Client.dll -define:dotNET35;ClientOnly -filealign:512 -target:library -optimize+ -debug- %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
-C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -out:dist\3.5\Hprose.dll -define:dotNET35 -filealign:512 -target:library -optimize+ -debug- %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -keyfile:HproseKeys.snk -out:dist\3.5\Hprose.Client.dll -define:dotNET35;ClientOnly -filealign:512 -target:library -optimize+ -debug- %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -keyfile:HproseKeys.snk -out:dist\3.5\Hprose.dll -define:dotNET35 -filealign:512 -target:library -optimize+ -debug- %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET 3.5 ClientProfile
 set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client
@@ -152,8 +152,8 @@ set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -out:dist\3.5\ClientProfile\Hprose.Client.dll -define:dotNET35;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
-C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -out:dist\3.5\ClientProfile\Hprose.dll -define:dotNET35;ClientProfile -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -keyfile:HproseKeys.snk -out:dist\3.5\ClientProfile\Hprose.Client.dll -define:dotNET35;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -keyfile:HproseKeys.snk -out:dist\3.5\ClientProfile\Hprose.dll -define:dotNET35;ClientProfile -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET 4.0
 set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0
@@ -164,9 +164,9 @@ set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dl
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -out:dist\4.0\Hprose.Client.dll -define:dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.0\Hprose.Client.dll -define:dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Web.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -out:dist\4.0\Hprose.dll -define:dotNET4; -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.0\Hprose.dll -define:dotNET4; -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET 4.0 ClientProfile
 set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\Profile\Client
@@ -177,8 +177,8 @@ set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dl
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -out:dist\4.0\ClientProfile\Hprose.Client.dll -define:dotNET4;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
-C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -out:dist\4.0\ClientProfile\Hprose.dll -define:dotNET4;ClientProfile -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.0\ClientProfile\Hprose.Client.dll -define:dotNET4;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.0\ClientProfile\Hprose.dll -define:dotNET4;ClientProfile -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET 4.5
 set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5
@@ -189,9 +189,9 @@ set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dl
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -out:dist\4.5\Hprose.Client.dll -define:dotNET4;dotNET45;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.5\Hprose.Client.dll -define:dotNET4;dotNET45;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Web.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -out:dist\4.5\Hprose.dll -define:dotNET4;dotNET45 -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.5\Hprose.dll -define:dotNET4;dotNET45 -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET 4.5 Windows Store App
 set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETCore\v4.5
@@ -213,7 +213,7 @@ set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Text.Encoding.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Text.Encoding.Extensions.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Threading.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -out:dist\4.5\Core\Hprose.Client.dll -define:dotNET4;dotNET45;Core;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.5\Core\Hprose.Client.dll -define:dotNET4;dotNET45;Core;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET 4.5.1
 set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.1
@@ -224,9 +224,9 @@ set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dl
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -out:dist\4.5.1\Hprose.Client.dll -define:dotNET4;dotNET45;dotNET451;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.5.1\Hprose.Client.dll -define:dotNET4;dotNET45;dotNET451;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Web.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -out:dist\4.5.1\Hprose.dll -define:dotNET4;dotNET45;dotNET451 -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.5.1\Hprose.dll -define:dotNET4;dotNET45;dotNET451 -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug- %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for Silverlight 2.0
 set SL_REFERENCE=
@@ -236,7 +236,7 @@ set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL2_PATH%\System.dll"
 set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL2_PATH%\System.Net.dll"
 set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL2_PATH%\System.Windows.dll"
 set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL2_PATH%\System.Runtime.Serialization.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\Csc.exe -out:dist\SilverLight2\Hprose.Client.dll -define:SILVERLIGHT;SL2;ClientOnly -filealign:512 -target:library -noconfig -nowarn:0444 -nostdlib+ -optimize+ -debug- %SL_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\Csc.exe -keyfile:HproseKeys.snk -out:dist\SilverLight2\Hprose.Client.dll -define:SILVERLIGHT;SL2;ClientOnly -filealign:512 -target:library -noconfig -nowarn:0444 -nostdlib+ -optimize+ -debug- %SL_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for Silverlight 3.0
 set SL_REFERENCE=
@@ -246,7 +246,7 @@ set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL3_PATH%\System.dll"
 set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL3_PATH%\System.Net.dll"
 set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL3_PATH%\System.Windows.dll"
 set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL3_PATH%\System.Runtime.Serialization.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -out:dist\SilverLight3\Hprose.Client.dll -define:SILVERLIGHT;SL3;ClientOnly -filealign:512 -target:library -noconfig -nowarn:0444 -nostdlib+ -optimize+ -debug- %SL_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -keyfile:HproseKeys.snk -out:dist\SilverLight3\Hprose.Client.dll -define:SILVERLIGHT;SL3;ClientOnly -filealign:512 -target:library -noconfig -nowarn:0444 -nostdlib+ -optimize+ -debug- %SL_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for Silverlight 4.0
 set SL_REFERENCE=
@@ -256,7 +256,7 @@ set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL4_PATH%\System.dll"
 set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL4_PATH%\System.Net.dll"
 set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL4_PATH%\System.Windows.dll"
 set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL4_PATH%\System.Runtime.Serialization.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -out:dist\SilverLight4\Hprose.Client.dll -define:SILVERLIGHT;SL4;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug- %SL_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -keyfile:HproseKeys.snk -out:dist\SilverLight4\Hprose.Client.dll -define:SILVERLIGHT;SL4;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug- %SL_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for Silverlight 5.0
 set SL_REFERENCE=
@@ -266,7 +266,7 @@ set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL5_PATH%\System.dll"
 set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL5_PATH%\System.Net.dll"
 set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL5_PATH%\System.Windows.dll"
 set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL5_PATH%\System.Runtime.Serialization.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -out:dist\SilverLight5\Hprose.Client.dll -define:SILVERLIGHT;SL5;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug- %SL_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\SilverLight5\Hprose.Client.dll -define:SILVERLIGHT;SL5;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug- %SL_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for Windows Phone 7.0
 set WP_REFERENCE=
@@ -276,7 +276,7 @@ set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP70_PATH%\System.dll"
 set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP70_PATH%\System.Net.dll"
 set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP70_PATH%\System.Windows.dll"
 set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP70_PATH%\System.Runtime.Serialization.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -out:dist\WindowsPhone\Hprose.Client.dll -define:WINDOWS_PHONE;WP70;ClientOnly -filealign:512 -target:library -noconfig -nowarn:0444 -nostdlib+ -optimize+ -debug- %WP_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -keyfile:HproseKeys.snk -out:dist\WindowsPhone\Hprose.Client.dll -define:WINDOWS_PHONE;WP70;ClientOnly -filealign:512 -target:library -noconfig -nowarn:0444 -nostdlib+ -optimize+ -debug- %WP_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for Windows Phone 7.1
 set WP_REFERENCE=
@@ -286,7 +286,7 @@ set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP71_PATH%\System.dll"
 set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP71_PATH%\System.Net.dll"
 set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP71_PATH%\System.Windows.dll"
 set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP71_PATH%\System.Runtime.Serialization.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -out:dist\WindowsPhone71\Hprose.Client.dll -define:WINDOWS_PHONE;WP71;ClientOnly -filealign:512 -target:library -noconfig -nowarn:0444 -nostdlib+ -optimize+ -debug- %WP_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -keyfile:HproseKeys.snk -out:dist\WindowsPhone71\Hprose.Client.dll -define:WINDOWS_PHONE;WP71;ClientOnly -filealign:512 -target:library -noconfig -nowarn:0444 -nostdlib+ -optimize+ -debug- %WP_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for Windows Phone 8.0
 set WP_REFERENCE=
@@ -296,7 +296,7 @@ set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP80_PATH%\System.dll"
 set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP80_PATH%\System.Net.dll"
 set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP80_PATH%\System.Windows.dll"
 set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP80_PATH%\System.Runtime.Serialization.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -out:dist\WindowsPhone8\Hprose.Client.dll -define:WINDOWS_PHONE;WP80;ClientOnly -filealign:512 -target:library -noconfig -nowarn:0444 -nostdlib+ -optimize+ -debug- %WP_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\WindowsPhone8\Hprose.Client.dll -define:WINDOWS_PHONE;WP80;ClientOnly -filealign:512 -target:library -noconfig -nowarn:0444 -nostdlib+ -optimize+ -debug- %WP_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET Compact Framework 1.0
 set CF_REFERENCE=
@@ -310,7 +310,7 @@ set CF_REFERENCE=
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v2.0\WindowsCE\mscorlib.dll"
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v2.0\WindowsCE\System.dll"
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v2.0\WindowsCE\System.Windows.Forms.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\Csc.exe -out:dist\CF2.0\Hprose.Client.dll -define:Smartphone;dotNETCF20;ClientOnly -noconfig -nostdlib -filealign:512 -target:library -optimize+ -debug- %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\Csc.exe -keyfile:HproseKeys.snk -out:dist\CF2.0\Hprose.Client.dll -define:Smartphone;dotNETCF20;ClientOnly -noconfig -nostdlib -filealign:512 -target:library -optimize+ -debug- %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET Compact Framework 3.5
 set CF_REFERENCE=
@@ -318,27 +318,27 @@ set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v3.5\WindowsCE\mscorlib.dl
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v3.5\WindowsCE\System.dll"
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v3.5\WindowsCE\System.Core.dll"
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v3.5\WindowsCE\System.Windows.Forms.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -out:dist\CF3.5\Hprose.Client.dll -define:Smartphone;dotNETCF35;ClientOnly -noconfig -nostdlib -filealign:512 -target:library -optimize+ -debug- %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -keyfile:HproseKeys.snk -out:dist\CF3.5\Hprose.Client.dll -define:Smartphone;dotNETCF35;ClientOnly -noconfig -nostdlib -filealign:512 -target:library -optimize+ -debug- %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for mono 1.0
-call "%MONO_PATH%\mcs" -out:dist\Mono\Hprose.Client.dll -define:dotNET11;MONO;ClientOnly -noconfig -target:library -optimize+ -debug- -reference:System,System.Windows.Forms %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
-call "%MONO_PATH%\mcs" -out:dist\Mono\Hprose.dll -define:dotNET11;MONO -noconfig -target:library -optimize+ -debug- -reference:System,System.Web,System.Windows.Forms %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+call "%MONO_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Mono\Hprose.Client.dll -define:dotNET11;MONO;ClientOnly -noconfig -target:library -optimize+ -debug- -reference:System,System.Windows.Forms %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+call "%MONO_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Mono\Hprose.dll -define:dotNET11;MONO -noconfig -target:library -optimize+ -debug- -reference:System,System.Web,System.Windows.Forms %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for mono 2.0
-call "%MONO_PATH%\gmcs" -out:dist\Mono2\Hprose.Client.dll -sdk:2 -define:dotNET2;MONO;ClientOnly -noconfig -target:library -optimize+ -debug- -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
-call "%MONO_PATH%\gmcs" -out:dist\Mono2\Hprose.dll -sdk:2 -define:dotNET2;MONO -noconfig -target:library -optimize+ -debug- -reference:System,System.Web %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+call "%MONO_PATH%\gmcs" -keyfile:HproseKeys.snk -out:dist\Mono2\Hprose.Client.dll -sdk:2 -define:dotNET2;MONO;ClientOnly -noconfig -target:library -optimize+ -debug- -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+call "%MONO_PATH%\gmcs" -keyfile:HproseKeys.snk -out:dist\Mono2\Hprose.dll -sdk:2 -define:dotNET2;MONO -noconfig -target:library -optimize+ -debug- -reference:System,System.Web %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for mono 4.0
-call "%MONO_PATH%\dmcs" -out:dist\Mono4\Hprose.Client.dll -sdk:4 -define:dotNET4;MONO;ClientOnly -noconfig -target:library -optimize+ -debug- -reference:System,System.Core,System.Runtime.Serialization,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
-call "%MONO_PATH%\dmcs" -out:dist\Mono4\Hprose.dll -sdk:4 -define:dotNET4;MONO -noconfig -target:library -optimize+ -debug- -reference:System,System.Core,System.Runtime.Serialization,System.Web,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
+call "%MONO_PATH%\dmcs" -keyfile:HproseKeys.snk -out:dist\Mono4\Hprose.Client.dll -sdk:4 -define:dotNET4;MONO;ClientOnly -noconfig -target:library -optimize+ -debug- -reference:System,System.Core,System.Runtime.Serialization,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
+call "%MONO_PATH%\dmcs" -keyfile:HproseKeys.snk -out:dist\Mono4\Hprose.dll -sdk:4 -define:dotNET4;MONO -noconfig -target:library -optimize+ -debug- -reference:System,System.Core,System.Runtime.Serialization,System.Web,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for mono 4.5
-call "%MONO_PATH%\dmcs" -out:dist\Mono4.5\Hprose.Client.dll -sdk:4.5 -define:dotNET4;dotNET45;MONO;ClientOnly -noconfig -target:library -optimize+ -debug- -reference:System,System.Core,System.Runtime.Serialization,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
-call "%MONO_PATH%\dmcs" -out:dist\Mono4.5\Hprose.dll -sdk:4.5 -define:dotNET4;dotNET45;MONO -noconfig -target:library -optimize+ -debug- -reference:System,System.Core,System.Runtime.Serialization,System.Web,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
+call "%MONO_PATH%\dmcs" -keyfile:HproseKeys.snk -out:dist\Mono4.5\Hprose.Client.dll -sdk:4.5 -define:dotNET4;dotNET45;MONO;ClientOnly -noconfig -target:library -optimize+ -debug- -reference:System,System.Core,System.Runtime.Serialization,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
+call "%MONO_PATH%\dmcs" -keyfile:HproseKeys.snk -out:dist\Mono4.5\Hprose.dll -sdk:4.5 -define:dotNET4;dotNET45;MONO -noconfig -target:library -optimize+ -debug- -reference:System,System.Core,System.Runtime.Serialization,System.Web,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for Unity
-call "%UNITY_PATH%\gmcs" -out:dist\Unity\Hprose.Client.dll -sdk:2 -define:dotNET2;MONO;Unity;ClientProfile;ClientOnly -noconfig -target:library -optimize+ -debug- -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
-call "%UNITY_PATH%\gmcs" -out:dist\Unity\Hprose.dll -sdk:2 -define:dotNET2;MONO;Unity;ClientProfile -noconfig -target:library -optimize+ -debug- -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+call "%UNITY_PATH%\gmcs" -keyfile:HproseKeys.snk -out:dist\Unity\Hprose.Client.dll -sdk:2 -define:dotNET2;MONO;Unity;ClientProfile;ClientOnly -noconfig -target:library -optimize+ -debug- -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+call "%UNITY_PATH%\gmcs" -keyfile:HproseKeys.snk -out:dist\Unity\Hprose.dll -sdk:2 -define:dotNET2;MONO;Unity;ClientProfile -noconfig -target:library -optimize+ -debug- -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 set NUMERICS_SRC=
 set HPROSE_SRC=

@@ -13,7 +13,7 @@
  *                                                        *
  * hprose reader class for C#.                            *
  *                                                        *
- * LastModified: Feb 18, 2014                             *
+ * LastModified: Feb 20, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -429,7 +429,7 @@ namespace Hprose.IO {
         private MemoryStream ReadCharsAsStream() {
             int count = ReadInt(HproseTags.TagQuote);
             // here count is capacity, not the real size
-            MemoryStream ms = new MemoryStream(count << 1);
+            MemoryStream ms = new MemoryStream(count * 3);
             for (int i = 0; i < count; i++) {
                 int c = stream.ReadByte();
                 switch (c >> 4) {
@@ -494,24 +494,15 @@ namespace Hprose.IO {
 
         private MemoryStream ReadBytesAsStream() {
             int len = ReadInt(HproseTags.TagQuote);
-            int size = 0;
-            MemoryStream ms = new MemoryStream(len);
-            byte[] buffer;
-            if (len > 4096) {
-                buffer = new byte[4096];
-                for (; len > 4096; len -= size) {
-                    size = stream.Read(buffer, 0, 4096);
-                    ms.Write(buffer, 0, size);
-                }
+            int off = 0;
+            byte[] b = new byte[len];
+            while (len > 0) {
+                int size = stream.Read(b, off, len);
+                off += size;
+                len -= size;
             }
-            else {
-                buffer = new byte[len];
-            }
-            len = stream.Read(buffer, 0, len);
-            ms.Write(buffer, 0, len);
-            buffer = null;
+            MemoryStream ms = new MemoryStream(b, 0, len, true);
             stream.ReadByte();
-            ms.Position = 0;
             refer.Set(ms);
             return ms;
         }

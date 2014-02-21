@@ -19,6 +19,9 @@
 \**********************************************************/
 using System;
 using System.IO;
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+using System.Net;
+#endif
 using System.Text;
 using System.Threading;
 using Hprose.IO;
@@ -29,6 +32,11 @@ using Hprose.Reflection;
 
 namespace Hprose.Client {
     public abstract class HproseClient : HproseInvoker {
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+        static HproseClient() {
+            ServicePointManager.DefaultConnectionLimit = Int32.MaxValue;
+        }
+#endif
         private static readonly object[] nullArgs = new object[0];
         public event HproseErrorEvent OnError = null;
         private static SynchronizationContext syncContext = SynchronizationContext.Current;
