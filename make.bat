@@ -120,6 +120,7 @@ set HPROSE_SRC=%HPROSE_SRC% src\Hprose\IO\HproseWriter.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Client\CookieManager.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Client\HproseClient.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Client\HproseHttpClient.cs
+set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Client\HproseTcpClient.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Server\HproseService.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Server\HproseServiceEvent.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Server\HproseHttpMethods.cs

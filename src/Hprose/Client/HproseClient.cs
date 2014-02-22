@@ -13,11 +13,16 @@
  *                                                        *
  * hprose client class for C#.                            *
  *                                                        *
- * LastModified: Feb 22, 2014                             *
+ * LastModified: Feb 23, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 using System;
+#if (dotNET10 || dotNET11 || dotNETCF10)
+using System.Collections;
+#else
+using System.Collections.Generic;
+#endif
 using System.IO;
 #if !(SILVERLIGHT || WINDOWS_PHONE || Core)
 using System.Net;
@@ -32,11 +37,6 @@ using Hprose.Reflection;
 
 namespace Hprose.Client {
     public abstract class HproseClient : HproseInvoker {
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
-        static HproseClient() {
-            ServicePointManager.DefaultConnectionLimit = Int32.MaxValue;
-        }
-#endif
         private static readonly object[] nullArgs = new object[0];
         public event HproseErrorEvent OnError = null;
         private static SynchronizationContext syncContext = SynchronizationContext.Current;
@@ -193,6 +193,46 @@ namespace Hprose.Client {
 #endif
         private HproseMode mode;
         private IHproseFilter filter;
+        protected string uri = null;
+
+        public delegate HproseClient HproseClientCreator(string uri, HproseMode mode);
+#if (dotNET10 || dotNET11 || dotNETCF10)
+        private static Hashtable clientFactories = new Hashtable();
+#else
+        private static Dictionary<string, HproseClientCreator> clientFactories = new Dictionary<string, HproseClientCreator>();
+#endif
+        static HproseClient() {
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+            ServicePointManager.DefaultConnectionLimit = Int32.MaxValue;
+            RegisterClientFactory("tcp", new HproseClientCreator(HproseTcpClient.Create));
+            RegisterClientFactory("tcp4", new HproseClientCreator(HproseTcpClient.Create));
+            RegisterClientFactory("tcp6", new HproseClientCreator(HproseTcpClient.Create));
+#endif
+            RegisterClientFactory("http", new HproseClientCreator(HproseHttpClient.Create));
+            RegisterClientFactory("https", new HproseClientCreator(HproseHttpClient.Create));
+        }
+
+        public static HproseClient Create(string uri) {
+            return HproseClient.Create(uri, HproseMode.MemberMode);
+        }
+
+        public static HproseClient Create(string uri, HproseMode mode) {
+            Uri u = new Uri(uri);
+#if (dotNET10 || dotNET11 || dotNETCF10)
+            HproseClientCreator creator = (HproseClientCreator)clientFactories[u.Scheme];
+#else
+            HproseClientCreator creator = null;
+            clientFactories.TryGetValue(u.Scheme, out creator);
+#endif
+            if (creator != null) {
+                return creator(uri, mode);
+            }
+            throw new HproseException("The " + u.Scheme + " client isn't implemented.");
+        }
+
+        public static void RegisterClientFactory(string scheme, HproseClientCreator creator) {
+            clientFactories[scheme.ToLower()] = creator;
+        }
 
         protected HproseClient()
             : this(null, HproseMode.MemberMode) {
@@ -222,7 +262,9 @@ namespace Hprose.Client {
                 filter = value;
             }
         }
-        public abstract void UseService(string uri);
+        public virtual void UseService(string uri) {
+            this.uri = uri;
+        }
 
 #if !(PocketPC || Smartphone || WindowsCE || WINDOWS_PHONE || Core)
         public object UseService(Type type) {
@@ -490,8 +532,9 @@ namespace Hprose.Client {
 
         private void DoOutput(Stream ostream, string functionName, object[] arguments, bool byRef, bool simple) {
             if (filter != null) ostream = filter.OutputFilter(ostream);
-            HproseWriter hproseWriter = new HproseWriter(ostream, mode, simple);
-            ostream.WriteByte(HproseTags.TagCall);
+            MemoryStream stream = new MemoryStream(4096);
+            HproseWriter hproseWriter = new HproseWriter(stream, mode, simple);
+            stream.WriteByte(HproseTags.TagCall);
             hproseWriter.WriteString(functionName);
             if ((arguments != null) && (arguments.Length > 0 || byRef)) {
                 hproseWriter.Reset();
@@ -500,7 +543,8 @@ namespace Hprose.Client {
                     hproseWriter.WriteBoolean(true);
                 }
             }
-            ostream.WriteByte(HproseTags.TagEnd);
+            stream.WriteByte(HproseTags.TagEnd);
+            stream.WriteTo(ostream);
         }
 
 #if !(dotNET10 || dotNET11 || dotNETCF10)

@@ -13,7 +13,7 @@
  *                                                        *
  * hprose ClassManager for C#.                            *
  *                                                        *
- * LastModified: May 16, 2010                             *
+ * LastModified: Feb 23, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -32,19 +32,18 @@ namespace Hprose.IO {
         private static readonly Dictionary<Type, string> classCache1 = new Dictionary<Type, string>();
         private static readonly Dictionary<string, Type> classCache2 = new Dictionary<string, Type>();
 #endif
+        private static readonly object syncRoot = new object();
         public static void Register(Type type, string alias) {
-            lock (((ICollection)classCache1).SyncRoot) {
+            lock (syncRoot) {
                 if (type != null) {
                     classCache1[type] = alias;
                 }
-            }
-            lock (((ICollection)classCache2).SyncRoot) {
                 classCache2[alias] = type;
             }
         }
 
         public static string GetClassAlias(Type type) {
-            lock (((ICollection)classCache1).SyncRoot) {
+            lock (syncRoot) {
 #if (dotNET10 || dotNET11 || dotNETCF10)
                 return (string)classCache1[type];
 #else
@@ -56,7 +55,7 @@ namespace Hprose.IO {
         }
 
         public static Type GetClass(string alias) {
-            lock (((ICollection)classCache2).SyncRoot) {
+            lock (syncRoot) {
 #if (dotNET10 || dotNET11 || dotNETCF10)
                 return (Type)classCache2[alias];
 #else
@@ -68,7 +67,7 @@ namespace Hprose.IO {
         }
 
         public static bool ContainsClass(string alias) {
-            lock (((ICollection)classCache2).SyncRoot) {
+            lock (syncRoot) {
                 return classCache2.ContainsKey(alias);
             }
         }

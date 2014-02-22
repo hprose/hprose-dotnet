@@ -32,7 +32,6 @@ namespace TestSerialize
         static void Main(string[] args)
         {
             DateTime start, end;
-            int n;
             ArrayList users = new ArrayList();
             User user1 = new User();
             user1.name = "李雷";

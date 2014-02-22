@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http client class for C#.                       *
  *                                                        *
- * LastModified: Jan 1, 2014                              *
+ * LastModified: Feb 23, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -30,6 +30,7 @@ using System.Net.Browser;
 #endif
 using System.Net;
 using Hprose.IO;
+using Hprose.Common;
 #if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETCF20 || SILVERLIGHT || WINDOWS_PHONE || Core)
 using System.Security.Cryptography.X509Certificates;
 #endif
@@ -57,7 +58,6 @@ namespace Hprose.Client {
             }
         }
 
-        private string url = null;
 #if !(dotNET10 || dotNET11 || dotNETCF10)
         private Dictionary<string, string> headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 #elif MONO
@@ -98,8 +98,13 @@ namespace Hprose.Client {
             : base(uri, mode) {
         }
 
-        public override void UseService(string uri) {
-            this.url = uri;
+        public static new HproseClient Create(string uri, HproseMode mode) {
+            Uri u = new Uri(uri);
+            if (u.Scheme != "http" &&
+                u.Scheme != "https") {
+                throw new HproseException("This client desn't support " + u.Scheme + " scheme.");
+            }
+            return new HproseHttpClient(uri, mode);
         }
 
         public void SetHeader(string name, string value) {
@@ -197,7 +202,7 @@ namespace Hprose.Client {
 #endif
 
         protected override object GetInvokeContext() {
-            Uri uri = new Uri(url);
+            Uri uri = new Uri(this.uri);
 #if !(SILVERLIGHT || WINDOWS_PHONE) || SL2
             HttpWebRequest request = WebRequest.Create(uri) as HttpWebRequest;
 #else
