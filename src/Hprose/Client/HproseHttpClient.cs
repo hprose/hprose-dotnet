@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http client class for C#.                       *
  *                                                        *
- * LastModified: Feb 23, 2014                             *
+ * LastModified: Feb 25, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -43,20 +43,19 @@ namespace Hprose.Client {
 #elif !SL2
         private static CookieContainer cookieContainer = new CookieContainer();
 #endif
-        private class HttpClientContext {
+        private class AsyncContext {
             internal HttpWebRequest request;
-            internal HttpWebResponse response;
+            internal HttpWebResponse response = null;
+            internal MemoryStream data;
+            internal AsyncCallback callback;
 #if !Core
             internal Timer timer;
 #endif
-            internal HttpClientContext(HttpWebRequest request, HttpWebResponse response) {
+            internal AsyncContext(HttpWebRequest request) {
                 this.request = request;
-                this.response = response;
-#if !Core
-                this.timer = null;
-#endif
             }
         }
+
 
 #if !(dotNET10 || dotNET11 || dotNETCF10)
         private Dictionary<string, string> headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -71,9 +70,10 @@ namespace Hprose.Client {
 #if !(SILVERLIGHT || WINDOWS_PHONE)
         private ICredentials credentials = null;
 #if !Core
-        private bool keepAlive = false;
+        private bool keepAlive = true;
         private int keepAliveTimeout = 300;
         private IWebProxy proxy = null;
+        private string encoding = null;
 #if !dotNETCF10
         private string connectionGroupName = null;
 #if !(dotNET10 || dotNET11 || dotNETCF20)
@@ -178,6 +178,15 @@ namespace Hprose.Client {
             }
         }
 
+        public string AcceptEncoding {
+            get {
+                return encoding;
+            }
+            set {
+                encoding = value;
+            }
+        }
+
 #if !dotNETCF10
         public string ConnectionGroupName {
             get {
@@ -201,19 +210,24 @@ namespace Hprose.Client {
 #endif
 #endif
 
-        protected override object GetInvokeContext() {
+        private HttpWebRequest GetRequest() {
             Uri uri = new Uri(this.uri);
 #if !(SILVERLIGHT || WINDOWS_PHONE) || SL2
             HttpWebRequest request = WebRequest.Create(uri) as HttpWebRequest;
 #else
             HttpWebRequest request = WebRequestCreator.ClientHttp.Create(uri) as HttpWebRequest;
 #endif
+            request.Method = "POST";
+            request.ContentType = "application/hprose";
 #if !(SILVERLIGHT || WINDOWS_PHONE)
             request.Credentials = credentials;
 #if !Core
             request.ServicePoint.ConnectionLimit = Int32.MaxValue;
             request.Timeout = timeout;
             request.SendChunked = false;
+            if (encoding != null) {
+                request.Headers.Set("Accept-Encoding", encoding);
+            }
 #if !(dotNET10 || dotNETCF10)
             request.ReadWriteTimeout = timeout;
 #endif
@@ -252,10 +266,11 @@ namespace Hprose.Client {
 #elif !SL2
             request.CookieContainer = cookieContainer;
 #endif
-            return new HttpClientContext(request, null);
+            return request;
         }
 
-        protected override void SendData(Stream ostream, object context, bool success) {
+        private void Send(MemoryStream data, Stream ostream) {
+            data.WriteTo(ostream);
             ostream.Flush();
 #if (dotNET10 || dotNET11 || dotNETCF10 || dotNETCF20)
             ostream.Close();
@@ -264,50 +279,13 @@ namespace Hprose.Client {
 #endif
         }
 
-        protected override void EndInvoke(Stream istream, object context, bool success) {
-            HttpClientContext clientContext = (HttpClientContext)context;
-#if !Core
-            if (clientContext.timer != null) {
-                clientContext.timer.Dispose();
-                clientContext.timer = null;
-            }
-#endif
-#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETCF20)
-            istream.Close();
-#else
-            istream.Dispose();
-#endif
-#if dotNET45
-            clientContext.response.Dispose();
-#else
-            clientContext.response.Close();
-#endif
-        }
-
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
-        protected override Stream GetOutputStream(object context) {
-            HttpWebRequest request = ((HttpClientContext)context).request;
-            request.Method = "POST";
-            request.ContentType = "application/hprose";
-            Stream ostream = request.GetRequestStream();
-#if !(PocketPC || Smartphone || WindowsCE)
-            ostream = new BufferedStream(ostream);
-#endif
-            return ostream;
-        }
-
-        protected override Stream GetInputStream(object context) {
-            HttpClientContext httpClientContent = (HttpClientContext)context;
-            HttpWebRequest request = httpClientContent.request;
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+        private MemoryStream Receive(HttpWebRequest request, HttpWebResponse response) {
 #if (PocketPC || Smartphone || WindowsCE)
             cookieManager.SetCookie(response.Headers.GetValues("Set-Cookie"), request.RequestUri.Host);
             cookieManager.SetCookie(response.Headers.GetValues("Set-Cookie2"), request.RequestUri.Host);
 #endif
             Stream istream = response.GetResponseStream();
-#if !(PocketPC || Smartphone || WindowsCE)
-            istream = new BufferedStream(istream);
-#endif
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
             string contentEncoding = response.ContentEncoding.ToLower();
             if (contentEncoding.IndexOf("deflate") > -1) {
                 istream = new DeflateStream(istream, CompressionMode.Decompress);
@@ -315,13 +293,42 @@ namespace Hprose.Client {
             else if (contentEncoding.IndexOf("gzip") > -1) {
                 istream = new GZipStream(istream, CompressionMode.Decompress);
             }
-            httpClientContent.response = response;
-            return istream;
+#endif
+            int len = (int)response.ContentLength;
+            MemoryStream data = (len > 0) ? new MemoryStream(len) : new MemoryStream();
+            len = (len > 81920 || len < 0) ? 81920 : len;
+            byte[] buffer = new byte[len];
+            for (;;) {
+                int size = istream.Read(buffer, 0, len);
+                if (size == 0) break;
+                data.Write(buffer, 0, size);
+            }
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETCF20)
+            istream.Close();
+#else
+            istream.Dispose();
+#endif
+#if dotNET45
+            response.Dispose();
+#else
+            response.Close();
+#endif
+            return data;
+        }
+
+        // SyncInvoke
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+        protected override MemoryStream SendAndReceive(MemoryStream data) {
+            HttpWebRequest request = GetRequest();
+            Send(data, request.GetRequestStream());
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            return Receive(request, response);
         }
 #endif
+
 #if !Core
         protected void TimeoutHandler(object state) {
-            HttpClientContext context = (HttpClientContext)state;
+            AsyncContext context = (AsyncContext)state;
             if (context.response == null) {
                 context.request.Abort();
             }
@@ -332,56 +339,40 @@ namespace Hprose.Client {
             context.timer = null;
         }
 #endif
-        protected override IAsyncResult BeginGetOutputStream(AsyncCallback callback, object context) {
-            HttpWebRequest request = ((HttpClientContext)context).request;
-            request.Method = "POST";
-            request.ContentType = "application/hprose";
+        // AsyncInvoke
+        protected override IAsyncResult BeginSendAndReceive(MemoryStream data, AsyncCallback callback) {
+            HttpWebRequest request = GetRequest();
+            AsyncContext context = new AsyncContext(request);
 #if !Core
-            ((HttpClientContext)context).timer = new Timer(new TimerCallback(TimeoutHandler),
-                                                           context,
-                                                           timeout,
-                                                           0);
+            context.timer = new Timer(new TimerCallback(TimeoutHandler),
+                                      context,
+                                      timeout,
+                                     0);
 #endif
-            return request.BeginGetRequestStream(callback, context);
+            context.data = data;
+            context.callback = callback;
+            return request.BeginGetRequestStream(new AsyncCallback(EndSend), context);
         }
 
-        protected override Stream EndGetOutputStream(IAsyncResult asyncResult) {
-            HttpClientContext context = (HttpClientContext)asyncResult.AsyncState;
-            Stream ostream = context.request.EndGetRequestStream(asyncResult);
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core)
-            ostream = new BufferedStream(ostream);
-#endif
-            return ostream;
+        private void EndSend(IAsyncResult asyncResult) {
+            AsyncContext context = (AsyncContext)asyncResult.AsyncState;
+            Send(context.data, context.request.EndGetRequestStream(asyncResult));
+            context.request.BeginGetResponse(context.callback, context);
         }
 
-        protected override IAsyncResult BeginGetInputStream(AsyncCallback callback, object context) {
-            HttpClientContext httpClientContent = (HttpClientContext)context;
-            return httpClientContent.request.BeginGetResponse(callback, context);
-        }
-
-        protected override Stream EndGetInputStream(IAsyncResult asyncResult) {
-            HttpClientContext httpClientContent = (HttpClientContext)asyncResult.AsyncState;
-            HttpWebRequest request = httpClientContent.request;
+        protected override MemoryStream EndSendAndReceive(IAsyncResult asyncResult) {
+            AsyncContext content = (AsyncContext)asyncResult.AsyncState;
+            HttpWebRequest request = content.request;
             HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult);
-#if (PocketPC || Smartphone || WindowsCE)
-            cookieManager.SetCookie(response.Headers.GetValues("Set-Cookie"), request.RequestUri.Host);
-            cookieManager.SetCookie(response.Headers.GetValues("Set-Cookie2"), request.RequestUri.Host);
-#endif
-            Stream istream = response.GetResponseStream();
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core)
-            istream = new BufferedStream(istream);
-#endif
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
-            string contentEncoding = response.ContentEncoding.ToLower();
-            if (contentEncoding.IndexOf("deflate") > -1) {
-                istream = new DeflateStream(istream, CompressionMode.Decompress);
-            }
-            else if (contentEncoding.IndexOf("gzip") > -1) {
-                istream = new GZipStream(istream, CompressionMode.Decompress);
+            content.response = response;
+            MemoryStream data = Receive(request, response);
+#if !Core
+            if (content.timer != null) {
+                content.timer.Dispose();
+                content.timer = null;
             }
 #endif
-            httpClientContent.response = response;
-            return istream;
+            return data;
         }
     }
 }

@@ -13,7 +13,7 @@
  *                                                        *
  * hprose filter interface for C#.                        *
  *                                                        *
- * LastModified: Nov 27, 2012                             *
+ * LastModified: Feb 24, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -21,7 +21,7 @@ using System.IO;
 
 namespace Hprose.Common {
     public interface IHproseFilter {
-        Stream InputFilter(Stream inStream);
-        Stream OutputFilter(Stream outStream);
+        MemoryStream InputFilter(MemoryStream inStream);
+        MemoryStream OutputFilter(MemoryStream outStream);
     }
 }

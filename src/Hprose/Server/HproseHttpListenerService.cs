@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http listener service class for C#.             *
  *                                                        *
- * LastModified: Feb 18, 2014                             *
+ * LastModified: Feb 24, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -34,10 +34,16 @@ namespace Hprose.Server {
         private bool getEnabled = true;
         private bool compressionEnabled = false;
         public event SendHeaderEvent OnSendHeader = null;
+
+        internal void SetSendHeaderEvent(SendHeaderEvent e) {
+            OnSendHeader = e;
+        }
+
         [ThreadStatic]
         private static HttpListenerContext currentContext;
 
-        protected override object[] FixArguments(Type[] argumentTypes, object[] arguments, int count) {
+        protected override object[] FixArguments(Type[] argumentTypes, object[] arguments, int count, object context) {
+            HttpListenerContext currentContext = (HttpListenerContext)context;
             if (argumentTypes.Length != count) {
                 object[] args = new object[argumentTypes.Length];
                 System.Array.Copy(arguments, args, count);
@@ -110,8 +116,8 @@ namespace Hprose.Server {
             }
         }
 
-        private Stream GetOutputStream() {
-            Stream ostream = new BufferedStream(currentContext.Response.OutputStream);
+        private Stream GetOutputStream(HttpListenerContext currentContext) {
+            Stream ostream = currentContext.Response.OutputStream;
             if (compressionEnabled) {
                 string acceptEncoding = currentContext.Request.Headers["Accept-Encoding"];
                 if (acceptEncoding != null) {
@@ -127,14 +133,101 @@ namespace Hprose.Server {
             return ostream;
         }
 
-        private Stream GetInputStream() {
-            Stream istream = new BufferedStream(currentContext.Request.InputStream);
-            return istream;
+        private class NonBlockingWriteContext {
+            public HttpListenerContext currentContext;
+            public Stream ostream;
         }
 
-        private void SendHeader() {
+        private void NonBlockingWriteCallback(IAsyncResult asyncResult) {
+            NonBlockingWriteContext context = (NonBlockingWriteContext)asyncResult.AsyncState;
+            try {
+                context.ostream.EndWrite(asyncResult);
+            }
+            catch (Exception e) {
+                FireErrorEvent(e);
+            }
+            finally {
+                if (context.ostream.CanWrite) {
+                    context.ostream.Close();
+                    context.currentContext.Response.Close();
+                }
+            }
+        }
+
+        private class NonBlockingReadContext {
+            public HttpListenerContext currentContext;
+            public HproseHttpListenerMethods methods;
+            public Stream istream;
+            public MemoryStream data;
+            public int bufferlength;
+            public byte[] buffer;
+        }
+
+        private void NonBlockingWrite(NonBlockingReadContext context) {
+            currentContext = context.currentContext;
+            NonBlockingWriteContext writeContext = new NonBlockingWriteContext();
+            writeContext.currentContext = context.currentContext;
+            try {
+                MemoryStream data = Handle(context.data, context.methods, context.currentContext);
+                writeContext.ostream = GetOutputStream(context.currentContext);
+                writeContext.ostream.BeginWrite(data.GetBuffer(), 0, (int)data.Length,
+                        new AsyncCallback(NonBlockingWriteCallback), writeContext);
+            }
+            catch (Exception e) {
+                FireErrorEvent(e);
+                if (writeContext.ostream != null) {
+                    writeContext.ostream.Close();
+                }
+                context.currentContext.Response.Close();
+                return;
+            }
+            finally {
+                currentContext = null;
+            }
+        }
+
+        private void NonBlockingReadCallback(IAsyncResult asyncResult) {
+            NonBlockingReadContext context = (NonBlockingReadContext)asyncResult.AsyncState;
+            Stream istream = context.istream;
+            try {
+                if (istream.CanRead) {
+                    int n = istream.EndRead(asyncResult);
+                    if (n > 0) {
+                        context.data.Write(context.buffer, 0, n);
+                        istream.BeginRead(context.buffer, 0, context.bufferlength,
+                                new AsyncCallback(NonBlockingReadCallback), context);
+                        return;
+                    }
+                }
+                else {
+                    return;
+                }
+            }
+            catch (Exception e) {
+                FireErrorEvent(e);
+                istream.Close();
+                context.currentContext.Response.Close();
+                return;
+            }
+            istream.Close();
+            NonBlockingWrite(context);
+        }
+
+        private void NonBlockingHandle(HttpListenerContext currentContext, HproseHttpListenerMethods methods) {
+            NonBlockingReadContext context = new NonBlockingReadContext();
+            context.currentContext = currentContext;
+            context.methods = methods;
+            context.istream = currentContext.Request.InputStream;
+            int len = (int)currentContext.Request.ContentLength64;
+            context.data = (len > 0) ? new MemoryStream(len) : new MemoryStream();
+            context.bufferlength = (len > 81920 || len < 0) ? 81920 : len;
+            context.buffer = new byte[context.bufferlength];
+            context.istream.BeginRead(context.buffer, 0, context.bufferlength, new AsyncCallback(NonBlockingReadCallback), context);
+        }
+
+        private void SendHeader(HttpListenerContext currentContext) {
             if (OnSendHeader != null) {
-                OnSendHeader();
+                OnSendHeader(currentContext);
             }
             currentContext.Response.ContentType = "text/plain";
             if (p3pEnabled) {
@@ -172,27 +265,22 @@ namespace Hprose.Server {
         }
 
         public void Handle(HttpListenerContext context, HproseHttpListenerMethods methods) {
-            currentContext = context;
-            try {
-                SendHeader();
-                string method = currentContext.Request.HttpMethod;
-                Stream istream = null, ostream = null;
-                if ((method == "GET") && getEnabled) {
-                    ostream = GetOutputStream();
-                    DoFunctionList(ostream, methods);
-                }
-                else if (method == "POST") {
-                    istream = GetInputStream();
-                    ostream = GetOutputStream();
-                    Handle(istream, ostream, methods);
-                }
-                else {
-                    currentContext.Response.StatusCode = 403;
-                }
-                currentContext.Response.Close();
+            SendHeader(context);
+            string method = context.Request.HttpMethod;
+            if ((method == "GET") && getEnabled) {
+                MemoryStream data = DoFunctionList(methods);
+                NonBlockingWriteContext writeContext = new NonBlockingWriteContext();
+                writeContext.currentContext = context;
+                writeContext.ostream = GetOutputStream(context);
+                writeContext.ostream.BeginWrite(data.GetBuffer(), 0, (int)data.Length,
+                    new AsyncCallback(NonBlockingWriteCallback), writeContext);
             }
-            finally {
-                currentContext = null;
+            else if (method == "POST") {
+                NonBlockingHandle(context, methods);
+            }
+            else {
+                context.Response.StatusCode = 403;
+                context.Response.Close();
             }
         }
     }

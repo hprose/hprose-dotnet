@@ -13,7 +13,7 @@
  *                                                        *
  * hprose tcp client class for C#.                        *
  *                                                        *
- * LastModified: Feb 23, 2014                             *
+ * LastModified: Feb 25, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -31,6 +31,112 @@ using Hprose.Common;
 
 namespace Hprose.Client {
     public class HproseTcpClient : HproseClient, IDisposable {
+
+        public HproseTcpClient()
+            : base() {
+            InitHproseTcpClient();
+        }
+
+        public HproseTcpClient(string uri)
+            : base(uri) {
+            InitHproseTcpClient();
+        }
+
+        public HproseTcpClient(HproseMode mode)
+            : base(mode) {
+            InitHproseTcpClient();
+        }
+
+        public HproseTcpClient(string uri, HproseMode mode)
+            : base(uri, mode) {
+            InitHproseTcpClient();
+        }
+
+        public static new HproseClient Create(string uri, HproseMode mode) {
+            Uri u = new Uri(uri);
+            if (u.Scheme != "tcp" &&
+                u.Scheme != "tcp4" &&
+                u.Scheme != "tcp6") {
+                throw new HproseException("This client desn't support " + u.Scheme + " scheme.");
+            }
+            return new HproseTcpClient(uri, mode);
+        }
+
+        public override void UseService(string uri) {
+            if (this.uri != null) {
+                pool.Close(this.uri);
+            }
+            base.UseService(uri);
+        }
+
+        public void Dispose() {
+            if (this.uri != null) {
+                pool.Close(this.uri);
+                this.uri = null;
+            }
+        }
+
+        public void Close() {
+            Dispose();
+        }
+
+        private LingerOption m_lingerState;
+        public LingerOption LingerState {
+            get {
+                return m_lingerState;
+            }
+            set {
+                m_lingerState = value;
+            }
+        }
+        private bool m_noDelay;
+        public bool NoDelay {
+            get {
+                return m_noDelay;
+            }
+            set {
+                m_noDelay = value;
+            }
+        }
+        private int m_receiveBufferSize;
+        public int ReceiveBufferSize {
+            get {
+                return m_receiveBufferSize;
+            }
+            set {
+                m_receiveBufferSize = value;
+            }
+        }
+        private int m_sendBufferSize;
+        public int SendBufferSize {
+            get {
+                return m_sendBufferSize;
+            }
+            set {
+                m_sendBufferSize = value;
+            }
+        }
+#if !dotNETCF10
+        private int m_receiveTimeout;
+        public int ReceiveTimeout {
+            get {
+                return m_receiveTimeout;
+            }
+            set {
+                m_receiveTimeout = value;
+            }
+        }
+        private int m_sendTimeout;
+        public int SendTimeout {
+            get {
+                return m_sendTimeout;
+            }
+            set {
+                m_sendTimeout = value;
+            }
+        }
+#endif
+
         internal struct TcpConn {
             public TcpClient client;
             public Stream stream;
@@ -50,7 +156,11 @@ namespace Hprose.Client {
             public void Set(TcpClient client) {
                 if (client != null) {
                     this.conn.client = client;
+#if (PocketPC || Smartphone || WindowsCE)
                     this.conn.stream = client.GetStream();
+#else
+                    this.conn.stream = new BufferedStream(client.GetStream());
+#endif
                 }
             }
             public void Close() {
@@ -143,134 +253,85 @@ namespace Hprose.Client {
         }
 
         private readonly TcpConnPool pool = new TcpConnPool();
-        private delegate Stream GetStream(object context);
-        private GetStream getOutputStream = null;
-        private GetStream getInputStream = null;
 
-        public HproseTcpClient()
-            : base() {
-            InitGetStream();
+        private delegate MemoryStream SendAndReceiveDelegate(MemoryStream data);
+        private SendAndReceiveDelegate sendAndReceive;
+
+        private void InitHproseTcpClient() {
+            sendAndReceive = new SendAndReceiveDelegate(SendAndReceive);
+            m_lingerState = new LingerOption(false, 0);
+            m_noDelay = false;
+            m_receiveBufferSize = 8192;
+            m_sendBufferSize = 8192;
+#if !dotNETCF10
+            m_receiveTimeout = 500;
+            m_sendTimeout = 500;
+#endif
         }
 
-        public HproseTcpClient(string uri)
-            : base(uri) {
-            InitGetStream();
-        }
-
-        public HproseTcpClient(HproseMode mode)
-            : base(mode) {
-            InitGetStream();
-        }
-
-        public HproseTcpClient(string uri, HproseMode mode)
-            : base(uri, mode) {
-            InitGetStream();
-        }
-
-        public static new HproseClient Create(string uri, HproseMode mode) {
+        private TcpClient CreateClient(string uri) {
             Uri u = new Uri(uri);
-            if (u.Scheme != "tcp" &&
-                u.Scheme != "tcp4" &&
-                u.Scheme != "tcp6") {
-                throw new HproseException("This client desn't support " + u.Scheme + " scheme.");
-            }
-            return new HproseTcpClient(uri, mode);
-        }
-
-        private void InitGetStream() {
-            getOutputStream = new GetStream(this.GetOutputStream);
-            getInputStream = new GetStream(this.GetInputStream);
-        }
-
-        public override void UseService(string uri) {
-            if (this.uri != null) {
-                pool.Close(this.uri);
-            }
-            base.UseService(uri);
-        }
-
-        public void Dispose() {
-            if (this.uri != null) {
-                pool.Close(this.uri);
-                this.uri = null;
-            }
-        }
-
-        public void Close() {
-            Dispose();
-        }
-
-        protected override object GetInvokeContext() {
-            return pool.Get(this.uri);
-        }
-
-        protected override void SendData(Stream ostream, object context, bool success) {
-            TcpConnEntry entry = context as TcpConnEntry;
-            if (success) {
-                try {
-                    ostream.Flush();
-                }
-                catch {
-                    entry.Close();
-                    pool.Free(entry);
-                    throw;
-                }
+#if (dotNET10 || dotNETCF10)
+            TcpClient client = new TcpClient(u.Host, u.Port);
+#else
+            TcpClient client;
+            if (u.Scheme == "tcp") {
+                client = new TcpClient(u.Host, u.Port);
             }
             else {
+                client = new TcpClient((u.Scheme == "tcp6") ?
+                                        AddressFamily.InterNetworkV6 :
+                                        AddressFamily.InterNetwork);
+                client.Connect(u.Host, u.Port);
+            }
+#endif
+            client.LingerState = m_lingerState;
+            client.NoDelay = m_noDelay;
+            client.ReceiveBufferSize = m_receiveBufferSize;
+            client.SendBufferSize = m_sendBufferSize;
+#if !dotNETCF10
+            client.ReceiveTimeout = m_receiveTimeout;
+            client.SendTimeout = m_sendTimeout;
+#endif
+            return client;
+        }
+
+        protected override MemoryStream SendAndReceive(MemoryStream data) {
+            TcpConnEntry entry = pool.Get(uri);
+            try {
+                if (entry.conn.client == null) {
+                    entry.Set(CreateClient(uri));
+                }
+                Stream stream = entry.conn.stream;
+                HproseHelper.WriteContentLength(stream, (int)data.Length);
+                data.WriteTo(stream);
+                stream.Flush();
+                int len = HproseHelper.ReadContentLength(stream);
+                int off = 0;
+                byte[] buf = new byte[len];
+                while (len > 0) {
+                    int size = stream.Read(buf, off, len);
+                    off += size;
+                    len -= size;
+                }
+                data = new MemoryStream(buf);
+            }
+            catch {
                 entry.Close();
                 pool.Free(entry);
-            }
-        }
-
-        protected override void EndInvoke(Stream istream, object context, bool success) {
-            TcpConnEntry entry = context as TcpConnEntry;
-            if (!success) {
-                entry.Close();
+                throw;
             }
             pool.Free(entry);
+            return data;
         }
 
-        protected override Stream GetOutputStream(object context) {
-            TcpConnEntry entry = context as TcpConnEntry;
-            if (entry.conn.client == null) {
-                Uri uri = new Uri(entry.uri);
-#if (dotNET10 || dotNETCF10)
-                TcpClient client = new TcpClient(uri.Host, uri.Port);
-#else
-                TcpClient client;
-                if (uri.Scheme == "tcp") {
-                    client = new TcpClient(uri.Host, uri.Port);
-                }
-                else {
-                    client = new TcpClient((uri.Scheme == "tcp6") ?
-                                            AddressFamily.InterNetworkV6 :
-                                            AddressFamily.InterNetwork);
-                    client.Connect(uri.Host, uri.Port);
-                }
-#endif
-                entry.Set(client);
-            }
-            return entry.conn.stream;
+        // AsyncInvoke
+        protected override IAsyncResult BeginSendAndReceive(MemoryStream data, AsyncCallback callback) {
+            return sendAndReceive.BeginInvoke(data, callback, null);
         }
 
-        protected override Stream GetInputStream(object context) {
-            return (context as TcpConnEntry).conn.stream;
-        }
-
-        protected override IAsyncResult BeginGetOutputStream(AsyncCallback callback, object context) {
-            return getOutputStream.BeginInvoke(context, callback, context);
-        }
-
-        protected override Stream EndGetOutputStream(IAsyncResult asyncResult) {
-            return getOutputStream.EndInvoke(asyncResult);
-        }
-
-        protected override IAsyncResult BeginGetInputStream(AsyncCallback callback, object context) {
-            return getInputStream.BeginInvoke(context, callback, context);
-        }
-
-        protected override Stream EndGetInputStream(IAsyncResult asyncResult) {
-            return getInputStream.EndInvoke(asyncResult);
+        protected override MemoryStream EndSendAndReceive(IAsyncResult asyncResult) {
+            return sendAndReceive.EndInvoke(asyncResult);
         }
     }
 }

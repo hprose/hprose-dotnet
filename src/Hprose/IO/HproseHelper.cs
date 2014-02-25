@@ -13,7 +13,7 @@
  *                                                        *
  * hprose helper class for C#.                            *
  *                                                        *
- * LastModified: Jan 3, 2013                              *
+ * LastModified: Feb 24, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -1261,20 +1261,30 @@ namespace Hprose.IO {
             return stackReader;
         }
 #endif
-        internal static String ReadWrongInfo(Stream istream, int tag) {
-            int len = 4095;
-            if (istream.CanSeek) {
-                len = (int)(istream.Length - istream.Position);
-            }
-            byte[] bytes = new byte[len + 1];
-            bytes[0] = (byte)tag;
-            int n = istream.Read(bytes, 1, len);
-#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETCF20)
-            istream.Close();
+        internal static String ReadWrongInfo(MemoryStream istream) {
+#if dotNET10 || dotNET11 || dotNETCF10
+            return new String(utf8Encoding.GetChars(istream.ToArray(), 0, (int)istream.Length));
 #else
-            istream.Dispose();
+            return utf8Encoding.GetString(istream.ToArray(), 0, (int)istream.Length);
 #endif
-            return new String(utf8Encoding.GetChars(bytes, 0, n + 1));
+        }
+
+        internal static void WriteContentLength(Stream stream, int n) {
+            byte[] buf = new byte[] {
+                (byte)((n >> 24) & 0xff),
+                (byte)((n >> 16) & 0xff),
+                (byte)((n >> 8) & 0xff),
+                (byte)(n & 0xff)
+            };
+            stream.Write(buf, 0, 4);
+        }
+
+        internal static int ReadContentLength(Stream stream) {
+            int n = stream.ReadByte();
+            n = n << 8 | stream.ReadByte();
+            n = n << 8 | stream.ReadByte();
+            n = n << 8 | stream.ReadByte();
+            return n;
         }
     }
 }

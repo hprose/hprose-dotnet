@@ -13,7 +13,7 @@
  *                                                        *
  * hprose client class for C#.                            *
  *                                                        *
- * LastModified: Feb 23, 2014                             *
+ * LastModified: Feb 25, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -61,12 +61,11 @@ namespace Hprose.Client {
             protected string functionName;
             protected object[] arguments;
             protected HproseErrorEvent errorCallback;
-            protected object result;
-            internal AsyncInvokeContextBase(HproseClient client, string functionName, object[] arguments, HproseErrorEvent errorCallback, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
+            public AsyncInvokeContextBase(HproseClient client, string functionName, object[] arguments, HproseErrorEvent errorCallback, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
                 this.client = client;
                 this.functionName = functionName;
                 this.arguments = arguments;
-                this.errorCallback = errorCallback;
+                this.errorCallback = (errorCallback == null) ? client.OnError : errorCallback;
                 this.returnType = returnType;
                 this.byRef = byRef;
                 this.resultMode = resultMode;
@@ -74,47 +73,45 @@ namespace Hprose.Client {
                 this.syncContext = HproseClient.SynchronizationContext;
             }
 
-            internal void GetOutputStream(IAsyncResult asyncResult) {
-                Stream ostream = null;
-                bool success = false;
+            public void Invoke() {
                 try {
-                    ostream = client.EndGetOutputStream(asyncResult);
-                    client.DoOutput(ostream, functionName, arguments, byRef, simple);
-                    success = true;
+                    client.BeginSendAndReceive(
+                        client.DoOutput(functionName, arguments, byRef, simple),
+                            new AsyncCallback(SendAndReceiveCallback));
                 }
                 catch (Exception e) {
-                    result = e;
-                    syncContext.Post(new SendOrPostCallback(DoCallback), null);
-                    return;
+                    DoError(e);
                 }
-                finally {
-                    if (ostream != null) {
-                        client.SendData(ostream, asyncResult.AsyncState, success);
-                    }
-                }
-                client.BeginGetInputStream(new AsyncCallback(GetInputStream), asyncResult.AsyncState);
             }
 
-            internal void GetInputStream(IAsyncResult asyncResult) {
-                bool success = false;
-                result = null;
-                Stream istream = null;
+            private void SendAndReceiveCallback(IAsyncResult asyncResult) {
+                object result = null;
                 try {
-                    istream = client.EndGetInputStream(asyncResult);
-                    result = client.DoInput(istream, arguments, returnType, resultMode);
-                    success = true;
+                    result = client.DoInput(client.EndSendAndReceive(asyncResult),
+                                            arguments, returnType, resultMode);
                 }
                 catch (Exception e) {
-                    result = e;
+                    DoError(e);
                 }
-                finally {
-                    if (istream != null) {
-                        client.EndInvoke(istream, asyncResult.AsyncState, success);
-                    }
+                if (result is HproseException) {
+                    DoError(result);
                 }
-                syncContext.Post(new SendOrPostCallback(DoCallback), null);
+                else {
+                    syncContext.Post(new SendOrPostCallback(DoCallback), result);
+                }
             }
-            protected abstract void DoCallback(object state);
+
+            private void DoError(object e) {
+                if (errorCallback != null) {
+                    syncContext.Post(new SendOrPostCallback(DoErrorCallback), e);
+                }
+            }
+
+            private void DoErrorCallback(object e) {
+                errorCallback(functionName, (Exception)e);
+            }
+
+            protected abstract void DoCallback(object result);
         }
 
         private class AsyncInvokeContext : AsyncInvokeContextBase {
@@ -123,16 +120,8 @@ namespace Hprose.Client {
             base(client, functionName, arguments, errorCallback, returnType, byRef, resultMode, simple) {
                 this.callback = callback;
             }
-
-            protected override void DoCallback(object state) {
-                if (result is Exception) {
-                    if (errorCallback != null) {
-                        errorCallback(functionName, (Exception)result);
-                    }
-                }
-                else {
-                    callback(result, arguments);
-                }
+            protected override void DoCallback(object result) {
+                callback(result, arguments);
             }
         }
         private class AsyncInvokeContext1 : AsyncInvokeContextBase {
@@ -141,16 +130,8 @@ namespace Hprose.Client {
                 base(client, functionName, arguments, errorCallback, returnType, false, resultMode, simple) {
                 this.callback = callback;
             }
-
-            protected override void DoCallback(object state) {
-                if (result is Exception) {
-                    if (errorCallback != null) {
-                        errorCallback(functionName, (Exception)result);
-                    }
-                }
-                else {
-                    callback(result);
-                }
+            protected override void DoCallback(object result) {
+                callback(result);
             }
         }
 #if !(dotNET10 || dotNET11 || dotNETCF10)
@@ -160,16 +141,8 @@ namespace Hprose.Client {
                 base(client, functionName, arguments, errorCallback, typeof(T), byRef, resultMode, simple) {
                 this.callback = callback;
             }
-
-            protected override void DoCallback(object state) {
-                if (result is Exception) {
-                    if (errorCallback != null) {
-                        errorCallback(functionName, (Exception)result);
-                    }
-                }
-                else {
-                    callback((T)result, arguments);
-                }
+            protected override void DoCallback(object result) {
+                callback((T)result, arguments);
             }
         }
         private class AsyncInvokeContext1<T> : AsyncInvokeContextBase {
@@ -178,16 +151,8 @@ namespace Hprose.Client {
                 base(client, functionName, arguments, errorCallback, typeof(T), false, resultMode, simple) {
                 this.callback = callback;
             }
-
-            protected override void DoCallback(object state) {
-                if (result is Exception) {
-                    if (errorCallback != null) {
-                        errorCallback(functionName, (Exception)result);
-                    }
-                }
-                else {
-                    callback((T)result);
-                }
+            protected override void DoCallback(object result) {
+                callback((T)result);
             }
         }
 #endif
@@ -404,26 +369,10 @@ namespace Hprose.Client {
         }
 #if !(SILVERLIGHT || WINDOWS_PHONE || Core)
         public object Invoke(string functionName, object[] arguments, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
-            object context = GetInvokeContext();
-            Stream ostream = GetOutputStream(context);
-            bool success = false;
-            try {
-                DoOutput(ostream, functionName, arguments, byRef, simple);
-                success = true;
-            }
-            finally {
-                SendData(ostream, context, success);
-            }
-            object result = null;
-            Stream istream = GetInputStream(context);
-            success = false;
-            try {
-                result = DoInput(istream, arguments, returnType, resultMode);
-                success = true;
-            }
-            finally {
-                EndInvoke(istream, context, success);
-            }
+            object result = DoInput(
+                                SendAndReceive(
+                                    DoOutput(functionName, arguments, byRef, simple)),
+                                        arguments, returnType, resultMode);
             if (result is HproseException) {
                 throw (HproseException)result;
             }
@@ -460,93 +409,6 @@ namespace Hprose.Client {
         }
 
 #endif
-        private object DoInput(Stream istream, object[] arguments, Type returnType, HproseResultMode resultMode) {
-            int tag;
-            if (filter != null) istream = filter.InputFilter(istream);
-            object result = null;
-            HproseReader hproseReader = new HproseReader(istream, mode);
-            MemoryStream memstream = null;
-            if (resultMode == HproseResultMode.RawWithEndTag || resultMode == HproseResultMode.Raw) {
-                memstream = new MemoryStream();
-            }
-            while ((tag = istream.ReadByte()) != HproseTags.TagEnd) {
-                switch (tag) {
-                    case HproseTags.TagResult:
-                        if (resultMode == HproseResultMode.Normal) {
-                            hproseReader.Reset();
-                            result = hproseReader.Unserialize(returnType);
-                        }
-                        else if (resultMode == HproseResultMode.Serialized) {
-                            memstream = hproseReader.ReadRaw();
-                        }
-                        else {
-                            memstream.WriteByte(HproseTags.TagResult);
-                            hproseReader.ReadRaw(memstream);
-                        }
-                        break;
-                    case HproseTags.TagArgument:
-                        if (resultMode == HproseResultMode.RawWithEndTag || resultMode == HproseResultMode.Raw) {
-                            memstream.WriteByte(HproseTags.TagArgument);
-                            hproseReader.ReadRaw(memstream);
-                        }
-                        else {
-                            hproseReader.Reset();
-                            Object[] args = hproseReader.ReadObjectArray();
-                            int length = arguments.Length;
-                            if (length > args.Length) length = args.Length;
-                            Array.Copy(args, 0, arguments, 0, length);
-                        }
-                        break;
-                    case HproseTags.TagError:
-                        if (resultMode == HproseResultMode.RawWithEndTag || resultMode == HproseResultMode.Raw) {
-                            memstream.WriteByte(HproseTags.TagError);
-                            hproseReader.ReadRaw(memstream);
-                        }
-                        else {
-                            hproseReader.Reset();
-                            result = new HproseException(hproseReader.ReadString());
-                        }
-                        break;
-                    default:
-                        throw new HproseException("Wrong Resoponse: \r\n" + HproseHelper.ReadWrongInfo(istream, tag));
-                }
-            }
-            if (resultMode != HproseResultMode.Normal) {
-                if (resultMode == HproseResultMode.RawWithEndTag) {
-                    memstream.WriteByte(HproseTags.TagEnd);
-                }
-                if (returnType == typeof(byte[])) {
-                    result = memstream.ToArray();
-                } else if (returnType == null ||
-                           returnType == typeof(object) ||
-                           returnType == typeof(MemoryStream) ||
-                           returnType == typeof(Stream)) {
-                    memstream.Position = 0;
-                    result = memstream;
-                } else {
-                    throw new HproseException("Can't Convert MemoryStream to Type: " + returnType.ToString());
-                }
-            }
-            return result;
-        }
-
-        private void DoOutput(Stream ostream, string functionName, object[] arguments, bool byRef, bool simple) {
-            if (filter != null) ostream = filter.OutputFilter(ostream);
-            MemoryStream stream = new MemoryStream(4096);
-            HproseWriter hproseWriter = new HproseWriter(stream, mode, simple);
-            stream.WriteByte(HproseTags.TagCall);
-            hproseWriter.WriteString(functionName);
-            if ((arguments != null) && (arguments.Length > 0 || byRef)) {
-                hproseWriter.Reset();
-                hproseWriter.WriteArray(arguments);
-                if (byRef) {
-                    hproseWriter.WriteBoolean(true);
-                }
-            }
-            stream.WriteByte(HproseTags.TagEnd);
-            stream.WriteTo(ostream);
-        }
-
 #if !(dotNET10 || dotNET11 || dotNETCF10)
         public void Invoke<T>(string functionName, HproseCallback<T> callback) {
             Invoke(functionName, nullArgs, callback, null, false, HproseResultMode.Normal, false);
@@ -614,18 +476,7 @@ namespace Hprose.Client {
             Invoke(functionName, arguments, callback, errorEvent, byRef, HproseResultMode.Normal, simple);
         }
         public void Invoke<T>(string functionName, object[] arguments, HproseCallback<T> callback, HproseErrorEvent errorEvent, bool byRef, HproseResultMode resultMode, bool simple) {
-            if (errorEvent == null) {
-                errorEvent = OnError;
-            }
-            AsyncInvokeContext<T> context = new AsyncInvokeContext<T>(this, functionName, arguments, callback, errorEvent, byRef, resultMode, simple);
-            try {
-                BeginGetOutputStream(new AsyncCallback(context.GetOutputStream), GetInvokeContext());
-            }
-            catch (Exception e) {
-                if (errorEvent != null) {
-                    errorEvent(functionName, e);
-                }
-            }
+            (new AsyncInvokeContext<T>(this, functionName, arguments, callback, errorEvent, byRef, resultMode, simple)).Invoke();
         }
 
         public void Invoke<T>(string functionName, HproseCallback1<T> callback, HproseErrorEvent errorEvent) {
@@ -644,18 +495,7 @@ namespace Hprose.Client {
             Invoke(functionName, arguments, callback, errorEvent, HproseResultMode.Normal, simple);
         }
         public void Invoke<T>(string functionName, object[] arguments, HproseCallback1<T> callback, HproseErrorEvent errorEvent, HproseResultMode resultMode, bool simple) {
-            if (errorEvent == null) {
-                errorEvent = OnError;
-            }
-            AsyncInvokeContext1<T> context = new AsyncInvokeContext1<T>(this, functionName, arguments, callback, errorEvent, resultMode, simple);
-            try {
-                BeginGetOutputStream(new AsyncCallback(context.GetOutputStream), GetInvokeContext());
-            }
-            catch (Exception e) {
-                if (errorEvent != null) {
-                    errorEvent(functionName, e);
-                }
-            }
+            (new AsyncInvokeContext1<T>(this, functionName, arguments, callback, errorEvent, resultMode, simple)).Invoke();
         }
 
 #endif
@@ -830,18 +670,7 @@ namespace Hprose.Client {
             Invoke(functionName, arguments, callback, errorEvent, returnType, byRef, resultMode, false);
         }
         public void Invoke(string functionName, object[] arguments, HproseCallback callback, HproseErrorEvent errorEvent, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
-            if (errorEvent == null) {
-                errorEvent = OnError;
-            }
-            AsyncInvokeContext context = new AsyncInvokeContext(this, functionName, arguments, callback, errorEvent, returnType, byRef, resultMode, simple);
-            try {
-                BeginGetOutputStream(new AsyncCallback(context.GetOutputStream), GetInvokeContext());
-            }
-            catch (Exception e) {
-                if (errorEvent != null) {
-                    errorEvent(functionName, e);
-                }
-            }
+            (new AsyncInvokeContext(this, functionName, arguments, callback, errorEvent, returnType, byRef, resultMode, simple)).Invoke();
         }
 
         public void Invoke(string functionName, HproseCallback1 callback, HproseErrorEvent errorEvent, Type returnType, HproseResultMode resultMode) {
@@ -851,36 +680,101 @@ namespace Hprose.Client {
             Invoke(functionName, arguments, callback, errorEvent, returnType, resultMode, false);
         }
         public void Invoke(string functionName, object[] arguments, HproseCallback1 callback, HproseErrorEvent errorEvent, Type returnType, HproseResultMode resultMode, bool simple) {
-            if (errorEvent == null) {
-                errorEvent = OnError;
-            }
-            AsyncInvokeContext1 context = new AsyncInvokeContext1(this, functionName, arguments, callback, errorEvent, returnType, resultMode, simple);
-            try {
-                BeginGetOutputStream(new AsyncCallback(context.GetOutputStream), GetInvokeContext());
-            }
-            catch (Exception e) {
-                if (errorEvent != null) {
-                    errorEvent(functionName, e);
+            (new AsyncInvokeContext1(this, functionName, arguments, callback, errorEvent, returnType, resultMode, simple)).Invoke();
+        }
+
+        // SyncInvoke
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+        protected abstract MemoryStream SendAndReceive(MemoryStream data);
+#endif
+        // AsyncInvoke
+        protected abstract IAsyncResult BeginSendAndReceive(MemoryStream data, AsyncCallback callback);
+
+        protected abstract MemoryStream EndSendAndReceive(IAsyncResult asyncResult);
+
+        private MemoryStream DoOutput(string functionName, object[] arguments, bool byRef, bool simple) {
+            MemoryStream outData = new MemoryStream();
+            HproseWriter writer = new HproseWriter(outData, mode, simple);
+            outData.WriteByte(HproseTags.TagCall);
+            writer.WriteString(functionName);
+            if ((arguments != null) && (arguments.Length > 0 || byRef)) {
+                writer.Reset();
+                writer.WriteArray(arguments);
+                if (byRef) {
+                    writer.WriteBoolean(true);
                 }
+            }
+            outData.WriteByte(HproseTags.TagEnd);
+            outData.Position = 0;
+            if (filter != null) {
+                outData = filter.OutputFilter(outData);
+                outData.Position = 0;
+            }
+            return outData;
+        }
+
+        private object MemoryStreamToType(MemoryStream inData, Type returnType) {
+            if (returnType == typeof(byte[])) {
+                return inData.ToArray();
+            } else if (returnType == null ||
+                       returnType == typeof(object) ||
+                       returnType == typeof(MemoryStream) ||
+                       returnType == typeof(Stream)) {
+                inData.Position = 0;
+                return inData;
+            } else {
+                throw new HproseException("Can't Convert MemoryStream to Type: " + returnType.ToString());
             }
         }
 
-        protected abstract object GetInvokeContext();
-
-        protected abstract void SendData(Stream ostream, object context, bool success);
-
-        protected abstract void EndInvoke(Stream istream, object context, bool success);
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
-        protected abstract Stream GetOutputStream(object context);
-
-        protected abstract Stream GetInputStream(object context);
-#endif
-        protected abstract IAsyncResult BeginGetOutputStream(AsyncCallback callback, object context);
-
-        protected abstract Stream EndGetOutputStream(IAsyncResult asyncResult);
-
-        protected abstract IAsyncResult BeginGetInputStream(AsyncCallback callback, object context);
-
-        protected abstract Stream EndGetInputStream(IAsyncResult asyncResult);
+        private object DoInput(MemoryStream inData, object[] arguments, Type returnType, HproseResultMode resultMode) {
+            int tag;
+            inData.Position = 0;
+            if (filter != null) {
+                inData = filter.InputFilter(inData);
+            }
+            inData.Position = inData.Length - 1;
+            tag = inData.ReadByte();
+            if (tag != HproseTags.TagEnd) {
+                throw new HproseException("Wrong Resoponse: \r\n" + HproseHelper.ReadWrongInfo(inData));
+            }
+            inData.Position = 0;
+            if (resultMode == HproseResultMode.Raw) {
+                inData.SetLength(inData.Length - 1);
+            }
+            if (resultMode == HproseResultMode.RawWithEndTag ||
+                resultMode == HproseResultMode.Raw) {
+                return MemoryStreamToType(inData, returnType);
+            }
+            object result = null;
+            HproseReader reader = new HproseReader(inData, mode);
+            while ((tag = inData.ReadByte()) != HproseTags.TagEnd) {
+                switch (tag) {
+                    case HproseTags.TagResult:
+                        if (resultMode == HproseResultMode.Normal) {
+                            reader.Reset();
+                            result = reader.Unserialize(returnType);
+                        }
+                        else {
+                            result = MemoryStreamToType(reader.ReadRaw(), returnType);
+                        }
+                        break;
+                    case HproseTags.TagArgument:
+                        reader.Reset();
+                        Object[] args = reader.ReadObjectArray();
+                        int length = arguments.Length;
+                        if (length > args.Length) length = args.Length;
+                        Array.Copy(args, 0, arguments, 0, length);
+                        break;
+                    case HproseTags.TagError:
+                        reader.Reset();
+                        result = new HproseException(reader.ReadString());
+                        break;
+                    default:
+                        throw new HproseException("Wrong Resoponse: \r\n" + HproseHelper.ReadWrongInfo(inData));
+                }
+            }
+            return result;
+        }
     }
 }
