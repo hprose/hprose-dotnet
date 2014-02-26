@@ -1270,8 +1270,9 @@ namespace Hprose.IO {
         }
 
         internal static void SendDataOverTcp(Stream stream, MemoryStream data) {
+            stream = new BufferedStream(stream, 1024);
             int n = (int)data.Length;
-            int len = n > 512 ? 1024 : 512;
+            int len = n > 2044 ? 4096 : n > 1020 ? 2048 : n > 508 ? 1024 : 512;
             byte[] buf = new byte[len];
             buf[0] = (byte)((n >> 24) & 0xff);
             buf[1] = (byte)((n >> 16) & 0xff);
@@ -1287,6 +1288,7 @@ namespace Hprose.IO {
                 stream.Write(buf, 0, len);
                 stream.Write(data.ToArray(), p, n - p);
             }
+            stream.Flush();
         }
 
         internal static int ReadAtLeast(Stream stream, byte[] buf, int offset, int min) {
