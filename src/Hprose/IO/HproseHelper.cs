@@ -13,7 +13,7 @@
  *                                                        *
  * hprose helper class for C#.                            *
  *                                                        *
- * LastModified: Feb 24, 2014                             *
+ * LastModified: Feb 25, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -1269,22 +1269,59 @@ namespace Hprose.IO {
 #endif
         }
 
-        internal static void WriteContentLength(Stream stream, int n) {
-            byte[] buf = new byte[] {
-                (byte)((n >> 24) & 0xff),
-                (byte)((n >> 16) & 0xff),
-                (byte)((n >> 8) & 0xff),
-                (byte)(n & 0xff)
-            };
-            stream.Write(buf, 0, 4);
+        internal static void SendDataOverTcp(Stream stream, MemoryStream data) {
+            int n = (int)data.Length;
+            int len = n > 512 ? 1024 : 512;
+            byte[] buf = new byte[len];
+            buf[0] = (byte)((n >> 24) & 0xff);
+            buf[1] = (byte)((n >> 16) & 0xff);
+            buf[2] = (byte)((n >> 8) & 0xff);
+            buf[3] = (byte)(n & 0xff);
+            int p = len - 4;
+            if (n <= p) {
+                data.Read(buf, 4, n);
+                stream.Write(buf, 0, n + 4);
+            }
+            else {
+                data.Read(buf, 4, p);
+                stream.Write(buf, 0, len);
+                stream.Write(data.ToArray(), p, n - p);
+            }
         }
 
-        internal static int ReadContentLength(Stream stream) {
-            int n = stream.ReadByte();
-            n = n << 8 | stream.ReadByte();
-            n = n << 8 | stream.ReadByte();
-            n = n << 8 | stream.ReadByte();
-            return n;
+        internal static int ReadAtLeast(Stream stream, byte[] buf, int offset, int min) {
+            if (min == 0) return 0;
+            int size = buf.Length - offset;
+            int n = offset;
+            int p = min + offset;
+            while (n < p) {
+                int nn = stream.Read(buf, n, size);
+                if (nn == 0) break;
+                n += nn;
+                size -= nn;
+            }
+            if (n < p) {
+                throw new HproseException("Unexpected EOF");
+            }
+            return n - offset;
         }
+
+        internal static MemoryStream ReceiveDataOverTcp(Stream stream) {
+            const int bufferlength = 2048;
+            byte[] buf = new byte[bufferlength];
+            int n = ReadAtLeast(stream, buf, 0, 4);
+            int len = (int)buf[0] << 24 | (int)buf[1] << 16 | (int)buf[2] << 8 | (int)buf[3];
+            int size = len - (n - 4);
+            if (len <= bufferlength - 4) {
+                ReadAtLeast(stream, buf, n, size);
+                return new MemoryStream(buf, 4, len);
+            }
+            n -= 4;
+            byte[] data = new byte[len];
+            Buffer.BlockCopy(buf, 4, data, 0, n);
+            ReadAtLeast(stream, data, n, size);
+            return new MemoryStream(data, 0, len);
+        }
+
     }
 }

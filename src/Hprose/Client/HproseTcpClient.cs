@@ -13,7 +13,7 @@
  *                                                        *
  * hprose tcp client class for C#.                        *
  *                                                        *
- * LastModified: Feb 25, 2014                             *
+ * LastModified: Feb 26, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -156,11 +156,7 @@ namespace Hprose.Client {
             public void Set(TcpClient client) {
                 if (client != null) {
                     this.conn.client = client;
-#if (PocketPC || Smartphone || WindowsCE)
                     this.conn.stream = client.GetStream();
-#else
-                    this.conn.stream = new BufferedStream(client.GetStream());
-#endif
                 }
             }
             public void Close() {
@@ -303,18 +299,8 @@ namespace Hprose.Client {
                     entry.Set(CreateClient(uri));
                 }
                 Stream stream = entry.conn.stream;
-                HproseHelper.WriteContentLength(stream, (int)data.Length);
-                data.WriteTo(stream);
-                stream.Flush();
-                int len = HproseHelper.ReadContentLength(stream);
-                int off = 0;
-                byte[] buf = new byte[len];
-                while (len > 0) {
-                    int size = stream.Read(buf, off, len);
-                    off += size;
-                    len -= size;
-                }
-                data = new MemoryStream(buf);
+                HproseHelper.SendDataOverTcp(stream, data);
+                data = HproseHelper.ReceiveDataOverTcp(stream);
             }
             catch {
                 entry.Close();
