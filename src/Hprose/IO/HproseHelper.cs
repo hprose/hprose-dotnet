@@ -13,7 +13,7 @@
  *                                                        *
  * hprose helper class for C#.                            *
  *                                                        *
- * LastModified: Feb 25, 2014                             *
+ * LastModified: Feb 27, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -29,6 +29,7 @@ using System.Reflection;
 #if !(PocketPC || Smartphone || WindowsCE)
 using System.Runtime.Serialization;
 #endif
+using System.Threading;
 using Hprose.Common;
 #if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core)
 using Hprose.Reflection;
@@ -1270,9 +1271,8 @@ namespace Hprose.IO {
         }
 
         internal static void SendDataOverTcp(Stream stream, MemoryStream data) {
-            stream = new BufferedStream(stream, 1024);
             int n = (int)data.Length;
-            int len = n > 2044 ? 4096 : n > 1020 ? 2048 : n > 508 ? 1024 : 512;
+            int len = n > 1020 ? 2048 : n > 508 ? 1024 : 512;
             byte[] buf = new byte[len];
             buf[0] = (byte)((n >> 24) & 0xff);
             buf[1] = (byte)((n >> 16) & 0xff);

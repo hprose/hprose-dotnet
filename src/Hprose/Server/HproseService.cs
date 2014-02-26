@@ -13,7 +13,7 @@
  *                                                        *
  * hprose service class for C#.                           *
  *                                                        *
- * LastModified: Feb 24, 2014                             *
+ * LastModified: Feb 27, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -472,10 +472,11 @@ namespace Hprose.Server {
             return arguments;
         }
 
-        protected MemoryStream SendError(string error) {
+        protected MemoryStream SendError(Exception e) {
             if (OnSendError != null) {
-                OnSendError(error);
+                OnSendError(e);
             }
+            string error = debugEnabled ? e.ToString(): e.Message;
             MemoryStream data = new MemoryStream(4096);
             HproseWriter writer = new HproseWriter(data, mode, true);
             data.WriteByte(HproseTags.TagError);
@@ -615,39 +616,28 @@ namespace Hprose.Server {
 
         protected void FireErrorEvent(Exception e) {
             if (OnSendError != null) {
-                if (IsDebugEnabled) {
-                    OnSendError(e.ToString());
-                }
-                else {
-                    OnSendError(e.Message);
-                }
+                OnSendError(e);
             }
         }
 
-        public MemoryStream Handle(MemoryStream istream, HproseMethods methods, object context) {
+        protected MemoryStream Handle(MemoryStream istream, HproseMethods methods, object context) {
             try {
                 istream.Position = 0;
                 if (filter != null) {
                     istream = filter.InputFilter(istream);
                     istream.Position = 0;
                 }
-                int tag = istream.ReadByte();
-                switch (tag) {
+                switch (istream.ReadByte()) {
                     case HproseTags.TagCall:
                         return DoInvoke(istream, methods, context);
                     case HproseTags.TagEnd:
                         return DoFunctionList(methods);
                     default:
-                        return SendError("Wrong Request: \r\n" + HproseHelper.ReadWrongInfo(istream));
+                        return SendError(new HproseException("Wrong Request: \r\n" + HproseHelper.ReadWrongInfo(istream)));
                 }
             }
             catch (Exception e) {
-                if (debugEnabled) {
-                    return SendError(e.ToString());
-                }
-                else {
-                    return SendError(e.Message);
-                }
+                return SendError(e);
             }
         }
     }

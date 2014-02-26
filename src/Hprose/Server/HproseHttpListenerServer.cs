@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http listener server class for C#.              *
  *                                                        *
- * LastModified: Feb 24, 2014                             *
+ * LastModified: Feb 27, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -274,12 +274,7 @@ namespace Hprose.Server {
             }
             catch(Exception e) {
                 if (OnSendError != null) {
-                    if (IsDebugEnabled) {
-                        OnSendError(e.ToString());
-                    }
-                    else {
-                        OnSendError(e.Message);
-                    }
+                    OnSendError(e);
                 }
             }
         }
