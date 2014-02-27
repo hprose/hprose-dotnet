@@ -54,6 +54,61 @@ namespace Hprose.Server {
             }
         }
 
+        private LingerOption m_lingerState = new LingerOption(false, 0);
+        public LingerOption LingerState {
+            get {
+                return m_lingerState;
+            }
+            set {
+                m_lingerState = value;
+            }
+        }
+        private bool m_noDelay = false;
+        public bool NoDelay {
+            get {
+                return m_noDelay;
+            }
+            set {
+                m_noDelay = value;
+            }
+        }
+        private int m_receiveBufferSize = 8192;
+        public int ReceiveBufferSize {
+            get {
+                return m_receiveBufferSize;
+            }
+            set {
+                m_receiveBufferSize = value;
+            }
+        }
+        private int m_sendBufferSize = 8192;
+        public int SendBufferSize {
+            get {
+                return m_sendBufferSize;
+            }
+            set {
+                m_sendBufferSize = value;
+            }
+        }
+        private int m_receiveTimeout = 500;
+        public int ReceiveTimeout {
+            get {
+                return m_receiveTimeout;
+            }
+            set {
+                m_receiveTimeout = value;
+            }
+        }
+        private int m_sendTimeout = 500;
+        public int SendTimeout {
+            get {
+                return m_sendTimeout;
+            }
+            set {
+                m_sendTimeout = value;
+            }
+        }
+
         public bool IsStarted {
             get {
                 return (Listener != null);
@@ -99,6 +154,12 @@ namespace Hprose.Server {
             try {
                 listener.BeginAcceptTcpClient(new AsyncCallback(AcceptTcpCallback), listener);
                 client = listener.EndAcceptTcpClient(asyncResult);
+                client.LingerState = m_lingerState;
+                client.NoDelay = m_noDelay;
+                client.ReceiveBufferSize = m_receiveBufferSize;
+                client.SendBufferSize = m_sendBufferSize;
+                client.ReceiveTimeout = m_receiveTimeout;
+                client.SendTimeout = m_sendTimeout;
                 stream = client.GetStream();
                 for (; ; ) {
                     HproseHelper.SendDataOverTcp(stream, Handle(HproseHelper.ReceiveDataOverTcp(stream), null, null));
