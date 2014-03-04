@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http service class for C#.                      *
  *                                                        *
- * LastModified: Feb 24, 2014                             *
+ * LastModified: Mar 4, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -210,6 +210,7 @@ namespace Hprose.Server {
                 else {
                     context.Response.StatusCode = 403;
                 }
+                ostream.Close();
                 context.Response.Flush();
             }
             finally {
