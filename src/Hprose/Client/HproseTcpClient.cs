@@ -13,7 +13,7 @@
  *                                                        *
  * hprose tcp client class for C#.                        *
  *                                                        *
- * LastModified: Feb 26, 2014                             *
+ * LastModified: Mar 4, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -26,6 +26,7 @@ using System.Collections.Generic;
 #endif
 using System.IO;
 using System.Net.Sockets;
+using System.Threading;
 using Hprose.IO;
 using Hprose.Common;
 
@@ -139,19 +140,23 @@ namespace Hprose.Client {
 
         internal struct TcpConn {
             public TcpClient client;
-            public Stream stream;
+            public NetworkStream stream;
         }
+
+        internal enum TcpConnStatus {
+            Free, Using, Closing
+        }
+
         internal class TcpConnEntry {
             public string uri;
             public TcpConn conn;
-            public bool free;
-            public bool valid;
+            public TcpConnStatus status;
+            public long lastUsedTime;
             public TcpConnEntry(string uri) {
                 this.uri = uri;
                 this.conn.client = null;
                 this.conn.stream = null;
-                this.free = false;
-                this.valid = false;
+                this.status = TcpConnStatus.Using;
             }
             public void Set(TcpClient client) {
                 if (client != null) {
@@ -160,8 +165,7 @@ namespace Hprose.Client {
                 }
             }
             public void Close() {
-                this.free = true;
-                this.valid = false;
+                this.status = TcpConnStatus.Closing;
             }
         }
         internal class TcpConnPool {
@@ -171,17 +175,133 @@ namespace Hprose.Client {
             private readonly List<TcpConnEntry> pool = new List<TcpConnEntry>();
 #endif
             private readonly object syncRoot = new object();
+
+            private Timer timer;
+
+            private long m_timeout = 0;
+
+            public long Timeout {
+                get {
+                    return m_timeout;
+                }
+                set {
+                    m_timeout = value;
+                    if (m_timeout > 0) {
+                        if (timer == null) {
+                            timer = new Timer(new TimerCallback(CloseTimeoutConns),
+                                    null,
+                                    m_timeout,
+                                    m_timeout);
+                        }
+                        else {
+                            timer.Change(m_timeout, m_timeout);
+                        }
+                    }
+                    else {
+                        timer.Dispose();
+                        timer = null;
+                    }
+                }
+            }
+
+#if (dotNET10 || dotNET11 || dotNETCF10)
+            private void CloseConn(TcpConn conn) {
+                if (conn.stream != null) {
+                    conn.stream.Close();
+                }
+                if (conn.client != null) {
+                    conn.client.Close();
+                }
+            }
+
+            private void FreeConns(ArrayList conns) {
+                foreach (TcpConn conn in conns) {
+                    if (conn.stream != null) {
+                        conn.stream.Close();
+                    }
+                    if (conn.client != null) {
+                        conn.client.Close();
+                    }
+                }
+            }
+#else
+            private void CloseConn(TcpConn conn) {
+                new Thread(delegate() {
+                    if (conn.stream != null) {
+                        conn.stream.Close();
+                    }
+                    if (conn.client != null) {
+                        conn.client.Close();
+                    }
+                }).Start();
+            }
+
+            private void FreeConns(List<TcpConn> conns) {
+                new Thread(delegate() {
+                    foreach (TcpConn conn in conns) {
+                        if (conn.stream != null) {
+                            conn.stream.Close();
+                        }
+                        if (conn.client != null) {
+                            conn.client.Close();
+                        }
+                    }
+                }).Start();
+            }
+#endif
+
+            private void CloseTimeoutConns(object state) {
+#if (dotNET10 || dotNET11 || dotNETCF10)
+                ArrayList conns = new ArrayList();
+#else
+                List<TcpConn> conns = new List<TcpConn>(pool.Count);
+#endif
+                lock(syncRoot) {
+                    foreach (TcpConnEntry entry in pool) {
+                        if (entry.status == TcpConnStatus.Free && entry.uri != null) {
+                            if ((DateTime.Now.Ticks - entry.lastUsedTime) > m_timeout * 10000) {
+                                conns.Add(entry.conn);
+                                entry.conn.stream = null;
+                                entry.conn.client = null;
+                                entry.uri = null;
+                            }
+                            else if (entry.conn.stream != null) {
+                                try {
+                                    if (entry.conn.stream.DataAvailable) {}
+                                }
+                                catch {
+                                    conns.Add(entry.conn);
+                                    entry.conn.stream = null;
+                                    entry.conn.client = null;
+                                    entry.uri = null;
+                                }
+                            }
+                        }
+                    }
+                }
+                FreeConns(conns);
+            }
+
             public TcpConnEntry Get(string uri) {
                 lock(syncRoot) {
                     foreach (TcpConnEntry entry in pool) {
-                        if (entry.free && entry.valid) {
+                        if (entry.status == TcpConnStatus.Free) {
                             if (entry.uri == uri) {
-                                entry.free = false;
+                                if (entry.conn.stream != null) {
+                                    try {
+                                        if (entry.conn.stream.DataAvailable) {}
+                                    }
+                                    catch {
+                                        CloseConn(entry.conn);
+                                        entry.conn.stream = null;
+                                        entry.conn.client = null;
+                                    }
+                                }
+                                entry.status = TcpConnStatus.Using;
                                 return entry;
                             }
                             else if (entry.uri == null) {
-                                entry.free = false;
-                                entry.valid = false;
+                                entry.status = TcpConnStatus.Using;
                                 entry.uri = uri;
                                 return entry;
                             }
@@ -192,22 +312,7 @@ namespace Hprose.Client {
                     return newEntry;
                 }
             }
-            private void FreeConns(
-#if (dotNET10 || dotNET11 || dotNETCF10)
-                ArrayList conns
-#else
-                List<TcpConn> conns
-#endif
-            ) {
-                foreach (TcpConn conn in conns) {
-                    if (conn.stream != null) {
-                        conn.stream.Close();
-                    }
-                    if (conn.client != null) {
-                        conn.client.Close();
-                    }
-                }
-            }
+
             public void Close(string uri) {
 #if (dotNET10 || dotNET11 || dotNETCF10)
                 ArrayList conns = new ArrayList();
@@ -217,7 +322,7 @@ namespace Hprose.Client {
                 lock(syncRoot) {
                     foreach (TcpConnEntry entry in pool) {
                         if (entry.uri == uri) {
-                            if (entry.free && entry.valid) {
+                            if (entry.status == TcpConnStatus.Free) {
                                 conns.Add(entry.conn);
                                 entry.conn.stream = null;
                                 entry.conn.client = null;
@@ -232,18 +337,17 @@ namespace Hprose.Client {
                 FreeConns(conns);
             }
             public void Free(TcpConnEntry entry) {
-                if (entry.free && !entry.valid) {
+                if (entry.status == TcpConnStatus.Closing) {
                     if (entry.conn.client != null) {
-                        entry.conn.stream.Close();
+                        CloseConn(entry.conn);
                         entry.conn.stream = null;
-                        entry.conn.client.Close();
                         entry.conn.client = null;
                     }
                     entry.uri = null;
                 }
                 lock(syncRoot) {
-                    entry.free = true;
-                    entry.valid = true;
+                    entry.lastUsedTime = DateTime.Now.Ticks;
+                    entry.status = TcpConnStatus.Free;
                 }
             }
         }
@@ -304,10 +408,11 @@ namespace Hprose.Client {
             }
             catch {
                 entry.Close();
-                pool.Free(entry);
                 throw;
             }
-            pool.Free(entry);
+            finally {
+                pool.Free(entry);
+            }
             return data;
         }
 

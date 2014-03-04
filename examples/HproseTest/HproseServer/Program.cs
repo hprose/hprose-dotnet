@@ -37,8 +37,8 @@ namespace HproseServer
             ClassManager.Register(typeof(User), "User");
             HproseHttpListenerServer server = new HproseHttpListenerServer("http://localhost:2012/");
             TestService ts = new TestService();
-            server.Methods.AddMethod("Hello", ts, true);
-            server.Methods.AddMethod("SendUsers", ts);
+            server.Add("Hello", ts, true);
+            server.Add("SendUsers", ts);
             server.IsCrossDomainEnabled = true;
             server.CrossDomainXmlFile = "crossdomain.xml";
             server.Start();

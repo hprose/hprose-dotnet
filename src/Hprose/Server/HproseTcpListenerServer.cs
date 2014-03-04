@@ -13,11 +13,11 @@
  *                                                        *
  * hprose tcp listener server class for C#.               *
  *                                                        *
- * LastModified: Feb 27, 2014                             *
+ * LastModified: Mar 4, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-#if !ClientOnly
+#if !(dotNET10 || dotNET11 || ClientOnly)
 using System;
 using System.IO;
 using System.Net;

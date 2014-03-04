@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http listener service class for C#.             *
  *                                                        *
- * LastModified: Feb 24, 2014                             *
+ * LastModified: Mar 4, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -34,10 +34,6 @@ namespace Hprose.Server {
         private bool getEnabled = true;
         private bool compressionEnabled = false;
         public event SendHeaderEvent OnSendHeader = null;
-
-        internal void SetSendHeaderEvent(SendHeaderEvent e) {
-            OnSendHeader = e;
-        }
 
         [ThreadStatic]
         private static HttpListenerContext currentContext;
@@ -260,11 +256,11 @@ namespace Hprose.Server {
             }
         }
 
-        public void Handle(HttpListenerContext context) {
+        protected void Handle(HttpListenerContext context) {
             Handle(context, null);
         }
 
-        public void Handle(HttpListenerContext context, HproseHttpListenerMethods methods) {
+        protected void Handle(HttpListenerContext context, HproseHttpListenerMethods methods) {
             SendHeader(context);
             string method = context.Request.HttpMethod;
             if ((method == "GET") && getEnabled) {

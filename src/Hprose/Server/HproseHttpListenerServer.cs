@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http listener server class for C#.              *
  *                                                        *
- * LastModified: Feb 27, 2014                             *
+ * LastModified: Mar 4, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -26,8 +26,7 @@ using Hprose.IO;
 using Hprose.Common;
 
 namespace Hprose.Server {
-    public class HproseHttpListenerServer {
-        private HproseHttpListenerService service = new HproseHttpListenerService();
+    public class HproseHttpListenerServer : HproseHttpListenerService {
         private HttpListener Listener = new HttpListener();
         private string url = null;
         private string crossDomainXmlFile = null;
@@ -37,10 +36,6 @@ namespace Hprose.Server {
         private string lastModified = null;
         private string etag = null;
         private int tCount = 2;
-        public event BeforeInvokeEvent OnBeforeInvoke = null;
-        public event AfterInvokeEvent OnAfterInvoke = null;
-        public event SendHeaderEvent OnSendHeader = null;
-        public event SendErrorEvent OnSendError = null;
 
         public HproseHttpListenerServer(string url) {
             Url = url;
@@ -61,81 +56,12 @@ namespace Hprose.Server {
             }
         }
 
-        public HproseMethods Methods {
-            get {
-                return service.GlobalMethods;
-            }
-        }
-
         public int ThreadCount {
             get {
                 return tCount;
             }
             set {
                 tCount = value;
-            }
-        }
-
-        public bool IsDebugEnabled {
-            get {
-                return service.IsDebugEnabled;
-            }
-            set {
-                service.IsDebugEnabled = value;
-            }
-        }
-
-        public bool IsCrossDomainEnabled {
-            get {
-                return service.IsCrossDomainEnabled;
-            }
-            set {
-                service.IsCrossDomainEnabled = value;
-            }
-        }
-
-        public bool IsP3pEnabled {
-            get {
-                return service.IsP3pEnabled;
-            }
-            set {
-                service.IsP3pEnabled = value;
-            }
-        }
-
-        public bool IsGetEnabled {
-            get {
-                return service.IsGetEnabled;
-            }
-            set {
-                service.IsGetEnabled = value;
-            }
-        }
-
-        public bool IsCompressionEnabled {
-            get {
-                return service.IsCompressionEnabled;
-            }
-            set {
-                service.IsCompressionEnabled = value;
-            }
-        }
-
-        public HproseMode Mode {
-            get {
-                return service.Mode;
-            }
-            set {
-                service.Mode = value;
-            }
-        }
-
-        public IHproseFilter Filter {
-            get {
-                return service.Filter;
-            }
-            set {
-                service.Filter = value;
             }
         }
 
@@ -236,10 +162,6 @@ namespace Hprose.Server {
         public void Start() {
             if (Listener.IsListening)
                 return;
-            service.SetBeforeInvokeEvent(OnBeforeInvoke);
-            service.SetAfterInvokeEvent(OnAfterInvoke);
-            service.SetSendErrorEvent(OnSendError);
-            service.SetSendHeaderEvent(OnSendHeader);
             lastModified = DateTime.Now.ToString("R");
             etag = '"' + new Random().Next().ToString("x") + ":" + new Random().Next().ToString() + '"';
             Listener.Start();
@@ -270,12 +192,10 @@ namespace Hprose.Server {
                 Listener.BeginGetContext(GetContext, Listener);
                 if (clientAccessPolicyXmlContent != null && ClientAccessPolicyXmlHandler(context)) return;
                 if (crossDomainXmlContent != null && CrossDomainXmlHandler(context)) return;
-                service.Handle(context);
+                Handle(context);
             }
             catch(Exception e) {
-                if (OnSendError != null) {
-                    OnSendError(e);
-                }
+                FireErrorEvent(e);
             }
         }
     }

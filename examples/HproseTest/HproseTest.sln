@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HproseServer", "HproseServer\HproseServer.csproj", "{614BEEC8-86A2-4BBB-BC30-33174D41B4C4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HproseClient", "HproseClient\HproseClient.csproj", "{5335C949-D135-4BED-9170-08345AA50170}"
@@ -10,6 +12,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSerialize", "TestSerialize\TestSerialize.csproj", "{1B196BC0-4075-4D9B-AC63-9555D6221024}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestHashMap", "TestHashMap\TestHashMap.csproj", "{8BFF425C-6D25-4948-8578-41729CA0E19C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HproseTcpServerTest", "TcpServer\HproseTcpServerTest.csproj", "{925155E9-DC24-4039-B2CA-46F5790AF3B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HproseTcpClientTest", "TcpClient\HproseTcpClientTest.csproj", "{8D686555-880A-4533-963C-60FEB6A178B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +79,26 @@ Global
 		{8BFF425C-6D25-4948-8578-41729CA0E19C}.Release|ARM.ActiveCfg = Release|Any CPU
 		{8BFF425C-6D25-4948-8578-41729CA0E19C}.Release|x64.ActiveCfg = Release|Any CPU
 		{8BFF425C-6D25-4948-8578-41729CA0E19C}.Release|x86.ActiveCfg = Release|Any CPU
+		{925155E9-DC24-4039-B2CA-46F5790AF3B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{925155E9-DC24-4039-B2CA-46F5790AF3B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{925155E9-DC24-4039-B2CA-46F5790AF3B9}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{925155E9-DC24-4039-B2CA-46F5790AF3B9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{925155E9-DC24-4039-B2CA-46F5790AF3B9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{925155E9-DC24-4039-B2CA-46F5790AF3B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{925155E9-DC24-4039-B2CA-46F5790AF3B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{925155E9-DC24-4039-B2CA-46F5790AF3B9}.Release|ARM.ActiveCfg = Release|Any CPU
+		{925155E9-DC24-4039-B2CA-46F5790AF3B9}.Release|x64.ActiveCfg = Release|Any CPU
+		{925155E9-DC24-4039-B2CA-46F5790AF3B9}.Release|x86.ActiveCfg = Release|Any CPU
+		{8D686555-880A-4533-963C-60FEB6A178B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D686555-880A-4533-963C-60FEB6A178B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D686555-880A-4533-963C-60FEB6A178B1}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{8D686555-880A-4533-963C-60FEB6A178B1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8D686555-880A-4533-963C-60FEB6A178B1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8D686555-880A-4533-963C-60FEB6A178B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D686555-880A-4533-963C-60FEB6A178B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D686555-880A-4533-963C-60FEB6A178B1}.Release|ARM.ActiveCfg = Release|Any CPU
+		{8D686555-880A-4533-963C-60FEB6A178B1}.Release|x64.ActiveCfg = Release|Any CPU
+		{8D686555-880A-4533-963C-60FEB6A178B1}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
