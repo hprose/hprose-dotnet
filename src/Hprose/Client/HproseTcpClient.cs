@@ -354,6 +354,15 @@ namespace Hprose.Client {
 
         private readonly TcpConnPool pool = new TcpConnPool();
 
+        public long Timeout {
+            get {
+                return pool.Timeout;
+            }
+            set {
+                pool.Timeout = value;
+            }
+        }
+
         private delegate MemoryStream SendAndReceiveDelegate(MemoryStream data);
         private SendAndReceiveDelegate sendAndReceive;
 
