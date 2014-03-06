@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Hprose.Client;
 using Hprose.IO;
+using Hprose.Common;
 
 namespace HproseClient
 {
@@ -16,12 +17,24 @@ namespace HproseClient
         public bool male;
         public List<User> friends;
     }
+
+    public interface IStub {
+        [SimpleMode(true)]
+        Task<string> Hello(string name);
+    }
+
     class Program
     {
+        static HproseHttpClient client;
+        static async void Hello() {
+            var stub = client.UseService<IStub>();
+            Console.WriteLine(await stub.Hello("World"));
+        }
+
         static void Main(string[] args)
         {
             ClassManager.Register(typeof(User), "User");
-            HproseHttpClient client = new HproseHttpClient("http://localhost:2012/");
+            client = new HproseHttpClient("http://localhost:2012/");
             List<User> users = new List<User>();
             User user1 = new User();
             user1.name = "李雷";
@@ -38,7 +51,7 @@ namespace HproseClient
             users.Add(user1);
             users.Add(user2);
             Func<List<User>, List<User>> SendUsers = userList => client.Invoke<List<User>>("sendUsers", new object[] { userList });
-
+            Hello();
             MemoryStream stream = (MemoryStream)HproseFormatter.Serialize(SendUsers(users));
             Console.WriteLine(Encoding.UTF8.GetString(stream.ToArray()));
             Console.ReadLine();

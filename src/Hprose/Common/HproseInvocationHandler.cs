@@ -13,7 +13,7 @@
  *                                                        *
  * hprose InvocationHandler class for C#.                 *
  *                                                        *
- * LastModified: Feb 22, 2014                             *
+ * LastModified: Mar 6, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -25,8 +25,23 @@ using System.Reflection;
 using System.Threading;
 using Hprose.IO;
 using Hprose.Reflection;
+#if dotNET45
+using System.Threading.Tasks;
+#endif
 
 namespace Hprose.Common {
+#if dotNET45
+    interface ITaskCreator {
+        Task GetTask(HproseInvoker invoker, string methodName, object[] args, bool byRef, HproseResultMode resultMode, bool simple);
+    }
+    class TaskCreator<T> : ITaskCreator {
+        public Task GetTask(HproseInvoker invoker, string methodName, object[] args, bool byRef, HproseResultMode resultMode, bool simple) {
+            return Task<T>.Run(delegate() {
+                return invoker.Invoke<T>(methodName, args, byRef, resultMode, simple);
+            });
+        }
+    }
+#endif
     class HproseInvocationHandler : IInvocationHandler {
         private String ns;
         private HproseInvoker invoker;
@@ -47,6 +62,12 @@ namespace Hprose.Common {
         private static void CheckResultType(HproseResultMode resultMode, Type returnType) {
             if (resultMode != HproseResultMode.Normal &&
                 returnType != null &&
+#if dotNET45
+                returnType != typeof(Task<object>) &&
+                returnType != typeof(Task<byte[]>) &&
+                returnType != typeof(Task<MemoryStream>) &&
+                returnType != typeof(Task<Stream>) &&
+#endif
                 returnType != typeof(object) &&
                 returnType != typeof(byte[]) &&
                 returnType != typeof(MemoryStream) &&
@@ -102,6 +123,18 @@ namespace Hprose.Common {
                     break;
                 }
             }
+#if dotNET45
+            if (returnType.IsGenericType &&
+                returnType.GetGenericTypeDefinition() == typeof(Task<>)) {
+                ITaskCreator taskCreator = Activator.CreateInstance(typeof(TaskCreator<>).MakeGenericType(returnType.GetGenericArguments())) as ITaskCreator;
+                return taskCreator.GetTask(invoker, methodName, args, byRef, resultMode, simple);
+            }
+            if (returnType == typeof(Task)) {
+                return Task.Run(delegate() {
+                    invoker.Invoke(methodName, args, (Type)null, byRef, resultMode, simple);
+                });
+            }
+#endif
             int n = paramTypes.Length;
             if ((n > 0) && (paramTypes[n - 1] == typeof(HproseCallback))) {
                 HproseCallback callback = (HproseCallback)args[n - 1];
@@ -203,11 +236,7 @@ namespace Hprose.Common {
                 return null;
             }
 #endif
-            object result = invoker.Invoke(methodName, args, returnType, byRef, resultMode, simple);
-            if (result is Exception) {
-                throw (Exception)result;
-            }
-            return result;
+            return invoker.Invoke(methodName, args, returnType, byRef, resultMode, simple);
         }
     }
 }
