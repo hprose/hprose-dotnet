@@ -13,7 +13,7 @@
  *                                                        *
  * hprose helper class for C#.                            *
  *                                                        *
- * LastModified: Feb 27, 2014                             *
+ * LastModified: Mar 7, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -857,14 +857,14 @@ namespace Hprose.IO {
         }
 
         public static string GetClassName(Type type) {
-            string className = ClassManager.GetClassAlias(type);
+            string className = HproseClassManager.GetClassAlias(type);
             if (className == null) {
                 className = type.FullName.Replace('.', '_').Replace('+', '_');
                 int index = className.IndexOf('`');
                 if (index > 0) {
                     className = className.Substring(0, index);
                 }
-                ClassManager.Register(type, className);
+                HproseClassManager.Register(type, className);
             }
             return className;
         }
@@ -939,8 +939,8 @@ namespace Hprose.IO {
             return type;
         }
         public static Type GetClass(string className) {
-            if (ClassManager.ContainsClass(className)) {
-                return ClassManager.GetClass(className);
+            if (HproseClassManager.ContainsClass(className)) {
+                return HproseClassManager.GetClass(className);
             }
 #if !(dotNET10 || dotNET11 || dotNETCF10)
             List<int> positions = new List<int>();
@@ -966,7 +966,7 @@ namespace Hprose.IO {
             else {
                 type = GetType(className.ToString());
             }
-            ClassManager.Register(type, className);
+            HproseClassManager.Register(type, className);
             return type;
         }
 

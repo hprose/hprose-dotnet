@@ -13,7 +13,7 @@
  *                                                        *
  * hprose ClassManager for C#.                            *
  *                                                        *
- * LastModified: Feb 23, 2014                             *
+ * LastModified: Mar 7, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -24,7 +24,7 @@ using System.Collections.Generic;
 #endif
 
 namespace Hprose.IO {
-    public sealed class ClassManager {
+    public sealed class HproseClassManager {
 #if (dotNET10 || dotNET11 || dotNETCF10)
         private static readonly Hashtable classCache1 = new Hashtable();
         private static readonly Hashtable classCache2 = new Hashtable();
