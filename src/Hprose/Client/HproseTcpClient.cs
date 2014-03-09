@@ -13,7 +13,7 @@
  *                                                        *
  * hprose tcp client class for C#.                        *
  *                                                        *
- * LastModified: Mar 4, 2014                              *
+ * LastModified: Mar 9, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -58,7 +58,7 @@ namespace Hprose.Client {
             if (u.Scheme != "tcp" &&
                 u.Scheme != "tcp4" &&
                 u.Scheme != "tcp6") {
-                throw new HproseException("This client desn't support " + u.Scheme + " scheme.");
+                throw new HproseException("This client doesn't support " + u.Scheme + " scheme.");
             }
             return new HproseTcpClient(uri, mode);
         }

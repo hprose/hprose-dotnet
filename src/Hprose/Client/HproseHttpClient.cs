@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http client class for C#.                       *
  *                                                        *
- * LastModified: Feb 25, 2014                             *
+ * LastModified: Mar 9, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -102,7 +102,7 @@ namespace Hprose.Client {
             Uri u = new Uri(uri);
             if (u.Scheme != "http" &&
                 u.Scheme != "https") {
-                throw new HproseException("This client desn't support " + u.Scheme + " scheme.");
+                throw new HproseException("This client doesn't support " + u.Scheme + " scheme.");
             }
             return new HproseHttpClient(uri, mode);
         }

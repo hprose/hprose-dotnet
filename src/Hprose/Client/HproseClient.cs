@@ -13,7 +13,7 @@
  *                                                        *
  * hprose client class for C#.                            *
  *                                                        *
- * LastModified: Feb 25, 2014                             *
+ * LastModified: Mar 9, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -736,7 +736,7 @@ namespace Hprose.Client {
             inData.Position = inData.Length - 1;
             tag = inData.ReadByte();
             if (tag != HproseTags.TagEnd) {
-                throw new HproseException("Wrong Resoponse: \r\n" + HproseHelper.ReadWrongInfo(inData));
+                throw new HproseException("Wrong Response: \r\n" + HproseHelper.ReadWrongInfo(inData));
             }
             inData.Position = 0;
             if (resultMode == HproseResultMode.Raw) {
@@ -771,7 +771,7 @@ namespace Hprose.Client {
                         result = new HproseException(reader.ReadString());
                         break;
                     default:
-                        throw new HproseException("Wrong Resoponse: \r\n" + HproseHelper.ReadWrongInfo(inData));
+                        throw new HproseException("Wrong Response: \r\n" + HproseHelper.ReadWrongInfo(inData));
                 }
             }
             return result;
