@@ -13,7 +13,7 @@
  *                                                        *
  * hprose ClassManager for C#.                            *
  *                                                        *
- * LastModified: Mar 7, 2014                              *
+ * LastModified: Mar 15, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -41,7 +41,11 @@ namespace Hprose.IO {
                 classCache2[alias] = type;
             }
         }
-
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        public static void Register<T>(string alias) {
+            Register(typeof(T), alias);
+        }
+#endif
         public static string GetClassAlias(Type type) {
             lock (syncRoot) {
 #if (dotNET10 || dotNET11 || dotNETCF10)
