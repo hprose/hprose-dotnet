@@ -13,7 +13,7 @@
  *                                                        *
  * hprose tcp client class for C#.                        *
  *                                                        *
- * LastModified: Mar 9, 2014                              *
+ * LastModified: Mar 16, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -373,8 +373,8 @@ namespace Hprose.Client {
             m_receiveBufferSize = 8192;
             m_sendBufferSize = 8192;
 #if !dotNETCF10
-            m_receiveTimeout = 500;
-            m_sendTimeout = 500;
+            m_receiveTimeout = 0;
+            m_sendTimeout = 0;
 #endif
         }
 
