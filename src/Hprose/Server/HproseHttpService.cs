@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http service class for C#.                      *
  *                                                        *
- * LastModified: Mar 4, 2014                              *
+ * LastModified: Mar 17, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -202,7 +202,7 @@ namespace Hprose.Server {
                 string method = context.Request.HttpMethod;
                 Stream ostream = GetOutputStream(context);
                 if ((method == "GET") && getEnabled) {
-                    DoFunctionList(methods).WriteTo(ostream);
+                    DoFunctionList(methods, context).WriteTo(ostream);
                 }
                 else if (method == "POST") {
                     Handle(GetInputStream(context), methods, context).WriteTo(ostream);

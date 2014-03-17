@@ -13,7 +13,7 @@
  *                                                        *
  * hprose tcp listener server class for C#.               *
  *                                                        *
- * LastModified: Mar 4, 2014                              *
+ * LastModified: Mar 17, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -90,7 +90,7 @@ namespace Hprose.Server {
                 m_sendBufferSize = value;
             }
         }
-        private int m_receiveTimeout = 500;
+        private int m_receiveTimeout = 0;
         public int ReceiveTimeout {
             get {
                 return m_receiveTimeout;
@@ -99,7 +99,7 @@ namespace Hprose.Server {
                 m_receiveTimeout = value;
             }
         }
-        private int m_sendTimeout = 500;
+        private int m_sendTimeout = 0;
         public int SendTimeout {
             get {
                 return m_sendTimeout;
@@ -162,11 +162,11 @@ namespace Hprose.Server {
                 client.SendTimeout = m_sendTimeout;
                 stream = client.GetStream();
                 for (; ; ) {
-                    HproseHelper.SendDataOverTcp(stream, Handle(HproseHelper.ReceiveDataOverTcp(stream), null, null));
+                    HproseHelper.SendDataOverTcp(stream, Handle(HproseHelper.ReceiveDataOverTcp(stream), null, client));
                 }
             }
             catch (Exception e) {
-                FireErrorEvent(e);
+                FireErrorEvent(e, client);
             }
             finally {
                 if (stream != null) {

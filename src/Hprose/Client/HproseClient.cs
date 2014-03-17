@@ -13,7 +13,7 @@
  *                                                        *
  * hprose client class for C#.                            *
  *                                                        *
- * LastModified: Mar 9, 2014                              *
+ * LastModified: Mar 17, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -707,7 +707,7 @@ namespace Hprose.Client {
             outData.WriteByte(HproseTags.TagEnd);
             outData.Position = 0;
             if (filter != null) {
-                outData = filter.OutputFilter(outData);
+                outData = filter.OutputFilter(outData, this);
                 outData.Position = 0;
             }
             return outData;
@@ -731,7 +731,7 @@ namespace Hprose.Client {
             int tag;
             inData.Position = 0;
             if (filter != null) {
-                inData = filter.InputFilter(inData);
+                inData = filter.InputFilter(inData, this);
             }
             inData.Position = inData.Length - 1;
             tag = inData.ReadByte();

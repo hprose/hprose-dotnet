@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http listener server class for C#.              *
  *                                                        *
- * LastModified: Mar 4, 2014                              *
+ * LastModified: Mar 17, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -187,15 +187,16 @@ namespace Hprose.Server {
         }
 
         private void GetContext(IAsyncResult result) {
+            HttpListenerContext context = null;
             try {
-                HttpListenerContext context = Listener.EndGetContext(result);
+                context = Listener.EndGetContext(result);
                 Listener.BeginGetContext(GetContext, Listener);
                 if (clientAccessPolicyXmlContent != null && ClientAccessPolicyXmlHandler(context)) return;
                 if (crossDomainXmlContent != null && CrossDomainXmlHandler(context)) return;
                 Handle(context);
             }
-            catch(Exception e) {
-                FireErrorEvent(e);
+            catch (Exception e) {
+                FireErrorEvent(e, context);
             }
         }
     }

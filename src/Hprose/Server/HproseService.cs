@@ -13,7 +13,7 @@
  *                                                        *
  * hprose service class for C#.                           *
  *                                                        *
- * LastModified: Mar 4, 2014                              *
+ * LastModified: Mar 17, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -447,10 +447,10 @@ namespace Hprose.Server {
             GlobalMethods.AddMissingMethod(methodName, type, mode, simple);
         }
 
-        private MemoryStream ResponseEnd(MemoryStream data) {
+        private MemoryStream ResponseEnd(MemoryStream data, object context) {
             data.Position = 0;
             if (filter != null) {
-                data = filter.OutputFilter(data);
+                data = filter.OutputFilter(data, context);
                 data.Position = 0;
             }
             return data;
@@ -460,9 +460,9 @@ namespace Hprose.Server {
             return arguments;
         }
 
-        protected MemoryStream SendError(Exception e) {
+        protected MemoryStream SendError(Exception e, object context) {
             if (OnSendError != null) {
-                OnSendError(e);
+                OnSendError(e, context);
             }
             string error = debugEnabled ? e.ToString(): e.Message;
             MemoryStream data = new MemoryStream(4096);
@@ -470,7 +470,7 @@ namespace Hprose.Server {
             data.WriteByte(HproseTags.TagError);
             writer.WriteString(error);
             data.WriteByte(HproseTags.TagEnd);
-            return ResponseEnd(data);
+            return ResponseEnd(data, context);
         }
 
         protected MemoryStream DoInvoke(MemoryStream istream, HproseMethods methods, object context) {
@@ -523,7 +523,7 @@ namespace Hprose.Server {
                     arguments = new object[0];
                 }
                 if (OnBeforeInvoke != null) {
-                    OnBeforeInvoke(name, arguments, byRef);
+                    OnBeforeInvoke(name, arguments, byRef, context);
                 }
                 if (remoteMethod == null) {
                     args = arguments;
@@ -551,11 +551,11 @@ namespace Hprose.Server {
                     Array.Copy(args, 0, arguments, 0, count);
                 }
                 if (OnAfterInvoke != null) {
-                    OnAfterInvoke(name, arguments, byRef, result);
+                    OnAfterInvoke(name, arguments, byRef, result, context);
                 }
                 if (remoteMethod.mode == HproseResultMode.RawWithEndTag) {
                     data.Write((byte[])result, 0, ((byte[])result).Length);
-                    return ResponseEnd(data);
+                    return ResponseEnd(data, context);
                 }
                 else if (remoteMethod.mode == HproseResultMode.Raw) {
                     data.Write((byte[])result, 0, ((byte[])result).Length);
@@ -578,10 +578,10 @@ namespace Hprose.Server {
                 }
             } while (tag == HproseTags.TagCall);
             data.WriteByte(HproseTags.TagEnd);
-            return ResponseEnd(data);
+            return ResponseEnd(data, context);
         }
 
-        protected MemoryStream DoFunctionList(HproseMethods methods) {
+        protected MemoryStream DoFunctionList(HproseMethods methods, object context) {
 #if !(dotNET10 || dotNET11 || dotNETCF10)
             List<string> names = new List<string>(GlobalMethods.AllNames);
 #else
@@ -599,12 +599,12 @@ namespace Hprose.Server {
             writer.WriteList((IList)names);
 #endif
             data.WriteByte(HproseTags.TagEnd);
-            return ResponseEnd(data);
+            return ResponseEnd(data, context);
         }
 
-        protected void FireErrorEvent(Exception e) {
+        protected void FireErrorEvent(Exception e, object context) {
             if (OnSendError != null) {
-                OnSendError(e);
+                OnSendError(e, context);
             }
         }
 
@@ -612,20 +612,20 @@ namespace Hprose.Server {
             try {
                 istream.Position = 0;
                 if (filter != null) {
-                    istream = filter.InputFilter(istream);
+                    istream = filter.InputFilter(istream, context);
                     istream.Position = 0;
                 }
                 switch (istream.ReadByte()) {
                     case HproseTags.TagCall:
                         return DoInvoke(istream, methods, context);
                     case HproseTags.TagEnd:
-                        return DoFunctionList(methods);
+                        return DoFunctionList(methods, context);
                     default:
-                        return SendError(new HproseException("Wrong Request: \r\n" + HproseHelper.ReadWrongInfo(istream)));
+                        return SendError(new HproseException("Wrong Request: \r\n" + HproseHelper.ReadWrongInfo(istream)), context);
                 }
             }
             catch (Exception e) {
-                return SendError(e);
+                return SendError(e, context);
             }
         }
     }

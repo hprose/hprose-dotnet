@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http listener service class for C#.             *
  *                                                        *
- * LastModified: Mar 4, 2014                              *
+ * LastModified: Mar 17, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -140,7 +140,7 @@ namespace Hprose.Server {
                 context.ostream.EndWrite(asyncResult);
             }
             catch (Exception e) {
-                FireErrorEvent(e);
+                FireErrorEvent(e, context.currentContext);
             }
             finally {
                 if (context.ostream.CanWrite) {
@@ -170,7 +170,7 @@ namespace Hprose.Server {
                         new AsyncCallback(NonBlockingWriteCallback), writeContext);
             }
             catch (Exception e) {
-                FireErrorEvent(e);
+                FireErrorEvent(e, currentContext);
                 if (writeContext.ostream != null) {
                     writeContext.ostream.Close();
                 }
@@ -200,7 +200,7 @@ namespace Hprose.Server {
                 }
             }
             catch (Exception e) {
-                FireErrorEvent(e);
+                FireErrorEvent(e, context.currentContext);
                 istream.Close();
                 context.currentContext.Response.Close();
                 return;
@@ -264,7 +264,7 @@ namespace Hprose.Server {
             SendHeader(context);
             string method = context.Request.HttpMethod;
             if ((method == "GET") && getEnabled) {
-                MemoryStream data = DoFunctionList(methods);
+                MemoryStream data = DoFunctionList(methods, context);
                 NonBlockingWriteContext writeContext = new NonBlockingWriteContext();
                 writeContext.currentContext = context;
                 writeContext.ostream = GetOutputStream(context);
