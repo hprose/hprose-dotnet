@@ -131,6 +131,7 @@ set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Server\HproseHttpListenerMethods.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Server\HproseHttpListenerService.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Server\HproseHttpListenerServer.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Server\HproseTcpListenerServer.cs
+set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Server\HproseTcpMethods.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\AssemblyInfo.cs
 
 set HPROSE_INFO= src\AssemblyInfo.cs

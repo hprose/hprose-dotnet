@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http listener service class for C#.             *
  *                                                        *
- * LastModified: Mar 17, 2014                             *
+ * LastModified: Mar 18, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -70,7 +70,7 @@ namespace Hprose.Server {
             }
         }
 
-        public static HttpListenerContext CurrentContext {
+        public static new HttpListenerContext CurrentContext {
             get {
                 return currentContext;
             }

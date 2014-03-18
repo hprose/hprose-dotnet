@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http service class for C#.                      *
  *                                                        *
- * LastModified: Mar 17, 2014                             *
+ * LastModified: Mar 18, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -75,7 +75,7 @@ namespace Hprose.Server {
             }
         }
 
-        public static HttpContext CurrentContext {
+        public static new HttpContext CurrentContext {
             get {
                 return currentContext;
             }

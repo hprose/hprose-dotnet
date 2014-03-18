@@ -13,7 +13,7 @@
  *                                                        *
  * hprose service class for C#.                           *
  *                                                        *
- * LastModified: Mar 17, 2014                             *
+ * LastModified: Mar 18, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -39,6 +39,8 @@ namespace Hprose.Server {
         public event AfterInvokeEvent OnAfterInvoke = null;
         public event SendErrorEvent OnSendError = null;
         private IHproseFilter filter = null;
+        [ThreadStatic]
+        private static Object currentContext;
 
         public virtual HproseMethods GlobalMethods {
             get {
@@ -49,6 +51,12 @@ namespace Hprose.Server {
             }
             set {
                 gMethods = value;
+            }
+        }
+
+        public static Object CurrentContext {
+            get {
+                return currentContext;
             }
         }
 
@@ -609,6 +617,7 @@ namespace Hprose.Server {
         }
 
         protected MemoryStream Handle(MemoryStream istream, HproseMethods methods, object context) {
+            currentContext = context;
             try {
                 istream.Position = 0;
                 if (filter != null) {
@@ -626,6 +635,9 @@ namespace Hprose.Server {
             }
             catch (Exception e) {
                 return SendError(e, context);
+            }
+            finally {
+                currentContext = null;
             }
         }
     }

@@ -13,7 +13,7 @@
  *                                                        *
  * hprose tcp listener server class for C#.               *
  *                                                        *
- * LastModified: Mar 17, 2014                             *
+ * LastModified: Mar 18, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -34,6 +34,29 @@ namespace Hprose.Server {
 
         public HproseTcpListenerServer(string uri) {
             this.uri = uri;
+        }
+
+        protected override object[] FixArguments(Type[] argumentTypes, object[] arguments, int count, object context) {
+            TcpClient client = (TcpClient)context;
+            if (argumentTypes.Length != count) {
+                object[] args = new object[argumentTypes.Length];
+                System.Array.Copy(arguments, args, count);
+                Type argType = argumentTypes[count];
+                if (argType == typeof(TcpClient)) {
+                    args[count] = client;
+                }
+                return args;
+            }
+            return arguments;
+        }
+
+        public override HproseMethods GlobalMethods {
+            get {
+                if (gMethods == null) {
+                    gMethods = new HproseTcpMethods();
+                }
+                return gMethods;
+            }
         }
 
         public string Uri {
