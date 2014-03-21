@@ -32,11 +32,9 @@ namespace TcpSessionServer {
                 inStream.Read(buf, 0, len);
                 return new MemoryStream(buf);
             }
-            else {
-                int sid = Session.sessions.Count;
-                Session.sidMap[context] = sid;
-                Session.sessions.Add(new Dictionary<string, dynamic>());
-            }
+            int sid = Session.sessions.Count;
+            Session.sidMap[context] = sid;
+            Session.sessions.Add(new Dictionary<string, dynamic>());
             return inStream;
         }
 
