@@ -157,13 +157,14 @@ namespace Hprose.Client {
         }
 #endif
         private HproseMode mode;
-        private IHproseFilter filter;
         protected string uri = null;
 
         public delegate HproseClient HproseClientCreator(string uri, HproseMode mode);
 #if (dotNET10 || dotNET11 || dotNETCF10)
+        private readonly ArrayList filters = new ArrayList();
         private static Hashtable clientFactories = new Hashtable();
 #else
+        private readonly List<IHproseFilter> filters = new List<IHproseFilter>();
         private static Dictionary<string, HproseClientCreator> clientFactories = new Dictionary<string, HproseClientCreator>();
 #endif
         static HproseClient() {
@@ -216,17 +217,45 @@ namespace Hprose.Client {
 	            UseService(uri);
         	}
             this.mode = mode;
-            filter = null;
         }
 
         public IHproseFilter Filter {
             get {
-                return filter;
+                if (filters.Count == 0) {
+                    return null;
+                }
+#if (dotNET10 || dotNET11 || dotNETCF10)
+                return (IHproseFilter)filters[0];
+#else
+                return filters[0];
+#endif
             }
             set {
-                filter = value;
+                if (filters.Count > 0) {
+                    filters.Clear();
+                }
+                if (value != null) {
+                    filters.Add(value);
+                }
             }
         }
+
+        public void AddFilter(IHproseFilter filter) {
+            filters.Add(filter);
+        }
+
+        public bool RemoveFilter(IHproseFilter filter) {
+#if (dotNET10 || dotNET11 || dotNETCF10)
+            if (filters.Contains(filter)) {
+                filters.Remove(filter);
+                return true;
+            }
+            return false;
+#else
+            return filters.Remove(filter);
+#endif
+        }
+
         public virtual void UseService(string uri) {
             this.uri = uri;
         }
@@ -706,8 +735,13 @@ namespace Hprose.Client {
             }
             outData.WriteByte(HproseTags.TagEnd);
             outData.Position = 0;
-            if (filter != null) {
+            for (int i = 0, n = filters.Count; i < n; i++) {
+#if (dotNET10 || dotNET11 || dotNETCF10)
+                IHproseFilter filter = (IHproseFilter)filters[i];
                 outData = filter.OutputFilter(outData, this);
+#else
+                outData = filters[i].OutputFilter(outData, this);
+#endif
                 outData.Position = 0;
             }
             return outData;
@@ -728,13 +762,17 @@ namespace Hprose.Client {
         }
 
         private object DoInput(MemoryStream inData, object[] arguments, Type returnType, HproseResultMode resultMode) {
-            int tag;
-            inData.Position = 0;
-            if (filter != null) {
+            for (int i = filters.Count - 1; i >= 0; i--) {
+                inData.Position = 0;
+#if (dotNET10 || dotNET11 || dotNETCF10)
+                IHproseFilter filter = (IHproseFilter)filters[i];
                 inData = filter.InputFilter(inData, this);
+#else
+                inData = filters[i].InputFilter(inData, this);
+#endif
             }
             inData.Position = inData.Length - 1;
-            tag = inData.ReadByte();
+            int tag = inData.ReadByte();
             if (tag != HproseTags.TagEnd) {
                 throw new HproseException("Wrong Response: \r\n" + HproseHelper.ReadWrongInfo(inData));
             }

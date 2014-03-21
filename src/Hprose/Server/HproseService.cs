@@ -38,7 +38,11 @@ namespace Hprose.Server {
         public event BeforeInvokeEvent OnBeforeInvoke = null;
         public event AfterInvokeEvent OnAfterInvoke = null;
         public event SendErrorEvent OnSendError = null;
-        private IHproseFilter filter = null;
+#if (dotNET10 || dotNET11 || dotNETCF10)
+        private readonly ArrayList filters = new ArrayList();
+#else
+        private readonly List<IHproseFilter> filters = new List<IHproseFilter>();
+#endif
         [ThreadStatic]
         private static Object currentContext;
 
@@ -80,11 +84,39 @@ namespace Hprose.Server {
 
         public IHproseFilter Filter {
             get {
-                return filter;
+                if (filters.Count == 0) {
+                    return null;
+                }
+#if (dotNET10 || dotNET11 || dotNETCF10)
+                return (IHproseFilter)filters[0];
+#else
+                return filters[0];
+#endif
             }
             set {
-                filter = value;
+                if (filters.Count > 0) {
+                    filters.Clear();
+                }
+                if (value != null) {
+                    filters.Add(value);
+                }
             }
+        }
+
+        public void AddFilter(IHproseFilter filter) {
+            filters.Add(filter);
+        }
+
+        public bool RemoveFilter(IHproseFilter filter) {
+#if (dotNET10 || dotNET11 || dotNETCF10)
+            if (filters.Contains(filter)) {
+                filters.Remove(filter);
+                return true;
+            }
+            return false;
+#else
+            return filters.Remove(filter);
+#endif
         }
 
         public void Add(MethodInfo method, object obj, string aliasName) {
@@ -457,8 +489,13 @@ namespace Hprose.Server {
 
         private MemoryStream ResponseEnd(MemoryStream data, object context) {
             data.Position = 0;
-            if (filter != null) {
+            for (int i = 0, n = filters.Count; i < n; i++) {
+#if (dotNET10 || dotNET11 || dotNETCF10)
+                IHproseFilter filter = (IHproseFilter)filters[i];
                 data = filter.OutputFilter(data, context);
+#else
+                data = filters[i].OutputFilter(data, context);
+#endif
                 data.Position = 0;
             }
             return data;
@@ -620,8 +657,13 @@ namespace Hprose.Server {
             currentContext = context;
             try {
                 istream.Position = 0;
-                if (filter != null) {
+                for (int i = filters.Count - 1; i >= 0; i--) {
+#if (dotNET10 || dotNET11 || dotNETCF10)
+                    IHproseFilter filter = (IHproseFilter)filters[i];
                     istream = filter.InputFilter(istream, context);
+#else
+                    istream = filters[i].InputFilter(istream, context);
+#endif
                     istream.Position = 0;
                 }
                 switch (istream.ReadByte()) {
