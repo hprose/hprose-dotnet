@@ -13,7 +13,7 @@
  *                                                        *
  * hprose helper class for C#.                            *
  *                                                        *
- * LastModified: Mar 7, 2014                              *
+ * LastModified: Apr 7, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -880,7 +880,7 @@ namespace Hprose.IO {
 #else
         private static Type GetType(String name) {
             Type type = null;
-            for (int i = assemblies.Length - 1; type == null && i >= 0; i--) {
+            for (int i = assemblies.Length - 1; type == null && i >= 0; --i) {
                 type = assemblies[i].GetType(name);
             }
             return type;
@@ -991,7 +991,7 @@ namespace Hprose.IO {
             ParameterInfo[] piarray = ctor.GetParameters();
             int length = piarray.Length;
             object[] args = new Object[length];
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 Type type = piarray[i].ParameterType;
                 if (type == typeofByte) {
                     args[i] = (byte)0;
@@ -1097,7 +1097,7 @@ namespace Hprose.IO {
                                                     BindingFlags.FlattenHierarchy;
                         ConstructorInfo[] ctors = type.GetConstructors(bindingflags);
                         Array.Sort(ctors, 0, ctors.Length, new ConstructorComparator());
-                        for (int i = 0, length = ctors.Length; i < length; i++) {
+                        for (int i = 0, length = ctors.Length; i < length; ++i) {
                             try {
                                 object obj = ctors[i].Invoke(GetArgs(ctors[i]));
                                 lock (cc.SyncRoot) {

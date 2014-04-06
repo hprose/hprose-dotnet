@@ -13,7 +13,7 @@
  *                                                        *
  * Object Unserializer class for C#.                      *
  *                                                        *
- * LastModified: Dec 19, 2012                             *
+ * LastModified: Apr 7, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -121,7 +121,7 @@ namespace Hprose.IO {
                     return false;
                 if (k1.names.Length != k2.names.Length)
                     return false;
-                for (int i = 0; i < k1.names.Length; i++)
+                for (int i = 0; i < k1.names.Length; ++i)
                     if (!k1.names[i].Equals(k2.names[i]))
                         return false;
                 return true;
@@ -160,7 +160,7 @@ namespace Hprose.IO {
             ILGenerator gen = dynamicMethod.GetILGenerator();
             LocalBuilder e = gen.DeclareLocal(typeofException);
             int count = names.Length;
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
                 FieldTypeInfo field;
                 if (fields.TryGetValue(names[i], out field)) {
                     Label exTryCatch = gen.BeginExceptionBlock();
@@ -211,7 +211,7 @@ namespace Hprose.IO {
             ILGenerator gen = dynamicMethod.GetILGenerator();
             LocalBuilder e = gen.DeclareLocal(typeofException);
             int count = names.Length;
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
                 PropertyTypeInfo property;
                 if (properties.TryGetValue(names[i], out property)) {
                     Label exTryCatch = gen.BeginExceptionBlock();
@@ -268,7 +268,7 @@ namespace Hprose.IO {
             ILGenerator gen = dynamicMethod.GetILGenerator();
             LocalBuilder e = gen.DeclareLocal(typeofException);
             int count = names.Length;
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
                 MemberTypeInfo member;
                 if (members.TryGetValue(names[i], out member)) {
                     Label exTryCatch = gen.BeginExceptionBlock();

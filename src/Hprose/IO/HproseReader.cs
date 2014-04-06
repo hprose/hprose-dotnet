@@ -13,7 +13,7 @@
  *                                                        *
  * hprose reader class for C#.                            *
  *                                                        *
- * LastModified: Feb 20, 2014                             *
+ * LastModified: Apr 7, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -322,7 +322,7 @@ namespace Hprose.IO {
         private char[] ReadChars() {
             int count = ReadInt(HproseTags.TagQuote);
             char[] buf = new char[count];
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
                 int c = stream.ReadByte();
                 switch (c >> 4) {
                     case 0:
@@ -365,8 +365,8 @@ namespace Hprose.IO {
                                         ((c3 & 0x3f) << 6) |
                                         (c4 & 0x3f) - 0x10000;
                                 if (0 <= s && s <= 0xfffff) {
-                                    buf[i++] = (char)(((s >> 10) & 0x03ff) | 0xd800);
-                                    buf[i] = (char)((s & 0x03ff) | 0xdc00);
+                                    buf[i] = (char)(((s >> 10) & 0x03ff) | 0xd800);
+                                    buf[++i] = (char)((s & 0x03ff) | 0xdc00);
                                     break;
                                 }
                             }
@@ -430,7 +430,7 @@ namespace Hprose.IO {
             int count = ReadInt(HproseTags.TagQuote);
             // here count is capacity, not the real size
             MemoryStream ms = new MemoryStream(count * 3);
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
                 int c = stream.ReadByte();
                 switch (c >> 4) {
                     case 0:
@@ -516,7 +516,7 @@ namespace Hprose.IO {
 #endif
             refer.Set(map);
             int count = memberNames.Length;
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
                 map[memberNames[i]] = Unserialize();
             }
             stream.ReadByte();
@@ -534,7 +534,7 @@ namespace Hprose.IO {
             object[] values = new object[count];
 #endif
             FieldTypeInfo field;
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
 #if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core)
                 names[i] = ReadString();
                 if (fields.TryGetValue(names[i], out field)) {
@@ -571,7 +571,7 @@ namespace Hprose.IO {
             object[] values = new object[count];
 #endif
             PropertyTypeInfo property;
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
 #if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core)
                 names[i] = ReadString();
                 if (properties.TryGetValue(names[i], out property)) {
@@ -612,7 +612,7 @@ namespace Hprose.IO {
             object[] values = new object[count];
 #endif
             MemberTypeInfo member;
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
 #if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core)
                 names[i] = ReadString();
                 if (members.TryGetValue(names[i], out member)) {
@@ -675,7 +675,7 @@ namespace Hprose.IO {
             string className = ReadCharsAsString();
             int count = ReadInt(HproseTags.TagOpenbrace);
             string[] memberNames = new string[count];
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
                 memberNames[i] = ReadString();
             }
             stream.ReadByte();
@@ -849,7 +849,7 @@ namespace Hprose.IO {
 
         public Guid ReadGuidWithoutTag() {
             char[] buf = new char[38];
-            for (int i = 0; i < 38; i++) {
+            for (int i = 0; i < 38; ++i) {
                 buf[i] = (char)stream.ReadByte();
             }
             Guid guid = new Guid(new String(buf));
@@ -865,7 +865,7 @@ namespace Hprose.IO {
             List<object> a = new List<object>(count);
 #endif
             refer.Set(a);
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
                 a.Add(Unserialize());
             }
             stream.ReadByte();
@@ -880,7 +880,7 @@ namespace Hprose.IO {
             HashMap<object, object> map = new HashMap<object, object>(count);
 #endif
             refer.Set(map);
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
                 object key = Unserialize();
                 object value = Unserialize();
                 map[key] = value;
@@ -899,7 +899,7 @@ namespace Hprose.IO {
             Hashtable fields = HproseHelper.GetFields(type);
 #endif
             FieldTypeInfo field;
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
 #if !(dotNET10 || dotNET11 || dotNETCF10)
                 if (fields.TryGetValue(memberNames[i], out field)) {
 #else
@@ -931,7 +931,7 @@ namespace Hprose.IO {
             Hashtable properties = HproseHelper.GetProperties(type);
 #endif
             PropertyTypeInfo property;
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
 #if !(dotNET10 || dotNET11 || dotNETCF10)
                 if (properties.TryGetValue(memberNames[i], out property)) {
 #else
@@ -967,7 +967,7 @@ namespace Hprose.IO {
             Hashtable members = HproseHelper.GetMembers(type);
 #endif
             MemberTypeInfo member;
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
 #if !(dotNET10 || dotNET11 || dotNETCF10)
                 if (members.TryGetValue(memberNames[i], out member)) {
 #else
@@ -1028,7 +1028,7 @@ namespace Hprose.IO {
                 Dictionary<string, object> map = new Dictionary<string, object>(count);
 #endif
                 refer.Set(map);
-                for (int i = 0; i < count; i++) {
+                for (int i = 0; i < count; ++i) {
                     map[memberNames[i]] = Unserialize();
                 }
                 obj = map;
@@ -1748,7 +1748,7 @@ namespace Hprose.IO {
 
         public void ReadArray(Type[] types, object[] a, int count) {
             refer.Set(a);
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
                 a[i] = Unserialize(types[i]);
             }
             stream.ReadByte();
@@ -1757,7 +1757,7 @@ namespace Hprose.IO {
         public object[] ReadArray(int count) {
             object[] a = new object[count];
             refer.Set(a);
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
                 a[i] = Unserialize();
             }
             stream.ReadByte();
@@ -1782,7 +1782,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     bool[] a = new bool[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadBoolean();
                     }
                     stream.ReadByte();
@@ -1803,7 +1803,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     char[] a = new char[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadChar();
                     }
                     stream.ReadByte();
@@ -1831,7 +1831,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     sbyte[] a = new sbyte[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadSByte();
                     }
                     stream.ReadByte();
@@ -1854,7 +1854,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     byte[] a = new byte[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadByte();
                     }
                     stream.ReadByte();
@@ -1882,7 +1882,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     short[] a = new short[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadInt16();
                     }
                     stream.ReadByte();
@@ -1902,7 +1902,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     ushort[] a = new ushort[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadUInt16();
                     }
                     stream.ReadByte();
@@ -1921,7 +1921,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     int[] a = new int[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadInt32();
                     }
                     stream.ReadByte();
@@ -1941,7 +1941,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     uint[] a = new uint[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadUInt32();
                     }
                     stream.ReadByte();
@@ -1960,7 +1960,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     long[] a = new long[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadInt64();
                     }
                     stream.ReadByte();
@@ -1980,7 +1980,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     ulong[] a = new ulong[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadUInt64();
                     }
                     stream.ReadByte();
@@ -1999,7 +1999,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     float[] a = new float[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadSingle();
                     }
                     stream.ReadByte();
@@ -2018,7 +2018,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     double[] a = new double[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadDouble();
                     }
                     stream.ReadByte();
@@ -2037,7 +2037,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     decimal[] a = new decimal[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadDecimal();
                     }
                     stream.ReadByte();
@@ -2056,7 +2056,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     DateTime[] a = new DateTime[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadDateTime();
                     }
                     stream.ReadByte();
@@ -2075,7 +2075,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     string[] a = new string[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadString();
                     }
                     stream.ReadByte();
@@ -2094,7 +2094,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     StringBuilder[] a = new StringBuilder[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadStringBuilder();
                     }
                     stream.ReadByte();
@@ -2113,7 +2113,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     Guid[] a = new Guid[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadGuid();
                     }
                     stream.ReadByte();
@@ -2132,7 +2132,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     BigInteger[] a = new BigInteger[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadBigInteger();
                     }
                     stream.ReadByte();
@@ -2151,7 +2151,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     TimeSpan[] a = new TimeSpan[count];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadTimeSpan();
                     }
                     stream.ReadByte();
@@ -2171,7 +2171,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     char[][] a = new char[count][];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadCharArray();
                     }
                     stream.ReadByte();
@@ -2191,7 +2191,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     byte[][] a = new byte[count][];
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadByteArray();
                     }
                     stream.ReadByte();
@@ -2215,7 +2215,7 @@ namespace Hprose.IO {
 #endif
                 a = Array.CreateInstance(elementType, count);
                 refer.Set(a);
-                for (int i = 0; i < count; i++) {
+                for (int i = 0; i < count; ++i) {
                     a.SetValue(Unserialize(elementType, elementTypeEnum), i);
                 }
 #if !dotNETCF10
@@ -2226,14 +2226,14 @@ namespace Hprose.IO {
                 int[] len = new int[rank];
                 int maxrank = rank - 1;
                 len[0] = count;
-                for (i = 1; i < rank; i++) {
+                for (i = 1; i < rank; ++i) {
                     stream.ReadByte();
                     //CheckTag(HproseTags.TagList);
                     len[i] = ReadInt(HproseTags.TagOpenbrace);
                 }
                 a = Array.CreateInstance(elementType, len);
                 refer.Set(a);
-                for (i = 1; i < rank; i++) {
+                for (i = 1; i < rank; ++i) {
                     refer.Set(null);
                 }
                 while (true) {
@@ -2262,7 +2262,7 @@ namespace Hprose.IO {
                             break;
                         }
                     }
-                    for (i = rank - n; i < rank; i++) {
+                    for (i = rank - n; i < rank; ++i) {
                         stream.ReadByte();
                         //CheckTag(HproseTags.TagList);
                         refer.Set(null);
@@ -2293,7 +2293,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     BitArray a = new BitArray(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a[i] = ReadBoolean();
                     }
                     stream.ReadByte();
@@ -2313,7 +2313,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     ArrayList a = new ArrayList(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(Unserialize());
                     }
                     stream.ReadByte();
@@ -2332,7 +2332,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     Queue a = new Queue(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Enqueue(Unserialize());
                     }
                     stream.ReadByte();
@@ -2355,7 +2355,7 @@ namespace Hprose.IO {
                     Stack a = new Stack();
 #endif
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Push(Unserialize());
                     }
                     stream.ReadByte();
@@ -2375,7 +2375,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     IList a = (IList)HproseHelper.NewInstance(type);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(Unserialize());
                     }
                     stream.ReadByte();
@@ -2397,7 +2397,7 @@ namespace Hprose.IO {
                     refer.Set(a);
                     Type type = typeof(T);
                     TypeEnum typeEnum = HproseHelper.GetTypeEnum(type);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add((T)Unserialize(type, typeEnum));
                     }
                     stream.ReadByte();
@@ -2416,7 +2416,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<object> a = new List<object>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(Unserialize());
                     }
                     stream.ReadByte();
@@ -2435,7 +2435,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<bool> a = new List<bool>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadBoolean());
                     }
                     stream.ReadByte();
@@ -2454,7 +2454,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<char> a = new List<char>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadChar());
                     }
                     stream.ReadByte();
@@ -2474,7 +2474,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<sbyte> a = new List<sbyte>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadSByte());
                     }
                     stream.ReadByte();
@@ -2493,7 +2493,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<byte> a = new List<byte>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadByte());
                     }
                     stream.ReadByte();
@@ -2512,7 +2512,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<short> a = new List<short>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadInt16());
                     }
                     stream.ReadByte();
@@ -2532,7 +2532,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<ushort> a = new List<ushort>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadUInt16());
                     }
                     stream.ReadByte();
@@ -2551,7 +2551,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<int> a = new List<int>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadInt32());
                     }
                     stream.ReadByte();
@@ -2571,7 +2571,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<uint> a = new List<uint>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadUInt32());
                     }
                     stream.ReadByte();
@@ -2590,7 +2590,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<long> a = new List<long>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadInt64());
                     }
                     stream.ReadByte();
@@ -2610,7 +2610,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<ulong> a = new List<ulong>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadUInt64());
                     }
                     stream.ReadByte();
@@ -2629,7 +2629,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<float> a = new List<float>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadSingle());
                     }
                     stream.ReadByte();
@@ -2648,7 +2648,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<double> a = new List<double>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadDouble());
                     }
                     stream.ReadByte();
@@ -2667,7 +2667,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<decimal> a = new List<decimal>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadDecimal());
                     }
                     stream.ReadByte();
@@ -2686,7 +2686,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<DateTime> a = new List<DateTime>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadDateTime());
                     }
                     stream.ReadByte();
@@ -2705,7 +2705,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<string> a = new List<string>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadString());
                     }
                     stream.ReadByte();
@@ -2724,7 +2724,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<StringBuilder> a = new List<StringBuilder>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadStringBuilder());
                     }
                     stream.ReadByte();
@@ -2743,7 +2743,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<Guid> a = new List<Guid>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadGuid());
                     }
                     stream.ReadByte();
@@ -2762,7 +2762,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<BigInteger> a = new List<BigInteger>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadBigInteger());
                     }
                     stream.ReadByte();
@@ -2781,7 +2781,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<TimeSpan> a = new List<TimeSpan>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadTimeSpan());
                     }
                     stream.ReadByte();
@@ -2800,7 +2800,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<char[]> a = new List<char[]>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadCharArray());
                     }
                     stream.ReadByte();
@@ -2819,7 +2819,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     List<byte[]> a = new List<byte[]>(count);
                     refer.Set(a);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add(ReadByteArray());
                     }
                     stream.ReadByte();
@@ -2840,7 +2840,7 @@ namespace Hprose.IO {
                     refer.Set(a);
                     Type type = typeof(T);
                     TypeEnum typeEnum = HproseHelper.GetTypeEnum(type);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Enqueue((T)Unserialize(type, typeEnum));
                     }
                     stream.ReadByte();
@@ -2861,7 +2861,7 @@ namespace Hprose.IO {
                     refer.Set(a);
                     Type type = typeof(T);
                     TypeEnum typeEnum = HproseHelper.GetTypeEnum(type);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Push((T)Unserialize(type, typeEnum));
                     }
                     stream.ReadByte();
@@ -2883,7 +2883,7 @@ namespace Hprose.IO {
                     refer.Set(a);
                     Type t = typeof(T);
                     TypeEnum typeEnum = HproseHelper.GetTypeEnum(t);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add((T)Unserialize(t, typeEnum));
                     }
                     stream.ReadByte();
@@ -2905,7 +2905,7 @@ namespace Hprose.IO {
                     refer.Set(a);
                     Type t = typeof(T);
                     TypeEnum typeEnum = HproseHelper.GetTypeEnum(t);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         a.Add((T)Unserialize(t, typeEnum));
                     }
                     stream.ReadByte();
@@ -2926,7 +2926,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     HashMap map = new HashMap(count);
                     refer.Set(map);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         object key = i;
                         object value = Unserialize();
                         map[key] = value;
@@ -2938,7 +2938,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     HashMap map = new HashMap(count);
                     refer.Set(map);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         object key = Unserialize();
                         object value = Unserialize();
                         map[key] = value;
@@ -2965,7 +2965,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     IDictionary map = (IDictionary)HproseHelper.NewInstance(type);
                     refer.Set(map);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         object key = i;
                         object value = Unserialize();
                         map[key] = value;
@@ -2977,7 +2977,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     IDictionary map = (IDictionary)HproseHelper.NewInstance(type);
                     refer.Set(map);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         object key = Unserialize();
                         object value = Unserialize();
                         map[key] = value;
@@ -3006,7 +3006,7 @@ namespace Hprose.IO {
             Type keyType = typeof(TKey);
             Type valueType = typeof(TValue);
             TypeEnum valueTypeEnum = HproseHelper.GetTypeEnum(valueType);
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
                 TKey key = (TKey)Convert.ChangeType(i, keyType, null);
                 TValue value = (TValue)Unserialize(valueType, valueTypeEnum);
                 map[key] = value;
@@ -3028,7 +3028,7 @@ namespace Hprose.IO {
                     TypeEnum keyTypeEnum = HproseHelper.GetTypeEnum(keyType);
                     Type valueType = typeof(TValue);
                     TypeEnum valueTypeEnum = HproseHelper.GetTypeEnum(valueType);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         TKey key = (TKey)Unserialize(keyType, keyTypeEnum);
                         TValue value = (TValue)Unserialize(valueType, valueTypeEnum);
                         map[key] = value;
@@ -3050,7 +3050,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     HashMap<string, object> map = new HashMap<string, object>(count);
                     refer.Set(map);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         string key = ReadString();
                         object value = Unserialize();
                         map[key] = value;
@@ -3077,7 +3077,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     HashMap<object, object> map = new HashMap<object, object>(count);
                     refer.Set(map);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         object key = Unserialize();
                         object value = Unserialize();
                         map[key] = value;
@@ -3104,7 +3104,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     HashMap<int, object> map = new HashMap<int, object>(count);
                     refer.Set(map);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         int key = ReadInt32();
                         object value = Unserialize();
                         map[key] = value;
@@ -3124,7 +3124,7 @@ namespace Hprose.IO {
             Type keyType = typeof(TKey);
             Type valueType = typeof(TValue);
             TypeEnum valueTypeEnum = HproseHelper.GetTypeEnum(valueType);
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
                 TKey key = (TKey)Convert.ChangeType(i, keyType, null);
                 TValue value = (TValue)Unserialize(valueType, valueTypeEnum);
                 map[key] = value;
@@ -3146,7 +3146,7 @@ namespace Hprose.IO {
                     TypeEnum keyTypeEnum = HproseHelper.GetTypeEnum(keyType);
                     Type valueType = typeof(TValue);
                     TypeEnum valueTypeEnum = HproseHelper.GetTypeEnum(valueType);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         TKey key = (TKey)Unserialize(keyType, keyTypeEnum);
                         TValue value = (TValue)Unserialize(valueType, valueTypeEnum);
                         map[key] = value;
@@ -3168,7 +3168,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     Dictionary<string, object> map = new Dictionary<string, object>(count);
                     refer.Set(map);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         string key = ReadString();
                         object value = Unserialize();
                         map[key] = value;
@@ -3195,7 +3195,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     Dictionary<object, object> map = new Dictionary<object, object>(count);
                     refer.Set(map);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         object key = Unserialize();
                         object value = Unserialize();
                         map[key] = value;
@@ -3222,7 +3222,7 @@ namespace Hprose.IO {
                     int count = ReadInt(HproseTags.TagOpenbrace);
                     Dictionary<int, object> map = new Dictionary<int, object>(count);
                     refer.Set(map);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         int key = ReadInt32();
                         object value = Unserialize();
                         map[key] = value;
@@ -3243,7 +3243,7 @@ namespace Hprose.IO {
             Type keyType = typeof(TKey);
             Type valueType = typeof(TValue);
             TypeEnum valueTypeEnum = HproseHelper.GetTypeEnum(valueType);
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
                 TKey key = (TKey)Convert.ChangeType(i, keyType, null);
                 TValue value = (TValue)Unserialize(valueType, valueTypeEnum);
                 map[key] = value;
@@ -3266,7 +3266,7 @@ namespace Hprose.IO {
                     TypeEnum keyTypeEnum = HproseHelper.GetTypeEnum(keyType);
                     Type valueType = typeof(TValue);
                     TypeEnum valueTypeEnum = HproseHelper.GetTypeEnum(valueType);
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; ++i) {
                         TKey key = (TKey)Unserialize(keyType, keyTypeEnum);
                         TValue value = (TValue)Unserialize(valueType, valueTypeEnum);
                         map[key] = value;
@@ -3582,7 +3582,7 @@ namespace Hprose.IO {
                 tag = stream.ReadByte();
                 ostream.WriteByte((byte)tag);
             } while (tag != HproseTags.TagQuote);
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; ++i) {
                 tag = stream.ReadByte();
                 switch (tag >> 4) {
                     case 0:
@@ -3618,6 +3618,7 @@ namespace Hprose.IO {
                             ostream.WriteByte((byte)stream.ReadByte());
                             ostream.WriteByte((byte)stream.ReadByte());
                             ostream.WriteByte((byte)stream.ReadByte());
+                            ++i;
                             break;
                         }
                         goto default;

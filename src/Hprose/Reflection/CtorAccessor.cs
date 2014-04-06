@@ -13,7 +13,7 @@
  *                                                        *
  * CtorAccessor class for C#.                             *
  *                                                        *
- * LastModified: Nov 6, 2012                              *
+ * LastModified: Apr 7, 2014                              *
  * Authors: Ma Bingyao <andot@hprose.com>                 *
  *                                                        *
 \**********************************************************/
@@ -95,7 +95,7 @@ namespace Hprose.Reflection {
             else {
                 ConstructorInfo[] ctors = type.GetConstructors(bindingflags);
                 Array.Sort(ctors, 0, ctors.Length, new ConstructorComparator());
-                for (int i = 0, length = ctors.Length; i < length; i++) {
+                for (int i = 0, length = ctors.Length; i < length; ++i) {
                     try {
                         DynamicMethod dynamicNewInstance = new DynamicMethod("$NewInstance",
                             typeofObject,

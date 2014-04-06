@@ -13,7 +13,7 @@
  *                                                        *
  * hprose service class for C#.                           *
  *                                                        *
- * LastModified: Mar 18, 2014                             *
+ * LastModified: Apr 7, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -489,7 +489,7 @@ namespace Hprose.Server {
 
         private MemoryStream ResponseEnd(MemoryStream data, object context) {
             data.Position = 0;
-            for (int i = 0, n = filters.Count; i < n; i++) {
+            for (int i = 0, n = filters.Count; i < n; ++i) {
 #if (dotNET10 || dotNET11 || dotNETCF10)
                 IHproseFilter filter = (IHproseFilter)filters[i];
                 data = filter.OutputFilter(data, context);
@@ -657,7 +657,7 @@ namespace Hprose.Server {
             currentContext = context;
             try {
                 istream.Position = 0;
-                for (int i = filters.Count - 1; i >= 0; i--) {
+                for (int i = filters.Count - 1; i >= 0; --i) {
 #if (dotNET10 || dotNET11 || dotNETCF10)
                     IHproseFilter filter = (IHproseFilter)filters[i];
                     istream = filter.InputFilter(istream, context);

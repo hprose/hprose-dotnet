@@ -13,7 +13,7 @@
  *                                                        *
  * hprose remote method class for C#.                     *
  *                                                        *
- * LastModified: Feb 19, 2014                             *
+ * LastModified: Apr 7, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -34,7 +34,7 @@ namespace Hprose.Common {
             this.simple = simple;
             ParameterInfo[] parameters = method.GetParameters();
             this.paramTypes = new Type[parameters.Length];
-            for (int i = 0; i < paramTypes.Length; i++) {
+            for (int i = 0; i < paramTypes.Length; ++i) {
                 this.paramTypes[i] = parameters[i].ParameterType;
             }
         }

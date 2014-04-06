@@ -13,7 +13,7 @@
  *                                                        *
  * hprose tcp listener server class for C#.               *
  *                                                        *
- * LastModified: Mar 18, 2014                             *
+ * LastModified: Apr 7, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -142,7 +142,7 @@ namespace Hprose.Server {
             if (Listener == null) {
                 Uri u = new Uri(uri);
                 IPAddress[] localAddrs = Dns.GetHostAddresses(u.Host);
-                for (int i = 0; i < localAddrs.Length; i++) {
+                for (int i = 0; i < localAddrs.Length; ++i) {
                     if (u.Scheme == "tcp6") {
                         if (localAddrs[i].AddressFamily == AddressFamily.InterNetworkV6) {
                             Listener = new TcpListener(localAddrs[i], u.Port);
@@ -157,7 +157,7 @@ namespace Hprose.Server {
                     }
                 }
                 Listener.Start();
-                for (int i = 0; i < tCount; i++) {
+                for (int i = 0; i < tCount; ++i) {
                     Listener.BeginAcceptTcpClient(new AsyncCallback(AcceptTcpCallback), Listener);
                 }
             }

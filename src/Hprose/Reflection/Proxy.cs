@@ -13,7 +13,7 @@
  *                                                        *
  * Proxy class for C#.                                    *
  *                                                        *
- * LastModified: Nov 6, 2012                              *
+ * LastModified: Apr 7, 2014                              *
  * Authors: Ma Bingyao <andot@hprose.com>                 *
  *                                                        *
 \**********************************************************/
@@ -222,7 +222,7 @@ namespace Hprose.Reflection {
 
         private static Type[] ToTypes(ParameterInfo[] parameterInfos) {
             Type[] types = new Type[parameterInfos.Length];
-            for (int i = 0; i < parameterInfos.Length; i++) {
+            for (int i = 0; i < parameterInfos.Length; ++i) {
                 types[i] = parameterInfos[i].ParameterType;
             }
             return types;
@@ -305,7 +305,7 @@ namespace Hprose.Reflection {
             if (paramNum > 0) {
                 gen.Emit(OpCodes.Stloc, parameters);
 
-                for (Int32 i = 0; i < paramNum; i++) {
+                for (Int32 i = 0; i < paramNum; ++i) {
                     gen.Emit(OpCodes.Ldloc, parameters);
                     gen.Emit(OpCodes.Ldc_I4, i);
                     gen.Emit(OpCodes.Ldarg, i + 1);
@@ -362,7 +362,7 @@ namespace Hprose.Reflection {
             gen.Emit(OpCodes.Callvirt, Proxy_Invoke);
             gen.Emit(OpCodes.Stloc, result);
 
-            for (Int32 i = 0; i < paramNum; i++) {
+            for (Int32 i = 0; i < paramNum; ++i) {
                 if (paramsByRef[i]) {
                     gen.Emit(OpCodes.Ldarg, i + 1);
                     gen.Emit(OpCodes.Ldloc, parameters);
@@ -458,7 +458,7 @@ namespace Hprose.Reflection {
                     return false;
                 if (p1.interfaces.Length != p2.interfaces.Length)
                     return false;
-                for (int i = 0; i < p1.interfaces.Length; i++)
+                for (int i = 0; i < p1.interfaces.Length; ++i)
                     if (!p1.interfaces[i].Equals(p2.interfaces[i]))
                         return false;
                 return true;

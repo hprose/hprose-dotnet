@@ -13,7 +13,7 @@
  *                                                        *
  * hprose client class for C#.                            *
  *                                                        *
- * LastModified: Mar 17, 2014                             *
+ * LastModified: Apr 7, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -735,7 +735,7 @@ namespace Hprose.Client {
             }
             outData.WriteByte(HproseTags.TagEnd);
             outData.Position = 0;
-            for (int i = 0, n = filters.Count; i < n; i++) {
+            for (int i = 0, n = filters.Count; i < n; ++i) {
 #if (dotNET10 || dotNET11 || dotNETCF10)
                 IHproseFilter filter = (IHproseFilter)filters[i];
                 outData = filter.OutputFilter(outData, this);
@@ -762,7 +762,7 @@ namespace Hprose.Client {
         }
 
         private object DoInput(MemoryStream inData, object[] arguments, Type returnType, HproseResultMode resultMode) {
-            for (int i = filters.Count - 1; i >= 0; i--) {
+            for (int i = filters.Count - 1; i >= 0; --i) {
                 inData.Position = 0;
 #if (dotNET10 || dotNET11 || dotNETCF10)
                 IHproseFilter filter = (IHproseFilter)filters[i];

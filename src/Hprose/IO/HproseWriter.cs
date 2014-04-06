@@ -13,7 +13,7 @@
  *                                                        *
  * hprose writer class for C#.                            *
  *                                                        *
- * LastModified: Feb 19, 2014                             *
+ * LastModified: Apr 7, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -635,7 +635,7 @@ namespace Hprose.IO {
             int length = s.Length;
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagQuote);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 int c = 0xffff & s[i];
                 if (c < 0x80) {
                     stream.WriteByte((byte)c);
@@ -685,7 +685,7 @@ namespace Hprose.IO {
             int length = s.Length;
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagQuote);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 int c = 0xffff & s[i];
                 if (c < 0x80) {
                     stream.WriteByte((byte)c);
@@ -750,7 +750,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteInteger(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -768,7 +768,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteInteger(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -786,7 +786,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteInteger(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -804,7 +804,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteLong(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -822,7 +822,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteInteger(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -840,7 +840,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteLong(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -858,7 +858,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteLong(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -876,7 +876,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteLong(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -894,7 +894,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteDouble(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -912,7 +912,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteDouble(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -930,7 +930,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteDouble(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -948,7 +948,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteBoolean(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -966,7 +966,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 byte[] value = array[i];
                 if (value == null) WriteNull();
                 else WriteBytes(value);
@@ -986,7 +986,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 char[] value = array[i];
                 if (value == null) WriteNull();
                 else WriteString(value);
@@ -1006,7 +1006,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 string value = array[i];
                 if (value == null) WriteNull();
                 else WriteString(value);
@@ -1026,7 +1026,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 StringBuilder value = array[i];
                 if (value == null) WriteNull();
                 else WriteString(value);
@@ -1046,7 +1046,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteGuidWithRef(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -1064,7 +1064,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteLong(array[i].Ticks);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -1082,7 +1082,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteDate(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -1099,7 +1099,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 Serialize(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -1117,7 +1117,7 @@ namespace Hprose.IO {
                 stream.WriteByte(HproseTags.TagList);
                 if (length > 0) WriteInt(length, stream);
                 stream.WriteByte(HproseTags.TagOpenbrace);
-                for (int i = 0; i < length; i++) {
+                for (int i = 0; i < length; ++i) {
                     Serialize(array.GetValue(i));
                 }
                 stream.WriteByte(HproseTags.TagClosebrace);
@@ -1128,7 +1128,7 @@ namespace Hprose.IO {
                 int[] loc = new int[rank];
                 int[] len = new int[rank];
                 int maxrank = rank - 1;
-                for (i = 0; i < rank; i++) {
+                for (i = 0; i < rank; ++i) {
                     des[i, 0] = array.GetLowerBound(i);
                     des[i, 1] = array.GetUpperBound(i);
                     loc[i] = des[i, 0];
@@ -1147,7 +1147,7 @@ namespace Hprose.IO {
                             break;
                         }
                     }
-                    for (i = rank - n; i < rank; i++) {
+                    for (i = rank - n; i < rank; ++i) {
                         refer.Set(new object());
                         stream.WriteByte(HproseTags.TagList);
                         if (len[i] > 0) WriteInt(len[i], stream);
@@ -1180,7 +1180,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteBoolean(array[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -1196,7 +1196,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 Serialize(list[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -1246,7 +1246,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteDouble(list[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -1262,7 +1262,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 WriteInteger(list[i]);
             }
             stream.WriteByte(HproseTags.TagClosebrace);
@@ -1278,7 +1278,7 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagList);
             if (length > 0) WriteInt(length, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < length; ++i) {
                 string value = list[i];
                 if (value == null) WriteNull();
                 else WriteStringWithRef(value);

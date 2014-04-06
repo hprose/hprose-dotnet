@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http remote methods class for C#.               *
  *                                                        *
- * LastModified: Nov 6, 2012                              *
+ * LastModified: Apr 7, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -35,7 +35,7 @@ namespace Hprose.Server {
                     paramType == typeof(HttpServerUtility) ||
                     paramType == typeof(HttpApplicationState) ||
                     paramType == typeof(HttpSessionState)) {
-                    i--;
+                    --i;
                 }
             }
             return i;

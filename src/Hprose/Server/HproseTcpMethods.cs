@@ -13,7 +13,7 @@
  *                                                        *
  * hprose tcp remote methods class for C#.                *
  *                                                        *
- * LastModified: Mar 18, 2014                             *
+ * LastModified: Apr 7, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -29,7 +29,7 @@ namespace Hprose.Server {
             if (i > 0) {
                 Type paramType = paramTypes[i - 1];
                 if (paramType == typeof(TcpClient)) {
-                    i--;
+                    --i;
                 }
             }
             return i;

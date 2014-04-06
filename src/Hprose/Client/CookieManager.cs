@@ -13,7 +13,7 @@
  *                                                        *
  * cookie manager class for .NET Compact Framework.       *
  *                                                        *
- * LastModified: May 16, 2010                             *
+ * LastModified: Apr 7, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -44,7 +44,7 @@ public class CookieManager {
                     cookie["value"] = value[1];
                 else
                     cookie["value"] = "";
-                for (int i = 1; i < cookies.Length; i++) {
+                for (int i = 1; i < cookies.Length; ++i) {
                     value = regex.Split(cookies[i].Trim(), 2);
                     if (value.Length == 2)
                         cookie[value[0].ToUpper()] = value[1];

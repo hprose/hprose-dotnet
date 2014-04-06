@@ -13,7 +13,7 @@
  *                                                        *
  * hprose InvocationHandler class for C#.                 *
  *                                                        *
- * LastModified: Mar 6, 2014                              *
+ * LastModified: Apr 7, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -54,7 +54,7 @@ namespace Hprose.Common {
         private static Type[] GetTypes(ParameterInfo[] parameters) {
             int n = parameters.Length;
             Type[] types = new Type[n];
-            for (int i = 0; i < n; i++) {
+            for (int i = 0; i < n; ++i) {
                 types[i] = parameters[i].ParameterType;
             }
             return types;

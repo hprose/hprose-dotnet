@@ -13,7 +13,7 @@
  *                                                        *
  * hprose remote methods class for C#.                    *
  *                                                        *
- * LastModified: Feb 19, 2014                             *
+ * LastModified: Apr 7, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -208,7 +208,7 @@ namespace Hprose.Common {
 #else
             BindingFlags flags = (obj == null) ? BindingFlags.Static : BindingFlags.Instance;
             MethodInfo[] methods = type.GetMethods(flags | BindingFlags.Public);
-            for (int i = 0; i < methods.Length; i++) {
+            for (int i = 0; i < methods.Length; ++i) {
                 if (methodName == methods[i].Name) {
                     AddMethod(aliasName, new HproseMethod(methods[i], obj, mode, simple));
                 }
@@ -295,7 +295,7 @@ namespace Hprose.Common {
         private void AddMethods(string[] methodNames, object obj, Type type, string[] aliasNames, HproseResultMode mode, bool simple) {
 #if dotNET45
             IEnumerable<MethodInfo> methods = type.GetRuntimeMethods();
-            for (int i = 0; i < methodNames.Length; i++) {
+            for (int i = 0; i < methodNames.Length; ++i) {
                 string methodName = methodNames[i];
                 string aliasName = aliasNames[i];
                 foreach (MethodInfo method in methods) {
@@ -307,7 +307,7 @@ namespace Hprose.Common {
 #else
             BindingFlags flags = (obj == null) ? BindingFlags.Static : BindingFlags.Instance;
             MethodInfo[] methods = type.GetMethods(flags | BindingFlags.Public);
-            for (int i = 0; i < methodNames.Length; i++) {
+            for (int i = 0; i < methodNames.Length; ++i) {
                 string methodName = methodNames[i];
                 string aliasName = aliasNames[i];
                 for (int j = 0; j < methods.Length; j++) {
@@ -333,7 +333,7 @@ namespace Hprose.Common {
 
         private void AddMethods(string[] methodNames, object obj, Type type, string aliasPrefix, HproseResultMode mode, bool simple) {
             string[] aliasNames = new string[methodNames.Length];
-            for (int i = 0; i < methodNames.Length; i++) {
+            for (int i = 0; i < methodNames.Length; ++i) {
                 aliasNames[i] = aliasPrefix + "_" + methodNames[i];
             }
             AddMethods(methodNames, obj, type, aliasNames, mode, simple);
@@ -476,7 +476,7 @@ namespace Hprose.Common {
                 MethodInfo[] methods = type.GetMethods(BindingFlags.DeclaredOnly |
                                                        BindingFlags.Instance |
                                                        BindingFlags.Public);
-                for (int i = 0; i < methods.Length; i++) {
+                for (int i = 0; i < methods.Length; ++i) {
                     AddMethod(methods[i], obj, aliasPrefix + "_" + methods[i].Name, mode, simple);
                 }
 #endif
@@ -508,7 +508,7 @@ namespace Hprose.Common {
                 MethodInfo[] methods = type.GetMethods(BindingFlags.DeclaredOnly |
                                                        BindingFlags.Instance |
                                                        BindingFlags.Public);
-                for (int i = 0; i < methods.Length; i++) {
+                for (int i = 0; i < methods.Length; ++i) {
                     AddMethod(methods[i], obj, methods[i].Name, mode, simple);
                 }
 #endif
@@ -571,7 +571,7 @@ namespace Hprose.Common {
             MethodInfo[] methods = type.GetMethods(BindingFlags.DeclaredOnly |
                                                    BindingFlags.Static |
                                                    BindingFlags.Public);
-            for (int i = 0; i < methods.Length; i++) {
+            for (int i = 0; i < methods.Length; ++i) {
                 AddMethod(methods[i], null, aliasPrefix + "_" + methods[i].Name, mode, simple);
             }
 #endif
@@ -601,7 +601,7 @@ namespace Hprose.Common {
             MethodInfo[] methods = type.GetMethods(BindingFlags.DeclaredOnly |
                                                    BindingFlags.Static |
                                                    BindingFlags.Public);
-            for (int i = 0; i < methods.Length; i++) {
+            for (int i = 0; i < methods.Length; ++i) {
                 AddMethod(methods[i], null, methods[i].Name, mode, simple);
             }
 #endif

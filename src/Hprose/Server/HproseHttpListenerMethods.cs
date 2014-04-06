@@ -33,7 +33,7 @@ namespace Hprose.Server {
                     paramType == typeof(HttpListenerRequest) ||
                     paramType == typeof(HttpListenerResponse) ||
                     paramType == typeof(IPrincipal)) {
-                    i--;
+                    --i;
                 }
             }
             return i;
