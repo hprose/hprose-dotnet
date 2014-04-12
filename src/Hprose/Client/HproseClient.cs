@@ -13,7 +13,7 @@
  *                                                        *
  * hprose client class for C#.                            *
  *                                                        *
- * LastModified: Apr 7, 2014                              *
+ * LastModified: Apr 10, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -85,19 +85,18 @@ namespace Hprose.Client {
             }
 
             private void SendAndReceiveCallback(IAsyncResult asyncResult) {
-                object result = null;
                 try {
-                    result = client.DoInput(client.EndSendAndReceive(asyncResult),
+                    object result = client.DoInput(client.EndSendAndReceive(asyncResult),
                                             arguments, returnType, resultMode);
+                    if (result is HproseException) {
+                        DoError(result);
+                    }
+                    else {
+                        syncContext.Post(new SendOrPostCallback(DoCallback), result);
+                    }
                 }
                 catch (Exception e) {
                     DoError(e);
-                }
-                if (result is HproseException) {
-                    DoError(result);
-                }
-                else {
-                    syncContext.Post(new SendOrPostCallback(DoCallback), result);
                 }
             }
 
