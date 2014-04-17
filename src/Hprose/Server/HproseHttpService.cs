@@ -19,6 +19,10 @@
 \**********************************************************/
 #if !(ClientOnly || ClientProfile)
 using System;
+using System.Collections;
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+using System.Collections.Generic;
+#endif
 using System.IO;
 using System.IO.Compression;
 using System.Web;
@@ -33,6 +37,11 @@ namespace Hprose.Server {
         private bool p3pEnabled = false;
         private bool getEnabled = true;
         private bool compressionEnabled = false;
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        private Dictionary<string, bool> origins = new Dictionary<string, bool>();
+#else
+        private Hashtable origins = new Hashtable();
+#endif
         public event SendHeaderEvent OnSendHeader = null;
         [ThreadStatic]
         private static HttpContext currentContext;
@@ -117,6 +126,14 @@ namespace Hprose.Server {
             }
         }
 
+        public void AddAccessControlAllowOrigin(string origin) {
+            origins[origin] = true;
+        }
+
+        public void RemoveAccessControlAllowOrigin(string origin) {
+            origins.Remove(origin);
+        }
+
         private Stream GetOutputStream(HttpContext context) {
             Stream ostream = new BufferedStream(context.Response.OutputStream);
             if (compressionEnabled) {
@@ -162,8 +179,10 @@ namespace Hprose.Server {
             if (crossDomainEnabled) {
                 string origin = context.Request.Headers["Origin"];
                 if (origin != null && origin != "" && origin != "null") {
-                    context.Response.AddHeader("Access-Control-Allow-Origin", origin);
-                    context.Response.AddHeader("Access-Control-Allow-Credentials", "true");
+                    if (origins.Count == 0 || origins.ContainsKey(origin)) {
+                        context.Response.AddHeader("Access-Control-Allow-Origin", origin);
+                        context.Response.AddHeader("Access-Control-Allow-Credentials", "true");
+                    }
                 }
                 else {
                     context.Response.AddHeader("Access-Control-Allow-Origin", "*");

@@ -13,12 +13,16 @@
  *                                                        *
  * hprose http listener service class for C#.             *
  *                                                        *
- * LastModified: Mar 18, 2014                             *
+ * LastModified: Apr 17, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 #if !(dotNET10 || dotNET11 || ClientOnly)
 using System;
+using System.Collections;
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+using System.Collections.Generic;
+#endif
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -33,6 +37,11 @@ namespace Hprose.Server {
         private bool p3pEnabled = false;
         private bool getEnabled = true;
         private bool compressionEnabled = false;
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        private Dictionary<string, bool> origins = new Dictionary<string, bool>();
+#else
+        private Hashtable origins = new Hashtable();
+#endif
         public event SendHeaderEvent OnSendHeader = null;
 
         [ThreadStatic]
@@ -110,6 +119,14 @@ namespace Hprose.Server {
             set {
                 compressionEnabled = value;
             }
+        }
+
+        public void AddAccessControlAllowOrigin(string origin) {
+            origins[origin] = true;
+        }
+
+        public void RemoveAccessControlAllowOrigin(string origin) {
+            origins.Remove(origin);
         }
 
         private Stream GetOutputStream(HttpListenerContext currentContext) {
@@ -235,8 +252,10 @@ namespace Hprose.Server {
             if (crossDomainEnabled) {
                 string origin = currentContext.Request.Headers["Origin"];
                 if (origin != null && origin != "" && origin != "null") {
-                    currentContext.Response.AddHeader("Access-Control-Allow-Origin", origin);
-                    currentContext.Response.AddHeader("Access-Control-Allow-Credentials", "true");
+                    if (origins.Count == 0 || origins.ContainsKey(origin)) {
+                        currentContext.Response.AddHeader("Access-Control-Allow-Origin", origin);
+                        currentContext.Response.AddHeader("Access-Control-Allow-Credentials", "true");
+                    }
                 }
                 else {
                     currentContext.Response.AddHeader("Access-Control-Allow-Origin", "*");

@@ -13,7 +13,7 @@
  *                                                        *
  * hprose helper class for C#.                            *
  *                                                        *
- * LastModified: Apr 7, 2014                              *
+ * LastModified: Apr 17, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -31,7 +31,7 @@ using System.Runtime.Serialization;
 #endif
 using System.Threading;
 using Hprose.Common;
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
 using Hprose.Reflection;
 #endif
 
@@ -513,7 +513,7 @@ namespace Hprose.IO {
         private static readonly Dictionary<Type, Dictionary<string, FieldTypeInfo>> fieldsCache = new Dictionary<Type, Dictionary<string, FieldTypeInfo>>();
         private static readonly Dictionary<Type, Dictionary<string, PropertyTypeInfo>> propertiesCache = new Dictionary<Type, Dictionary<string, PropertyTypeInfo>>();
         private static readonly Dictionary<Type, Dictionary<string, MemberTypeInfo>> membersCache = new Dictionary<Type, Dictionary<string, MemberTypeInfo>>();
-#if (PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core)
+#if (PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
         private static readonly Dictionary<Type, ConstructorInfo> ctorCache = new Dictionary<Type, ConstructorInfo>();
         private static readonly Dictionary<ConstructorInfo, object[]> argsCache = new Dictionary<ConstructorInfo, object[]>();
 #endif
@@ -970,7 +970,7 @@ namespace Hprose.IO {
             return type;
         }
 
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
         public static object NewInstance(Type type) {
             return CtorAccessor.Get(type).NewInstance();
         }

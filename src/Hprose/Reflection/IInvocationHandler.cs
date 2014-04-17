@@ -13,12 +13,11 @@
  *                                                        *
  * IInvocationHandler interface for C#.                   *
  *                                                        *
- * LastModified: Jul 14, 2010                             *
+ * LastModified: Apr 17, 2014                             *
  * Authors: Ma Bingyao <andot@hprose.com>                 *
  *                                                        *
 \**********************************************************/
 
-#if !(PocketPC || Smartphone || WindowsCE || WINDOWS_PHONE || Core)
 using System.Reflection;
 
 namespace Hprose.Reflection {
@@ -26,4 +25,3 @@ namespace Hprose.Reflection {
         object Invoke(object proxy, MethodInfo method, object[] args);
     }
 }
-#endif

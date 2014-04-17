@@ -13,7 +13,7 @@
  *                                                        *
  * hprose client class for C#.                            *
  *                                                        *
- * LastModified: Apr 10, 2014                             *
+ * LastModified: Apr 17, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -31,7 +31,7 @@ using System.Text;
 using System.Threading;
 using Hprose.IO;
 using Hprose.Common;
-#if !(PocketPC || Smartphone || WindowsCE || WINDOWS_PHONE || Core)
+#if !(PocketPC || Smartphone || WindowsCE || WINDOWS_PHONE || Core || Unity_iOS)
 using Hprose.Reflection;
 #endif
 
@@ -259,7 +259,7 @@ namespace Hprose.Client {
             this.uri = uri;
         }
 
-#if !(PocketPC || Smartphone || WindowsCE || WINDOWS_PHONE || Core)
+#if !(PocketPC || Smartphone || WindowsCE || WINDOWS_PHONE || Core || Unity_iOS)
         public object UseService(Type type) {
             return UseService(type, null);
         }

@@ -28,6 +28,7 @@ if not exist dist\Mono2 mkdir dist\Mono2
 if not exist dist\Mono4 mkdir dist\Mono4
 if not exist dist\Mono4.5 mkdir dist\Mono4.5
 if not exist dist\Unity mkdir dist\Unity
+if not exist dist\Unity_iOS mkdir dist\Unity_iOS
 
 set SL2_PATH=C:\Program Files\Microsoft SDKs\Silverlight\v2.0\Reference Assemblies
 set SL3_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\Silverlight\v3.0
@@ -221,6 +222,7 @@ set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Text.Encoding.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Text.Encoding.Extensions.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Threading.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Threading.Tasks.dll"
 
 C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.5\Core\Hprose.Client.dll -define:dotNET4;dotNET45;Core;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %1 %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
@@ -348,6 +350,10 @@ call "%MONO_PATH%\dmcs" -keyfile:HproseKeys.snk -out:dist\Mono4.5\Hprose.dll -sd
 echo start compile hprose for Unity
 call "%UNITY_PATH%\gmcs" -keyfile:HproseKeys.snk -out:dist\Unity\Hprose.Client.dll -sdk:2 -define:dotNET2;MONO;Unity;ClientProfile;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 call "%UNITY_PATH%\gmcs" -keyfile:HproseKeys.snk -out:dist\Unity\Hprose.dll -sdk:2 -define:dotNET2;MONO;Unity;ClientProfile -noconfig -target:library -optimize+ %1 -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for Unity iOS
+call "%UNITY_PATH%\gmcs" -keyfile:HproseKeys.snk -out:dist\Unity_iOS\Hprose.Client.dll -sdk:2 -define:dotNET2;MONO;Unity;Unity_iOS;ClientProfile;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+call "%UNITY_PATH%\gmcs" -keyfile:HproseKeys.snk -out:dist\Unity_iOS\Hprose.dll -sdk:2 -define:dotNET2;MONO;Unity;Unity_iOS;ClientProfile -noconfig -target:library -optimize+ %1 -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 set NUMERICS_SRC=
 set HPROSE_SRC=

@@ -13,11 +13,11 @@
  *                                                        *
  * hprose InvocationHandler class for C#.                 *
  *                                                        *
- * LastModified: Apr 7, 2014                              *
+ * LastModified: Apr 17, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-#if !(PocketPC || Smartphone || WindowsCE || WINDOWS_PHONE || Core)
+
 using System;
 using System.IO;
 using System.Numerics;
@@ -42,7 +42,7 @@ namespace Hprose.Common {
         }
     }
 #endif
-    class HproseInvocationHandler : IInvocationHandler {
+    public class HproseInvocationHandler : IInvocationHandler {
         private String ns;
         private HproseInvoker invoker;
 
@@ -124,9 +124,15 @@ namespace Hprose.Common {
                 }
             }
 #if dotNET45
+#if Core
+            if (returnType.GetTypeInfo().IsGenericType &&
+                returnType.GetGenericTypeDefinition() == typeof(Task<>)) {
+                ITaskCreator taskCreator = Activator.CreateInstance(typeof(TaskCreator<>).MakeGenericType(returnType.GenericTypeArguments)) as ITaskCreator;
+#else
             if (returnType.IsGenericType &&
                 returnType.GetGenericTypeDefinition() == typeof(Task<>)) {
                 ITaskCreator taskCreator = Activator.CreateInstance(typeof(TaskCreator<>).MakeGenericType(returnType.GetGenericArguments())) as ITaskCreator;
+#endif
                 return taskCreator.GetTask(invoker, methodName, args, byRef, resultMode, simple);
             }
             if (returnType == typeof(Task)) {
@@ -195,28 +201,47 @@ namespace Hprose.Common {
                 return null;
             }
 #if !(dotNET10 || dotNET11 || dotNETCF10)
+#if Core
+            if ((n > 0) && paramTypes[n - 1].GetTypeInfo().IsGenericType &&
+                           paramTypes[n - 1].GetGenericTypeDefinition() == typeof(HproseCallback<>)) {
+                IInvokeHelper helper = Activator.CreateInstance(typeof(InvokeHelper<>).MakeGenericType(paramTypes[n - 1].GenericTypeArguments)) as IInvokeHelper;
+#else
             if ((n > 0) && paramTypes[n - 1].IsGenericType &&
                            paramTypes[n - 1].GetGenericTypeDefinition() == typeof(HproseCallback<>)) {
                 IInvokeHelper helper = Activator.CreateInstance(typeof(InvokeHelper<>).MakeGenericType(paramTypes[n - 1].GetGenericArguments())) as IInvokeHelper;
+#endif
                 Delegate callback = (Delegate)args[n - 1];
                 object[] tmpargs = new object[n - 1];
                 Array.Copy(args, 0, tmpargs, 0, n - 1);
                 helper.Invoke(invoker, methodName, tmpargs, callback, null, byRef, resultMode, simple);
                 return null;
             }
+#if Core
+            if ((n > 0) && paramTypes[n - 1].GetTypeInfo().IsGenericType &&
+                           paramTypes[n - 1].GetGenericTypeDefinition() == typeof(HproseCallback1<>)) {
+                IInvokeHelper1 helper = Activator.CreateInstance(typeof(InvokeHelper1<>).MakeGenericType(paramTypes[n - 1].GenericTypeArguments)) as IInvokeHelper1;
+#else
             if ((n > 0) && paramTypes[n - 1].IsGenericType &&
                            paramTypes[n - 1].GetGenericTypeDefinition() == typeof(HproseCallback1<>)) {
                 IInvokeHelper1 helper = Activator.CreateInstance(typeof(InvokeHelper1<>).MakeGenericType(paramTypes[n - 1].GetGenericArguments())) as IInvokeHelper1;
+#endif
                 Delegate callback = (Delegate)args[n - 1];
                 object[] tmpargs = new object[n - 1];
                 Array.Copy(args, 0, tmpargs, 0, n - 1);
                 helper.Invoke(invoker, methodName, tmpargs, callback, null, resultMode, simple);
                 return null;
             }
+#if Core
+            if ((n > 1) && paramTypes[n - 2].GetTypeInfo().IsGenericType &&
+                           paramTypes[n - 2].GetGenericTypeDefinition() == typeof(HproseCallback<>) &&
+                           paramTypes[n - 1] == typeof(HproseErrorEvent)) {
+                IInvokeHelper helper = Activator.CreateInstance(typeof(InvokeHelper<>).MakeGenericType(paramTypes[n - 1].GenericTypeArguments)) as IInvokeHelper;
+#else
             if ((n > 1) && paramTypes[n - 2].IsGenericType &&
                            paramTypes[n - 2].GetGenericTypeDefinition() == typeof(HproseCallback<>) &&
                            paramTypes[n - 1] == typeof(HproseErrorEvent)) {
                 IInvokeHelper helper = Activator.CreateInstance(typeof(InvokeHelper<>).MakeGenericType(paramTypes[n - 1].GetGenericArguments())) as IInvokeHelper;
+#endif
                 Delegate callback = (Delegate)args[n - 2];
                 HproseErrorEvent errorEvent = (HproseErrorEvent)args[n - 1];
                 object[] tmpargs = new object[n - 2];
@@ -224,10 +249,17 @@ namespace Hprose.Common {
                 helper.Invoke(invoker, methodName, tmpargs, callback, errorEvent, byRef, resultMode, simple);
                 return null;
             }
+#if Core
+            if ((n > 1) && paramTypes[n - 2].GetTypeInfo().IsGenericType &&
+                           paramTypes[n - 2].GetGenericTypeDefinition() == typeof(HproseCallback1<>) &&
+                           paramTypes[n - 1] == typeof(HproseErrorEvent)) {
+                IInvokeHelper1 helper = Activator.CreateInstance(typeof(InvokeHelper1<>).MakeGenericType(paramTypes[n - 1].GenericTypeArguments)) as IInvokeHelper1;
+#else
             if ((n > 1) && paramTypes[n - 2].IsGenericType &&
                            paramTypes[n - 2].GetGenericTypeDefinition() == typeof(HproseCallback1<>) &&
                            paramTypes[n - 1] == typeof(HproseErrorEvent)) {
                 IInvokeHelper1 helper = Activator.CreateInstance(typeof(InvokeHelper1<>).MakeGenericType(paramTypes[n - 1].GetGenericArguments())) as IInvokeHelper1;
+#endif
                 Delegate callback = (Delegate)args[n - 2];
                 HproseErrorEvent errorEvent = (HproseErrorEvent)args[n - 1];
                 object[] tmpargs = new object[n - 2];
@@ -240,4 +272,3 @@ namespace Hprose.Common {
         }
     }
 }
-#endif

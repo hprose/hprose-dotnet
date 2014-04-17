@@ -13,7 +13,7 @@
  *                                                        *
  * hprose writer class for C#.                            *
  *                                                        *
- * LastModified: Apr 7, 2014                              *
+ * LastModified: Apr 17, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -30,7 +30,7 @@ using System.IO;
 using System.Text;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
 using System.Runtime.Serialization;
 using Hprose.Reflection;
 #endif
@@ -1349,7 +1349,7 @@ namespace Hprose.IO {
 
         private void WriteSerializableObject(object obj, Type type) {
             if (mode == HproseMode.FieldMode) {
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
                 ObjectSerializer.Get(type).SerializeFields(obj, this);
 #else
 #if !(dotNET10 || dotNET11 || dotNETCF10)
@@ -1372,7 +1372,7 @@ namespace Hprose.IO {
 #endif
             }
             else {
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
                 ObjectSerializer.Get(type).SerializeProperties(obj, this);
 #else
 #if !(dotNET10 || dotNET11 || dotNETCF10)
@@ -1403,7 +1403,7 @@ namespace Hprose.IO {
         }
 
         private void WriteDataContractObject(object obj, Type type) {
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
             ObjectSerializer.Get(type).SerializeMembers(obj, this);
 #else
 #if !(dotNET10 || dotNET11 || dotNETCF10)
