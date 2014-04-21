@@ -160,8 +160,9 @@ namespace Hprose.Server {
         }
 
         public void Start() {
-            if (Listener.IsListening)
+            if (Listener.IsListening) {
                 return;
+            }
             lastModified = DateTime.Now.ToString("R");
             etag = '"' + new Random().Next().ToString("x") + ":" + new Random().Next().ToString() + '"';
             Listener.Start();
@@ -171,7 +172,9 @@ namespace Hprose.Server {
         }
 
         public void Stop() {
-            Listener.Stop();
+            if (Listener.IsListening) {
+                Listener.Stop();
+            }
         }
 
         public void Close() {

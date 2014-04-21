@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http client class for C#.                       *
  *                                                        *
- * LastModified: Mar 12, 2014                             *
+ * LastModified: Apr 21, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -331,14 +331,21 @@ namespace Hprose.Client {
 #if !Core
         protected void TimeoutHandler(object state) {
             AsyncContext context = (AsyncContext)state;
-            if (context.response == null) {
-                context.request.Abort();
+            try {
+                if (context.response == null) {
+                    if (context.request != null) {
+                        context.request.Abort();
+                    }
+                }
+                else {
+                    context.response.Close();
+                }
+                if (context.timer != null) {
+                    context.timer.Dispose();
+                    context.timer = null;
+                }
             }
-            else {
-                context.response.Close();
-            }
-            context.timer.Dispose();
-            context.timer = null;
+            catch (Exception) { }
         }
 #endif
         // AsyncInvoke
@@ -363,15 +370,15 @@ namespace Hprose.Client {
         }
 
         protected override MemoryStream EndSendAndReceive(IAsyncResult asyncResult) {
-            AsyncContext content = (AsyncContext)asyncResult.AsyncState;
-            HttpWebRequest request = content.request;
+            AsyncContext context = (AsyncContext)asyncResult.AsyncState;
+            HttpWebRequest request = context.request;
             HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult);
-            content.response = response;
+            context.response = response;
             MemoryStream data = Receive(request, response);
 #if !Core
-            if (content.timer != null) {
-                content.timer.Dispose();
-                content.timer = null;
+            if (context.timer != null) {
+                context.timer.Dispose();
+                context.timer = null;
             }
 #endif
             return data;

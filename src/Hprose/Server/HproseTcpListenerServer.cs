@@ -13,7 +13,7 @@
  *                                                        *
  * hprose tcp listener server class for C#.               *
  *                                                        *
- * LastModified: Apr 7, 2014                              *
+ * LastModified: Apr 21, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -170,13 +170,173 @@ namespace Hprose.Server {
             }
         }
 
+        private delegate void ReadCallback(ReadContext context);
+
+        private class ReadContext {
+            public ReadCallback callback;
+            public TcpClient client;
+            public NetworkStream stream;
+            public byte[] buf;
+            public int n;
+            public int size;
+        }
+
+        private void CloseConnection(TcpClient client, NetworkStream stream) {
+            try {
+                if (stream != null) {
+                    stream.Close();
+                }
+                if (client != null) {
+                    client.Close();
+                }
+            }
+            catch (Exception) { }
+        }
+
+        private void AsyncReadCallback(IAsyncResult asyncResult) {
+            ReadContext context = (ReadContext)asyncResult.AsyncState;
+            TcpClient client = context.client;
+            NetworkStream stream = context.stream;
+            try {
+                int n = stream.EndRead(asyncResult);
+                if (n > 0) {
+                    context.n += n;
+                    context.size -= n;
+                    if (context.n < context.buf.Length) {
+                        stream.BeginRead(context.buf, context.n, context.size, new AsyncCallback(AsyncReadCallback), context);
+                        return;
+                    }
+                }
+                if (context.n < context.buf.Length) {
+                    FireErrorEvent(new HproseException("Unexpected EOF"), client);
+                    CloseConnection(client, stream);
+                    return;
+                }
+                context.callback(context);
+            }
+            catch (IOException) {
+                CloseConnection(client, stream);
+            }
+            catch (Exception e) {
+                FireErrorEvent(e, client);
+                CloseConnection(client, stream);
+            }
+        }
+
+        private void AsyncRead(TcpClient client, NetworkStream stream, byte[] buf, ReadCallback callback) {
+            ReadContext context = new ReadContext();
+            context.callback = callback;
+            context.client = client;
+            context.stream = stream;
+            context.buf = buf;
+            context.n = 0;
+            context.size = buf.Length;
+            stream.BeginRead(context.buf, context.n, context.size, new AsyncCallback(AsyncReadCallback), context);
+        }
+
+        private void ReadHeadCallback(ReadContext context) {
+            byte[] buf = context.buf;
+            int len = (int)buf[0] << 24 | (int)buf[1] << 16 | (int)buf[2] << 8 | (int)buf[3];
+            AsyncRead(context.client, context.stream, new byte[len], new ReadCallback(ReadBodyCallback));
+        }
+
+        private void ReadBodyCallback(ReadContext context) {
+            TcpClient client = context.client;
+            NetworkStream stream = context.stream;
+            byte[] buf = context.buf;
+            try {
+                AsyncWrite(client, stream, Handle(new MemoryStream(buf, 0, buf.Length), null, client));
+            }
+            catch (Exception e) {
+                FireErrorEvent(e, client);
+                CloseConnection(client, stream);
+            }
+        }
+
+        private class WriteFullContext {
+            public TcpClient client;
+            public NetworkStream stream;
+        }
+
+        private void WriteFullCallback(IAsyncResult asyncResult) {
+            WriteFullContext context = (WriteFullContext)asyncResult.AsyncState;
+            TcpClient client = context.client;
+            NetworkStream stream = context.stream;
+            try {
+                stream.EndWrite(asyncResult);
+                NonBlockingHandle(client, stream);
+            }
+            catch (Exception e) {
+                FireErrorEvent(e, client);
+                CloseConnection(client, stream);
+            }
+        }
+
+        private class WritePartContext : WriteFullContext {
+            public byte[] buf;
+            public int offset;
+            public int length;
+        }
+
+        private void WritePartCallback(IAsyncResult asyncResult) {
+            WritePartContext context = (WritePartContext)asyncResult.AsyncState;
+            TcpClient client = context.client;
+            NetworkStream stream = context.stream;
+            try {
+                stream.EndWrite(asyncResult);
+                stream.BeginWrite(context.buf, context.offset, context.length, new AsyncCallback(WriteFullCallback), context);
+            }
+            catch (Exception e) {
+                FireErrorEvent(e, client);
+                CloseConnection(client, stream);
+            }
+        }
+
+        private void AsyncWrite(TcpClient client, NetworkStream stream, MemoryStream data) {
+            try {
+                int n = (int)data.Length;
+                int len = n > 1020 ? 2048 : n > 508 ? 1024 : 512;
+                byte[] buf = new byte[len];
+                buf[0] = (byte)((n >> 24) & 0xff);
+                buf[1] = (byte)((n >> 16) & 0xff);
+                buf[2] = (byte)((n >> 8) & 0xff);
+                buf[3] = (byte)(n & 0xff);
+                int p = len - 4;
+                if (n <= p) {
+                    data.Read(buf, 4, n);
+                    WriteFullContext context = new WriteFullContext();
+                    context.client = client;
+                    context.stream = stream;
+                    stream.BeginWrite(buf, 0, n + 4, new AsyncCallback(WriteFullCallback), context);
+                }
+                else {
+                    data.Read(buf, 4, p);
+                    WritePartContext context = new WritePartContext();
+                    context.client = client;
+                    context.stream = stream;
+                    context.buf = data.ToArray();
+                    context.offset = p;
+                    context.length = n - p;
+                    stream.BeginWrite(buf, 0, len, new AsyncCallback(WritePartCallback), context);
+                }
+            }
+            catch (Exception e) {
+                FireErrorEvent(e, client);
+                CloseConnection(client, stream);
+            }
+        }
+
+        private void NonBlockingHandle(TcpClient client, NetworkStream stream) {
+            AsyncRead(client, stream, new byte[4], new ReadCallback(ReadHeadCallback));
+        }
+
         private void AcceptTcpCallback(IAsyncResult asyncResult) {
             TcpListener listener = asyncResult.AsyncState as TcpListener;
             TcpClient client = null;
             NetworkStream stream = null;
             try {
-                listener.BeginAcceptTcpClient(new AsyncCallback(AcceptTcpCallback), listener);
                 client = listener.EndAcceptTcpClient(asyncResult);
+                listener.BeginAcceptTcpClient(new AsyncCallback(AcceptTcpCallback), listener);
                 client.LingerState = m_lingerState;
                 client.NoDelay = m_noDelay;
                 client.ReceiveBufferSize = m_receiveBufferSize;
@@ -184,20 +344,14 @@ namespace Hprose.Server {
                 client.ReceiveTimeout = m_receiveTimeout;
                 client.SendTimeout = m_sendTimeout;
                 stream = client.GetStream();
-                for (; ; ) {
-                    HproseHelper.SendDataOverTcp(stream, Handle(HproseHelper.ReceiveDataOverTcp(stream), null, client));
-                }
+                NonBlockingHandle(client, stream);
+            }
+            catch (ObjectDisposedException) {
+                CloseConnection(client, stream);
             }
             catch (Exception e) {
                 FireErrorEvent(e, client);
-            }
-            finally {
-                if (stream != null) {
-                    stream.Close();
-                }
-                if (client != null) {
-                    client.Close();
-                }
+                CloseConnection(client, stream);
             }
         }
     }

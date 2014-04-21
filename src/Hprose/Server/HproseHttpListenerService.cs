@@ -13,7 +13,7 @@
  *                                                        *
  * hprose http listener service class for C#.             *
  *                                                        *
- * LastModified: Apr 17, 2014                             *
+ * LastModified: Apr 21, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -160,9 +160,13 @@ namespace Hprose.Server {
                 FireErrorEvent(e, context.currentContext);
             }
             finally {
-                if (context.ostream.CanWrite) {
-                    context.ostream.Close();
-                    context.currentContext.Response.Close();
+                try {
+                    if (context.ostream.CanWrite) {
+                        context.ostream.Close();
+                        context.currentContext.Response.Close();
+                    }
+                }
+                catch (Exception) {
                 }
             }
         }
@@ -188,10 +192,13 @@ namespace Hprose.Server {
             }
             catch (Exception e) {
                 FireErrorEvent(e, currentContext);
-                if (writeContext.ostream != null) {
-                    writeContext.ostream.Close();
+                try {
+                    if (writeContext.ostream != null) {
+                        writeContext.ostream.Close();
+                    }
+                    context.currentContext.Response.Close();
                 }
-                context.currentContext.Response.Close();
+                catch (Exception) { }
                 return;
             }
             finally {
@@ -215,14 +222,17 @@ namespace Hprose.Server {
                 else {
                     return;
                 }
+                istream.Close();
             }
             catch (Exception e) {
                 FireErrorEvent(e, context.currentContext);
-                istream.Close();
-                context.currentContext.Response.Close();
+                try {
+                    istream.Close();
+                    context.currentContext.Response.Close();
+                }
+                catch (Exception) { }
                 return;
             }
-            istream.Close();
             NonBlockingWrite(context);
         }
 
