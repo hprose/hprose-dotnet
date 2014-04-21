@@ -111,9 +111,6 @@ namespace Hprose.Common {
                 methodName = ns + '_' + methodName;
             }
             Type returnType = method.ReturnType;
-            if (returnType == typeof(void)) {
-                returnType = null;
-            }
             CheckResultType(resultMode, returnType);
             bool byRef = false;
             Type[] paramTypes = GetTypes(parameters);
@@ -268,6 +265,9 @@ namespace Hprose.Common {
                 return null;
             }
 #endif
+            if (returnType == typeof(void)) {
+                returnType = null;
+            }
             return invoker.Invoke(methodName, args, returnType, byRef, resultMode, simple);
         }
     }
