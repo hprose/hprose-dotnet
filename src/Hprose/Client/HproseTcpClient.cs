@@ -13,7 +13,7 @@
  *                                                        *
  * hprose tcp client class for C#.                        *
  *                                                        *
- * LastModified: Mar 21, 2014                             *
+ * LastModified: Mar 22, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -227,24 +227,30 @@ namespace Hprose.Client {
 #else
             private void CloseConn(TcpConn conn) {
                 new Thread(delegate() {
-                    if (conn.stream != null) {
-                        conn.stream.Close();
-                    }
-                    if (conn.client != null) {
-                        conn.client.Close();
-                    }
-                }).Start();
-            }
-
-            private void FreeConns(List<TcpConn> conns) {
-                new Thread(delegate() {
-                    foreach (TcpConn conn in conns) {
+                    try {
                         if (conn.stream != null) {
                             conn.stream.Close();
                         }
                         if (conn.client != null) {
                             conn.client.Close();
                         }
+                    }
+                    catch (Exception) { }
+                }).Start();
+            }
+
+            private void FreeConns(List<TcpConn> conns) {
+                new Thread(delegate() {
+                    foreach (TcpConn conn in conns) {
+                        try {
+                            if (conn.stream != null) {
+                                conn.stream.Close();
+                            }
+                            if (conn.client != null) {
+                                conn.client.Close();
+                            }
+                        }
+                        catch (Exception) { }
                     }
                 }).Start();
             }
@@ -363,11 +369,7 @@ namespace Hprose.Client {
             }
         }
 
-        private delegate MemoryStream SendAndReceiveDelegate(MemoryStream data);
-        private SendAndReceiveDelegate sendAndReceive;
-
         private void InitHproseTcpClient() {
-            sendAndReceive = new SendAndReceiveDelegate(SendAndReceive);
             m_lingerState = new LingerOption(false, 0);
             m_noDelay = false;
             m_receiveBufferSize = 8192;
@@ -380,20 +382,31 @@ namespace Hprose.Client {
 
         private TcpClient CreateClient(string uri) {
             Uri u = new Uri(uri);
-#if (dotNET10 || dotNETCF10)
-            TcpClient client = new TcpClient(u.Host, u.Port);
-#else
+            int i = 0;
             TcpClient client;
-            if (u.Scheme == "tcp") {
+            tryagain:
+            try {
+#if (dotNET10 || dotNETCF10)
                 client = new TcpClient(u.Host, u.Port);
-            }
-            else {
-                client = new TcpClient((u.Scheme == "tcp6") ?
-                                        AddressFamily.InterNetworkV6 :
-                                        AddressFamily.InterNetwork);
-                client.Connect(u.Host, u.Port);
-            }
+#else
+                if (u.Scheme == "tcp") {
+                    client = new TcpClient(u.Host, u.Port);
+                }
+                else {
+                    client = new TcpClient((u.Scheme == "tcp6") ?
+                                            AddressFamily.InterNetworkV6 :
+                                            AddressFamily.InterNetwork);
+                    client.Connect(u.Host, u.Port);
+                }
 #endif
+            }
+            catch (SocketException) {
+                if (i < 5) {
+                    i++;
+                    goto tryagain;
+                }
+                throw;
+            }
             client.LingerState = m_lingerState;
             client.NoDelay = m_noDelay;
             client.ReceiveBufferSize = m_receiveBufferSize;
@@ -403,6 +416,61 @@ namespace Hprose.Client {
             client.SendTimeout = m_sendTimeout;
 #endif
             return client;
+        }
+
+        private void Send(Stream stream, MemoryStream data) {
+            int n = (int)data.Length;
+            int len = n > 1020 ? 2048 : n > 508 ? 1024 : 512;
+            byte[] buf = new byte[len];
+            buf[0] = (byte)((n >> 24) & 0xff);
+            buf[1] = (byte)((n >> 16) & 0xff);
+            buf[2] = (byte)((n >> 8) & 0xff);
+            buf[3] = (byte)(n & 0xff);
+            int p = len - 4;
+            if (n <= p) {
+                data.Read(buf, 4, n);
+                stream.Write(buf, 0, n + 4);
+            }
+            else {
+                data.Read(buf, 4, p);
+                stream.Write(buf, 0, len);
+                stream.Write(data.ToArray(), p, n - p);
+            }
+            stream.Flush();
+        }
+
+        private int ReadAtLeast(Stream stream, byte[] buf, int offset, int min) {
+            if (min == 0) return 0;
+            int size = buf.Length - offset;
+            int n = offset;
+            int p = min + offset;
+            while (n < p) {
+                int nn = stream.Read(buf, n, size);
+                if (nn == 0) break;
+                n += nn;
+                size -= nn;
+            }
+            if (n < p) {
+                throw new HproseException("Unexpected EOF");
+            }
+            return n - offset;
+        }
+
+        private MemoryStream Receive(Stream stream) {
+            const int bufferlength = 2048;
+            byte[] buf = new byte[bufferlength];
+            int n = ReadAtLeast(stream, buf, 0, 4);
+            int len = (int)buf[0] << 24 | (int)buf[1] << 16 | (int)buf[2] << 8 | (int)buf[3];
+            int size = len - (n - 4);
+            if (len <= bufferlength - 4) {
+                ReadAtLeast(stream, buf, n, size);
+                return new MemoryStream(buf, 4, len);
+            }
+            n -= 4;
+            byte[] data = new byte[len];
+            Buffer.BlockCopy(buf, 4, data, 0, n);
+            ReadAtLeast(stream, data, n, size);
+            return new MemoryStream(data, 0, len);
         }
 
         protected override MemoryStream SendAndReceive(MemoryStream data) {
@@ -426,15 +494,118 @@ namespace Hprose.Client {
         }
 
         // AsyncInvoke
+
+        private class SendAndReceiveContext {
+            public AsyncCallback callback;
+            public AsyncCallback readCallback;
+            public TcpConnEntry entry;
+            public Exception e;
+            public byte[] buf;
+            public int offset;
+            public int length;
+        }
+
         protected override IAsyncResult BeginSendAndReceive(MemoryStream data, AsyncCallback callback) {
-            return sendAndReceive.BeginInvoke(data, callback, null);
+            TcpConnEntry entry = pool.Get(uri);
+            try {
+                if (entry.conn.client == null) {
+                    entry.Set(CreateClient(uri));
+                }
+                return AsyncSend(entry, data, callback);
+            }
+            catch {
+                entry.Close();
+                pool.Free(entry);
+                throw;
+            }
         }
 
         protected override MemoryStream EndSendAndReceive(IAsyncResult asyncResult) {
-            return sendAndReceive.EndInvoke(asyncResult);
+            SendAndReceiveContext context = (SendAndReceiveContext)asyncResult.AsyncState;
+            try {
+                if (context.e == null) {
+                    byte[] buf = context.buf;
+                    return new MemoryStream(buf, 0, buf.Length);
+                }
+                else {
+                    context.entry.Close();
+                    throw context.e;
+                }
+            }
+            finally {
+                pool.Free(context.entry);
+            }
         }
 
-        private static void Send(Stream stream, MemoryStream data) {
+        private void AsyncReadCallback(IAsyncResult asyncResult) {
+            SendAndReceiveContext context = (SendAndReceiveContext)asyncResult.AsyncState;
+            try {
+                NetworkStream stream = context.entry.conn.stream;
+                int n = stream.EndRead(asyncResult);
+                if (n > 0) {
+                    context.offset += n;
+                    context.length -= n;
+                    if (context.offset < context.buf.Length) {
+                        stream.BeginRead(context.buf, context.offset, context.length, new AsyncCallback(AsyncReadCallback), context);
+                        return;
+                    }
+                }
+                if (context.offset < context.buf.Length) {
+                    context.e = new HproseException("Unexpected EOF");
+                    context.callback(asyncResult);
+                    return;
+                }
+                context.readCallback(asyncResult);
+            }
+            catch (Exception e) {
+                context.e = e;
+                context.callback(asyncResult);
+            }
+        }
+
+        private void ReadHeadCallback(IAsyncResult asyncResult) {
+            SendAndReceiveContext context = (SendAndReceiveContext)asyncResult.AsyncState;
+            NetworkStream stream = context.entry.conn.stream;
+            byte[] buf = context.buf;
+            int len = (int)buf[0] << 24 | (int)buf[1] << 16 | (int)buf[2] << 8 | (int)buf[3];
+            context.readCallback = context.callback;
+            context.buf = new byte[len];
+            context.offset = 0;
+            context.length = len;
+            stream.BeginRead(context.buf, context.offset, context.length, new AsyncCallback(AsyncReadCallback), context);
+        }
+
+        private void WriteFullCallback(IAsyncResult asyncResult) {
+            SendAndReceiveContext context = (SendAndReceiveContext)asyncResult.AsyncState;
+            try {
+                NetworkStream stream = context.entry.conn.stream;
+                stream.EndWrite(asyncResult);
+                context.readCallback = new AsyncCallback(ReadHeadCallback);
+                context.buf = new byte[4];
+                context.offset = 0;
+                context.length = 4;
+                stream.BeginRead(context.buf, context.offset, context.length, new AsyncCallback(AsyncReadCallback), context);
+            }
+            catch (Exception e) {
+                context.e = e;
+                context.callback(asyncResult);
+            }
+        }
+
+        private void WritePartCallback(IAsyncResult asyncResult) {
+            SendAndReceiveContext context = (SendAndReceiveContext)asyncResult.AsyncState;
+            try {
+                NetworkStream stream = context.entry.conn.stream;
+                stream.EndWrite(asyncResult);
+                stream.BeginWrite(context.buf, context.offset, context.length, new AsyncCallback(WriteFullCallback), context);
+            }
+            catch (Exception e) {
+                context.e = e;
+                context.callback(asyncResult);
+            }
+        }
+
+        private IAsyncResult AsyncSend(TcpConnEntry entry, MemoryStream data, AsyncCallback callback) {
             int n = (int)data.Length;
             int len = n > 1020 ? 2048 : n > 508 ? 1024 : 512;
             byte[] buf = new byte[len];
@@ -443,52 +614,22 @@ namespace Hprose.Client {
             buf[2] = (byte)((n >> 8) & 0xff);
             buf[3] = (byte)(n & 0xff);
             int p = len - 4;
+            SendAndReceiveContext context = new SendAndReceiveContext();
+            context.callback = callback;
+            context.entry = entry;
+            NetworkStream stream = entry.conn.stream;
             if (n <= p) {
                 data.Read(buf, 4, n);
-                stream.Write(buf, 0, n + 4);
+                return stream.BeginWrite(buf, 0, n + 4, new AsyncCallback(WriteFullCallback), context);
             }
             else {
                 data.Read(buf, 4, p);
-                stream.Write(buf, 0, len);
-                stream.Write(data.ToArray(), p, n - p);
+                context.buf = data.ToArray();
+                context.offset = p;
+                context.length = n - p;
+                return stream.BeginWrite(buf, 0, len, new AsyncCallback(WritePartCallback), context);
             }
-            stream.Flush();
         }
-
-        private static int ReadAtLeast(Stream stream, byte[] buf, int offset, int min) {
-            if (min == 0) return 0;
-            int size = buf.Length - offset;
-            int n = offset;
-            int p = min + offset;
-            while (n < p) {
-                int nn = stream.Read(buf, n, size);
-                if (nn == 0) break;
-                n += nn;
-                size -= nn;
-            }
-            if (n < p) {
-                throw new HproseException("Unexpected EOF");
-            }
-            return n - offset;
-        }
-
-        private static MemoryStream Receive(Stream stream) {
-            const int bufferlength = 2048;
-            byte[] buf = new byte[bufferlength];
-            int n = ReadAtLeast(stream, buf, 0, 4);
-            int len = (int)buf[0] << 24 | (int)buf[1] << 16 | (int)buf[2] << 8 | (int)buf[3];
-            int size = len - (n - 4);
-            if (len <= bufferlength - 4) {
-                ReadAtLeast(stream, buf, n, size);
-                return new MemoryStream(buf, 4, len);
-            }
-            n -= 4;
-            byte[] data = new byte[len];
-            Buffer.BlockCopy(buf, 4, data, 0, n);
-            ReadAtLeast(stream, data, n, size);
-            return new MemoryStream(data, 0, len);
-        }
-
     }
 }
 #endif
