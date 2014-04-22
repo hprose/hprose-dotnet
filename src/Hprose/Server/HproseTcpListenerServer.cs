@@ -209,9 +209,6 @@ namespace Hprose.Server {
                 }
                 context.readCallback(asyncResult);
             }
-            catch (IOException) {
-                context.callback(asyncResult);
-            }
             catch (Exception e) {
                 context.e = e;
                 context.callback(asyncResult);
@@ -324,9 +321,6 @@ namespace Hprose.Server {
                 context.client = client;
                 context.stream = stream;
                 NonBlockingHandle(context);
-            }
-            catch (ObjectDisposedException) {
-                CloseConnection(context);
             }
             catch (Exception e) {
                 FireErrorEvent(e, client);
