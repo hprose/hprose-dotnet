@@ -13,7 +13,7 @@
  *                                                        *
  * Object Unserializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 17, 2014                             *
+ * LastModified: May 18, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -320,7 +320,7 @@ namespace Hprose.IO {
             return new ObjectMemberModeUnserializer(type, names);
         }
         public static ObjectUnserializer Get(Type type, string[] names) {
-            return ObjectUnserializer.Get(HproseMode.FieldMode | HproseMode.PropertyMode, type, names, CreateObjectUnserializer);
+            return ObjectUnserializer.Get(HproseMode.MemberMode, type, names, CreateObjectUnserializer);
         }
     }
 }
