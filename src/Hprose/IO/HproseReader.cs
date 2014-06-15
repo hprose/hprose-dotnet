@@ -12,7 +12,7 @@
  *                                                        *
  * hprose reader class for C#.                            *
  *                                                        *
- * LastModified: Apr 17, 2014                             *
+ * LastModified: Jun 15, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -1176,7 +1176,7 @@ namespace Hprose.IO {
                 case HproseTags.TagFalse: return false;
                 case HproseTags.TagNaN: return true;
                 case HproseTags.TagInfinity: stream.ReadByte(); return true;
-                case HproseTags.TagUTF8Char: return "\00".IndexOf(ReadUTF8CharAsChar()) > -1;
+                case HproseTags.TagUTF8Char: return "\00".IndexOf(ReadUTF8CharAsChar()) == -1;
                 case HproseTags.TagString: return bool.Parse(ReadStringWithoutTag());
                 case HproseTags.TagRef: return Convert.ToBoolean(ReadRef());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofBoolean);
