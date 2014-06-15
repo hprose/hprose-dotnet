@@ -1196,6 +1196,7 @@ namespace Hprose.IO {
                 case '7':
                 case '8':
                 case '9': return (char)tag;
+                case HproseTags.TagNull: return (char)0;
                 case HproseTags.TagInteger: return Convert.ToChar(ReadIntWithoutTag());
                 case HproseTags.TagLong: return Convert.ToChar(ReadLongWithoutTag());
                 case HproseTags.TagUTF8Char: return ReadUTF8CharAsChar();
