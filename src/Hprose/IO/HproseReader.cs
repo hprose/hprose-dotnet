@@ -1846,6 +1846,7 @@ namespace Hprose.IO {
             int tag = stream.ReadByte();
             switch (tag) {
                 case HproseTags.TagNull: return null;
+                case HproseTags.TagEmpty: return new byte[0];
                 case HproseTags.TagUTF8Char: return ReadUTF8CharAsStream().ToArray();
                 case HproseTags.TagString: return ReadCharsAsStream().ToArray();
                 case HproseTags.TagGuid: return ReadGuidWithoutTag().ToByteArray();
