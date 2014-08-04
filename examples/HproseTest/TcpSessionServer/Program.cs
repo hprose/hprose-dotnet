@@ -19,11 +19,12 @@ namespace TcpSessionServer {
     class MyServerFilter : IHproseFilter {
         public MemoryStream InputFilter(MemoryStream inStream, object context) {
             int len = (int)inStream.Length - 7;
+            int sid;
             if (len > 0 &&
                 inStream.ReadByte() == 's' &&
                 inStream.ReadByte() == 'i' &&
                 inStream.ReadByte() == 'd') {
-                int sid = inStream.ReadByte() << 24 |
+                sid = inStream.ReadByte() << 24 |
                           inStream.ReadByte() << 16 |
                           inStream.ReadByte() << 8 |
                           inStream.ReadByte();
@@ -32,7 +33,7 @@ namespace TcpSessionServer {
                 inStream.Read(buf, 0, len);
                 return new MemoryStream(buf);
             }
-            int sid = Session.sessions.Count;
+            sid = Session.sessions.Count;
             Session.sidMap[context] = sid;
             Session.sessions.Add(new Dictionary<string, dynamic>());
             return inStream;
