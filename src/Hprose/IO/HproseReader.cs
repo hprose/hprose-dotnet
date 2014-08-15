@@ -12,7 +12,7 @@
  *                                                        *
  * hprose reader class for C#.                            *
  *                                                        *
- * LastModified: Jun 15, 2014                             *
+ * LastModified: Aug 15, 2014                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -1227,7 +1227,7 @@ namespace Hprose.IO {
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
-                case HproseTags.TagUTF8Char: return Convert.ToSByte(ReadUTF8CharAsChar());
+                case HproseTags.TagUTF8Char: return Convert.ToSByte(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToSByte(ReadStringWithoutTag());
 #if dotNETCF10
                 case HproseTags.TagRef: return Convert.ToSByte(Convert.ToInt32(ReadRef()));
@@ -1258,7 +1258,7 @@ namespace Hprose.IO {
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
-                case HproseTags.TagUTF8Char: return Convert.ToByte(ReadUTF8CharAsChar());
+                case HproseTags.TagUTF8Char: return Convert.ToByte(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToByte(ReadStringWithoutTag());
 #if dotNETCF10
                 case HproseTags.TagRef: return Convert.ToByte(Convert.ToInt32(ReadRef()));
@@ -1289,7 +1289,7 @@ namespace Hprose.IO {
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
-                case HproseTags.TagUTF8Char: return Convert.ToInt16(ReadUTF8CharAsChar());
+                case HproseTags.TagUTF8Char: return Convert.ToInt16(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToInt16(ReadStringWithoutTag());
 #if dotNETCF10
                 case HproseTags.TagRef: return Convert.ToInt16(Convert.ToInt32(ReadRef()));
@@ -1321,7 +1321,7 @@ namespace Hprose.IO {
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
-                case HproseTags.TagUTF8Char: return Convert.ToUInt16(ReadUTF8CharAsChar());
+                case HproseTags.TagUTF8Char: return Convert.ToUInt16(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToUInt16(ReadStringWithoutTag());
                 case HproseTags.TagRef: return Convert.ToUInt16(ReadRef());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofUInt16);
@@ -1348,7 +1348,7 @@ namespace Hprose.IO {
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
-                case HproseTags.TagUTF8Char: return Convert.ToInt32(ReadUTF8CharAsChar());
+                case HproseTags.TagUTF8Char: return Convert.ToInt32(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToInt32(ReadStringWithoutTag());
                 case HproseTags.TagRef: return Convert.ToInt32(ReadRef());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofInt32);
@@ -1376,7 +1376,7 @@ namespace Hprose.IO {
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
-                case HproseTags.TagUTF8Char: return Convert.ToUInt32(ReadUTF8CharAsChar());
+                case HproseTags.TagUTF8Char: return Convert.ToUInt32(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToUInt32(ReadStringWithoutTag());
                 case HproseTags.TagRef: return Convert.ToUInt32(ReadRef());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofUInt32);
@@ -1405,7 +1405,7 @@ namespace Hprose.IO {
                 case HproseTags.TagFalse: return 0L;
                 case HproseTags.TagDate: return ReadDateWithoutTag().Ticks;
                 case HproseTags.TagTime: return ReadTimeWithoutTag().Ticks;
-                case HproseTags.TagUTF8Char: return Convert.ToInt64(ReadUTF8CharAsChar());
+                case HproseTags.TagUTF8Char: return Convert.ToInt64(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToInt64(ReadStringWithoutTag());
                 case HproseTags.TagRef: return Convert.ToInt64(ReadRef());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofInt64);
@@ -1433,7 +1433,7 @@ namespace Hprose.IO {
                 case HproseTags.TagEmpty: return 0L;
                 case HproseTags.TagTrue: return 1L;
                 case HproseTags.TagFalse: return 0L;
-                case HproseTags.TagUTF8Char: return Convert.ToUInt64(ReadUTF8CharAsChar());
+                case HproseTags.TagUTF8Char: return Convert.ToUInt64(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToUInt64(ReadStringWithoutTag());
                 case HproseTags.TagRef: return Convert.ToUInt64(ReadRef());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofUInt64);
@@ -1464,7 +1464,7 @@ namespace Hprose.IO {
                 case HproseTags.TagInfinity: return (stream.ReadByte() == HproseTags.TagPos) ?
                                                      float.PositiveInfinity :
                                                      float.NegativeInfinity;
-                case HproseTags.TagUTF8Char: return Convert.ToSingle(ReadUTF8CharAsChar());
+                case HproseTags.TagUTF8Char: return Convert.ToSingle(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToSingle(ReadStringWithoutTag());
                 case HproseTags.TagRef: return Convert.ToSingle(ReadRef());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofSingle);
@@ -1493,7 +1493,7 @@ namespace Hprose.IO {
                 case HproseTags.TagFalse: return 0.0;
                 case HproseTags.TagNaN: return double.NaN;
                 case HproseTags.TagInfinity: return ReadInfinityWithoutTag();
-                case HproseTags.TagUTF8Char: return Convert.ToDouble(ReadUTF8CharAsChar());
+                case HproseTags.TagUTF8Char: return Convert.ToDouble(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToDouble(ReadStringWithoutTag());
                 case HproseTags.TagRef: return Convert.ToDouble(ReadRef());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofDouble);
@@ -1520,7 +1520,7 @@ namespace Hprose.IO {
                 case HproseTags.TagEmpty: return 0.0M;
                 case HproseTags.TagTrue: return 1.0M;
                 case HproseTags.TagFalse: return 0.0M;
-                case HproseTags.TagUTF8Char: return Convert.ToDecimal(ReadUTF8CharAsChar());
+                case HproseTags.TagUTF8Char: return Convert.ToDecimal(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToDecimal(ReadStringWithoutTag());
                 case HproseTags.TagRef: return Convert.ToDecimal(ReadRef());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofDecimal);
@@ -1669,7 +1669,7 @@ namespace Hprose.IO {
                 case HproseTags.TagFalse: return BigInteger.Zero;
                 case HproseTags.TagDate: return new BigInteger(ReadDateWithoutTag().Ticks);
                 case HproseTags.TagTime: return new BigInteger(ReadTimeWithoutTag().Ticks);
-                case HproseTags.TagUTF8Char: return new BigInteger(Convert.ToInt64(ReadUTF8CharAsChar()));
+                case HproseTags.TagUTF8Char: return BigInteger.Parse(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return BigInteger.Parse(ReadStringWithoutTag());
                 case HproseTags.TagRef: return BigInteger.Parse(Convert.ToString(ReadRef()));
                 default: throw CastError(TagToString(tag), HproseHelper.typeofBigInteger);
@@ -1698,7 +1698,6 @@ namespace Hprose.IO {
                 case HproseTags.TagFalse: return TimeSpan.Zero;
                 case HproseTags.TagDate: return new TimeSpan(ReadDateWithoutTag().Ticks);
                 case HproseTags.TagTime: return new TimeSpan(ReadTimeWithoutTag().Ticks);
-                case HproseTags.TagUTF8Char: return new TimeSpan(Convert.ToInt64(ReadUTF8CharAsChar()));
                 case HproseTags.TagString: return new TimeSpan(Convert.ToDateTime(ReadStringWithoutTag()).Ticks);
                 case HproseTags.TagRef: return new TimeSpan(Convert.ToDateTime(ReadRef()).Ticks);
                 default: throw CastError(TagToString(tag), HproseHelper.typeofTimeSpan);
@@ -1737,8 +1736,8 @@ namespace Hprose.IO {
                 case HproseTags.TagEmpty: return Enum.ToObject(type, 0);
                 case HproseTags.TagTrue: return Enum.ToObject(type, 1);
                 case HproseTags.TagFalse: return Enum.ToObject(type, 0);
-                case HproseTags.TagUTF8Char: return Enum.ToObject(type, Convert.ToInt32(ReadUTF8CharAsChar()));
 #if !dotNETCF10
+                case HproseTags.TagUTF8Char: return Enum.Parse(type, ReadUTF8CharWithoutTag(), true);
                 case HproseTags.TagString: return Enum.Parse(type, ReadStringWithoutTag(), true);
                 case HproseTags.TagRef: return Enum.Parse(type, ReadRef().ToString(), true);
 #endif
