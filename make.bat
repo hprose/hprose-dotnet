@@ -16,6 +16,7 @@ if not exist dist\4.5.1 mkdir dist\4.5.1
 if not exist dist\WindowsPhone mkdir dist\WindowsPhone
 if not exist dist\WindowsPhone71 mkdir dist\WindowsPhone71
 if not exist dist\WindowsPhone8 mkdir dist\WindowsPhone8
+if not exist dist\WindowsPhone81 mkdir dist\WindowsPhone81
 if not exist dist\SilverLight2 mkdir dist\SilverLight2
 if not exist dist\SilverLight3 mkdir dist\SilverLight3
 if not exist dist\SilverLight4 mkdir dist\SilverLight4
@@ -25,6 +26,7 @@ if not exist dist\CF2.0 mkdir dist\CF2.0
 if not exist dist\CF3.5 mkdir dist\CF3.5
 if not exist dist\Mono mkdir dist\Mono
 if not exist dist\Mono2 mkdir dist\Mono2
+if not exist dist\Mono3.5 mkdir dist\Mono3.5
 if not exist dist\Mono4 mkdir dist\Mono4
 if not exist dist\Mono4.5 mkdir dist\Mono4.5
 if not exist dist\Unity mkdir dist\Unity
@@ -37,6 +39,7 @@ set SL5_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\Silverlig
 set WP70_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0\Profile\WindowsPhone
 set WP71_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0\Profile\WindowsPhone71
 set WP80_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\WindowsPhone\v8.0
+set WP80_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\WindowsPhone\v8.1
 set CF_PATH=C:\Program Files\Microsoft.NET\SDK\CompactFramework
 set MONO_PATH=C:\Program Files\Mono-3.2.3\bin
 set UNITY_PATH=C:\Program Files\Unity\Editor\Data\MonoBleedingEdge\bin
@@ -48,6 +51,7 @@ if DEFINED ProgramFiles(x86) set SL5_PATH=C:\Program Files (x86)\Reference Assem
 if DEFINED ProgramFiles(x86) set WP70_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0\Profile\WindowsPhone
 if DEFINED ProgramFiles(x86) set WP71_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0\Profile\WindowsPhone71
 if DEFINED ProgramFiles(x86) set WP80_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\WindowsPhone\v8.0
+if DEFINED ProgramFiles(x86) set WP81_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\WindowsPhone\v8.1
 if DEFINED ProgramFiles(x86) set CF_PATH=C:\Program Files (x86)\Microsoft.NET\SDK\CompactFramework
 if DEFINED ProgramFiles(x86) set MONO_PATH=C:\Program Files (x86)\Mono-3.2.3\bin
 if DEFINED ProgramFiles(x86) set UNITY_PATH=C:\Program Files (x86)\Unity\Editor\Data\MonoBleedingEdge\bin
@@ -309,6 +313,16 @@ set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP80_PATH%\System.Windows.dll"
 set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP80_PATH%\System.Runtime.Serialization.dll"
 C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\WindowsPhone8\Hprose.Client.dll -define:WINDOWS_PHONE;WP80;ClientOnly -filealign:512 -target:library -noconfig -nowarn:0444 -nostdlib+ -optimize+ %1 %WP_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
+echo start compile hprose for Windows Phone 8.1
+set WP_REFERENCE=
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\mscorlib.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Core.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Net.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Windows.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Runtime.Serialization.dll"
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\WindowsPhone81\Hprose.Client.dll -define:WINDOWS_PHONE;WP81;ClientOnly -filealign:512 -target:library -noconfig -nowarn:0444 -nostdlib+ -optimize+ %1 %WP_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
 echo start compile hprose for .NET Compact Framework 1.0
 set CF_REFERENCE=
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v1.0\WindowsCE\mscorlib.dll"
@@ -336,24 +350,28 @@ call "%MONO_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Mono\Hprose.Client.dll 
 call "%MONO_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Mono\Hprose.dll -define:dotNET11;MONO -noconfig -target:library -optimize+ %1 -reference:System,System.Web,System.Windows.Forms %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for mono 2.0
-call "%MONO_PATH%\gmcs" -keyfile:HproseKeys.snk -out:dist\Mono2\Hprose.Client.dll -sdk:2 -define:dotNET2;MONO;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
-call "%MONO_PATH%\gmcs" -keyfile:HproseKeys.snk -out:dist\Mono2\Hprose.dll -sdk:2 -define:dotNET2;MONO -noconfig -target:library -optimize+ %1 -reference:System,System.Web %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+call "%MONO_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Mono2\Hprose.Client.dll -sdk:2 -define:dotNET2;MONO;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+call "%MONO_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Mono2\Hprose.dll -sdk:2 -define:dotNET2;MONO -noconfig -target:library -optimize+ %1 -reference:System,System.Web %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for mono 3.5
+call "%MONO_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Mono3.5\Hprose.Client.dll -sdk:2 -define:dotNET35;MONO;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+call "%MONO_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Mono3.5\Hprose.dll -sdk:2 -define:dotNET35;MONO -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization,System.Web %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for mono 4.0
-call "%MONO_PATH%\dmcs" -keyfile:HproseKeys.snk -out:dist\Mono4\Hprose.Client.dll -sdk:4 -define:dotNET4;MONO;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
-call "%MONO_PATH%\dmcs" -keyfile:HproseKeys.snk -out:dist\Mono4\Hprose.dll -sdk:4 -define:dotNET4;MONO -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization,System.Web,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
+call "%MONO_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Mono4\Hprose.Client.dll -sdk:4 -define:dotNET4;MONO;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
+call "%MONO_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Mono4\Hprose.dll -sdk:4 -define:dotNET4;MONO -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization,System.Web,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for mono 4.5
-call "%MONO_PATH%\dmcs" -keyfile:HproseKeys.snk -out:dist\Mono4.5\Hprose.Client.dll -sdk:4.5 -define:dotNET4;dotNET45;MONO;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
-call "%MONO_PATH%\dmcs" -keyfile:HproseKeys.snk -out:dist\Mono4.5\Hprose.dll -sdk:4.5 -define:dotNET4;dotNET45;MONO -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization,System.Web,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
+call "%MONO_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Mono4.5\Hprose.Client.dll -sdk:4.5 -define:dotNET4;dotNET45;MONO;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
+call "%MONO_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Mono4.5\Hprose.dll -sdk:4.5 -define:dotNET4;dotNET45;MONO -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization,System.Web,System.Numerics %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for Unity
-call "%UNITY_PATH%\gmcs" -keyfile:HproseKeys.snk -out:dist\Unity\Hprose.Client.dll -sdk:2 -define:dotNET2;MONO;Unity;ClientProfile;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
-call "%UNITY_PATH%\gmcs" -keyfile:HproseKeys.snk -out:dist\Unity\Hprose.dll -sdk:2 -define:dotNET2;MONO;Unity;ClientProfile -noconfig -target:library -optimize+ %1 -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+call "%UNITY_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Unity\Hprose.Client.dll -sdk:2 -define:dotNET35;MONO;Unity;ClientProfile;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+call "%UNITY_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Unity\Hprose.dll -sdk:2 -define:dotNET35;MONO;Unity;ClientProfile -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for Unity iOS
-call "%UNITY_PATH%\gmcs" -keyfile:HproseKeys.snk -out:dist\Unity_iOS\Hprose.Client.dll -sdk:2 -define:dotNET2;MONO;Unity;Unity_iOS;ClientProfile;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
-call "%UNITY_PATH%\gmcs" -keyfile:HproseKeys.snk -out:dist\Unity_iOS\Hprose.dll -sdk:2 -define:dotNET2;MONO;Unity;Unity_iOS;ClientProfile -noconfig -target:library -optimize+ %1 -reference:System %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+call "%UNITY_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Unity_iOS\Hprose.Client.dll -sdk:2 -define:dotNET35;MONO;Unity;Unity_iOS;ClientProfile;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+call "%UNITY_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Unity_iOS\Hprose.dll -sdk:2 -define:dotNET35;MONO;Unity;Unity_iOS;ClientProfile -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 set NUMERICS_SRC=
 set HPROSE_SRC=

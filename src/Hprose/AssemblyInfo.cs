@@ -9,8 +9,8 @@ namespace Hprose {
         public const string FileName = "Hprose.dll";
     #endif
     #if MONO
-        #if (Unity && dotNET2)
-        public const string dotNET_Version = "2.0.0.0";
+        #if (Unity && dotNET35)
+        public const string dotNET_Version = "3.5.0.0";
         public const string dotNET_Name = "Unity";
         #elif dotNET45
         public const string dotNET_Version = "4.0.30319.17020";
@@ -18,6 +18,9 @@ namespace Hprose {
         #elif dotNET4
         public const string dotNET_Version = "4.0.30319.1";
         public const string dotNET_Name = "Mono 4.0";
+        #elif dotNET35
+        public const string dotNET_Version = "3.5.21022.8";
+        public const string dotNET_Name = "Mono 3.5";
         #elif dotNET2
         public const string dotNET_Version = "2.0.50727.1433";
         public const string dotNET_Name = "Mono 2.0";
@@ -79,6 +82,9 @@ namespace Hprose {
         #elif SL2
         public const string dotNET_Version = "2.0.31005.0";
         public const string dotNET_Name = "Silverlight 2";
+        #elif WP81
+        public const string dotNET_Version = "4.0.30227.0";
+        public const string dotNET_Name = "WindowsPhone 8.1";
         #elif WP80
         public const string dotNET_Version = "4.0.50829.0";
         public const string dotNET_Name = "WindowsPhone 8.0";
@@ -92,7 +98,7 @@ namespace Hprose {
     #endif
     #if SL5
         public const string dotNET_MajorVersion = "5.0";
-    #elif dotNET45
+    #elif (dotNET45 || WP81)
         public const string dotNET_MajorVersion = "4.5";
     #elif (dotNET4 || SL4 || WP80)
         public const string dotNET_MajorVersion = "4.0";
