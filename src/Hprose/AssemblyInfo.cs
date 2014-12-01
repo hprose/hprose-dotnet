@@ -30,11 +30,19 @@ namespace Hprose {
         #endif
     #else
         #if dotNET451
-        public const string dotNET_Version = "4.0.30319.18402";
-        public const string dotNET_Name = ".NET Framework 4.5.1";
+            #if WP81
+            public const string dotNET_Version = "4.0.40024.3";
+            public const string dotNET_Name = "WindowsPhone 8.1";
+            #elif Core
+            public const string dotNET_Version = "4.0.40013.0";
+            public const string dotNET_Name = "Windows Store 8.1 apps";
+            #else
+            public const string dotNET_Version = "4.0.30319.18402";
+            public const string dotNET_Name = ".NET Framework 4.5.1";
+            #endif
         #elif Core
         public const string dotNET_Version = "4.0.30319.18020";
-        public const string dotNET_Name = "Windows Store apps";
+        public const string dotNET_Name = "Windows Store 8 apps";
         #elif dotNET45
         public const string dotNET_Version = "4.0.30319.17929";
         public const string dotNET_Name = ".NET Framework 4.5";
@@ -82,9 +90,6 @@ namespace Hprose {
         #elif SL2
         public const string dotNET_Version = "2.0.31005.0";
         public const string dotNET_Name = "Silverlight 2";
-        #elif WP81
-        public const string dotNET_Version = "4.0.30227.0";
-        public const string dotNET_Name = "WindowsPhone 8.1";
         #elif WP80
         public const string dotNET_Version = "4.0.50829.0";
         public const string dotNET_Name = "WindowsPhone 8.0";

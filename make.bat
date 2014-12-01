@@ -13,6 +13,7 @@ if not exist dist\4.0\ClientProfile mkdir dist\4.0\ClientProfile
 if not exist dist\4.5 mkdir dist\4.5
 if not exist dist\4.5\Core mkdir dist\4.5\Core
 if not exist dist\4.5.1 mkdir dist\4.5.1
+if not exist dist\4.5.1\Core mkdir dist\4.5.1\Core
 if not exist dist\WindowsPhone mkdir dist\WindowsPhone
 if not exist dist\WindowsPhone71 mkdir dist\WindowsPhone71
 if not exist dist\WindowsPhone8 mkdir dist\WindowsPhone8
@@ -39,7 +40,7 @@ set SL5_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\Silverlig
 set WP70_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0\Profile\WindowsPhone
 set WP71_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0\Profile\WindowsPhone71
 set WP80_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\WindowsPhone\v8.0
-set WP80_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\WindowsPhone\v8.1
+set WP80_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\WindowsPhoneApp\v8.1
 set CF_PATH=C:\Program Files\Microsoft.NET\SDK\CompactFramework
 set MONO_PATH=C:\Program Files\Mono-3.2.3\bin
 set UNITY_PATH=C:\Program Files\Unity\Editor\Data\MonoBleedingEdge\bin
@@ -51,7 +52,7 @@ if DEFINED ProgramFiles(x86) set SL5_PATH=C:\Program Files (x86)\Reference Assem
 if DEFINED ProgramFiles(x86) set WP70_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0\Profile\WindowsPhone
 if DEFINED ProgramFiles(x86) set WP71_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0\Profile\WindowsPhone71
 if DEFINED ProgramFiles(x86) set WP80_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\WindowsPhone\v8.0
-if DEFINED ProgramFiles(x86) set WP81_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\WindowsPhone\v8.1
+if DEFINED ProgramFiles(x86) set WP81_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\WindowsPhoneApp\v8.1
 if DEFINED ProgramFiles(x86) set CF_PATH=C:\Program Files (x86)\Microsoft.NET\SDK\CompactFramework
 if DEFINED ProgramFiles(x86) set MONO_PATH=C:\Program Files (x86)\Mono-3.2.3\bin
 if DEFINED ProgramFiles(x86) set UNITY_PATH=C:\Program Files (x86)\Unity\Editor\Data\MonoBleedingEdge\bin
@@ -243,6 +244,30 @@ C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -o
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Web.dll"
 C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.5.1\Hprose.dll -define:dotNET4;dotNET45;dotNET451 -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %1 %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
+echo start compile hprose for .NET 4.5.1 Windows Store App
+set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETCore\v4.5.1
+if DEFINED ProgramFiles(x86) set DOTNET_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETCore\v4.5.1
+set DOTNET_REFERENCE=
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Collections.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.IO.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Linq.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Net.Requests.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Net.Primitives.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Reflection.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Reflection.Extensions.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Reflection.Primitives.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Extensions.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Numerics.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.Primitives.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Text.Encoding.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Text.Encoding.Extensions.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Threading.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Threading.Tasks.dll"
+
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.5.1\Core\Hprose.Client.dll -define:dotNET4;dotNET45;dotNET451;Core;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %1 %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+
 echo start compile hprose for Silverlight 2.0
 set SL_REFERENCE=
 set SL_REFERENCE=%SL_REFERENCE% -reference:"%SL2_PATH%\mscorlib.dll"
@@ -316,12 +341,23 @@ C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -o
 echo start compile hprose for Windows Phone 8.1
 set WP_REFERENCE=
 set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\mscorlib.dll"
-set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Core.dll"
-set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.dll"
-set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Net.dll"
-set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Windows.dll"
-set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Runtime.Serialization.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\WindowsPhone81\Hprose.Client.dll -define:WINDOWS_PHONE;WP81;ClientOnly -filealign:512 -target:library -noconfig -nowarn:0444 -nostdlib+ -optimize+ %1 %WP_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Collections.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.IO.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Linq.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Net.Requests.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Net.Primitives.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Reflection.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Reflection.Extensions.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Reflection.Primitives.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Runtime.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Runtime.Extensions.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Runtime.Numerics.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Runtime.Serialization.Primitives.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Text.Encoding.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Text.Encoding.Extensions.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Threading.dll"
+set WP_REFERENCE=%WP_REFERENCE% -reference:"%WP81_PATH%\System.Threading.Tasks.dll"
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\WindowsPhone81\Hprose.Client.dll -define:dotNET4;dotNET45;dotNET451;Core;WP81;ClientOnly -filealign:512 -target:library -noconfig -nowarn:0444 -nostdlib+ -optimize+ %1 %WP_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET Compact Framework 1.0
 set CF_REFERENCE=
