@@ -11,7 +11,13 @@ namespace Hprose {
     #if MONO
         #if (Unity && dotNET35)
         public const string dotNET_Version = "3.5.0.0";
-        public const string dotNET_Name = "Unity";
+            #if UNITY_WEBPLAYER
+                public const string dotNET_Name = "Unity Web Player";
+            #elif Unity_iOS
+                public const string dotNET_Name = "Unity iOS";
+            #else
+                public const string dotNET_Name = "Unity";
+            #endif
         #elif dotNET45
         public const string dotNET_Version = "4.0.30319.17020";
         public const string dotNET_Name = "Mono 4.5";

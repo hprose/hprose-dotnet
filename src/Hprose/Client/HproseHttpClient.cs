@@ -75,7 +75,7 @@ namespace Hprose.Client {
         private string encoding = null;
 #if !dotNETCF10
         private string connectionGroupName = null;
-#if !(dotNET10 || dotNET11 || dotNETCF20)
+#if !(dotNET10 || dotNET11 || dotNETCF20 || UNITY_WEBPLAYER)
         private X509CertificateCollection clientCertificates = null;
 #endif
 #endif
@@ -195,7 +195,7 @@ namespace Hprose.Client {
                 connectionGroupName = value;
             }
         }
-#if !(dotNET10 || dotNET11 || dotNETCF20)
+#if !(dotNET10 || dotNET11 || dotNETCF20 || UNITY_WEBPLAYER)
         public X509CertificateCollection ClientCertificates {
             get {
                 return clientCertificates;
@@ -242,7 +242,7 @@ namespace Hprose.Client {
             }
 #if !dotNETCF10
             request.ConnectionGroupName = connectionGroupName;
-#if !(dotNET10 || dotNET11 || dotNETCF20)
+#if !(dotNET10 || dotNET11 || dotNETCF20 || UNITY_WEBPLAYER)
             if (clientCertificates != null) {
                 request.ClientCertificates = clientCertificates;
             }

@@ -32,6 +32,7 @@ if not exist dist\Mono4 mkdir dist\Mono4
 if not exist dist\Mono4.5 mkdir dist\Mono4.5
 if not exist dist\Unity mkdir dist\Unity
 if not exist dist\Unity_iOS mkdir dist\Unity_iOS
+if not exist dist\Unity_Web mkdir dist\Unity_Web
 
 set SL2_PATH=C:\Program Files\Microsoft SDKs\Silverlight\v2.0\Reference Assemblies
 set SL3_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\Silverlight\v3.0
@@ -95,6 +96,8 @@ set HPROSE_SRC=%HPROSE_SRC% src\System\IO\Compression\InputBuffer.cs
 set HPROSE_SRC=%HPROSE_SRC% src\System\IO\Compression\Match.cs
 set HPROSE_SRC=%HPROSE_SRC% src\System\IO\Compression\MatchState.cs
 set HPROSE_SRC=%HPROSE_SRC% src\System\IO\Compression\OutputWindow.cs
+set HPROSE_SRC=%HPROSE_SRC% src\System\Runtime\Serialization\DataContractAttribute.cs
+set HPROSE_SRC=%HPROSE_SRC% src\System\Runtime\Serialization\DataMemberAttribute.cs
 set HPROSE_SRC=%HPROSE_SRC% src\System\Threading\ReaderWriterLock.cs
 set HPROSE_SRC=%HPROSE_SRC% src\System\Threading\SynchronizationContext.cs
 set HPROSE_SRC=%HPROSE_SRC% src\System\Windows\Forms\WindowsFormsSynchronizationContext.cs
@@ -408,6 +411,10 @@ call "%UNITY_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Unity\Hprose.dll -sdk:
 echo start compile hprose for Unity iOS
 call "%UNITY_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Unity_iOS\Hprose.Client.dll -sdk:2 -define:dotNET35;MONO;Unity;Unity_iOS;ClientProfile;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 call "%UNITY_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Unity_iOS\Hprose.dll -sdk:2 -define:dotNET35;MONO;Unity;Unity_iOS;ClientProfile -noconfig -target:library -optimize+ %1 -reference:System,System.Core,System.Runtime.Serialization %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for Unity Web Player
+call "%UNITY_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Unity_Web\Hprose.Client.dll -sdk:2 -define:dotNET35;MONO;Unity;Unity_iOS;UNITY_WEBPLAYER;ClientProfile;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System,System.Core %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+call "%UNITY_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Unity_Web\Hprose.dll -sdk:2 -define:dotNET35;MONO;Unity;Unity_iOS;UNITY_WEBPLAYER;ClientProfile -noconfig -target:library -optimize+ %1 -reference:System,System.Core %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 set NUMERICS_SRC=
 set HPROSE_SRC=
