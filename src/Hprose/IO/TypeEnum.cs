@@ -12,7 +12,7 @@
  *                                                        *
  * type enum for C#.                                      *
  *                                                        *
- * LastModified: Dec 17, 2012                             *
+ * LastModified: Jan 17, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -87,6 +87,25 @@ namespace Hprose.IO {
         Stack,
 #endif
 #if !(dotNET10 || dotNET11 || dotNETCF10)
+
+        NullableBoolean,
+        NullableChar,
+        NullableSByte,
+        NullableByte,
+        NullableInt16,
+        NullableUInt16,
+        NullableInt32,
+        NullableUInt32,
+        NullableInt64,
+        NullableUInt64,
+        NullableSingle,
+        NullableDouble,
+        NullableDecimal,
+        NullableDateTime,
+        NullableGuid,
+        NullableBigInteger,
+        NullableTimeSpan, 
+        
         GenericList,
         GenericDictionary,
         GenericQueue,

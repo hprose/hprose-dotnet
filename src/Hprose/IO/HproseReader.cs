@@ -12,7 +12,7 @@
  *                                                        *
  * hprose reader class for C#.                            *
  *                                                        *
- * LastModified: Aug 15, 2014                             *
+ * LastModified: Jan 17, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -1154,8 +1154,7 @@ namespace Hprose.IO {
         }
 #endif
 
-        public bool ReadBoolean() {
-            int tag = stream.ReadByte();
+        private bool ReadBooleanWithTag(int tag) {
             switch (tag) {
                 case '0': return false;
                 case '1':
@@ -1170,7 +1169,6 @@ namespace Hprose.IO {
                 case HproseTags.TagInteger: return ReadIntWithoutTag() != 0;
                 case HproseTags.TagLong: return !(ReadBigIntegerWithoutTag().IsZero);
                 case HproseTags.TagDouble: return ReadDoubleWithoutTag() != 0.0;
-                case HproseTags.TagNull: return false;
                 case HproseTags.TagEmpty: return false;
                 case HproseTags.TagTrue: return true;
                 case HproseTags.TagFalse: return false;
@@ -1183,8 +1181,24 @@ namespace Hprose.IO {
             }
         }
 
-        public char ReadChar() {
+        public bool ReadBoolean() {
             int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? false : ReadBooleanWithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        public bool? ReadNullableBoolean() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadBooleanWithTag(tag);
+            }
+        }
+#endif
+
+        private char ReadCharWithTag(int tag) {
             switch (tag) {
                 case '0':
                 case '1':
@@ -1196,7 +1210,6 @@ namespace Hprose.IO {
                 case '7':
                 case '8':
                 case '9': return (char)tag;
-                case HproseTags.TagNull: return (char)0;
                 case HproseTags.TagInteger: return Convert.ToChar(ReadIntWithoutTag());
                 case HproseTags.TagLong: return Convert.ToChar(ReadLongWithoutTag());
                 case HproseTags.TagUTF8Char: return ReadUTF8CharAsChar();
@@ -1206,9 +1219,24 @@ namespace Hprose.IO {
             }
         }
 
-        [CLSCompliantAttribute(false)]
-        public sbyte ReadSByte() {
+        public char ReadChar() {
             int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? (char)0 : ReadCharWithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        public char? ReadNullableChar() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadCharWithTag(tag);
+            }
+        }
+#endif
+
+        private sbyte ReadSByteWithTag(int tag) {
             switch (tag) {
                 case '0': return 0;
                 case '1': return 1;
@@ -1223,7 +1251,6 @@ namespace Hprose.IO {
                 case HproseTags.TagInteger: return Convert.ToSByte(ReadIntWithoutTag());
                 case HproseTags.TagLong: return Convert.ToSByte(ReadLongWithoutTag());
                 case HproseTags.TagDouble: return Convert.ToSByte(ReadDoubleWithoutTag());
-                case HproseTags.TagNull: return 0;
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
@@ -1238,8 +1265,26 @@ namespace Hprose.IO {
             }
         }
 
-        public byte ReadByte() {
+        [CLSCompliantAttribute(false)]
+        public sbyte ReadSByte() {
             int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? (sbyte)0 : ReadSByteWithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        [CLSCompliantAttribute(false)]
+        public sbyte? ReadNullableSByte() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadSByteWithTag(tag);
+            }
+        }
+#endif
+
+        private byte ReadByteWithTag(int tag) {
             switch (tag) {
                 case '0': return 0;
                 case '1': return 1;
@@ -1254,7 +1299,6 @@ namespace Hprose.IO {
                 case HproseTags.TagInteger: return Convert.ToByte(ReadIntWithoutTag());
                 case HproseTags.TagLong: return Convert.ToByte(ReadLongWithoutTag());
                 case HproseTags.TagDouble: return Convert.ToByte(ReadDoubleWithoutTag());
-                case HproseTags.TagNull: return 0;
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
@@ -1269,8 +1313,24 @@ namespace Hprose.IO {
             }
         }
 
-        public short ReadInt16() {
+        public byte ReadByte() {
             int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? (byte)0 : ReadByteWithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        public byte? ReadNullableByte() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadByteWithTag(tag);
+            }
+        }
+#endif
+
+        private short ReadInt16WithTag(int tag) {
             switch (tag) {
                 case '0': return 0;
                 case '1': return 1;
@@ -1285,7 +1345,6 @@ namespace Hprose.IO {
                 case HproseTags.TagInteger: return Convert.ToInt16(ReadIntWithoutTag());
                 case HproseTags.TagLong: return Convert.ToInt16(ReadLongWithoutTag());
                 case HproseTags.TagDouble: return Convert.ToInt16(ReadDoubleWithoutTag());
-                case HproseTags.TagNull: return 0;
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
@@ -1300,9 +1359,24 @@ namespace Hprose.IO {
             }
         }
 
-        [CLSCompliantAttribute(false)]
-        public ushort ReadUInt16() {
+        public short ReadInt16() {
             int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? (short)0 : ReadInt16WithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        public short? ReadNullableInt16() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadInt16WithTag(tag);
+            }
+        }
+#endif
+
+        private ushort ReadUInt16WithTag(int tag) {
             switch (tag) {
                 case '0': return 0;
                 case '1': return 1;
@@ -1317,7 +1391,6 @@ namespace Hprose.IO {
                 case HproseTags.TagInteger: return Convert.ToUInt16(ReadIntWithoutTag());
                 case HproseTags.TagLong: return Convert.ToUInt16(ReadLongWithoutTag());
                 case HproseTags.TagDouble: return Convert.ToUInt16(ReadDoubleWithoutTag());
-                case HproseTags.TagNull: return 0;
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
@@ -1328,8 +1401,26 @@ namespace Hprose.IO {
             }
         }
 
-        public int ReadInt32() {
+        [CLSCompliantAttribute(false)]
+        public ushort ReadUInt16() {
             int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? (ushort)0 : ReadUInt16WithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        [CLSCompliantAttribute(false)]
+        public ushort? ReadNullableUInt16() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadUInt16WithTag(tag);
+            }
+        }
+#endif
+
+        private int ReadInt32WithTag(int tag) {
             switch (tag) {
                 case '0': return 0;
                 case '1': return 1;
@@ -1344,7 +1435,6 @@ namespace Hprose.IO {
                 case HproseTags.TagInteger: return ReadIntWithoutTag();
                 case HproseTags.TagLong: return Convert.ToInt32(ReadLongWithoutTag());
                 case HproseTags.TagDouble: return Convert.ToInt32(ReadDoubleWithoutTag());
-                case HproseTags.TagNull: return 0;
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
@@ -1355,9 +1445,24 @@ namespace Hprose.IO {
             }
         }
 
-        [CLSCompliantAttribute(false)]
-        public uint ReadUInt32() {
+        public int ReadInt32() {
             int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? 0 : ReadInt32WithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        public int? ReadNullableInt32() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadInt32WithTag(tag);
+            }
+        }
+#endif
+
+        private uint ReadUInt32WithTag(int tag) {
             switch (tag) {
                 case '0': return 0;
                 case '1': return 1;
@@ -1372,7 +1477,6 @@ namespace Hprose.IO {
                 case HproseTags.TagInteger: return Convert.ToUInt32(ReadIntWithoutTag());
                 case HproseTags.TagLong: return Convert.ToUInt32(ReadLongWithoutTag());
                 case HproseTags.TagDouble: return Convert.ToUInt32(ReadDoubleWithoutTag());
-                case HproseTags.TagNull: return 0;
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
@@ -1383,8 +1487,26 @@ namespace Hprose.IO {
             }
         }
 
-        public long ReadInt64() {
+        [CLSCompliantAttribute(false)]
+        public uint ReadUInt32() {
             int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? 0 : ReadUInt32WithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        [CLSCompliantAttribute(false)]
+        public uint? ReadNullableUInt32() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadUInt32WithTag(tag);
+            }
+        }
+#endif
+
+        private long ReadInt64WithTag(int tag) {
             switch (tag) {
                 case '0': return 0L;
                 case '1': return 1L;
@@ -1399,7 +1521,6 @@ namespace Hprose.IO {
                 case HproseTags.TagInteger: return ReadLongWithoutTag();
                 case HproseTags.TagLong: return ReadLongWithoutTag();
                 case HproseTags.TagDouble: return Convert.ToInt64(ReadDoubleWithoutTag());
-                case HproseTags.TagNull: return 0L;
                 case HproseTags.TagEmpty: return 0L;
                 case HproseTags.TagTrue: return 1L;
                 case HproseTags.TagFalse: return 0L;
@@ -1412,9 +1533,24 @@ namespace Hprose.IO {
             }
         }
 
-        [CLSCompliantAttribute(false)]
-        public ulong ReadUInt64() {
+        public long ReadInt64() {
             int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? 0L : ReadInt64WithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        public long? ReadNullableInt64() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadInt64WithTag(tag);
+            }
+        }
+#endif
+
+        private ulong ReadUInt64WithTag(int tag) {
             switch (tag) {
                 case '0': return 0L;
                 case '1': return 1L;
@@ -1429,7 +1565,6 @@ namespace Hprose.IO {
                 case HproseTags.TagInteger: return Convert.ToUInt64(ReadLongWithoutTag());
                 case HproseTags.TagLong: return Convert.ToUInt64(ReadLongWithoutTag());
                 case HproseTags.TagDouble: return Convert.ToUInt64(ReadDoubleWithoutTag());
-                case HproseTags.TagNull: return 0L;
                 case HproseTags.TagEmpty: return 0L;
                 case HproseTags.TagTrue: return 1L;
                 case HproseTags.TagFalse: return 0L;
@@ -1440,8 +1575,26 @@ namespace Hprose.IO {
             }
         }
 
-        public float ReadSingle() {
+        [CLSCompliantAttribute(false)]
+        public ulong ReadUInt64() {
             int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? 0L : ReadUInt64WithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        [CLSCompliantAttribute(false)]
+        public ulong? ReadNullableUInt64() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadUInt64WithTag(tag);
+            }
+        }
+#endif
+
+        private float ReadSingleWithTag(int tag) {
             switch (tag) {
                 case '0': return 0.0F;
                 case '1': return 1.0F;
@@ -1456,7 +1609,6 @@ namespace Hprose.IO {
                 case HproseTags.TagInteger: return ReadIntAsFloat();
                 case HproseTags.TagLong: return ReadIntAsFloat();
                 case HproseTags.TagDouble: return ParseFloat(ReadUntil(HproseTags.TagSemicolon));
-                case HproseTags.TagNull: return 0.0F;
                 case HproseTags.TagEmpty: return 0.0F;
                 case HproseTags.TagTrue: return 1.0F;
                 case HproseTags.TagFalse: return 0.0F;
@@ -1471,8 +1623,24 @@ namespace Hprose.IO {
             }
         }
 
-        public double ReadDouble() {
+        public float ReadSingle() {
             int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? 0.0F : ReadSingleWithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        public float? ReadNullableSingle() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadSingleWithTag(tag);
+            }
+        }
+#endif
+
+        private double ReadDoubleWithTag(int tag) {
             switch (tag) {
                 case '0': return 0.0;
                 case '1': return 1.0;
@@ -1487,7 +1655,6 @@ namespace Hprose.IO {
                 case HproseTags.TagInteger: return ReadIntAsDouble();
                 case HproseTags.TagLong: return ReadIntAsDouble();
                 case HproseTags.TagDouble: return ReadDoubleWithoutTag();
-                case HproseTags.TagNull: return 0.0;
                 case HproseTags.TagEmpty: return 0.0;
                 case HproseTags.TagTrue: return 1.0;
                 case HproseTags.TagFalse: return 0.0;
@@ -1500,8 +1667,24 @@ namespace Hprose.IO {
             }
         }
 
-        public decimal ReadDecimal() {
+        public double ReadDouble() {
             int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? 0.0 : ReadDoubleWithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        public double? ReadNullableDouble() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadDoubleWithTag(tag);
+            }
+        }
+#endif
+
+        private decimal ReadDecimalWithTag(int tag) {
             switch (tag) {
                 case '0': return 0.0M;
                 case '1': return 1.0M;
@@ -1516,7 +1699,6 @@ namespace Hprose.IO {
                 case HproseTags.TagInteger: return ReadIntAsDecimal();
                 case HproseTags.TagLong: return ReadIntAsDecimal();
                 case HproseTags.TagDouble: return decimal.Parse(ReadUntil(HproseTags.TagSemicolon).ToString());
-                case HproseTags.TagNull: return 0.0M;
                 case HproseTags.TagEmpty: return 0.0M;
                 case HproseTags.TagTrue: return 1.0M;
                 case HproseTags.TagFalse: return 0.0M;
@@ -1527,8 +1709,24 @@ namespace Hprose.IO {
             }
         }
 
-        public DateTime ReadDateTime() {
+        public decimal ReadDecimal() {
             int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? 0.0M : ReadDecimalWithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        public decimal? ReadNullableDecimal() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadDecimalWithTag(tag);
+            }
+        }
+#endif
+
+        private DateTime ReadDateTimeWithTag(int tag) {
             switch (tag) {
                 case '0': return new DateTime(0L);
                 case '1': return new DateTime(1L);
@@ -1543,7 +1741,6 @@ namespace Hprose.IO {
                 case HproseTags.TagInteger: return new DateTime(ReadLongWithoutTag());
                 case HproseTags.TagLong: return new DateTime(ReadLongWithoutTag());
                 case HproseTags.TagDouble: return new DateTime((long)ReadDoubleWithoutTag());
-                case HproseTags.TagNull: return DateTime.MinValue;
                 case HproseTags.TagEmpty: return new DateTime(0L);
                 case HproseTags.TagDate: return ReadDateWithoutTag();
                 case HproseTags.TagTime: return ReadTimeWithoutTag();
@@ -1552,6 +1749,23 @@ namespace Hprose.IO {
                 default: throw CastError(TagToString(tag), HproseHelper.typeofDateTime);
             }
         }
+
+        public DateTime ReadDateTime() {
+            int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? DateTime.MinValue : ReadDateTimeWithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        public DateTime? ReadNullableDateTime() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadDateTimeWithTag(tag);
+            }
+        }
+#endif
 
         public string ReadString() {
             int tag = stream.ReadByte();
@@ -1629,8 +1843,7 @@ namespace Hprose.IO {
             }
         }
 
-        public Guid ReadGuid()  {
-            int tag = stream.ReadByte();
+        private Guid ReadGuidWithTag(int tag)  {
             switch (tag) {
                 case HproseTags.TagBytes: return new Guid(ReadBytesWithoutTag());
                 case HproseTags.TagGuid: return ReadGuidWithoutTag();
@@ -1647,8 +1860,23 @@ namespace Hprose.IO {
             }
         }
 
-        public BigInteger ReadBigInteger() {
+        public Guid ReadGuid() {
+            return ReadGuidWithTag(stream.ReadByte());
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        public Guid? ReadNullableGuid() {
             int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadGuidWithTag(tag);
+            }
+        }
+#endif
+
+        private BigInteger ReadBigIntegerWithTag(int tag) {
             switch (tag) {
                 case '0': return BigInteger.Zero;
                 case '1': return BigInteger.One;
@@ -1663,7 +1891,6 @@ namespace Hprose.IO {
                 case HproseTags.TagInteger: return new BigInteger(ReadIntWithoutTag());
                 case HproseTags.TagLong: return ReadBigIntegerWithoutTag();
                 case HproseTags.TagDouble: return new BigInteger(ReadDoubleWithoutTag());
-                case HproseTags.TagNull: return BigInteger.Zero;
                 case HproseTags.TagEmpty: return BigInteger.Zero;
                 case HproseTags.TagTrue: return BigInteger.One;
                 case HproseTags.TagFalse: return BigInteger.Zero;
@@ -1676,8 +1903,24 @@ namespace Hprose.IO {
             }
         }
 
-        public TimeSpan ReadTimeSpan() {
+        public BigInteger ReadBigInteger() {
             int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? BigInteger.Zero : ReadBigIntegerWithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        public BigInteger? ReadNullableBigInteger() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadBigIntegerWithTag(tag);
+            }
+        }
+#endif
+
+        private TimeSpan ReadTimeSpanWithTag(int tag) {
             switch (tag) {
                 case '0': return TimeSpan.Zero;
                 case '1': return new TimeSpan(1L);
@@ -1692,7 +1935,6 @@ namespace Hprose.IO {
                 case HproseTags.TagInteger: return new TimeSpan(ReadLongWithoutTag());
                 case HproseTags.TagLong: return new TimeSpan(ReadLongWithoutTag());
                 case HproseTags.TagDouble: return new TimeSpan(Convert.ToInt64(ReadDoubleWithoutTag()));
-                case HproseTags.TagNull: return TimeSpan.Zero;
                 case HproseTags.TagEmpty: return TimeSpan.Zero;
                 case HproseTags.TagTrue: return new TimeSpan(1L);
                 case HproseTags.TagFalse: return TimeSpan.Zero;
@@ -1703,6 +1945,23 @@ namespace Hprose.IO {
                 default: throw CastError(TagToString(tag), HproseHelper.typeofTimeSpan);
             }
         }
+
+        public TimeSpan ReadTimeSpan() {
+            int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? TimeSpan.Zero : ReadTimeSpanWithTag(tag);
+        }
+
+#if !(dotNET10 || dotNET11 || dotNETCF10)
+        public TimeSpan? ReadNullableTimeSpan() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadTimeSpanWithTag(tag);
+            }
+        }
+#endif
 
         public MemoryStream ReadStream() {
             int tag = stream.ReadByte();
@@ -3358,6 +3617,23 @@ namespace Hprose.IO {
                 case TypeEnum.HashMap: return ReadHashMap();
 #endif
 #if !(dotNET10 || dotNET11 || dotNETCF10)
+                case TypeEnum.NullableBoolean: return ReadNullableBoolean();
+                case TypeEnum.NullableChar: return ReadNullableChar();
+                case TypeEnum.NullableSByte: return ReadNullableSByte();
+                case TypeEnum.NullableByte: return ReadNullableByte();
+                case TypeEnum.NullableInt16: return ReadNullableInt16();
+                case TypeEnum.NullableUInt16: return ReadNullableUInt16();
+                case TypeEnum.NullableInt32: return ReadNullableInt32();
+                case TypeEnum.NullableUInt32: return ReadNullableUInt32();
+                case TypeEnum.NullableInt64: return ReadNullableInt64();
+                case TypeEnum.NullableUInt64: return ReadNullableUInt64();
+                case TypeEnum.NullableSingle: return ReadNullableSingle();
+                case TypeEnum.NullableDouble: return ReadNullableDouble();
+                case TypeEnum.NullableDecimal: return ReadNullableDecimal();
+                case TypeEnum.NullableDateTime: return ReadNullableDateTime();
+                case TypeEnum.NullableGuid: return ReadNullableGuid();
+                case TypeEnum.NullableBigInteger: return ReadNullableBigInteger();
+                case TypeEnum.NullableTimeSpan: return ReadNullableTimeSpan();
                 case TypeEnum.ObjectList:
                 case TypeEnum.ObjectIList: return ReadObjectList();
                 case TypeEnum.BooleanList:

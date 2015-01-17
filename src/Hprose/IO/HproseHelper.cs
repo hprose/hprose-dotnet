@@ -12,7 +12,7 @@
  *                                                        *
  * hprose helper class for C#.                            *
  *                                                        *
- * LastModified: Apr 21, 2014                             *
+ * LastModified: Jan 17, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -184,6 +184,24 @@ namespace Hprose.IO {
         public static readonly Type typeofUInt64 = typeof(UInt64);
         public static readonly Type typeofUInt64Array = typeof(UInt64[]);
 #if !(dotNET10 || dotNET11 || dotNETCF10)
+        public static readonly Type typeofNullableBoolean = typeof(Nullable<Boolean>);
+        public static readonly Type typeofNullableChar = typeof(Nullable<Char>);
+        public static readonly Type typeofNullableSByte = typeof(Nullable<SByte>);
+        public static readonly Type typeofNullableByte = typeof(Nullable<Byte>);
+        public static readonly Type typeofNullableInt16 = typeof(Nullable<Int16>);
+        public static readonly Type typeofNullableUInt16 = typeof(Nullable<UInt16>);
+        public static readonly Type typeofNullableInt32 = typeof(Nullable<Int32>);
+        public static readonly Type typeofNullableUInt32 = typeof(Nullable<UInt32>);
+        public static readonly Type typeofNullableInt64 = typeof(Nullable<Int64>);
+        public static readonly Type typeofNullableUInt64 = typeof(Nullable<UInt64>);
+        public static readonly Type typeofNullableSingle = typeof(Nullable<Single>);
+        public static readonly Type typeofNullableDouble = typeof(Nullable<Double>);
+        public static readonly Type typeofNullableDecimal = typeof(Nullable<Decimal>);
+        public static readonly Type typeofNullableDateTime = typeof(Nullable<DateTime>);
+        public static readonly Type typeofNullableGuid = typeof(Nullable<Guid>);
+        public static readonly Type typeofNullableBigInteger = typeof(Nullable<BigInteger>);
+        public static readonly Type typeofNullableTimeSpan = typeof(Nullable<TimeSpan>);
+        
         public static readonly Type typeofObjectList = typeof(List<Object>);
         public static readonly Type typeofBooleanList = typeof(List<Boolean>);
         public static readonly Type typeofCharList = typeof(List<Char>);
@@ -321,6 +339,24 @@ namespace Hprose.IO {
             typeMap[typeofStack] = TypeEnum.Stack;
 #endif
 #if !(dotNET10 || dotNET11 || dotNETCF10)
+            typeMap[typeofNullableBoolean] = TypeEnum.NullableBoolean;
+            typeMap[typeofNullableChar] = TypeEnum.NullableChar;
+            typeMap[typeofNullableSByte] = TypeEnum.NullableSByte;
+            typeMap[typeofNullableByte] = TypeEnum.NullableByte;
+            typeMap[typeofNullableInt16] = TypeEnum.NullableInt16;
+            typeMap[typeofNullableUInt16] = TypeEnum.NullableUInt16;
+            typeMap[typeofNullableInt32] = TypeEnum.NullableInt32;
+            typeMap[typeofNullableUInt32] = TypeEnum.NullableUInt32;
+            typeMap[typeofNullableInt64] = TypeEnum.NullableInt64;
+            typeMap[typeofNullableUInt64] = TypeEnum.NullableUInt64;
+            typeMap[typeofNullableSingle] = TypeEnum.NullableSingle;
+            typeMap[typeofNullableDouble] = TypeEnum.NullableDouble;
+            typeMap[typeofNullableDecimal] = TypeEnum.NullableDecimal;
+            typeMap[typeofNullableDateTime] = TypeEnum.NullableDateTime;
+            typeMap[typeofNullableBigInteger] = TypeEnum.NullableBigInteger;
+            typeMap[typeofNullableGuid] = TypeEnum.NullableGuid;
+            typeMap[typeofNullableTimeSpan] = TypeEnum.NullableTimeSpan;
+            
             typeMap[typeofObjectList] = TypeEnum.ObjectList;
             typeMap[typeofBooleanList] = TypeEnum.BooleanList;
             typeMap[typeofCharList] = TypeEnum.CharList;
