@@ -12,7 +12,7 @@
  *                                                        *
  * hprose http client class for C#.                       *
  *                                                        *
- * LastModified: Apr 21, 2014                             *
+ * LastModified: Feb 8, 2014                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -37,10 +37,23 @@ using System.Threading;
 
 namespace Hprose.Client {
     public class HproseHttpClient : HproseClient {
+#if !SL2
+        private static bool disableGlobalCookie = false;
+        public bool DisableGlobalCookie {
+            get {
+                return disableGlobalCookie;
+            }
+            set {
+                disableGlobalCookie = value;
+            }
+        }
+#endif
 #if (PocketPC || Smartphone || WindowsCE)
-        private static CookieManager cookieManager = new CookieManager();
+        private static CookieManager globalCookieManager = new CookieManager();
+        private CookieManager cookieManager = disableGlobalCookie ? new CookieManager() : globalCookieManager;
 #elif !SL2
-        private static CookieContainer cookieContainer = new CookieContainer();
+        private static CookieContainer globalCookieContainer = new CookieContainer();
+        private CookieContainer cookieContainer = disableGlobalCookie ? new CookieContainer() : globalCookieContainer;
 #endif
         private class AsyncContext {
             internal HttpWebRequest request;
