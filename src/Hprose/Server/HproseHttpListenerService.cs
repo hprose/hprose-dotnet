@@ -12,7 +12,7 @@
  *                                                        *
  * hprose http listener service class for C#.             *
  *                                                        *
- * LastModified: Apr 21, 2014                             *
+ * LastModified: Mar 2, 2015                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -291,19 +291,24 @@ namespace Hprose.Server {
         protected void Handle(HttpListenerContext context, HproseHttpListenerMethods methods) {
             SendHeader(context);
             string method = context.Request.HttpMethod;
-            if ((method == "GET") && getEnabled) {
-                MemoryStream data = DoFunctionList(methods, context);
-                NonBlockingWriteContext writeContext = new NonBlockingWriteContext();
-                writeContext.currentContext = context;
-                writeContext.ostream = GetOutputStream(context);
-                writeContext.ostream.BeginWrite(data.GetBuffer(), 0, (int)data.Length,
-                    new AsyncCallback(NonBlockingWriteCallback), writeContext);
+            if (method == "GET") {
+                if (getEnabled) {
+                    MemoryStream data = DoFunctionList(methods, context);
+                    NonBlockingWriteContext writeContext = new NonBlockingWriteContext();
+                    writeContext.currentContext = context;
+                    writeContext.ostream = GetOutputStream(context);
+                    writeContext.ostream.BeginWrite(data.GetBuffer(), 0, (int)data.Length,
+                        new AsyncCallback(NonBlockingWriteCallback), writeContext);
+                }
+                else {
+                    context.Response.StatusCode = 403;
+                    context.Response.Close();
+                }
             }
             else if (method == "POST") {
                 NonBlockingHandle(context, methods);
             }
             else {
-                context.Response.StatusCode = 403;
                 context.Response.Close();
             }
         }
