@@ -146,6 +146,14 @@ namespace Hprose.Server {
                 Uri u = new Uri(uri);
 #if !Smartphone
                 IPAddress[] localAddrs = Dns.GetHostAddresses(u.Host);
+#elif dotNETCF10
+                IPAddress[] localAddrs = Dns.Resolve(u.Host).AddressList;
+#else
+                IPAddress[] localAddrs = Dns.GetHostEntry(u.Host).AddressList;
+#endif
+#if dotNETCF10
+                Listener = new TcpListener(localAddrs[0], u.Port);
+#else
                 for (int i = 0; i < localAddrs.Length; ++i) {
                     if (u.Scheme == "tcp6") {
                         if (localAddrs[i].AddressFamily == AddressFamily.InterNetworkV6) {
@@ -160,18 +168,15 @@ namespace Hprose.Server {
                         }
                     }
                 }
-                Listener.Start();
-                for (int i = 0; i < tCount; ++i) {
-                    Listener.BeginAcceptTcpClient(new AsyncCallback(AcceptTcpCallback), Listener);
-                }
-#else
-                IPAddress localAddr = IPAddress.Parse(u.Host);
-                Listener = new TcpListener(localAddr, u.Port);
-                Listener.Start();
-                for (int i = 0; i < tCount; ++i) {
-                    new Thread(new ThreadStart(AcceptTcp));
-                }
 #endif
+                Listener.Start();
+                for (int i = 0; i < tCount; ++i) {
+#if !Smartphone
+                    Listener.BeginAcceptTcpClient(new AsyncCallback(AcceptTcpCallback), Listener);
+#else
+                    new Thread(new ThreadStart(AcceptTcp));
+#endif
+                }
             }
         }
 
