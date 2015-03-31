@@ -368,6 +368,7 @@ set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v1.0\WindowsCE\mscorlib.dl
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v1.0\WindowsCE\System.dll"
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v1.0\WindowsCE\System.Windows.Forms.dll"
 c:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\Csc.exe -out:dist\CF1.0\Hprose.Client.dll -define:Smartphone;dotNETCF10;ClientOnly -noconfig -nostdlib -filealign:512 -target:library -optimize+ %1 -unsafe+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+c:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\Csc.exe -out:dist\CF1.0\Hprose.dll -define:Smartphone;dotNETCF10 -noconfig -nostdlib -filealign:512 -target:library -optimize+ %1 -unsafe+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET Compact Framework 2.0
 set CF_REFERENCE=
@@ -375,6 +376,7 @@ set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v2.0\WindowsCE\mscorlib.dl
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v2.0\WindowsCE\System.dll"
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v2.0\WindowsCE\System.Windows.Forms.dll"
 C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\Csc.exe -keyfile:HproseKeys.snk -out:dist\CF2.0\Hprose.Client.dll -define:Smartphone;dotNETCF20;ClientOnly -noconfig -nostdlib -filealign:512 -target:library -optimize+ %1 %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\Csc.exe -keyfile:HproseKeys.snk -out:dist\CF2.0\Hprose.dll -define:Smartphone;dotNETCF20 -noconfig -nostdlib -filealign:512 -target:library -optimize+ %1 %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET Compact Framework 3.5
 set CF_REFERENCE=
@@ -383,6 +385,7 @@ set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v3.5\WindowsCE\System.dll"
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v3.5\WindowsCE\System.Core.dll"
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v3.5\WindowsCE\System.Windows.Forms.dll"
 C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -keyfile:HproseKeys.snk -out:dist\CF3.5\Hprose.Client.dll -define:Smartphone;dotNETCF35;ClientOnly -noconfig -nostdlib -filealign:512 -target:library -optimize+ %1 %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -keyfile:HproseKeys.snk -out:dist\CF3.5\Hprose.dll -define:Smartphone;dotNETCF35 -noconfig -nostdlib -filealign:512 -target:library -optimize+ %1 %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for mono 1.0
 call "%MONO_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Mono\Hprose.Client.dll -define:dotNET11;MONO;ClientOnly -noconfig -target:library -optimize+ %1 -reference:System,System.Windows.Forms %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%

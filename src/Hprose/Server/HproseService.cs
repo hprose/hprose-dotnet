@@ -12,7 +12,7 @@
  *                                                        *
  * hprose service class for C#.                           *
  *                                                        *
- * LastModified: Apr 7, 2014                              *
+ * LastModified: Mar 31, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -42,8 +42,17 @@ namespace Hprose.Server {
 #else
         private readonly List<IHproseFilter> filters = new List<IHproseFilter>();
 #endif
+
+#if !Smartphone
         [ThreadStatic]
         private static Object currentContext;
+
+        public static Object CurrentContext {
+            get {
+                return currentContext;
+            }
+        }
+#endif
 
         public virtual HproseMethods GlobalMethods {
             get {
@@ -54,12 +63,6 @@ namespace Hprose.Server {
             }
             set {
                 gMethods = value;
-            }
-        }
-
-        public static Object CurrentContext {
-            get {
-                return currentContext;
             }
         }
 
@@ -653,7 +656,9 @@ namespace Hprose.Server {
         }
 
         protected MemoryStream Handle(MemoryStream istream, HproseMethods methods, object context) {
+#if !Smartphone
             currentContext = context;
+#endif
             try {
                 istream.Position = 0;
                 for (int i = filters.Count - 1; i >= 0; --i) {
@@ -677,9 +682,11 @@ namespace Hprose.Server {
             catch (Exception e) {
                 return SendError(e, context);
             }
+#if !Smartphone
             finally {
                 currentContext = null;
             }
+#endif
         }
     }
 }

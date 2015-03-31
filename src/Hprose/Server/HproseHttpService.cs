@@ -12,14 +12,14 @@
  *                                                        *
  * hprose http service class for C#.                      *
  *                                                        *
- * LastModified: Mar 2, 2015                              *
+ * LastModified: Mar 31, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-#if !(ClientOnly || ClientProfile)
+#if !(ClientOnly || ClientProfile || Smartphone)
 using System;
 using System.Collections;
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11)
 using System.Collections.Generic;
 #endif
 using System.IO;
@@ -36,7 +36,7 @@ namespace Hprose.Server {
         private bool p3pEnabled = false;
         private bool getEnabled = true;
         private bool compressionEnabled = false;
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11)
         private Dictionary<string, bool> origins = new Dictionary<string, bool>();
 #else
         private Hashtable origins = new Hashtable();

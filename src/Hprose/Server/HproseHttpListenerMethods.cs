@@ -12,11 +12,11 @@
  *                                                        *
  * hprose http listener remote methods class for C#.      *
  *                                                        *
- * LastModified: May 16, 2010                             *
+ * LastModified: May 31, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-#if !(dotNET10 || dotNET11 || ClientOnly)
+#if !(dotNET10 || dotNET11 || ClientOnly || Smartphone)
 using System;
 using System.Net;
 using System.Security.Principal;

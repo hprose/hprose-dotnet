@@ -12,16 +12,14 @@
  *                                                        *
  * hprose http listener service class for C#.             *
  *                                                        *
- * LastModified: Mar 2, 2015                              *
+ * LastModified: Mar 31, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-#if !(dotNET10 || dotNET11 || ClientOnly)
+#if !(dotNET10 || dotNET11 || ClientOnly || Smartphone)
 using System;
 using System.Collections;
-#if !(dotNET10 || dotNET11 || dotNETCF10)
 using System.Collections.Generic;
-#endif
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -36,11 +34,7 @@ namespace Hprose.Server {
         private bool p3pEnabled = false;
         private bool getEnabled = true;
         private bool compressionEnabled = false;
-#if !(dotNET10 || dotNET11 || dotNETCF10)
         private Dictionary<string, bool> origins = new Dictionary<string, bool>();
-#else
-        private Hashtable origins = new Hashtable();
-#endif
         public event SendHeaderEvent OnSendHeader = null;
 
         [ThreadStatic]

@@ -12,7 +12,7 @@
  *                                                        *
  * hprose tcp listener server class for C#.               *
  *                                                        *
- * LastModified: Apr 22, 2014                             *
+ * LastModified: Mar 31, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -22,6 +22,9 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+#if Smartphone
+using System.Threading;
+#endif
 using Hprose.IO;
 using Hprose.Common;
 
@@ -39,7 +42,7 @@ namespace Hprose.Server {
             TcpClient client = (TcpClient)context;
             if (argumentTypes.Length != count) {
                 object[] args = new object[argumentTypes.Length];
-                System.Array.Copy(arguments, args, count);
+                System.Array.Copy(arguments, 0, args, 0, count);
                 Type argType = argumentTypes[count];
                 if (argType == typeof(TcpClient)) {
                     args[count] = client;
@@ -112,6 +115,7 @@ namespace Hprose.Server {
                 m_sendBufferSize = value;
             }
         }
+#if !dotNETCF10
         private int m_receiveTimeout = 0;
         public int ReceiveTimeout {
             get {
@@ -130,7 +134,7 @@ namespace Hprose.Server {
                 m_sendTimeout = value;
             }
         }
-
+#endif
         public bool IsStarted {
             get {
                 return (Listener != null);
@@ -140,6 +144,7 @@ namespace Hprose.Server {
         public void Start() {
             if (Listener == null) {
                 Uri u = new Uri(uri);
+#if !Smartphone
                 IPAddress[] localAddrs = Dns.GetHostAddresses(u.Host);
                 for (int i = 0; i < localAddrs.Length; ++i) {
                     if (u.Scheme == "tcp6") {
@@ -159,6 +164,14 @@ namespace Hprose.Server {
                 for (int i = 0; i < tCount; ++i) {
                     Listener.BeginAcceptTcpClient(new AsyncCallback(AcceptTcpCallback), Listener);
                 }
+#else
+                IPAddress localAddr = IPAddress.Parse(u.Host);
+                Listener = new TcpListener(localAddr, u.Port);
+                Listener.Start();
+                for (int i = 0; i < tCount; ++i) {
+                    new Thread(new ThreadStart(AcceptTcp));
+                }
+#endif
             }
         }
 
@@ -301,6 +314,7 @@ namespace Hprose.Server {
             CloseConnection(context);
         }
 
+#if !Smartphone
         private void AcceptTcpCallback(IAsyncResult asyncResult) {
             TcpListener listener = asyncResult.AsyncState as TcpListener;
             TcpClient client = null;
@@ -326,6 +340,34 @@ namespace Hprose.Server {
                 CloseConnection(context);
             }
         }
+#else
+        private void AcceptTcp() {
+            while (true) {
+                TcpClient client = null;
+                SendAndReceiveContext context = new SendAndReceiveContext();
+                try {
+                    client = Listener.AcceptTcpClient();
+                    client.LingerState = m_lingerState;
+                    client.NoDelay = m_noDelay;
+                    client.ReceiveBufferSize = m_receiveBufferSize;
+                    client.SendBufferSize = m_sendBufferSize;
+#if !dotNETCF10
+                    client.ReceiveTimeout = m_receiveTimeout;
+                    client.SendTimeout = m_sendTimeout;
+#endif
+                    NetworkStream stream = client.GetStream();
+                    context.callback = new AsyncCallback(ErrorCallback);
+                    context.client = client;
+                    context.stream = stream;
+                    NonBlockingHandle(context);
+                }
+                catch (Exception e) {
+                    FireErrorEvent(e, client);
+                    CloseConnection(context);
+                }
+            }
+        }
+#endif
     }
 }
 #endif

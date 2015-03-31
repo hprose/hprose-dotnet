@@ -12,11 +12,11 @@
  *                                                        *
  * hprose http listener server class for C#.              *
  *                                                        *
- * LastModified: Apr 7, 2014                              *
+ * LastModified: Mar 31, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-#if !(dotNET10 || dotNET11 || ClientOnly)
+#if !(dotNET10 || dotNET11 || ClientOnly || Smartphone)
 using System;
 using System.IO;
 using System.Net;

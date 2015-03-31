@@ -12,11 +12,11 @@
  *                                                        *
  * hprose http remote methods class for C#.               *
  *                                                        *
- * LastModified: Apr 7, 2014                              *
+ * LastModified: Mar 31, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-#if !(ClientOnly || ClientProfile)
+#if !(ClientOnly || ClientProfile || Smartphone)
 using System;
 using System.Web;
 using System.Web.SessionState;
