@@ -16,7 +16,6 @@ TestResults
 # Build results
 [Dd]ebug/
 [Rr]elease/
-x64/
 *_i.c
 *_p.c
 *.ilk
@@ -59,7 +58,7 @@ _ReSharper*
 *.ncrunch*
 .*crunch*.local.xml
 
-# Installshield output folder 
+# Installshield output folder
 [Ee]xpress
 
 # DocProject is a documentation generator add-in
