@@ -12,7 +12,7 @@
  *                                                        *
  * hprose tcp listener server class for C#.               *
  *                                                        *
- * LastModified: Mar 31, 2015                             *
+ * LastModified: Apr 2, 2015                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -174,7 +174,11 @@ namespace Hprose.Server {
 #if !Smartphone
                     Listener.BeginAcceptTcpClient(new AsyncCallback(AcceptTcpCallback), Listener);
 #else
-                    new Thread(new ThreadStart(AcceptTcp));
+                    Thread t = new Thread(new ThreadStart(AcceptTcp));
+#if !dotNETCF10
+                    t.IsBackground = true;
+#endif
+                    t.Start();
 #endif
                 }
             }
