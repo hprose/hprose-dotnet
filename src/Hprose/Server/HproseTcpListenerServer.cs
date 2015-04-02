@@ -115,7 +115,7 @@ namespace Hprose.Server {
                 m_sendBufferSize = value;
             }
         }
-#if !dotNETCF10
+#if !Smartphone
         private int m_receiveTimeout = 0;
         public int ReceiveTimeout {
             get {
@@ -360,10 +360,6 @@ namespace Hprose.Server {
                     client.NoDelay = m_noDelay;
                     client.ReceiveBufferSize = m_receiveBufferSize;
                     client.SendBufferSize = m_sendBufferSize;
-#if !dotNETCF10
-                    client.ReceiveTimeout = m_receiveTimeout;
-                    client.SendTimeout = m_sendTimeout;
-#endif
                     NetworkStream stream = client.GetStream();
                     context.callback = new AsyncCallback(ErrorCallback);
                     context.client = client;
