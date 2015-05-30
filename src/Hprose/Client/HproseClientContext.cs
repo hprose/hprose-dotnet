@@ -1,4 +1,4 @@
-﻿/**********************************************************\
+/**********************************************************\
 |                                                          |
 |                          hprose                          |
 |                                                          |
@@ -8,31 +8,29 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * HproseTcpMethods.cs                                    *
+ * HproseClientContext.cs                                 *
  *                                                        *
- * hprose tcp remote methods class for C#.                *
+ * hprose client context class for C#.                    *
  *                                                        *
- * LastModified: Apr 7, 2014                              *
+ * LastModified: May 30, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-#if !(dotNET10 || dotNET11 || ClientOnly)
-using System;
-using System.Net.Sockets;
+
 using Hprose.Common;
 
-namespace Hprose.Server {
-    public class HproseTcpMethods : HproseMethods {
-        protected override int GetCount(Type[] paramTypes) {
-            int i = paramTypes.Length;
-            if (i > 0) {
-                Type paramType = paramTypes[i - 1];
-                if (paramType == typeof(TcpClient)) {
-                    --i;
-                }
+namespace Hprose.Client {
+    public class HproseClientContext : HproseContext {
+        private readonly HproseClient client;
+
+        public HproseClientContext(HproseClient client) {
+            this.client = client;
+        }
+
+        public HproseClient Client {
+            get {
+                return client;
             }
-            return i;
         }
     }
 }
-#endif

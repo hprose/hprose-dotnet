@@ -1,4 +1,4 @@
-﻿/**********************************************************\
+/**********************************************************\
 |                                                          |
 |                          hprose                          |
 |                                                          |
@@ -8,38 +8,55 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * HproseHttpMethods.cs                                   *
+ * HproseHttpContext.cs                                   *
  *                                                        *
- * hprose http remote methods class for C#.               *
+ * hprose http context class for C#.                      *
  *                                                        *
  * LastModified: May 30, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 #if !(ClientOnly || ClientProfile || Smartphone)
-using System;
 using System.Web;
 using System.Web.SessionState;
 using Hprose.Common;
 
 namespace Hprose.Server {
-    public class HproseHttpMethods : HproseMethods {
-        protected override int GetCount(Type[] paramTypes) {
-            int i = paramTypes.Length;
-            if (i > 0) {
-                Type paramType = paramTypes[i - 1];
-                if (paramType == typeof(HproseContext) ||
-                    paramType == typeof(HproseHttpContext) ||
-                    paramType == typeof(HttpContext) ||
-                    paramType == typeof(HttpRequest) ||
-                    paramType == typeof(HttpResponse) ||
-                    paramType == typeof(HttpServerUtility) ||
-                    paramType == typeof(HttpApplicationState) ||
-                    paramType == typeof(HttpSessionState)) {
-                    --i;
-                }
+    public class HproseHttpContext : HproseContext {
+        private readonly HttpContext context;
+
+        public HproseHttpContext(HttpContext context) {
+            this.context = context;
+        }
+        public HttpContext Context {
+            get {
+                return context;
             }
-            return i;
+        }
+        public HttpRequest Request {
+            get {
+                return context.Request;
+            }
+        }
+        public HttpResponse Response {
+            get {
+                return context.Response;
+            }
+        }
+        public HttpServerUtility Server {
+            get {
+                return context.Server;
+            }
+        }
+        public HttpApplicationState Application {
+            get {
+                return context.Application;
+            }
+        }
+        public HttpSessionState Session {
+            get {
+                return context.Session;
+            }
         }
     }
 }

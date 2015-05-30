@@ -12,17 +12,18 @@
  *                                                        *
  * hprose service event for C#.                           *
  *                                                        *
- * LastModified: Mar 17, 2014                             *
+ * LastModified: May 30, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 #if !ClientOnly
 using System;
+using Hprose.Common;
 
 namespace Hprose.Server {
-    public delegate void BeforeInvokeEvent(string name, object[] args, bool byRef, object context);
-    public delegate void AfterInvokeEvent(string name, object[] args, bool byRef, object result, object context);
-    public delegate void SendHeaderEvent(object context);
-    public delegate void SendErrorEvent(Exception e, object context);
+    public delegate void BeforeInvokeEvent(string name, object[] args, bool byRef, HproseContext context);
+    public delegate void AfterInvokeEvent(string name, object[] args, bool byRef, object result, HproseContext context);
+    public delegate void SendHeaderEvent(HproseContext context);
+    public delegate void SendErrorEvent(Exception e, HproseContext context);
 }
 #endif

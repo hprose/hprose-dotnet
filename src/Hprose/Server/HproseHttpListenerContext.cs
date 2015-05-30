@@ -1,4 +1,4 @@
-﻿/**********************************************************\
+/**********************************************************\
 |                                                          |
 |                          hprose                          |
 |                                                          |
@@ -8,36 +8,44 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * HproseHttpListenerMethods.cs                           *
+ * HproseHttpListenerContext.cs                           *
  *                                                        *
- * hprose http listener remote methods class for C#.      *
+ * hprose http listener context class for C#.             *
  *                                                        *
  * LastModified: May 30, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 #if !(dotNET10 || dotNET11 || ClientOnly || Smartphone)
-using System;
 using System.Net;
 using System.Security.Principal;
 using Hprose.Common;
 
 namespace Hprose.Server {
-    public class HproseHttpListenerMethods : HproseMethods {
-        protected override int GetCount(Type[] paramTypes) {
-            int i = paramTypes.Length;
-            if (i > 0) {
-                Type paramType = paramTypes[i - 1];
-                if (paramType == typeof(HproseContext) ||
-                    paramType == typeof(HproseHttpListenerContext) ||
-                    paramType == typeof(HttpListenerContext) ||
-                    paramType == typeof(HttpListenerRequest) ||
-                    paramType == typeof(HttpListenerResponse) ||
-                    paramType == typeof(IPrincipal)) {
-                    --i;
-                }
+    public class HproseHttpListenerContext : HproseContext {
+        private readonly HttpListenerContext context;
+        public HproseHttpListenerContext(HttpListenerContext context) {
+            this.context = context;
+        }
+        public HttpListenerContext Context {
+            get {
+                return context;
             }
-            return i;
+        }
+        public HttpListenerRequest Request {
+            get {
+                return context.Request;
+            }
+        }
+        public HttpListenerResponse Response {
+            get {
+                return context.Response;
+            }
+        }
+        public IPrincipal User {
+            get {
+                return context.User;
+            }
         }
     }
 }

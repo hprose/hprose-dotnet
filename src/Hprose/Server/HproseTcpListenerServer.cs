@@ -12,7 +12,7 @@
  *                                                        *
  * hprose tcp listener server class for C#.               *
  *                                                        *
- * LastModified: Apr 2, 2015                              *
+ * LastModified: May 30, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -38,14 +38,18 @@ namespace Hprose.Server {
             this.uri = uri;
         }
 
-        protected override object[] FixArguments(Type[] argumentTypes, object[] arguments, int count, object context) {
-            TcpClient client = (TcpClient)context;
+        protected override object[] FixArguments(Type[] argumentTypes, object[] arguments, int count, HproseContext context) {
+            HproseTcpListenerContext currentContext = (HproseTcpListenerContext)context;
             if (argumentTypes.Length != count) {
                 object[] args = new object[argumentTypes.Length];
                 System.Array.Copy(arguments, 0, args, 0, count);
                 Type argType = argumentTypes[count];
-                if (argType == typeof(TcpClient)) {
-                    args[count] = client;
+                if (argType == typeof(HproseContext) ||
+                    argType == typeof(HproseTcpListenerContext)) {
+                    args[count] = currentContext;
+                }
+                else if (argType == typeof(TcpClient)) {
+                    args[count] = currentContext.Client;
                 }
                 return args;
             }
@@ -55,7 +59,7 @@ namespace Hprose.Server {
         public override HproseMethods GlobalMethods {
             get {
                 if (gMethods == null) {
-                    gMethods = new HproseTcpMethods();
+                    gMethods = new HproseTcpListenerMethods();
                 }
                 return gMethods;
             }
@@ -194,7 +198,7 @@ namespace Hprose.Server {
         private class SendAndReceiveContext {
             public AsyncCallback callback;
             public AsyncCallback readCallback;
-            public TcpClient client;
+            public HproseTcpListenerContext context;
             public NetworkStream stream;
             public Exception e;
             public byte[] buf;
@@ -251,7 +255,7 @@ namespace Hprose.Server {
         private void ReadBodyCallback(IAsyncResult asyncResult) {
             SendAndReceiveContext context = (SendAndReceiveContext)asyncResult.AsyncState;
             byte[] buf = context.buf;
-            AsyncWrite(context, Handle(new MemoryStream(buf, 0, buf.Length), null, context.client));
+            AsyncWrite(context, Handle(new MemoryStream(buf, 0, buf.Length), null, context.context));
         }
 
         private void WriteFullCallback(IAsyncResult asyncResult) {
@@ -308,8 +312,8 @@ namespace Hprose.Server {
                 if (context.stream != null) {
                     context.stream.Close();
                 }
-                if (context.client != null) {
-                    context.client.Close();
+                if (context.context.Client != null) {
+                    context.context.Client.Close();
                 }
             }
             catch (Exception) { }
@@ -318,7 +322,7 @@ namespace Hprose.Server {
         private void ErrorCallback(IAsyncResult asyncResult) {
             SendAndReceiveContext context = (SendAndReceiveContext)asyncResult.AsyncState;
             if (context.e != null) {
-                FireErrorEvent(context.e, context.client);
+                FireErrorEvent(context.e, context.context);
             }
             CloseConnection(context);
         }
@@ -340,12 +344,15 @@ namespace Hprose.Server {
                 client.SendTimeout = m_sendTimeout;
                 stream = client.GetStream();
                 context.callback = new AsyncCallback(ErrorCallback);
-                context.client = client;
+                context.context = new HproseTcpListenerContext(client);
                 context.stream = stream;
                 NonBlockingHandle(context);
             }
             catch (Exception e) {
-                FireErrorEvent(e, client);
+                if (context.context == null) {
+                    context.context = new HproseTcpListenerContext(null);
+                }
+                FireErrorEvent(e, context.context);
                 CloseConnection(context);
             }
         }
@@ -362,12 +369,15 @@ namespace Hprose.Server {
                     client.SendBufferSize = m_sendBufferSize;
                     NetworkStream stream = client.GetStream();
                     context.callback = new AsyncCallback(ErrorCallback);
-                    context.client = client;
+                    context.context = new HproseTcpListenerContext(client);
                     context.stream = stream;
                     NonBlockingHandle(context);
                 }
                 catch (Exception e) {
-                    FireErrorEvent(e, client);
+                    if (context.context == null) {
+                        context.context = new HproseTcpListenerContext(null);
+                    }
+                    FireErrorEvent(e, context.context);
                     CloseConnection(context);
                 }
             }

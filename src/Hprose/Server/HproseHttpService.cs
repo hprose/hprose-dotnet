@@ -12,7 +12,7 @@
  *                                                        *
  * hprose http service class for C#.                      *
  *                                                        *
- * LastModified: Mar 31, 2015                             *
+ * LastModified: May 30, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -45,14 +45,18 @@ namespace Hprose.Server {
         [ThreadStatic]
         private static HttpContext currentContext;
 
-        protected override object[] FixArguments(Type[] argumentTypes, object[] arguments, int count, object context) {
-            HttpContext currentContext = (HttpContext)context;
+        protected override object[] FixArguments(Type[] argumentTypes, object[] arguments, int count, HproseContext context) {
+            HproseHttpContext currentContext = (HproseHttpContext)context;
             if (argumentTypes.Length != count) {
                 object[] args = new object[argumentTypes.Length];
-                System.Array.Copy(arguments, args, count);
+                System.Array.Copy(arguments, 0, args, 0, count);
                 Type argType = argumentTypes[count];
-                if (argType == typeof(HttpContext)) {
+                if (argType == typeof(HproseContext) ||
+                    argType == typeof(HproseHttpContext)) {
                     args[count] = currentContext;
+                }
+                else if (argType == typeof(HttpContext)) {
+                    args[count] = currentContext.Context;
                 }
                 else if (argType == typeof(HttpRequest)) {
                     args[count] = currentContext.Request;
@@ -133,7 +137,7 @@ namespace Hprose.Server {
             origins.Remove(origin);
         }
 
-        private Stream GetOutputStream(HttpContext context) {
+        private Stream GetOutputStream(HproseHttpContext context) {
             Stream ostream = new BufferedStream(context.Response.OutputStream);
             if (compressionEnabled) {
                 string acceptEncoding = context.Request.Headers["Accept-Encoding"];
@@ -150,7 +154,7 @@ namespace Hprose.Server {
             return ostream;
         }
 
-        private MemoryStream GetInputStream(HttpContext context) {
+        private MemoryStream GetInputStream(HproseHttpContext context) {
             Stream istream = context.Request.InputStream;
             int len = (int)istream.Length;
             int off = 0;
@@ -164,38 +168,41 @@ namespace Hprose.Server {
             return new MemoryStream(data);
         }
 
-        private void SendHeader(HttpContext context) {
+        private void SendHeader(HproseHttpContext context) {
             if (OnSendHeader != null) {
                 OnSendHeader(context);
             }
-            context.Response.ContentType = "text/plain";
+            HttpRequest request = context.Request;
+            HttpResponse response = context.Response;
+            response.ContentType = "text/plain";
             if (p3pEnabled) {
-                context.Response.AddHeader("P3P", "CP=\"CAO DSP COR CUR ADM DEV TAI PSA PSD " +
-                                                         "IVAi IVDi CONi TELo OTPi OUR DELi SAMi " +
-                                                         "OTRi UNRi PUBi IND PHY ONL UNI PUR FIN " +
-                                                         "COM NAV INT DEM CNT STA POL HEA PRE GOV\"");
+                response.AddHeader("P3P",
+                    "CP=\"CAO DSP COR CUR ADM DEV TAI PSA PSD " +
+                    "IVAi IVDi CONi TELo OTPi OUR DELi SAMi " +
+                    "OTRi UNRi PUBi IND PHY ONL UNI PUR FIN " +
+                    "COM NAV INT DEM CNT STA POL HEA PRE GOV\"");
             }
             if (crossDomainEnabled) {
-                string origin = context.Request.Headers["Origin"];
+                string origin = request.Headers["Origin"];
                 if (origin != null && origin != "" && origin != "null") {
                     if (origins.Count == 0 || origins.ContainsKey(origin)) {
-                        context.Response.AddHeader("Access-Control-Allow-Origin", origin);
-                        context.Response.AddHeader("Access-Control-Allow-Credentials", "true");
+                        response.AddHeader("Access-Control-Allow-Origin", origin);
+                        response.AddHeader("Access-Control-Allow-Credentials", "true");
                     }
                 }
                 else {
-                    context.Response.AddHeader("Access-Control-Allow-Origin", "*");
+                    response.AddHeader("Access-Control-Allow-Origin", "*");
                 }
             }
             if (compressionEnabled) {
-                string acceptEncoding = context.Request.Headers["Accept-Encoding"];
+                string acceptEncoding = request.Headers["Accept-Encoding"];
                 if (acceptEncoding != null) {
                     acceptEncoding = acceptEncoding.ToLower();
                     if (acceptEncoding.IndexOf("deflate") > -1) {
-                        context.Response.AddHeader("Content-Encoding", "deflate");
+                        response.AddHeader("Content-Encoding", "deflate");
                     }
                     else if (acceptEncoding.IndexOf("gzip") > -1) {
-                        context.Response.AddHeader("Content-Encoding", "gzip");
+                        response.AddHeader("Content-Encoding", "gzip");
                     }
                 }
             }
@@ -209,26 +216,29 @@ namespace Hprose.Server {
             Handle(HttpContext.Current, (HproseHttpMethods) methods);
         }
 
-        public void Handle(HttpContext context) {
-            Handle(context, null);
+        public void Handle(HttpContext httpContext) {
+            Handle(httpContext, null);
         }
 
-        public void Handle(HttpContext context, HproseHttpMethods methods) {
-            currentContext = context;
+        public void Handle(HttpContext httpContext, HproseHttpMethods methods) {
+            currentContext = httpContext;
             try {
+                HproseHttpContext context = new HproseHttpContext(httpContext);
                 SendHeader(context);
                 string method = context.Request.HttpMethod;
                 Stream ostream = GetOutputStream(context);
                 if ((method == "GET") && getEnabled) {
                     if (getEnabled) {
-                        DoFunctionList(methods, context).WriteTo(ostream);
+                        DoFunctionList(methods, context)
+                        .WriteTo(ostream);
                     }
                     else {
                         context.Response.StatusCode = 403;
                     }
                 }
                 else if (method == "POST") {
-                    Handle(GetInputStream(context), methods, context).WriteTo(ostream);
+                    Handle(GetInputStream(context), methods, context)
+                    .WriteTo(ostream);
                 }
                 ostream.Close();
                 context.Response.Flush();

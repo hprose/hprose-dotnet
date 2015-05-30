@@ -1,6 +1,6 @@
 namespace Hprose {
     public class AssemblyInfo {
-        public const string Version = "1.4";
+        public const string Version = "1.5";
     #if ClientOnly
         public const string Name = "Hprose Client";
         public const string FileName = "Hprose.Client.dll";

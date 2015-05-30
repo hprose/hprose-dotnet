@@ -57,6 +57,7 @@ namespace Hprose.Client {
             private HproseResultMode resultMode;
             private bool simple;
             private SynchronizationContext syncContext;
+            private HproseClientContext context;
             protected string functionName;
             protected object[] arguments;
             protected HproseErrorEvent errorCallback;
@@ -70,13 +71,13 @@ namespace Hprose.Client {
                 this.resultMode = resultMode;
                 this.simple = simple;
                 this.syncContext = HproseClient.SynchronizationContext;
+                this.context = new HproseClientContext(client);
             }
 
             public void Invoke() {
                 try {
                     client.BeginSendAndReceive(
-                        client.DoOutput(functionName, arguments, byRef, simple),
-                            new AsyncCallback(SendAndReceiveCallback));
+                        client.DoOutput(functionName, arguments, byRef, simple, context), new AsyncCallback(SendAndReceiveCallback));
                 }
                 catch (Exception e) {
                     DoError(e);
@@ -86,7 +87,7 @@ namespace Hprose.Client {
             private void SendAndReceiveCallback(IAsyncResult asyncResult) {
                 try {
                     object result = client.DoInput(client.EndSendAndReceive(asyncResult),
-                                            arguments, returnType, resultMode);
+                                   arguments, returnType, resultMode, context);
                     if (result is HproseException) {
                         DoError(result);
                     }
@@ -396,10 +397,10 @@ namespace Hprose.Client {
         }
 #if !(SILVERLIGHT || WINDOWS_PHONE || Core)
         public object Invoke(string functionName, object[] arguments, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
-            object result = DoInput(
-                                SendAndReceive(
-                                    DoOutput(functionName, arguments, byRef, simple)),
-                                        arguments, returnType, resultMode);
+            HproseClientContext context = new HproseClientContext(this);
+            object result = DoInput(SendAndReceive(
+                    DoOutput(functionName, arguments, byRef, simple, context)
+                ), arguments, returnType, resultMode, context);
             if (result is HproseException) {
                 throw (HproseException)result;
             }
@@ -719,7 +720,7 @@ namespace Hprose.Client {
 
         protected abstract MemoryStream EndSendAndReceive(IAsyncResult asyncResult);
 
-        private MemoryStream DoOutput(string functionName, object[] arguments, bool byRef, bool simple) {
+        private MemoryStream DoOutput(string functionName, object[] arguments, bool byRef, bool simple, HproseClientContext context) {
             MemoryStream outData = new MemoryStream();
             HproseWriter writer = new HproseWriter(outData, mode, simple);
             outData.WriteByte(HproseTags.TagCall);
@@ -736,9 +737,9 @@ namespace Hprose.Client {
             for (int i = 0, n = filters.Count; i < n; ++i) {
 #if (dotNET10 || dotNET11 || dotNETCF10)
                 IHproseFilter filter = (IHproseFilter)filters[i];
-                outData = filter.OutputFilter(outData, this);
+                outData = filter.OutputFilter(outData, context);
 #else
-                outData = filters[i].OutputFilter(outData, this);
+                outData = filters[i].OutputFilter(outData, context);
 #endif
                 outData.Position = 0;
             }
@@ -759,14 +760,14 @@ namespace Hprose.Client {
             }
         }
 
-        private object DoInput(MemoryStream inData, object[] arguments, Type returnType, HproseResultMode resultMode) {
+        private object DoInput(MemoryStream inData, object[] arguments, Type returnType, HproseResultMode resultMode, HproseClientContext context) {
             for (int i = filters.Count - 1; i >= 0; --i) {
                 inData.Position = 0;
 #if (dotNET10 || dotNET11 || dotNETCF10)
                 IHproseFilter filter = (IHproseFilter)filters[i];
-                inData = filter.InputFilter(inData, this);
+                inData = filter.InputFilter(inData, context);
 #else
-                inData = filters[i].InputFilter(inData, this);
+                inData = filters[i].InputFilter(inData, context);
 #endif
             }
             inData.Position = inData.Length - 1;

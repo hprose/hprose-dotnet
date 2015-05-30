@@ -20,7 +20,7 @@ using System.IO;
 
 namespace Hprose.Common {
     public interface IHproseFilter {
-        MemoryStream InputFilter(MemoryStream inStream, object context);
-        MemoryStream OutputFilter(MemoryStream outStream, object context);
+        MemoryStream InputFilter(MemoryStream inStream, HproseContext context);
+        MemoryStream OutputFilter(MemoryStream outStream, HproseContext context);
     }
 }

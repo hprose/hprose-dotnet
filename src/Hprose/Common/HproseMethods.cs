@@ -72,7 +72,14 @@ namespace Hprose.Common {
         }
 
         protected virtual int GetCount(Type[] paramTypes) {
-            return paramTypes.Length;
+            int i = paramTypes.Length;
+            if (i > 0) {
+                Type paramType = paramTypes[i - 1];
+                if (paramType == typeof(HproseContext)) {
+                    --i;
+                }
+            }
+            return i;
         }
 
         internal void AddMethod(string aliasName, HproseMethod method) {

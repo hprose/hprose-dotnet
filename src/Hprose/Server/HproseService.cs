@@ -12,7 +12,7 @@
  *                                                        *
  * hprose service class for C#.                           *
  *                                                        *
- * LastModified: Mar 31, 2015                             *
+ * LastModified: May 30, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -45,9 +45,9 @@ namespace Hprose.Server {
 
 #if !Smartphone
         [ThreadStatic]
-        private static Object currentContext;
+        private static HproseContext currentContext;
 
-        public static Object CurrentContext {
+        public static HproseContext CurrentContext {
             get {
                 return currentContext;
             }
@@ -489,7 +489,7 @@ namespace Hprose.Server {
             GlobalMethods.AddMissingMethod(methodName, type, mode, simple);
         }
 
-        private MemoryStream ResponseEnd(MemoryStream data, object context) {
+        private MemoryStream ResponseEnd(MemoryStream data, HproseContext context) {
             data.Position = 0;
             for (int i = 0, n = filters.Count; i < n; ++i) {
 #if (dotNET10 || dotNET11 || dotNETCF10)
@@ -503,11 +503,20 @@ namespace Hprose.Server {
             return data;
         }
 
-        protected virtual object[] FixArguments(Type[] argumentTypes, object[] arguments, int count, object context) {
+        protected virtual object[] FixArguments(Type[] argumentTypes, object[] arguments, int count, HproseContext context) {
+            if (argumentTypes.Length != count) {
+                object[] args = new object[argumentTypes.Length];
+                System.Array.Copy(arguments, 0, args, 0, count);
+                Type argType = argumentTypes[count];
+                if (argType == typeof(HproseContext)) {
+                    args[count] = context;
+                }
+                return args;
+            }
             return arguments;
         }
 
-        protected MemoryStream SendError(Exception e, object context) {
+        protected MemoryStream SendError(Exception e, HproseContext context) {
             if (OnSendError != null) {
                 OnSendError(e, context);
             }
@@ -520,7 +529,7 @@ namespace Hprose.Server {
             return ResponseEnd(data, context);
         }
 
-        protected MemoryStream DoInvoke(MemoryStream istream, HproseMethods methods, object context) {
+        protected MemoryStream DoInvoke(MemoryStream istream, HproseMethods methods, HproseContext context) {
             HproseReader reader = new HproseReader(istream, mode);
             MemoryStream data = new MemoryStream(4096);
             int tag;
@@ -628,7 +637,7 @@ namespace Hprose.Server {
             return ResponseEnd(data, context);
         }
 
-        protected MemoryStream DoFunctionList(HproseMethods methods, object context) {
+        protected MemoryStream DoFunctionList(HproseMethods methods, HproseContext context) {
 #if !(dotNET10 || dotNET11 || dotNETCF10)
             List<string> names = new List<string>(GlobalMethods.AllNames);
 #else
@@ -649,13 +658,13 @@ namespace Hprose.Server {
             return ResponseEnd(data, context);
         }
 
-        protected void FireErrorEvent(Exception e, object context) {
+        protected void FireErrorEvent(Exception e, HproseContext context) {
             if (OnSendError != null) {
                 OnSendError(e, context);
             }
         }
 
-        protected MemoryStream Handle(MemoryStream istream, HproseMethods methods, object context) {
+        protected MemoryStream Handle(MemoryStream istream, HproseMethods methods, HproseContext context) {
 #if !Smartphone
             currentContext = context;
 #endif
