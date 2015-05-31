@@ -12,7 +12,7 @@
  *                                                        *
  * hprose helper class for C#.                            *
  *                                                        *
- * LastModified: Jan 17, 2015                             *
+ * LastModified: May 31, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -201,7 +201,7 @@ namespace Hprose.IO {
         public static readonly Type typeofNullableGuid = typeof(Nullable<Guid>);
         public static readonly Type typeofNullableBigInteger = typeof(Nullable<BigInteger>);
         public static readonly Type typeofNullableTimeSpan = typeof(Nullable<TimeSpan>);
-        
+
         public static readonly Type typeofObjectList = typeof(List<Object>);
         public static readonly Type typeofBooleanList = typeof(List<Boolean>);
         public static readonly Type typeofCharList = typeof(List<Char>);
@@ -356,7 +356,7 @@ namespace Hprose.IO {
             typeMap[typeofNullableBigInteger] = TypeEnum.NullableBigInteger;
             typeMap[typeofNullableGuid] = TypeEnum.NullableGuid;
             typeMap[typeofNullableTimeSpan] = TypeEnum.NullableTimeSpan;
-            
+
             typeMap[typeofObjectList] = TypeEnum.ObjectList;
             typeMap[typeofBooleanList] = TypeEnum.BooleanList;
             typeMap[typeofCharList] = TypeEnum.CharList;
@@ -628,6 +628,7 @@ namespace Hprose.IO {
             foreach (FieldInfo fi in fiarray) {
                 string name;
                 if (fi.IsPublic && !fi.IsStatic && !members.ContainsKey(name = fi.Name)) {
+                    name = char.ToLower(name[0]) + name.Substring(1);
                     members[name] = new MemberTypeInfo(fi);
                 }
             }
@@ -650,6 +651,7 @@ namespace Hprose.IO {
             foreach (FieldInfo fi in fiarray) {
                 string name;
                 if (!members.ContainsKey(name = fi.Name)) {
+                    name = char.ToLower(name[0]) + name.Substring(1);
                     members[name] = new MemberTypeInfo(fi);
                 }
             }
@@ -677,6 +679,7 @@ namespace Hprose.IO {
                 string name;
                 if (fi.IsDefined(typeofDataMember, false) &&
                     !fi.IsStatic && !members.ContainsKey(name = fi.Name)) {
+                    name = char.ToLower(name[0]) + name.Substring(1);
                     members[name] = new MemberTypeInfo(fi);
                 }
             }
@@ -704,6 +707,7 @@ namespace Hprose.IO {
                 string name;
                 if (fi.IsDefined(typeofDataMember, false) &&
                     !members.ContainsKey(name = fi.Name)) {
+                    name = char.ToLower(name[0]) + name.Substring(1);
                     members[name] = new MemberTypeInfo(fi);
                 }
             }
@@ -836,6 +840,7 @@ namespace Hprose.IO {
                     if (((fi.Attributes & ns) != ns) &&
                         !fi.IsStatic &&
                         !fields.ContainsKey(name = fi.Name)) {
+                        name = char.ToLower(name[0]) + name.Substring(1);
                         fields[name] = new FieldTypeInfo(fi);
                     }
                 }
@@ -852,6 +857,7 @@ namespace Hprose.IO {
                     string name;
                     if (!fi.IsNotSerialized &&
                         !fields.ContainsKey(name = fi.Name)) {
+                        name = char.ToLower(name[0]) + name.Substring(1);
                         fields[name] = new FieldTypeInfo(fi);
                     }
                 }
