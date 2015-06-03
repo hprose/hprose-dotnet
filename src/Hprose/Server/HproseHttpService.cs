@@ -12,7 +12,7 @@
  *                                                        *
  * hprose http service class for C#.                      *
  *                                                        *
- * LastModified: May 30, 2015                             *
+ * LastModified: Jun 2, 2015                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -176,7 +176,7 @@ namespace Hprose.Server {
             HttpResponse response = context.Response;
             response.ContentType = "text/plain";
             if (p3pEnabled) {
-                response.AddHeader("P3P",
+                response.AppendHeader("P3P",
                     "CP=\"CAO DSP COR CUR ADM DEV TAI PSA PSD " +
                     "IVAi IVDi CONi TELo OTPi OUR DELi SAMi " +
                     "OTRi UNRi PUBi IND PHY ONL UNI PUR FIN " +
@@ -186,12 +186,12 @@ namespace Hprose.Server {
                 string origin = request.Headers["Origin"];
                 if (origin != null && origin != "" && origin != "null") {
                     if (origins.Count == 0 || origins.ContainsKey(origin)) {
-                        response.AddHeader("Access-Control-Allow-Origin", origin);
-                        response.AddHeader("Access-Control-Allow-Credentials", "true");
+                        response.AppendHeader("Access-Control-Allow-Origin", origin);
+                        response.AppendHeader("Access-Control-Allow-Credentials", "true");
                     }
                 }
                 else {
-                    response.AddHeader("Access-Control-Allow-Origin", "*");
+                    response.AppendHeader("Access-Control-Allow-Origin", "*");
                 }
             }
             if (compressionEnabled) {
@@ -199,10 +199,10 @@ namespace Hprose.Server {
                 if (acceptEncoding != null) {
                     acceptEncoding = acceptEncoding.ToLower();
                     if (acceptEncoding.IndexOf("deflate") > -1) {
-                        response.AddHeader("Content-Encoding", "deflate");
+                        response.AppendHeader("Content-Encoding", "deflate");
                     }
                     else if (acceptEncoding.IndexOf("gzip") > -1) {
-                        response.AddHeader("Content-Encoding", "gzip");
+                        response.AppendHeader("Content-Encoding", "gzip");
                     }
                 }
             }
