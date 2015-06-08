@@ -15,6 +15,7 @@ if not exist dist\4.0\x64 mkdir dist\4.0\x64
 if not exist dist\4.0\ClientProfile mkdir dist\4.0\ClientProfile
 if not exist dist\4.5 mkdir dist\4.5
 if not exist dist\4.5\Core mkdir dist\4.5\Core
+if not exist dist\4.5\x64 mkdir dist\4.5\x64
 if not exist dist\4.5.1 mkdir dist\4.5.1
 if not exist dist\4.5.1\Core mkdir dist\4.5.1\Core
 if not exist dist\WindowsPhone mkdir dist\WindowsPhone
@@ -192,7 +193,8 @@ C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -keyfile:HproseKeys.snk -out:dis
 C:\WINDOWS\Microsoft.NET\Framework\v3.5\Csc.exe -keyfile:HproseKeys.snk -out:dist\3.5\ClientProfile\Hprose.dll -define:dotNET35;ClientProfile -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %1 %DOTNET_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET 4.0
-set DOTNET_PATH=C:\Windows\Microsoft.NET\Framework\v4.0.30319
+set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0
+if DEFINED ProgramFiles(x86) set DOTNET_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0
 set DOTNET_REFERENCE=
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
@@ -201,7 +203,7 @@ set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
 C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.0\Hprose.Client.dll -define:dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %1 %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Web.dll"
-C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.0\Hprose.dll -define:dotNET4; -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %1 %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.0\Hprose.dll -define:dotNET4 -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %1 %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET 4.0 x64
 set DOTNET_PATH=C:\Windows\Microsoft.NET\Framework64\v4.0.30319
@@ -213,7 +215,7 @@ set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
 C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.0\x64\Hprose.Client.dll -define:dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %1 %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Web.dll"
-C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.0\x64\Hprose.dll -define:dotNET4; -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %1 %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.0\x64\Hprose.dll -define:dotNET4 -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %1 %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET 4.0 ClientProfile
 set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\Profile\Client
@@ -239,6 +241,18 @@ set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numeric
 C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.5\Hprose.Client.dll -define:dotNET4;dotNET45;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %1 %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Web.dll"
 C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.5\Hprose.dll -define:dotNET4;dotNET45 -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %1 %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET 4.5 x64
+set DOTNET_PATH=C:\Windows\Microsoft.NET\Framework64\v4.0.30319
+set DOTNET_REFERENCE=
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
+C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.5\x64\Hprose.Client.dll -define:dotNET4;dotNET45;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %1 %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Web.dll"
+C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\4.5\x64\Hprose.dll -define:dotNET4;dotNET45 -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %1 %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET 4.5 Windows Store App
 set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETCore\v4.5

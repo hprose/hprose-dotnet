@@ -12,7 +12,7 @@
  *                                                        *
  * hprose InvocationHandler class for C#.                 *
  *                                                        *
- * LastModified: Apr 17, 2014                             *
+ * LastModified: Jun 9, 2015                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -24,20 +24,26 @@ using System.Reflection;
 using System.Threading;
 using Hprose.IO;
 using Hprose.Reflection;
-#if dotNET45
+#if dotNET4 || SL5 || WP80
 using System.Threading.Tasks;
 #endif
 
 namespace Hprose.Common {
-#if dotNET45
+#if dotNET4 || SL5 || WP80
     interface ITaskCreator {
         Task GetTask(HproseInvoker invoker, string methodName, object[] args, bool byRef, HproseResultMode resultMode, bool simple);
     }
     class TaskCreator<T> : ITaskCreator {
         public Task GetTask(HproseInvoker invoker, string methodName, object[] args, bool byRef, HproseResultMode resultMode, bool simple) {
+#if dotNET45
             return Task<T>.Run(delegate() {
                 return invoker.Invoke<T>(methodName, args, byRef, resultMode, simple);
             });
+#else
+            return Task<T>.Factory.StartNew(delegate() {
+                return invoker.Invoke<T>(methodName, args, byRef, resultMode, simple);
+            }, default(CancellationToken), TaskCreationOptions.None, TaskScheduler.Default);
+#endif
         }
     }
 #endif
@@ -61,7 +67,7 @@ namespace Hprose.Common {
         private static void CheckResultType(HproseResultMode resultMode, Type returnType) {
             if (resultMode != HproseResultMode.Normal &&
                 returnType != null &&
-#if dotNET45
+#if dotNET4 || SL5 || WP80
                 returnType != typeof(Task<object>) &&
                 returnType != typeof(Task<byte[]>) &&
                 returnType != typeof(Task<MemoryStream>) &&
@@ -119,7 +125,7 @@ namespace Hprose.Common {
                     break;
                 }
             }
-#if dotNET45
+#if dotNET4 || SL5 || WP80
 #if Core
             if (returnType.GetTypeInfo().IsGenericType &&
                 returnType.GetGenericTypeDefinition() == typeof(Task<>)) {
@@ -132,9 +138,15 @@ namespace Hprose.Common {
                 return taskCreator.GetTask(invoker, methodName, args, byRef, resultMode, simple);
             }
             if (returnType == typeof(Task)) {
+#if dotNET45
                 return Task.Run(delegate() {
                     invoker.Invoke(methodName, args, (Type)null, byRef, resultMode, simple);
                 });
+#else
+                return Task.Factory.StartNew(delegate() {
+                    invoker.Invoke(methodName, args, (Type)null, byRef, resultMode, simple);
+                }, default(CancellationToken), TaskCreationOptions.None, TaskScheduler.Default);
+#endif
             }
 #endif
             int n = paramTypes.Length;
