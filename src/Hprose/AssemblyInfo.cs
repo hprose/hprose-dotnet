@@ -49,6 +49,9 @@ namespace Hprose {
             public const string dotNET_Version = "3.7.10302.0";
             public const string dotNET_Name = "WindowsPhone 7.0";
             #endif
+        #elif dotNET452
+            public const string dotNET_Version = "4.0.30319.34209";
+            public const string dotNET_Name = ".NET Framework 4.5.2";
         #elif dotNET451
             #if WP81
             public const string dotNET_Version = "4.0.40024.3";
