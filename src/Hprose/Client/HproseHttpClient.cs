@@ -12,7 +12,7 @@
  *                                                        *
  * hprose http client class for C#.                       *
  *                                                        *
- * LastModified: Feb 8, 2015                              *
+ * LastModified: Jun 18, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -60,6 +60,7 @@ namespace Hprose.Client {
             internal HttpWebResponse response = null;
             internal MemoryStream data;
             internal AsyncCallback callback;
+            internal Exception e = null;
 #if !Core
             internal Timer timer;
 #endif
@@ -377,23 +378,33 @@ namespace Hprose.Client {
 
         private void EndSend(IAsyncResult asyncResult) {
             AsyncContext context = (AsyncContext)asyncResult.AsyncState;
-            Send(context.data, context.request.EndGetRequestStream(asyncResult));
-            context.request.BeginGetResponse(context.callback, context);
+            try {
+                Send(context.data, context.request.EndGetRequestStream(asyncResult));
+                context.request.BeginGetResponse(context.callback, context);
+            }
+            catch (Exception e) {
+                context.e = e;
+                context.callback(asyncResult);
+            }
         }
 
         protected override MemoryStream EndSendAndReceive(IAsyncResult asyncResult) {
             AsyncContext context = (AsyncContext)asyncResult.AsyncState;
-            HttpWebRequest request = context.request;
-            HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asyncResult);
-            context.response = response;
-            MemoryStream data = Receive(request, response);
-#if !Core
-            if (context.timer != null) {
-                context.timer.Dispose();
-                context.timer = null;
+            try {
+                if (context.e != null) {
+                    throw context.e;
+                }
+                context.response = (HttpWebResponse)context.request.EndGetResponse(asyncResult);
+                return Receive(context.request, context.response);
             }
+            finally {
+#if !Core
+                if (context.timer != null) {
+                    context.timer.Dispose();
+                    context.timer = null;
+                }
 #endif
-            return data;
+            }
         }
     }
 }
