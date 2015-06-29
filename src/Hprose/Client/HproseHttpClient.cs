@@ -24,7 +24,7 @@ using System.Collections.Generic;
 using System.IO;
 #if !(SILVERLIGHT || WINDOWS_PHONE || Core)
 using System.IO.Compression;
-#elif !(SL2 || Core)
+#elif WINDOWS_PHONE
 using System.Net.Browser;
 #endif
 using System.Net;
@@ -37,7 +37,7 @@ using System.Threading;
 
 namespace Hprose.Client {
     public class HproseHttpClient : HproseClient {
-#if !SL2
+#if !SILVERLIGHT
         private static bool disableGlobalCookie = false;
         public bool DisableGlobalCookie {
             get {
@@ -51,7 +51,7 @@ namespace Hprose.Client {
 #if (PocketPC || Smartphone || WindowsCE)
         private static CookieManager globalCookieManager = new CookieManager();
         private CookieManager cookieManager = disableGlobalCookie ? new CookieManager() : globalCookieManager;
-#elif !SL2
+#elif !SILVERLIGHT
         private static CookieContainer globalCookieContainer = new CookieContainer();
         private CookieContainer cookieContainer = disableGlobalCookie ? new CookieContainer() : globalCookieContainer;
 #endif
@@ -225,7 +225,7 @@ namespace Hprose.Client {
 
         private HttpWebRequest GetRequest() {
             Uri uri = new Uri(this.uri);
-#if !(SILVERLIGHT || WINDOWS_PHONE) || SL2
+#if !WINDOWS_PHONE
             HttpWebRequest request = WebRequest.Create(uri) as HttpWebRequest;
 #else
             HttpWebRequest request = WebRequestCreator.ClientHttp.Create(uri) as HttpWebRequest;
@@ -278,7 +278,7 @@ namespace Hprose.Client {
             request.Headers["Cookie"] = cookieManager.GetCookie(uri.Host,
                                                                 uri.AbsolutePath,
                                                                 uri.Scheme == "https");
-#elif !SL2
+#elif !SILVERLIGHT
             request.CookieContainer = cookieContainer;
 #endif
             return request;
