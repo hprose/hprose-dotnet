@@ -25,7 +25,7 @@ if not exist dist\Hprose\Release\net40-client mkdir dist\Hprose\Release\net40-cl
 if not exist dist\Hprose\Release\net45 mkdir dist\Hprose\Release\net45
 if not exist dist\Hprose\Release\net451 mkdir dist\Hprose\Release\net451
 if not exist dist\Hprose\Release\net452 mkdir dist\Hprose\Release\net452
-if not exist dist\Hprose\Release\net452-x64 mkdir dist\Hprose\Release\net452-x64
+if not exist dist\Hprose\Release\net46 mkdir dist\Hprose\Release\net46
 if not exist dist\Hprose\Release\netcore45 mkdir dist\Hprose\Release\netcore45
 if not exist dist\Hprose\Release\netcore451 mkdir dist\Hprose\Release\netcore451
 if not exist dist\Hprose\Release\wp8 mkdir dist\Hprose\Release\wp8
@@ -58,7 +58,7 @@ if not exist dist\Hprose\Debug\net40-client mkdir dist\Hprose\Debug\net40-client
 if not exist dist\Hprose\Debug\net45 mkdir dist\Hprose\Debug\net45
 if not exist dist\Hprose\Debug\net451 mkdir dist\Hprose\Debug\net451
 if not exist dist\Hprose\Debug\net452 mkdir dist\Hprose\Debug\net452
-if not exist dist\Hprose\Debug\net452-x64 mkdir dist\Hprose\Debug\net452-x64
+if not exist dist\Hprose\Debug\net46 mkdir dist\Hprose\Debug\net46
 if not exist dist\Hprose\Debug\netcore45 mkdir dist\Hprose\Debug\netcore45
 if not exist dist\Hprose\Debug\netcore451 mkdir dist\Hprose\Debug\netcore451
 if not exist dist\Hprose\Debug\wp8 mkdir dist\Hprose\Debug\wp8
@@ -91,7 +91,7 @@ if not exist dist\Hprose.Client\Release\net40-client mkdir dist\Hprose.Client\Re
 if not exist dist\Hprose.Client\Release\net45 mkdir dist\Hprose.Client\Release\net45
 if not exist dist\Hprose.Client\Release\net451 mkdir dist\Hprose.Client\Release\net451
 if not exist dist\Hprose.Client\Release\net452 mkdir dist\Hprose.Client\Release\net452
-if not exist dist\Hprose.Client\Release\net452-x64 mkdir dist\Hprose.Client\Release\net452-x64
+if not exist dist\Hprose.Client\Release\net46 mkdir dist\Hprose.Client\Release\net46
 if not exist dist\Hprose.Client\Release\netcore45 mkdir dist\Hprose.Client\Release\netcore45
 if not exist dist\Hprose.Client\Release\netcore451 mkdir dist\Hprose.Client\Release\netcore451
 if not exist dist\Hprose.Client\Release\sl3-wp mkdir dist\Hprose.Client\Release\sl3-wp
@@ -130,7 +130,7 @@ if not exist dist\Hprose.Client\Debug\net40-client mkdir dist\Hprose.Client\Debu
 if not exist dist\Hprose.Client\Debug\net45 mkdir dist\Hprose.Client\Debug\net45
 if not exist dist\Hprose.Client\Debug\net451 mkdir dist\Hprose.Client\Debug\net451
 if not exist dist\Hprose.Client\Debug\net452 mkdir dist\Hprose.Client\Debug\net452
-if not exist dist\Hprose.Client\Debug\net452-x64 mkdir dist\Hprose.Client\Debug\net452-x64
+if not exist dist\Hprose.Client\Debug\net46 mkdir dist\Hprose.Client\Debug\net46
 if not exist dist\Hprose.Client\Debug\netcore45 mkdir dist\Hprose.Client\Debug\netcore45
 if not exist dist\Hprose.Client\Debug\netcore451 mkdir dist\Hprose.Client\Debug\netcore451
 if not exist dist\Hprose.Client\Debug\sl3-wp mkdir dist\Hprose.Client\Debug\sl3-wp
@@ -164,7 +164,7 @@ set WP80_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\WindowsP
 set WP81_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\WindowsPhone\v8.1
 set WPA81_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\WindowsPhoneApp\v8.1
 set CF_PATH=C:\Program Files\Microsoft.NET\SDK\CompactFramework
-set MONO_PATH=C:\Program Files\Mono-3.2.3\bin
+set MONO_PATH=C:\Program Files\Mono\bin
 set UNITY_PATH=C:\Program Files\Unity\Editor\Data\MonoBleedingEdge\bin
 
 if DEFINED ProgramFiles(x86) set SL2_PATH=C:\Program Files (x86)\Microsoft SDKs\Silverlight\v2.0\Reference Assemblies
@@ -177,8 +177,7 @@ if DEFINED ProgramFiles(x86) set WP80_PATH=C:\Program Files (x86)\Reference Asse
 if DEFINED ProgramFiles(x86) set WP81_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\WindowsPhone\v8.1
 if DEFINED ProgramFiles(x86) set WPA81_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\WindowsPhoneApp\v8.1
 if DEFINED ProgramFiles(x86) set CF_PATH=C:\Program Files (x86)\Microsoft.NET\SDK\CompactFramework
-if DEFINED ProgramFiles(x86) set MONO_PATH=C:\Program Files (x86)\Mono-3.2.3\bin
-if DEFINED ProgramFiles(x86) set UNITY_PATH=C:\Program Files (x86)\Unity\Editor\Data\MonoBleedingEdge\bin
+if DEFINED ProgramFiles(x86) set MONO_PATH=C:\Program Files (x86)\Mono\bin
 
 set NUMERICS_SRC=
 
@@ -480,7 +479,8 @@ echo start compile hprose for .NET 4.5.1 Windows Store App Debug
 C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\netcore451\Hprose.Client.dll -define:dotNET4;dotNET45;dotNET451;Core;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET 4.5.2 Release
-set DOTNET_PATH=C:\Windows\Microsoft.NET\Framework\v4.0.30319
+set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2
+if DEFINED ProgramFiles(x86) set DOTNET_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2
 set DOTNET_REFERENCE=
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
@@ -492,7 +492,8 @@ set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Web.dll
 C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose\Release\net452\Hprose.dll -define:dotNET4;dotNET45;dotNET451;dotNET452 -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET 4.5.2 Debug
-set DOTNET_PATH=C:\Windows\Microsoft.NET\Framework\v4.0.30319
+set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2
+if DEFINED ProgramFiles(x86) set DOTNET_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2
 set DOTNET_REFERENCE=
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
@@ -503,29 +504,79 @@ C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -o
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Web.dll"
 C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose\Debug\net452\Hprose.dll -define:dotNET4;dotNET45;dotNET451;dotNET452 -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
-echo start compile hprose for .NET 4.5.2 x64 Release
-set DOTNET_PATH=C:\Windows\Microsoft.NET\Framework64\v4.0.30319
+echo start compile hprose for .NET 4.6 Release
+set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6
+if DEFINED ProgramFiles(x86) set DOTNET_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6
 set DOTNET_REFERENCE=
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
-C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\net452-x64\Hprose.Client.dll -define:dotNET4;dotNET45;dotNET451;dotNET452;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\net46\Hprose.Client.dll -define:dotNET4;dotNET45;dotNET451;dotNET452;dotNET46;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Web.dll"
-C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose\Release\net452-x64\Hprose.dll -define:dotNET4;dotNET45;dotNET451;dotNET452 -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose\Release\net46\Hprose.dll -define:dotNET4;dotNET45;dotNET451;dotNET452;dotNET46 -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
-echo start compile hprose for .NET 4.5.2 x64 Debug
-set DOTNET_PATH=C:\Windows\Microsoft.NET\Framework64\v4.0.30319
+echo start compile hprose for .NET 4.6 Debug
+set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6
+if DEFINED ProgramFiles(x86) set DOTNET_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6
 set DOTNET_REFERENCE=
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
-C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\net452-x64\Hprose.Client.dll -define:dotNET4;dotNET45;dotNET451;dotNET452;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\net46\Hprose.Client.dll -define:dotNET4;dotNET45;dotNET451;dotNET452;dotNET46;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Web.dll"
-C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose\Debug\net452-x64\Hprose.dll -define:dotNET4;dotNET45;dotNET451;dotNET452 -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose\Debug\net46\Hprose.dll -define:dotNET4;dotNET45;dotNET451;dotNET452;dotNET46 -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for MonoAndroid Release
+set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\MonoAndroid\v1.0
+if DEFINED ProgramFiles(x86) set DOTNET_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\MonoAndroid\v1.0
+set DOTNET_REFERENCE=
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\MonoAndroid\Hprose.Client.dll -define:dotNET4;dotNET45;MONO;Unity;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose\Release\MonoAndroid\Hprose.dll -define:dotNET4;dotNET45;MONO;Unity;ClientProfile -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for MonoAndroid Debug
+set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\MonoAndroid\v1.0
+if DEFINED ProgramFiles(x86) set DOTNET_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\MonoAndroid\v1.0
+set DOTNET_REFERENCE=
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\MonoAndroid\Hprose.Client.dll -define:dotNET4;dotNET45;MONO;Unity;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose\Debug\MonoAndroid\Hprose.dll -define:dotNET4;dotNET45;MONO;Unity;ClientProfile -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for MonoTouch Release
+set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\MonoTouch\v1.0
+if DEFINED ProgramFiles(x86) set DOTNET_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\MonoTouch\v1.0
+set DOTNET_REFERENCE=
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\MonoTouch\Hprose.Client.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose\Release\MonoTouch\Hprose.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for MonoTouch Debug
+set DOTNET_PATH=C:\Program Files\Reference Assemblies\Microsoft\Framework\MonoTouch\v1.0
+if DEFINED ProgramFiles(x86) set DOTNET_PATH=C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\MonoTouch\v1.0
+set DOTNET_REFERENCE=
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\MonoTouch\Hprose.Client.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\Csc.exe -keyfile:HproseKeys.snk -out:dist\Hprose\Debug\MonoTouch\Hprose.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for Silverlight 2.0 Release
 set SL_REFERENCE=
@@ -756,23 +807,23 @@ echo start compile hprose for Unity Web Player Debug
 call "%UNITY_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\unity-web\Hprose.Client.dll -sdk:2 -define:dotNET35;MONO;Unity;Unity_iOS;UNITY_WEBPLAYER;ClientProfile;ClientOnly -noconfig -target:library -optimize+ -debug+ -reference:System,System.Core %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 call "%UNITY_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Hprose\Debug\unity-web\Hprose.dll -sdk:2 -define:dotNET35;MONO;Unity;Unity_iOS;UNITY_WEBPLAYER;ClientProfile -noconfig -target:library -optimize+ -debug+ -reference:System,System.Core %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
-copy dist\Hprose.Client\Release\unity\* dist\Hprose.Client\Release\MonoAndroid\*
-copy dist\Hprose\Release\unity\* dist\Hprose\Release\MonoAndroid\*
+rem copy dist\Hprose.Client\Release\unity\* dist\Hprose.Client\Release\MonoAndroid\*
+rem copy dist\Hprose\Release\unity\* dist\Hprose\Release\MonoAndroid\*
 
-copy dist\Hprose.Client\Debug\unity\* dist\Hprose.Client\Debug\MonoAndroid\*
-copy dist\Hprose\Debug\unity\* dist\Hprose\Debug\MonoAndroid\*
+rem copy dist\Hprose.Client\Debug\unity\* dist\Hprose.Client\Debug\MonoAndroid\*
+rem copy dist\Hprose\Debug\unity\* dist\Hprose\Debug\MonoAndroid\*
 
-copy dist\Hprose.Client\Release\unity\* dist\Hprose.Client\Release\MonoMac\*
-copy dist\Hprose\Release\unity\* dist\Hprose\Release\MonoMac\*
+rem copy dist\Hprose.Client\Release\unity\* dist\Hprose.Client\Release\MonoMac\*
+rem copy dist\Hprose\Release\unity\* dist\Hprose\Release\MonoMac\*
 
-copy dist\Hprose.Client\Debug\unity\* dist\Hprose.Client\Debug\MonoMac\*
-copy dist\Hprose\Debug\unity\* dist\Hprose\Debug\MonoMac\*
+rem copy dist\Hprose.Client\Debug\unity\* dist\Hprose.Client\Debug\MonoMac\*
+rem copy dist\Hprose\Debug\unity\* dist\Hprose\Debug\MonoMac\*
 
-copy dist\Hprose.Client\Release\unity-ios\* dist\Hprose.Client\Release\MonoTouch\*
-copy dist\Hprose\Release\unity-ios\* dist\Hprose\Release\MonoTouch\*
+rem copy dist\Hprose.Client\Release\unity-ios\* dist\Hprose.Client\Release\MonoTouch\*
+rem copy dist\Hprose\Release\unity-ios\* dist\Hprose\Release\MonoTouch\*
 
-copy dist\Hprose.Client\Debug\unity-ios\* dist\Hprose.Client\Debug\MonoTouch\*
-copy dist\Hprose\Debug\unity-ios\* dist\Hprose\Debug\MonoTouch\*
+rem copy dist\Hprose.Client\Debug\unity-ios\* dist\Hprose.Client\Debug\MonoTouch\*
+rem copy dist\Hprose\Debug\unity-ios\* dist\Hprose\Debug\MonoTouch\*
 
 set NUMERICS_SRC=
 set HPROSE_SRC=
