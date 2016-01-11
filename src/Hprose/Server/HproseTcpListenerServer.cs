@@ -12,17 +12,17 @@
  *                                                        *
  * hprose tcp listener server class for C#.               *
  *                                                        *
- * LastModified: May 30, 2015                             *
+ * LastModified: Jan 11, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-#if !(dotNET10 || dotNET11 || ClientOnly)
+#if !ClientOnly
 using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-#if Smartphone
+#if (dotNET10 || dotNET11 || Smartphone)
 using System.Threading;
 #endif
 using Hprose.IO;
@@ -145,37 +145,45 @@ namespace Hprose.Server {
             }
         }
 
+        private IPAddress GetIPAddress(string host, AddressFamily addressFamily) {
+#if (dotNET10 || dotNET11 || Smartphone)
+            try {
+                return IPAddress.Parse(host);
+            }
+            catch (Exception) {}
+#else
+            IPAddress addr;
+            if (IPAddress.TryParse(host, out addr)) {
+                return addr;
+            }
+#endif
+#if (dotNET10 || dotNET11 || dotNETCF10) && !MONO
+            IPAddress[] localAddrs = Dns.Resolve(host).AddressList;
+#elif Smartphone
+            IPAddress[] localAddrs = Dns.GetHostEntry(host).AddressList;
+#else
+            IPAddress[] localAddrs = Dns.GetHostAddresses(host);
+#endif
+#if dotNETCF10
+            return localAddrs[0];
+#else
+            for (int i = 0; i < localAddrs.Length; ++i) {
+                if (localAddrs[i].AddressFamily == addressFamily) {
+                    return localAddrs[i];
+                }
+            }
+            return localAddrs[0];
+#endif
+        }
+
         public void Start() {
             if (Listener == null) {
                 Uri u = new Uri(uri);
-#if !Smartphone
-                IPAddress[] localAddrs = Dns.GetHostAddresses(u.Host);
-#elif dotNETCF10
-                IPAddress[] localAddrs = Dns.Resolve(u.Host).AddressList;
-#else
-                IPAddress[] localAddrs = Dns.GetHostEntry(u.Host).AddressList;
-#endif
-#if dotNETCF10
-                Listener = new TcpListener(localAddrs[0], u.Port);
-#else
-                for (int i = 0; i < localAddrs.Length; ++i) {
-                    if (u.Scheme == "tcp6") {
-                        if (localAddrs[i].AddressFamily == AddressFamily.InterNetworkV6) {
-                            Listener = new TcpListener(localAddrs[i], u.Port);
-                            break;
-                        }
-                    }
-                    else {
-                        if (localAddrs[i].AddressFamily == AddressFamily.InterNetwork) {
-                            Listener = new TcpListener(localAddrs[i], u.Port);
-                            break;
-                        }
-                    }
-                }
-#endif
+                IPAddress addr = GetIPAddress(u.Host, (u.Scheme == "tcp6" ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork));
+                Listener = new TcpListener(addr, u.Port);
                 Listener.Start();
                 for (int i = 0; i < tCount; ++i) {
-#if !Smartphone
+#if !(dotNET10 || dotNET11 || Smartphone)
                     Listener.BeginAcceptTcpClient(new AsyncCallback(AcceptTcpCallback), Listener);
 #else
                     Thread t = new Thread(new ThreadStart(AcceptTcp));
@@ -327,7 +335,7 @@ namespace Hprose.Server {
             CloseConnection(context);
         }
 
-#if !Smartphone
+#if !(dotNET10 || dotNET11 || Smartphone)
         private void AcceptTcpCallback(IAsyncResult asyncResult) {
             TcpListener listener = asyncResult.AsyncState as TcpListener;
             TcpClient client = null;
@@ -367,6 +375,10 @@ namespace Hprose.Server {
                     client.NoDelay = m_noDelay;
                     client.ReceiveBufferSize = m_receiveBufferSize;
                     client.SendBufferSize = m_sendBufferSize;
+#if (dotNET10 || dotNET11)
+                    client.ReceiveTimeout = m_receiveTimeout;
+                    client.SendTimeout = m_sendTimeout;
+#endif
                     NetworkStream stream = client.GetStream();
                     context.callback = new AsyncCallback(ErrorCallback);
                     context.context = new HproseTcpListenerContext(client);

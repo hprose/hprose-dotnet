@@ -12,11 +12,11 @@
  *                                                        *
  * hprose tcp listener context class for C#.              *
  *                                                        *
- * LastModified: May 30, 2015                             *
+ * LastModified: Jan 11, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-#if !(dotNET10 || dotNET11 || ClientOnly)
+#if !ClientOnly
 using System.Net.Sockets;
 using Hprose.Common;
 
