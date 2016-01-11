@@ -227,7 +227,7 @@ namespace Hprose.Server {
                 SendHeader(context);
                 string method = context.Request.HttpMethod;
                 Stream ostream = GetOutputStream(context);
-                if ((method == "GET") && getEnabled) {
+                if (method == "GET") {
                     if (getEnabled) {
                         DoFunctionList(methods, context)
                         .WriteTo(ostream);
