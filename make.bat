@@ -42,6 +42,7 @@ if not exist dist\Hprose\Release\unity-web mkdir dist\Hprose\Release\unity-web
 if not exist dist\Hprose\Release\MonoAndroid mkdir dist\Hprose\Release\MonoAndroid
 if not exist dist\Hprose\Release\MonoMac mkdir dist\Hprose\Release\MonoMac
 if not exist dist\Hprose\Release\MonoTouch mkdir dist\Hprose\Release\MonoTouch
+if not exist dist\Hprose\Release\Xamarin.iOS mkdir dist\Hprose\Release\Xamarin.iOS
 
 if not exist dist\Hprose\Debug\net10 mkdir dist\Hprose\Debug\net10
 if not exist dist\Hprose\Debug\net10-cf mkdir dist\Hprose\Debug\net10-cf
@@ -75,6 +76,7 @@ if not exist dist\Hprose\Debug\unity-web mkdir dist\Hprose\Debug\unity-web
 if not exist dist\Hprose\Debug\MonoAndroid mkdir dist\Hprose\Debug\MonoAndroid
 if not exist dist\Hprose\Debug\MonoMac mkdir dist\Hprose\Debug\MonoMac
 if not exist dist\Hprose\Debug\MonoTouch mkdir dist\Hprose\Debug\MonoTouch
+if not exist dist\Hprose\Debug\Xamarin.iOS mkdir dist\Hprose\Debug\Xamarin.iOS
 
 if not exist dist\Hprose.Client\Release\net10 mkdir dist\Hprose.Client\Release\net10
 if not exist dist\Hprose.Client\Release\net10-cf mkdir dist\Hprose.Client\Release\net10-cf
@@ -114,6 +116,7 @@ if not exist dist\Hprose.Client\Release\unity-web mkdir dist\Hprose.Client\Relea
 if not exist dist\Hprose.Client\Release\MonoAndroid mkdir dist\Hprose.Client\Release\MonoAndroid
 if not exist dist\Hprose.Client\Release\MonoMac mkdir dist\Hprose.Client\Release\MonoMac
 if not exist dist\Hprose.Client\Release\MonoTouch mkdir dist\Hprose.Client\Release\MonoTouch
+if not exist dist\Hprose.Client\Release\Xamarin.iOS mkdir dist\Hprose.Client\Release\Xamarin.iOS
 
 if not exist dist\Hprose.Client\Debug\net10 mkdir dist\Hprose.Client\Debug\net10
 if not exist dist\Hprose.Client\Debug\net10-cf mkdir dist\Hprose.Client\Debug\net10-cf
@@ -153,6 +156,7 @@ if not exist dist\Hprose.Client\Debug\unity-web mkdir dist\Hprose.Client\Debug\u
 if not exist dist\Hprose.Client\Debug\MonoAndroid mkdir dist\Hprose.Client\Debug\MonoAndroid
 if not exist dist\Hprose.Client\Debug\MonoMac mkdir dist\Hprose.Client\Debug\MonoMac
 if not exist dist\Hprose.Client\Debug\MonoTouch mkdir dist\Hprose.Client\Debug\MonoTouch
+if not exist dist\Hprose.Client\Debug\Xamarin.iOS mkdir dist\Hprose.Client\Debug\Xamarin.iOS
 
 set PRO_PATH=C:\Program Files
 
@@ -570,6 +574,28 @@ set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
 "%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\MonoTouch\Hprose.Client.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 "%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose\Debug\MonoTouch\Hprose.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for Xamarin.iOS Release
+set DOTNET_PATH=%PRO_PATH%\Reference Assemblies\Microsoft\Framework\Xamarin.iOS\v1.0
+set DOTNET_REFERENCE=
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\Xamarin.iOS\Hprose.Client.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose\Release\Xamarin.iOS\Hprose.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for Xamarin.iOS Debug
+set DOTNET_PATH=%PRO_PATH%\Reference Assemblies\Microsoft\Framework\Xamarin.iOS\v1.0
+set DOTNET_REFERENCE=
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\Xamarin.iOS\Hprose.Client.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose\Debug\Xamarin.iOS\Hprose.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
 set CSC=c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\Csc.exe
 
