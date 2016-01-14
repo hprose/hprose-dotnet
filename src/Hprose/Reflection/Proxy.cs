@@ -276,7 +276,7 @@ namespace Hprose.Reflection {
                              MethodAttributes.HideBySig;
             }
             else {
-                name = method.DeclaringType.FullName + "." + method.Name;
+                name = method.DeclaringType.Name + "." + method.Name;
                 methodAttr = MethodAttributes.Private |
                              MethodAttributes.Virtual |
                              MethodAttributes.HideBySig |
