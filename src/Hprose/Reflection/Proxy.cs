@@ -253,7 +253,7 @@ namespace Hprose.Reflection {
 #if !(dotNET10 || dotNET11)
                     pb.SetSetMethod(methodToMB[setMethod]);
 #else
-                    pb.SetGetMethod((MethodBuilder)methodToMB[getMethod]);
+                    pb.SetSetMethod((MethodBuilder)methodToMB[setMethod]);
 #endif
                 }
             }
