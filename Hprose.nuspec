@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>Hprose</id>
+        <version>1.5.0</version>
+        <title>Hprose for .NET</title>
+        <authors>Ma Bingyao</authors>
+        <owners>Ma Bingyao&lt;andot@hprose.com&gt;</owners>
+        <licenseUrl>https://raw.githubusercontent.com/hprose/hprose-dotnet/master/LICENSE.md</licenseUrl>
+        <projectUrl>https://github.com/hprose/hprose-dotnet</projectUrl>
+        <iconUrl>http://hprose.com/apple-touch-icon.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Hprose is a High Performance Remote Object Service Engine.
+
+    It is a modern, lightweight, cross-language, cross-platform, object-oriented, high performance, remote dynamic communication middleware. It is not only easy to use, but powerful. You just need a little time to learn, then you can use it to easily construct cross language cross platform distributed application system.
+
+    Hprose supports many programming languages, for example:
+
+    * AAuto Quicker
+    * ActionScript
+    * ASP
+    * C++
+    * Dart
+    * Delphi/Free Pascal
+    * dotNET(C#, Visual Basic...)
+    * Golang
+    * Java
+    * JavaScript
+    * Node.js
+    * Objective-C
+    * Perl
+    * PHP
+    * Python
+    * Ruby
+    * ...
+    
+    Through Hprose, You can conveniently and efficiently intercommunicate between those programming languages.
+
+    This project is the implementation of Hprose for .NET (C#, Visual Basic...).</description>
+        <summary>Hprose is a High Performance Remote Object Service Engine.
+
+It is a modern, lightweight, cross-language, cross-platform, object-oriented, high performance, remote dynamic communication middleware.</summary>
+        <releaseNotes>This is the first stable version of Hprose for .NET.
+It supports .NET Framework 1.0 ~ 4.6.1.
+It supports .NET CompactFramework 1.0 ~ 3.5.
+It supports .NET Framework Client Profile 3.5 ~ 4.0.
+It supports .NET Core 4.5 ~ 4.5.1.
+It supports SilverLight 2.0 ~ 5.0.
+It supports Windows Phone 7.0 ~ 10.
+It supports Mono.
+It supports Unity, Unity iOS and Unity Web.
+It supports sync and async invoking.
+It supports Http and Tcp Client and Server.
+It supports Http service with ASP.NET.
+It supports standalone Http service, too.
+It supplies System.Numerics for all .NET version.
+It supplies System.IO.Compression for .NET 1.x and .NET CompactFramework.
+It supplies full System.Action and System.Func definition for .NET Framework 2.0+, .NET CompactFramework 2.0+, SilverLight, Windows Phone and Mono.
+It supplies HashMap for null key Hashtable and Dictionary.
+It is faster, easier and robuster than any other Serialization and RPC.
+It supports NuGet install.</releaseNotes>
+        <copyright>Copyright (c) 2008-2016 http://hprose.com</copyright>
+        <tags>Hprose RPC WebService WebAPI Serialize Serialization</tags>
+    </metadata>
+    <files>
+        <file src="dist/Hprose/Release/net10/Hprose.dll" target="lib/net10" />
+        <file src="dist/Hprose/Release/net11/Hprose.dll" target="lib/net11" />
+        <file src="dist/Hprose/Release/net20/Hprose.dll" target="lib/net20" />
+        <file src="dist/Hprose/Release/net35/Hprose.dll" target="lib/net35" />
+        <file src="dist/Hprose/Release/net40/Hprose.dll" target="lib/net40" />
+        <file src="dist/Hprose/Release/net45/Hprose.dll" target="lib/net45" />
+        <file src="dist/Hprose/Release/net451/Hprose.dll" target="lib/net451" />
+        <file src="dist/Hprose/Release/net452/Hprose.dll" target="lib/net452" />
+        <file src="dist/Hprose/Release/net46/Hprose.dll" target="lib/net46" />
+        <file src="dist/Hprose/Release/net461/Hprose.dll" target="lib/net461" />
+        <file src="dist/Hprose/Release/net10-cf/Hprose.dll" target="lib/net10-cf" />
+        <file src="dist/Hprose/Release/net20-cf/Hprose.dll" target="lib/net20-cf" />
+        <file src="dist/Hprose/Release/net35-cf/Hprose.dll" target="lib/net35-cf" />
+        <file src="dist/Hprose/Release/net35-client/Hprose.dll" target="lib/net35-client" />
+        <file src="dist/Hprose/Release/net40-client/Hprose.dll" target="lib/net40-client" />
+        <file src="dist/Hprose/Release/monoandroid/Hprose.dll" target="lib/monoandroid" />
+        <file src="dist/Hprose/Release/monotouch/Hprose.dll" target="lib/monotouch" />
+        <file src="dist/Hprose/Release/xamarinios/Hprose.dll" target="lib/xamarinios" />
+    </files>
+</package>

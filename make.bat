@@ -25,11 +25,6 @@ if not exist dist\Hprose\Release\net451 mkdir dist\Hprose\Release\net451
 if not exist dist\Hprose\Release\net452 mkdir dist\Hprose\Release\net452
 if not exist dist\Hprose\Release\net46 mkdir dist\Hprose\Release\net46
 if not exist dist\Hprose\Release\net461 mkdir dist\Hprose\Release\net461
-if not exist dist\Hprose\Release\netcore45 mkdir dist\Hprose\Release\netcore45
-if not exist dist\Hprose\Release\netcore451 mkdir dist\Hprose\Release\netcore451
-if not exist dist\Hprose\Release\wp8 mkdir dist\Hprose\Release\wp8
-if not exist dist\Hprose\Release\wp81 mkdir dist\Hprose\Release\wp81
-if not exist dist\Hprose\Release\wpa81 mkdir dist\Hprose\Release\wpa81
 if not exist dist\Hprose\Release\mono mkdir dist\Hprose\Release\mono
 if not exist dist\Hprose\Release\mono20 mkdir dist\Hprose\Release\mono20
 if not exist dist\Hprose\Release\mono35 mkdir dist\Hprose\Release\mono35
@@ -39,7 +34,6 @@ if not exist dist\Hprose\Release\unity mkdir dist\Hprose\Release\unity
 if not exist dist\Hprose\Release\unity-ios mkdir dist\Hprose\Release\unity-ios
 if not exist dist\Hprose\Release\unity-web mkdir dist\Hprose\Release\unity-web
 if not exist dist\Hprose\Release\monoandroid mkdir dist\Hprose\Release\monoandroid
-if not exist dist\Hprose\Release\monomac mkdir dist\Hprose\Release\monomac
 if not exist dist\Hprose\Release\monotouch mkdir dist\Hprose\Release\monotouch
 if not exist dist\Hprose\Release\xamarinios mkdir dist\Hprose\Release\xamarinios
 
@@ -58,11 +52,6 @@ if not exist dist\Hprose\Debug\net451 mkdir dist\Hprose\Debug\net451
 if not exist dist\Hprose\Debug\net452 mkdir dist\Hprose\Debug\net452
 if not exist dist\Hprose\Debug\net46 mkdir dist\Hprose\Debug\net46
 if not exist dist\Hprose\Debug\net461 mkdir dist\Hprose\Debug\net461
-if not exist dist\Hprose\Debug\netcore45 mkdir dist\Hprose\Debug\netcore45
-if not exist dist\Hprose\Debug\netcore451 mkdir dist\Hprose\Debug\netcore451
-if not exist dist\Hprose\Debug\wp8 mkdir dist\Hprose\Debug\wp8
-if not exist dist\Hprose\Debug\wp81 mkdir dist\Hprose\Debug\wp81
-if not exist dist\Hprose\Debug\wpa81 mkdir dist\Hprose\Debug\wpa81
 if not exist dist\Hprose\Debug\mono mkdir dist\Hprose\Debug\mono
 if not exist dist\Hprose\Debug\mono20 mkdir dist\Hprose\Debug\mono20
 if not exist dist\Hprose\Debug\mono35 mkdir dist\Hprose\Debug\mono35
@@ -72,7 +61,6 @@ if not exist dist\Hprose\Debug\unity mkdir dist\Hprose\Debug\unity
 if not exist dist\Hprose\Debug\unity-ios mkdir dist\Hprose\Debug\unity-ios
 if not exist dist\Hprose\Debug\unity-web mkdir dist\Hprose\Debug\unity-web
 if not exist dist\Hprose\Debug\monoandroid mkdir dist\Hprose\Debug\monoandroid
-if not exist dist\Hprose\Debug\monomac mkdir dist\Hprose\Debug\monomac
 if not exist dist\Hprose\Debug\monotouch mkdir dist\Hprose\Debug\monotouch
 if not exist dist\Hprose\Debug\xamarinios mkdir dist\Hprose\Debug\xamarinios
 
@@ -111,7 +99,6 @@ if not exist dist\Hprose.Client\Release\unity mkdir dist\Hprose.Client\Release\u
 if not exist dist\Hprose.Client\Release\unity-ios mkdir dist\Hprose.Client\Release\unity-ios
 if not exist dist\Hprose.Client\Release\unity-web mkdir dist\Hprose.Client\Release\unity-web
 if not exist dist\Hprose.Client\Release\monoandroid mkdir dist\Hprose.Client\Release\monoandroid
-if not exist dist\Hprose.Client\Release\monomac mkdir dist\Hprose.Client\Release\monomac
 if not exist dist\Hprose.Client\Release\monotouch mkdir dist\Hprose.Client\Release\monotouch
 if not exist dist\Hprose.Client\Release\xamarinios mkdir dist\Hprose.Client\Release\xamarinios
 
@@ -150,7 +137,6 @@ if not exist dist\Hprose.Client\Debug\unity mkdir dist\Hprose.Client\Debug\unity
 if not exist dist\Hprose.Client\Debug\unity-ios mkdir dist\Hprose.Client\Debug\unity-ios
 if not exist dist\Hprose.Client\Debug\unity-web mkdir dist\Hprose.Client\Debug\unity-web
 if not exist dist\Hprose.Client\Debug\monoandroid mkdir dist\Hprose.Client\Debug\monoandroid
-if not exist dist\Hprose.Client\Debug\monomac mkdir dist\Hprose.Client\Debug\monomac
 if not exist dist\Hprose.Client\Debug\monotouch mkdir dist\Hprose.Client\Debug\monotouch
 if not exist dist\Hprose.Client\Debug\xamarinios mkdir dist\Hprose.Client\Debug\xamarinios
 
