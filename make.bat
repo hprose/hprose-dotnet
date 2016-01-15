@@ -18,6 +18,7 @@ if not exist dist\Hprose\Release\net20-cf mkdir dist\Hprose\Release\net20-cf
 if not exist dist\Hprose\Release\net35 mkdir dist\Hprose\Release\net35
 if not exist dist\Hprose\Release\net35-cf mkdir dist\Hprose\Release\net35-cf
 if not exist dist\Hprose\Release\net35-client mkdir dist\Hprose\Release\net35-client
+if not exist dist\Hprose\Release\net39-cf mkdir dist\Hprose\Release\net39-cf
 if not exist dist\Hprose\Release\net40 mkdir dist\Hprose\Release\net40
 if not exist dist\Hprose\Release\net40-client mkdir dist\Hprose\Release\net40-client
 if not exist dist\Hprose\Release\net45 mkdir dist\Hprose\Release\net45
@@ -45,6 +46,7 @@ if not exist dist\Hprose\Debug\net20-cf mkdir dist\Hprose\Debug\net20-cf
 if not exist dist\Hprose\Debug\net35 mkdir dist\Hprose\Debug\net35
 if not exist dist\Hprose\Debug\net35-cf mkdir dist\Hprose\Debug\net35-cf
 if not exist dist\Hprose\Debug\net35-client mkdir dist\Hprose\Debug\net35-client
+if not exist dist\Hprose\Debug\net39-cf mkdir dist\Hprose\Debug\net39-cf
 if not exist dist\Hprose\Debug\net40 mkdir dist\Hprose\Debug\net40
 if not exist dist\Hprose\Debug\net40-client mkdir dist\Hprose\Debug\net40-client
 if not exist dist\Hprose\Debug\net45 mkdir dist\Hprose\Debug\net45
@@ -72,6 +74,7 @@ if not exist dist\Hprose.Client\Release\net20-cf mkdir dist\Hprose.Client\Releas
 if not exist dist\Hprose.Client\Release\net35 mkdir dist\Hprose.Client\Release\net35
 if not exist dist\Hprose.Client\Release\net35-cf mkdir dist\Hprose.Client\Release\net35-cf
 if not exist dist\Hprose.Client\Release\net35-client mkdir dist\Hprose.Client\Release\net35-client
+if not exist dist\Hprose.Client\Release\net39-cf mkdir dist\Hprose.Client\Release\net39-cf
 if not exist dist\Hprose.Client\Release\net40 mkdir dist\Hprose.Client\Release\net40
 if not exist dist\Hprose.Client\Release\net40-client mkdir dist\Hprose.Client\Release\net40-client
 if not exist dist\Hprose.Client\Release\net45 mkdir dist\Hprose.Client\Release\net45
@@ -110,6 +113,7 @@ if not exist dist\Hprose.Client\Debug\net20-cf mkdir dist\Hprose.Client\Debug\ne
 if not exist dist\Hprose.Client\Debug\net35 mkdir dist\Hprose.Client\Debug\net35
 if not exist dist\Hprose.Client\Debug\net35-cf mkdir dist\Hprose.Client\Debug\net35-cf
 if not exist dist\Hprose.Client\Debug\net35-client mkdir dist\Hprose.Client\Debug\net35-client
+if not exist dist\Hprose.Client\Debug\net39-cf mkdir dist\Hprose.Client\Debug\net39-cf
 if not exist dist\Hprose.Client\Debug\net40 mkdir dist\Hprose.Client\Debug\net40
 if not exist dist\Hprose.Client\Debug\net40-client mkdir dist\Hprose.Client\Debug\net40-client
 if not exist dist\Hprose.Client\Debug\net45 mkdir dist\Hprose.Client\Debug\net45
@@ -757,6 +761,21 @@ set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v3.5\WindowsCE\System.Wind
 echo start compile hprose for .NET Compact Framework 3.5 Debug
 "%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\net35-cf\Hprose.Client.dll -define:Smartphone;dotNETCF35;ClientOnly -noconfig -nostdlib -filealign:512 -target:library -optimize+ -debug+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 "%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose\Debug\net35-cf\Hprose.dll -define:Smartphone;dotNETCF35 -noconfig -nostdlib -filealign:512 -target:library -optimize+ -debug+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+set CSC=%PRO_PATH%\MSBuild\14.0\Bin\Csc.exe
+
+echo start compile hprose for .NET Compact Framework 3.9 Release
+set CF_REFERENCE=
+set CF_REFERENCE=%CF_REFERENCE% -reference:"%PRO_PATH%\Reference Assemblies\Microsoft\Framework\WindowsEmbeddedCompact\v3.9\mscorlib.dll"
+set CF_REFERENCE=%CF_REFERENCE% -reference:"%PRO_PATH%\Reference Assemblies\Microsoft\Framework\WindowsEmbeddedCompact\v3.9\System.dll"
+set CF_REFERENCE=%CF_REFERENCE% -reference:"%PRO_PATH%\Reference Assemblies\Microsoft\Framework\WindowsEmbeddedCompact\v3.9\System.Core.dll"
+set CF_REFERENCE=%CF_REFERENCE% -reference:"%PRO_PATH%\Reference Assemblies\Microsoft\Framework\WindowsEmbeddedCompact\v3.9\System.Windows.Forms.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\net39-cf\Hprose.Client.dll -define:Smartphone;dotNETCF39;ClientOnly -noconfig -nostdlib -filealign:512 -target:library -optimize+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose\Release\net39-cf\Hprose.dll -define:Smartphone;dotNETCF39 -noconfig -nostdlib -filealign:512 -target:library -optimize+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Compact Framework 3.9 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\net39-cf\Hprose.Client.dll -define:Smartphone;dotNETCF39;ClientOnly -noconfig -nostdlib -filealign:512 -target:library -optimize+ -debug+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose\Debug\net39-cf\Hprose.dll -define:Smartphone;dotNETCF39 -noconfig -nostdlib -filealign:512 -target:library -optimize+ -debug+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for mono 1.0 Release
 call "%MONO_PATH%\mcs" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\mono\Hprose.Client.dll -define:dotNET11;MONO;ClientOnly -noconfig -target:library -optimize+ -reference:System,System.Windows.Forms %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%

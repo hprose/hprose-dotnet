@@ -1,4 +1,4 @@
-#if (dotNET2 || dotNET35 || dotNETCF20 || dotNETCF35 || SL2 || SL3 || WP70 || WP71 || MONO2)
+#if (dotNET2 || dotNET35 || dotNETCF20 || dotNETCF35 || dotNETCF39 || SL2 || SL3 || WP70 || WP71 || MONO2)
 namespace System
 {
 #if (dotNET2 || dotNETCF20)

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Hprose</id>
-        <version>1.5.0</version>
+        <version>1.5.1</version>
         <title>Hprose for .NET</title>
         <authors>Ma Bingyao</authors>
         <owners>Ma Bingyao&lt;andot@hprose.com&gt;</owners>
@@ -42,7 +42,7 @@
 It is a modern, lightweight, cross-language, cross-platform, object-oriented, high performance, remote dynamic communication middleware.</summary>
         <releaseNotes>This is the first stable version of Hprose for .NET.
 It supports .NET Framework 1.0 ~ 4.6.1.
-It supports .NET CompactFramework 1.0 ~ 3.5.
+It supports .NET CompactFramework 1.0 ~ 3.9.
 It supports .NET Framework Client Profile 3.5 ~ 4.0.
 It supports .NET Core 4.5 ~ 4.5.1.
 It supports SilverLight 2.0 ~ 5.0.
@@ -76,6 +76,7 @@ It supports NuGet install.</releaseNotes>
         <file src="dist/Hprose/Debug/net10-cf/Hprose.dll" target="lib/net10-cf" />
         <file src="dist/Hprose/Debug/net20-cf/Hprose.dll" target="lib/net20-cf" />
         <file src="dist/Hprose/Debug/net35-cf/Hprose.dll" target="lib/net35-cf" />
+        <file src="dist/Hprose/Debug/net39-cf/Hprose.dll" target="lib/net39-cf" />
         <file src="dist/Hprose/Debug/net35-client/Hprose.dll" target="lib/net35-client" />
         <file src="dist/Hprose/Debug/net40-client/Hprose.dll" target="lib/net40-client" />
         <file src="dist/Hprose/Debug/monoandroid/Hprose.dll" target="lib/monoandroid" />
@@ -95,6 +96,7 @@ It supports NuGet install.</releaseNotes>
         <file src="dist/Hprose/Debug/net10-cf/Hprose.pdb" target="lib/net10-cf" />
         <file src="dist/Hprose/Debug/net20-cf/Hprose.pdb" target="lib/net20-cf" />
         <file src="dist/Hprose/Debug/net35-cf/Hprose.pdb" target="lib/net35-cf" />
+        <file src="dist/Hprose/Debug/net39-cf/Hprose.pdb" target="lib/net39-cf" />
         <file src="dist/Hprose/Debug/net35-client/Hprose.pdb" target="lib/net35-client" />
         <file src="dist/Hprose/Debug/net40-client/Hprose.pdb" target="lib/net40-client" />
         <file src="dist/Hprose/Debug/monoandroid/Hprose.pdb" target="lib/monoandroid" />

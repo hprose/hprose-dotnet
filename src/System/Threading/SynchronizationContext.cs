@@ -1,4 +1,4 @@
-#if (PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11) && !MONO
+#if (PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11) && !MONO && !dotNETCF39
 using System;
 using System.Windows.Forms;
 

@@ -101,6 +101,9 @@ namespace Hprose {
         #elif dotNETCF35
         public const string dotNET_Version = "3.5.7283.0";
         public const string dotNET_Name = ".NET Compact Framework 3.5";
+        #elif dotNETCF39
+        public const string dotNET_Version = "3.9.15155.0";
+        public const string dotNET_Name = ".NET Compact Framework 3.9";
         #elif SL5
         public const string dotNET_Version = "5.0.61118.0";
         public const string dotNET_Name = "Silverlight 5";
@@ -123,6 +126,8 @@ namespace Hprose {
         public const string dotNET_MajorVersion = "4.0";
     #elif (WP70 || WP71)
         public const string dotNET_MajorVersion = "3.7";
+    #elif dotNETCF39
+        public const string dotNET_MajorVersion = "3.9";
     #elif (dotNET35 || dotNETCF35)
         public const string dotNET_MajorVersion = "3.5";
     #elif SL3
