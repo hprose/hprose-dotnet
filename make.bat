@@ -37,6 +37,8 @@ if not exist dist\Hprose\Release\unity-web mkdir dist\Hprose\Release\unity-web
 if not exist dist\Hprose\Release\monoandroid mkdir dist\Hprose\Release\monoandroid
 if not exist dist\Hprose\Release\monotouch mkdir dist\Hprose\Release\monotouch
 if not exist dist\Hprose\Release\xamarinios mkdir dist\Hprose\Release\xamarinios
+if not exist dist\Hprose\Release\xamarintvos mkdir dist\Hprose\Release\xamarintvos
+if not exist dist\Hprose\Release\xamarinwatchos mkdir dist\Hprose\Release\xamarinwatchos
 
 if not exist dist\Hprose\Debug\net10 mkdir dist\Hprose\Debug\net10
 if not exist dist\Hprose\Debug\net10-cf mkdir dist\Hprose\Debug\net10-cf
@@ -65,6 +67,8 @@ if not exist dist\Hprose\Debug\unity-web mkdir dist\Hprose\Debug\unity-web
 if not exist dist\Hprose\Debug\monoandroid mkdir dist\Hprose\Debug\monoandroid
 if not exist dist\Hprose\Debug\monotouch mkdir dist\Hprose\Debug\monotouch
 if not exist dist\Hprose\Debug\xamarinios mkdir dist\Hprose\Debug\xamarinios
+if not exist dist\Hprose\Debug\xamarintvos mkdir dist\Hprose\Debug\xamarintvos
+if not exist dist\Hprose\Debug\xamarinwatchos mkdir dist\Hprose\Debug\xamarinwatchos
 
 if not exist dist\Hprose.Client\Release\net10 mkdir dist\Hprose.Client\Release\net10
 if not exist dist\Hprose.Client\Release\net10-cf mkdir dist\Hprose.Client\Release\net10-cf
@@ -104,6 +108,8 @@ if not exist dist\Hprose.Client\Release\unity-web mkdir dist\Hprose.Client\Relea
 if not exist dist\Hprose.Client\Release\monoandroid mkdir dist\Hprose.Client\Release\monoandroid
 if not exist dist\Hprose.Client\Release\monotouch mkdir dist\Hprose.Client\Release\monotouch
 if not exist dist\Hprose.Client\Release\xamarinios mkdir dist\Hprose.Client\Release\xamarinios
+if not exist dist\Hprose.Client\Release\xamarintvos mkdir dist\Hprose.Client\Release\xamarintvos
+if not exist dist\Hprose.Client\Release\xamarinwatchos mkdir dist\Hprose.Client\Release\xamarinwatchos
 
 if not exist dist\Hprose.Client\Debug\net10 mkdir dist\Hprose.Client\Debug\net10
 if not exist dist\Hprose.Client\Debug\net10-cf mkdir dist\Hprose.Client\Debug\net10-cf
@@ -143,6 +149,8 @@ if not exist dist\Hprose.Client\Debug\unity-web mkdir dist\Hprose.Client\Debug\u
 if not exist dist\Hprose.Client\Debug\monoandroid mkdir dist\Hprose.Client\Debug\monoandroid
 if not exist dist\Hprose.Client\Debug\monotouch mkdir dist\Hprose.Client\Debug\monotouch
 if not exist dist\Hprose.Client\Debug\xamarinios mkdir dist\Hprose.Client\Debug\xamarinios
+if not exist dist\Hprose.Client\Debug\xamarintvos mkdir dist\Hprose.Client\Debug\xamarintvos
+if not exist dist\Hprose.Client\Debug\xamarinwatchos mkdir dist\Hprose.Client\Debug\xamarinwatchos
 
 set PRO_PATH=C:\Program Files
 
@@ -584,6 +592,50 @@ set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime
 set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
 "%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\xamarinios\Hprose.Client.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 "%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose\Debug\xamarinios\Hprose.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for Xamarin.TVOS Release
+set DOTNET_PATH=%PRO_PATH%\Reference Assemblies\Microsoft\Framework\Xamarin.TVOS\v1.0
+set DOTNET_REFERENCE=
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\xamarintvos\Hprose.Client.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose\Release\xamarintvos\Hprose.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for Xamarin.TVOS Debug
+set DOTNET_PATH=%PRO_PATH%\Reference Assemblies\Microsoft\Framework\Xamarin.TVOS\v1.0
+set DOTNET_REFERENCE=
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\xamarintvos\Hprose.Client.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose\Debug\xamarintvos\Hprose.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for Xamarin.WatchOS Release
+set DOTNET_PATH=%PRO_PATH%\Reference Assemblies\Microsoft\Framework\Xamarin.WatchOS\v1.0
+set DOTNET_REFERENCE=
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\xamarinwatchos\Hprose.Client.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose\Release\xamarinwatchos\Hprose.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for Xamarin.WatchOS Debug
+set DOTNET_PATH=%PRO_PATH%\Reference Assemblies\Microsoft\Framework\Xamarin.WatchOS\v1.0
+set DOTNET_REFERENCE=
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\mscorlib.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Core.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Runtime.Serialization.dll"
+set DOTNET_REFERENCE=%DOTNET_REFERENCE% -reference:"%DOTNET_PATH%\System.Numerics.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\xamarinwatchos\Hprose.Client.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile;ClientOnly -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose\Debug\xamarinwatchos\Hprose.dll -define:dotNET4;dotNET45;MONO;Unity;Unity_iOS;ClientProfile -filealign:512 -target:library -noconfig -nowarn:1685 -nostdlib+ -optimize+ -debug+ %DOTNET_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
 set CSC=c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\Csc.exe
 

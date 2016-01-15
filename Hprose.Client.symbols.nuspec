@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Hprose.Client</id>
-        <version>1.5.1</version>
+        <version>1.5.2</version>
         <title>Hprose Client for .NET</title>
         <authors>Ma Bingyao</authors>
         <owners>Ma Bingyao&lt;andot@hprose.com&gt;</owners>
@@ -47,7 +47,7 @@ It supports .NET Framework Client Profile 3.5 ~ 4.0.
 It supports .NET Core 4.5 ~ 4.5.1.
 It supports SilverLight 2.0 ~ 5.0.
 It supports Windows Phone 7.0 ~ 10.
-It supports Mono.
+It supports Mono, MonoAndroid, MonoTouch, Xamarin.iOS, Xamarin.TVOS, Xamarin.WatchOS.
 It supports Unity, Unity iOS and Unity Web.
 It supports sync and async invoking.
 It supports Http and Tcp Client and Server.
@@ -93,7 +93,9 @@ It supports NuGet install.</releaseNotes>
         <file src="dist/Hprose.Client/Debug/monoandroid/Hprose.Client.dll" target="lib/monoandroid" />
         <file src="dist/Hprose.Client/Debug/monotouch/Hprose.Client.dll" target="lib/monotouch" />
         <file src="dist/Hprose.Client/Debug/xamarinios/Hprose.Client.dll" target="lib/xamarinios" />
-
+        <file src="dist/Hprose.Client/Debug/xamarintvos/Hprose.Client.dll" target="lib/xamarintvos" />
+        <file src="dist/Hprose.Client/Debug/xamarinwatchos/Hprose.Client.dll" target="lib/xamarinwatchos" />
+        
         <file src="dist/Hprose.Client/Debug/net10/Hprose.Client.pdb" target="lib/net10" />
         <file src="dist/Hprose.Client/Debug/net11/Hprose.Client.pdb" target="lib/net11" />
         <file src="dist/Hprose.Client/Debug/net20/Hprose.Client.pdb" target="lib/net20" />
@@ -124,6 +126,8 @@ It supports NuGet install.</releaseNotes>
         <file src="dist/Hprose.Client/Debug/monoandroid/Hprose.Client.pdb" target="lib/monoandroid" />
         <file src="dist/Hprose.Client/Debug/monotouch/Hprose.Client.pdb" target="lib/monotouch" />
         <file src="dist/Hprose.Client/Debug/xamarinios/Hprose.Client.pdb" target="lib/xamarinios" />
+        <file src="dist/Hprose.Client/Debug/xamarintvos/Hprose.Client.dll" target="lib/xamarintvos" />
+        <file src="dist/Hprose.Client/Debug/xamarinwatchos/Hprose.Client.dll" target="lib/xamarinwatchos" />
 
         <file src="src/**/*.cs" target="src" />
 
