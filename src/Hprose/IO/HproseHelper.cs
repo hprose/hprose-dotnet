@@ -33,6 +33,7 @@ using Hprose.Common;
 #if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
 using Hprose.Reflection;
 #endif
+using System.Runtime.CompilerServices; 
 
 namespace Hprose.IO {
 #if !(dotNET10 || dotNET11 || dotNETCF10)
@@ -1310,7 +1311,8 @@ namespace Hprose.IO {
             return utf8Encoding.GetString(istream.ToArray(), 0, (int)istream.Length);
 #endif
         }
-#if PORTABLE && (Profile23 || Profile24)
+
+#if PORTABLE && (Profile23 || Profile24 || Profile46 || Profile47)
         public static BigInteger ToBigInteger(String value) {
             int length = value.Length;
             int i = 0;
@@ -1362,6 +1364,13 @@ namespace Hprose.IO {
                 return -bi;
             }
             return bi;
+        }
+#else
+#if dotNET45
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public static BigInteger ToBigInteger(String value) {
+            return BigInteger.Parse(value);
         }
 #endif
     }

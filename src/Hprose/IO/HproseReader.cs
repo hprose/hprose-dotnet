@@ -710,11 +710,7 @@ namespace Hprose.IO {
         }
 
         public BigInteger ReadBigIntegerWithoutTag() {
-#if PORTABLE && (Profile23 || Profile24)
             return HproseHelper.ToBigInteger(ReadUntil(HproseTags.TagSemicolon).ToString());
-#else
-            return BigInteger.Parse(ReadUntil(HproseTags.TagSemicolon).ToString());
-#endif
         }
 
         public long ReadLongWithoutTag() {
@@ -1900,15 +1896,9 @@ namespace Hprose.IO {
                 case HproseTags.TagFalse: return BigInteger.Zero;
                 case HproseTags.TagDate: return new BigInteger(ReadDateWithoutTag().Ticks);
                 case HproseTags.TagTime: return new BigInteger(ReadTimeWithoutTag().Ticks);
-#if PORTABLE && (Profile23 || Profile24)
                 case HproseTags.TagUTF8Char: return HproseHelper.ToBigInteger(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return HproseHelper.ToBigInteger(ReadStringWithoutTag());
                 case HproseTags.TagRef: return HproseHelper.ToBigInteger(Convert.ToString(ReadRef()));
-#else
-                case HproseTags.TagUTF8Char: return BigInteger.Parse(ReadUTF8CharWithoutTag());
-                case HproseTags.TagString: return BigInteger.Parse(ReadStringWithoutTag());
-                case HproseTags.TagRef: return BigInteger.Parse(Convert.ToString(ReadRef()));
-#endif
                 default: throw CastError(TagToString(tag), HproseHelper.typeofBigInteger);
             }
         }
