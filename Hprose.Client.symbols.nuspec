@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Hprose.Client</id>
-        <version>1.5.2</version>
+        <version>1.5.3</version>
         <title>Hprose Client for .NET</title>
         <authors>Ma Bingyao</authors>
         <owners>Ma Bingyao&lt;andot@hprose.com&gt;</owners>
@@ -45,6 +45,7 @@ It supports .NET Framework 1.0 ~ 4.6.1.
 It supports .NET CompactFramework 1.0 ~ 3.9.
 It supports .NET Framework Client Profile 3.5 ~ 4.0.
 It supports .NET Core 4.5 ~ 4.5.1.
+It supports .NET Portable Framework 4.0, 4.5, 4.6.
 It supports SilverLight 2.0 ~ 5.0.
 It supports Windows Phone 7.0 ~ 10.
 It supports Mono, MonoAndroid, MonoTouch, Xamarin.iOS, Xamarin.TVOS, Xamarin.WatchOS.
@@ -95,7 +96,52 @@ It supports NuGet install.</releaseNotes>
         <file src="dist/Hprose.Client/Debug/xamarinios/Hprose.Client.dll" target="lib/xamarinios" />
         <file src="dist/Hprose.Client/Debug/xamarintvos/Hprose.Client.dll" target="lib/xamarintvos" />
         <file src="dist/Hprose.Client/Debug/xamarinwatchos/Hprose.Client.dll" target="lib/xamarinwatchos" />
-        
+
+        <file src="dist/Hprose.Client/Debug/portable/profile2/Hprose.Client.dll" target="lib/portable-net40+win8+sl4+wp7" />
+        <file src="dist/Hprose.Client/Debug/portable/profile3/Hprose.Client.dll" target="lib/portable-net40+sl4" />
+        <file src="dist/Hprose.Client/Debug/portable/profile4/Hprose.Client.dll" target="lib/portable-net45+sl4+win8+wp7" />
+        <file src="dist/Hprose.Client/Debug/portable/profile5/Hprose.Client.dll" target="lib/portable-net40+win8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile6/Hprose.Client.dll" target="lib/portable-net403+win8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile7/Hprose.Client.dll" target="lib/portable-net45+win8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile14/Hprose.Client.dll" target="lib/portable-net40+sl5" />
+        <file src="dist/Hprose.Client/Debug/portable/profile18/Hprose.Client.dll" target="lib/portable-net403+sl4" />
+        <file src="dist/Hprose.Client/Debug/portable/profile19/Hprose.Client.dll" target="lib/portable-net403+sl5" />
+        <file src="dist/Hprose.Client/Debug/portable/profile23/Hprose.Client.dll" target="lib/portable-net45+sl4" />
+        <file src="dist/Hprose.Client/Debug/portable/profile24/Hprose.Client.dll" target="lib/portable-net45+sl5" />
+        <file src="dist/Hprose.Client/Debug/portable/profile31/Hprose.Client.dll" target="lib/portable-win81+wp81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile32/Hprose.Client.dll" target="lib/portable-win81+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile36/Hprose.Client.dll" target="lib/portable-net40+sl4+win8+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile37/Hprose.Client.dll" target="lib/portable-net40+sl5+win8 " />
+        <file src="dist/Hprose.Client/Debug/portable/profile41/Hprose.Client.dll" target="lib/portable-net403+sl4+win8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile42/Hprose.Client.dll" target="lib/portable-net403+sl5+win8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile44/Hprose.Client.dll" target="lib/portable-net451+win81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile46/Hprose.Client.dll" target="lib/portable-net45+sl4+win8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile47/Hprose.Client.dll" target="lib/portable-net45+sl5+win8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile49/Hprose.Client.dll" target="lib/portable-net45+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile78/Hprose.Client.dll" target="lib/portable-net45+win8+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile84/Hprose.Client.dll" target="lib/portable-wp81+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile88/Hprose.Client.dll" target="lib/portable-net40+sl4+win8+wp75" />
+        <file src="dist/Hprose.Client/Debug/portable/profile92/Hprose.Client.dll" target="lib/portable-net40+win8+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile95/Hprose.Client.dll" target="lib/portable-net403+sl4+win8+wp7" />
+        <file src="dist/Hprose.Client/Debug/portable/profile96/Hprose.Client.dll" target="lib/portable-net403+sl4+win8+wp75" />
+        <file src="dist/Hprose.Client/Debug/portable/profile102/Hprose.Client.dll" target="lib/portable-net403+win8+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile104/Hprose.Client.dll" target="lib/portable-net45+sl4+win8+wp75" />
+        <file src="dist/Hprose.Client/Debug/portable/profile111/Hprose.Client.dll" target="lib/portable-net45+win8+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile136/Hprose.Client.dll" target="lib/portable-net40+sl5+win8+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile143/Hprose.Client.dll" target="lib/portable-net403+sl4+win8+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile147/Hprose.Client.dll" target="lib/portable-net403+sl5+win8+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile151/Hprose.Client.dll" target="lib/portable-net451+win81+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile154/Hprose.Client.dll" target="lib/portable-net45+sl4+win8+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile157/Hprose.Client.dll" target="lib/portable-win81+wp81+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile158/Hprose.Client.dll" target="lib/portable-net45+sl5+win8+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile225/Hprose.Client.dll" target="lib/portable-net40+sl5+win8+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile240/Hprose.Client.dll" target="lib/portable-net403+sl5+win8+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile255/Hprose.Client.dll" target="lib/portable-net45+sl5+win8+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile259/Hprose.Client.dll" target="lib/portable-net45+win8+wpa81+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile328/Hprose.Client.dll" target="lib/portable-net40+sl5+win8+wpa81+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile336/Hprose.Client.dll" target="lib/portable-net403+sl5+win8+wpa81+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile344/Hprose.Client.dll" target="lib/portable-net45+sl5+win8+wpa81+wp8" />
+
         <file src="dist/Hprose.Client/Debug/net10/Hprose.Client.pdb" target="lib/net10" />
         <file src="dist/Hprose.Client/Debug/net11/Hprose.Client.pdb" target="lib/net11" />
         <file src="dist/Hprose.Client/Debug/net20/Hprose.Client.pdb" target="lib/net20" />
@@ -126,8 +172,53 @@ It supports NuGet install.</releaseNotes>
         <file src="dist/Hprose.Client/Debug/monoandroid/Hprose.Client.pdb" target="lib/monoandroid" />
         <file src="dist/Hprose.Client/Debug/monotouch/Hprose.Client.pdb" target="lib/monotouch" />
         <file src="dist/Hprose.Client/Debug/xamarinios/Hprose.Client.pdb" target="lib/xamarinios" />
-        <file src="dist/Hprose.Client/Debug/xamarintvos/Hprose.Client.dll" target="lib/xamarintvos" />
-        <file src="dist/Hprose.Client/Debug/xamarinwatchos/Hprose.Client.dll" target="lib/xamarinwatchos" />
+        <file src="dist/Hprose.Client/Debug/xamarintvos/Hprose.Client.pdb" target="lib/xamarintvos" />
+        <file src="dist/Hprose.Client/Debug/xamarinwatchos/Hprose.Client.pdb" target="lib/xamarinwatchos" />
+
+        <file src="dist/Hprose.Client/Debug/portable/profile2/Hprose.Client.pdb" target="lib/portable-net40+win8+sl4+wp7" />
+        <file src="dist/Hprose.Client/Debug/portable/profile3/Hprose.Client.pdb" target="lib/portable-net40+sl4" />
+        <file src="dist/Hprose.Client/Debug/portable/profile4/Hprose.Client.pdb" target="lib/portable-net45+sl4+win8+wp7" />
+        <file src="dist/Hprose.Client/Debug/portable/profile5/Hprose.Client.pdb" target="lib/portable-net40+win8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile6/Hprose.Client.pdb" target="lib/portable-net403+win8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile7/Hprose.Client.pdb" target="lib/portable-net45+win8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile14/Hprose.Client.pdb" target="lib/portable-net40+sl5" />
+        <file src="dist/Hprose.Client/Debug/portable/profile18/Hprose.Client.pdb" target="lib/portable-net403+sl4" />
+        <file src="dist/Hprose.Client/Debug/portable/profile19/Hprose.Client.pdb" target="lib/portable-net403+sl5" />
+        <file src="dist/Hprose.Client/Debug/portable/profile23/Hprose.Client.pdb" target="lib/portable-net45+sl4" />
+        <file src="dist/Hprose.Client/Debug/portable/profile24/Hprose.Client.pdb" target="lib/portable-net45+sl5" />
+        <file src="dist/Hprose.Client/Debug/portable/profile31/Hprose.Client.pdb" target="lib/portable-win81+wp81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile32/Hprose.Client.pdb" target="lib/portable-win81+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile36/Hprose.Client.pdb" target="lib/portable-net40+sl4+win8+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile37/Hprose.Client.pdb" target="lib/portable-net40+sl5+win8 " />
+        <file src="dist/Hprose.Client/Debug/portable/profile41/Hprose.Client.pdb" target="lib/portable-net403+sl4+win8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile42/Hprose.Client.pdb" target="lib/portable-net403+sl5+win8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile44/Hprose.Client.pdb" target="lib/portable-net451+win81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile46/Hprose.Client.pdb" target="lib/portable-net45+sl4+win8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile47/Hprose.Client.pdb" target="lib/portable-net45+sl5+win8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile49/Hprose.Client.pdb" target="lib/portable-net45+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile78/Hprose.Client.pdb" target="lib/portable-net45+win8+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile84/Hprose.Client.pdb" target="lib/portable-wp81+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile88/Hprose.Client.pdb" target="lib/portable-net40+sl4+win8+wp75" />
+        <file src="dist/Hprose.Client/Debug/portable/profile92/Hprose.Client.pdb" target="lib/portable-net40+win8+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile95/Hprose.Client.pdb" target="lib/portable-net403+sl4+win8+wp7" />
+        <file src="dist/Hprose.Client/Debug/portable/profile96/Hprose.Client.pdb" target="lib/portable-net403+sl4+win8+wp75" />
+        <file src="dist/Hprose.Client/Debug/portable/profile102/Hprose.Client.pdb" target="lib/portable-net403+win8+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile104/Hprose.Client.pdb" target="lib/portable-net45+sl4+win8+wp75" />
+        <file src="dist/Hprose.Client/Debug/portable/profile111/Hprose.Client.pdb" target="lib/portable-net45+win8+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile136/Hprose.Client.pdb" target="lib/portable-net40+sl5+win8+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile143/Hprose.Client.pdb" target="lib/portable-net403+sl4+win8+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile147/Hprose.Client.pdb" target="lib/portable-net403+sl5+win8+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile151/Hprose.Client.pdb" target="lib/portable-net451+win81+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile154/Hprose.Client.pdb" target="lib/portable-net45+sl4+win8+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile157/Hprose.Client.pdb" target="lib/portable-win81+wp81+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile158/Hprose.Client.pdb" target="lib/portable-net45+sl5+win8+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile225/Hprose.Client.pdb" target="lib/portable-net40+sl5+win8+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile240/Hprose.Client.pdb" target="lib/portable-net403+sl5+win8+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile255/Hprose.Client.pdb" target="lib/portable-net45+sl5+win8+wpa81" />
+        <file src="dist/Hprose.Client/Debug/portable/profile259/Hprose.Client.pdb" target="lib/portable-net45+win8+wpa81+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile328/Hprose.Client.pdb" target="lib/portable-net40+sl5+win8+wpa81+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile336/Hprose.Client.pdb" target="lib/portable-net403+sl5+win8+wpa81+wp8" />
+        <file src="dist/Hprose.Client/Debug/portable/profile344/Hprose.Client.pdb" target="lib/portable-net45+sl5+win8+wpa81+wp8" />
 
         <file src="src/**/*.cs" target="src" />
 
