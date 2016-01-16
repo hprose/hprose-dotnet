@@ -916,3 +916,5 @@ set CF_REFERENCE=
 set CF_PATH=
 set HPROSE_INFO=
 set CSC=
+
+call makeport.bat
