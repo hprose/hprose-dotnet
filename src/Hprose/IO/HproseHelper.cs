@@ -1310,5 +1310,59 @@ namespace Hprose.IO {
             return utf8Encoding.GetString(istream.ToArray(), 0, (int)istream.Length);
 #endif
         }
+#if PORTABLE && (Profile23 || Profile24)
+        public static BigInteger ToBigInteger(String value) {
+            int length = value.Length;
+            int i = 0;
+            long sign = 1;
+            if (value[0] == '+') {
+                i++;
+            }
+            else if (value[0] == '-') {
+                i++;
+                sign = -1;
+            }
+            for (int j = i; j < length; j++) {
+                if (value[j] < '0' || value[j] > '9') {
+                    throw new ArgumentException("The parsed string was invalid.");
+                }
+            }
+            long n = 0;
+            for (int l = ((length - i > 18) ? 18 + i : length); i < l; i++) {
+                n *= 10;
+                n += (long)(value[i] - '0');
+            }
+            if (i == length) {
+                return new BigInteger(n * sign);
+            }
+            int m = (length - i) / 18;
+            int r = (length - i) % 18;
+            BigInteger bi = new BigInteger(n);
+            for (int j = 0; j < m; j++) {
+                n = 0;
+                for (int l = 18 + i; i < l; i++) {
+                    n *= 10;
+                    n += (long)(value[i] - '0');
+                }
+                bi *= 1000000000000000000L;
+                bi += n;
+            }
+            if (r > 0) {
+                long k = 1;
+                n = 0;
+                for (int l = r + i; i < l; i++) {
+                    k *= 10;
+                    n *= 10;
+                    n += (long)(value[i] - '0');
+                }
+                bi *= k;
+                bi += n;
+            }
+            if (sign == -1) {
+                return -bi;
+            }
+            return bi;
+        }
+#endif
     }
 }
