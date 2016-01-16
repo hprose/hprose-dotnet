@@ -42,7 +42,7 @@ namespace Hprose {
             public const string dotNET_Version = "4.0.30.0";
         #elif (Profile3 || Profile18 || Profile23 || Profile36 || Profile41 || Profile46 || Profile143 || Profile154)
             public const string dotNET_Version = "4.0.40.0";
-        #elif (Profile136 || Profile147 || Profile158 || Profile238 || Profile336 || Profile344)
+        #elif (Profile136 || Profile147 || Profile158 || Profile328 || Profile336 || Profile344)
             public const string dotNET_Version = "4.0.45.0";
         #elif (Profile14 || Profile19 || Profile24 || Profile37 || Profile42 || Profile47 || Profile225 || Profile240 || Profile255)
             public const string dotNET_Version = "4.0.50.0";

@@ -396,6 +396,210 @@ set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile4
 echo start compile hprose for .NET Portable Profile47 Debug
 "%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile47\Hprose.Client.dll -define:PORTABLE;Profile47;SL5;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %HPROSE_SRC% %HPROSE_INFO%
 
+echo start compile hprose for .NET Portable Profile88 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile88\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile88\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile88\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile88\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile88\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile88\Hprose.Client.dll -define:PORTABLE;Profile88;SL4;WP71;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile88 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile88\Hprose.Client.dll -define:PORTABLE;Profile88;SL4;WP71;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile92 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile92\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile92\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile92\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile92\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile92\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile92\Hprose.Client.dll -define:PORTABLE;Profile92;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile92 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile92\Hprose.Client.dll -define:PORTABLE;Profile92;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile95 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile95\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile95\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile95\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile95\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile95\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile95\Hprose.Client.dll -define:PORTABLE;Profile95;SL4;WP70;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile95 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile95\Hprose.Client.dll -define:PORTABLE;Profile95;SL4;WP70;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile96 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile96\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile96\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile96\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile96\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile96\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile96\Hprose.Client.dll -define:PORTABLE;Profile96;SL4;WP71;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile96 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile96\Hprose.Client.dll -define:PORTABLE;Profile96;SL4;WP71;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile102 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile102\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile102\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile102\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile102\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile102\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile102\Hprose.Client.dll -define:PORTABLE;Profile102;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile102 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile102\Hprose.Client.dll -define:PORTABLE;Profile102;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile104 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile104\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile104\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile104\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile104\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile104\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile104\Hprose.Client.dll -define:PORTABLE;Profile104;SL4;WP71;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile104 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile104\Hprose.Client.dll -define:PORTABLE;Profile104;SL4;WP71;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile136 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile136\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile136\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile136\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile136\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile136\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile136\Hprose.Client.dll -define:PORTABLE;Profile136;SL5;WP80;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile136 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile136\Hprose.Client.dll -define:PORTABLE;Profile136;SL5;WP80;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile143 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile143\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile143\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile143\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile143\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile143\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile143\Hprose.Client.dll -define:PORTABLE;Profile143;SL4;WP80;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile143 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile143\Hprose.Client.dll -define:PORTABLE;Profile143;SL4;WP80;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile147 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile147\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile147\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile147\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile147\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile147\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile147\Hprose.Client.dll -define:PORTABLE;Profile147;SL5;WP80;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile147 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile147\Hprose.Client.dll -define:PORTABLE;Profile147;SL5;WP80;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile154 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile154\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile154\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile154\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile154\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile154\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile154\Hprose.Client.dll -define:PORTABLE;Profile154;SL4;WP80;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile154 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile154\Hprose.Client.dll -define:PORTABLE;Profile154;SL4;WP80;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile158 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile158\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile158\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile158\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile158\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile158\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile158\Hprose.Client.dll -define:PORTABLE;Profile158;SL5;WP80;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile158 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile158\Hprose.Client.dll -define:PORTABLE;Profile158;SL5;WP80;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile225 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile225\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile225\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile225\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile225\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile225\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile225\Hprose.Client.dll -define:PORTABLE;Profile225;SL5;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile225 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile225\Hprose.Client.dll -define:PORTABLE;Profile225;SL5;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile240 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile240\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile240\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile240\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile240\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile240\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile240\Hprose.Client.dll -define:PORTABLE;Profile240;SL5;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile240 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile240\Hprose.Client.dll -define:PORTABLE;Profile240;SL5;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile255 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile255\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile255\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile255\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile255\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile255\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile255\Hprose.Client.dll -define:PORTABLE;Profile255;SL5;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile255 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile255\Hprose.Client.dll -define:PORTABLE;Profile255;SL5;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile328 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile328\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile328\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile328\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile328\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile328\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile328\Hprose.Client.dll -define:PORTABLE;Profile328;SL5;WP80;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile328 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile328\Hprose.Client.dll -define:PORTABLE;Profile328;SL5;WP80;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile336 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile336\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile336\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile336\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile336\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile336\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile336\Hprose.Client.dll -define:PORTABLE;Profile336;SL5;WP80;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile336 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile336\Hprose.Client.dll -define:PORTABLE;Profile336;SL5;WP80;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile344 Release
+set PORTABLE_REFERENCE=
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile344\mscorlib.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile344\System.Core.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile344\System.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile344\System.Net.dll"
+set PORTABLE_REFERENCE=%PORTABLE_REFERENCE% -reference:"%PORTABLE_PATH%\Profile344\System.Runtime.Serialization.dll"
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Release\portable\profile344\Hprose.Client.dll -define:PORTABLE;Profile344;SL5;WP80;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
+echo start compile hprose for .NET Portable Profile344 Debug
+"%CSC%" -keyfile:HproseKeys.snk -out:dist\Hprose.Client\Debug\portable\profile344\Hprose.Client.dll -define:PORTABLE;Profile344;SL5;WP80;WP81;dotNET4;ClientOnly -filealign:512 -target:library -noconfig -nostdlib+ -optimize+ -debug+ %PORTABLE_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+
 set PRO_PATH=
 set NUMERICS_SRC=
 set HPROSE_SRC=
