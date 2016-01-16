@@ -572,20 +572,20 @@ namespace Hprose.IO {
 #endif
 #endif
 
-#if (PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || PORTABLE)
+#if (PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || (PORTABLE && dotNET4))
         private static readonly Assembly[] assemblies = new Assembly[] {
             Assembly.GetCallingAssembly(),
             Assembly.GetExecutingAssembly()
         };
-#elif !(Core || PORTABLE)
+#elif !(Core || PORTABLE && dotNET45)
         private static readonly Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
 #endif
 
         public static bool IsSerializable(Type type) {
-#if (PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || PORTABLE)
+#if (PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || (PORTABLE && dotNET4))
             const TypeAttributes sa = TypeAttributes.Serializable;
             return (type.Attributes & sa) == sa;
-#elif Core
+#elif (Core || (PORTABLE && dotNET45))
             return type.GetTypeInfo().IsDefined(typeof(SerializableAttribute));
 #else
             return type.IsSerializable;
@@ -1312,7 +1312,7 @@ namespace Hprose.IO {
 #endif
         }
 
-#if PORTABLE && (Profile23 || Profile24 || Profile46 || Profile47)
+#if (PORTABLE && (Profile23 || Profile24 || Profile46 || Profile47))
         public static BigInteger ToBigInteger(String value) {
             int length = value.Length;
             int i = 0;

@@ -61,9 +61,7 @@ namespace Hprose.Client {
             internal MemoryStream data;
             internal AsyncCallback callback;
             internal Exception e = null;
-#if !Core
             internal Timer timer;
-#endif
             internal AsyncContext(HttpWebRequest request) {
                 this.request = request;
             }
@@ -77,9 +75,7 @@ namespace Hprose.Client {
 #else
         private Hashtable headers = new Hashtable(new CaseInsensitiveHashCodeProvider(), new CaseInsensitiveComparer());
 #endif
-#if !Core
 		private int timeout = 30000;
-#endif
 #if !(SILVERLIGHT || WINDOWS_PHONE || PORTABLE)
         private ICredentials credentials = null;
 #if !Core
@@ -142,7 +138,6 @@ namespace Hprose.Client {
 #endif
         }
 
-#if !Core
         public int Timeout {
             get {
                 return timeout;
@@ -151,7 +146,6 @@ namespace Hprose.Client {
                 timeout = value;
             }
         }
-#endif
 
 #if !(SILVERLIGHT || WINDOWS_PHONE || PORTABLE)
         public ICredentials Credentials {
@@ -341,7 +335,6 @@ namespace Hprose.Client {
         }
 #endif
 
-#if !Core
         protected void TimeoutHandler(object state) {
             AsyncContext context = (AsyncContext)state;
             try {
@@ -351,7 +344,7 @@ namespace Hprose.Client {
                     }
                 }
                 else {
-#if PORTABLE
+#if dotNET45 || PORTABLE
                     context.response.Dispose();
 #else
                     context.response.Close();
@@ -364,17 +357,15 @@ namespace Hprose.Client {
             }
             catch (Exception) { }
         }
-#endif
+
         // AsyncInvoke
         protected override IAsyncResult BeginSendAndReceive(MemoryStream data, AsyncCallback callback) {
             HttpWebRequest request = GetRequest();
             AsyncContext context = new AsyncContext(request);
-#if !Core
             context.timer = new Timer(new TimerCallback(TimeoutHandler),
                                       context,
                                       timeout,
-                                     0);
-#endif
+                                      -1);
             context.data = data;
             context.callback = callback;
             return request.BeginGetRequestStream(new AsyncCallback(EndSend), context);
@@ -402,12 +393,10 @@ namespace Hprose.Client {
                 return Receive(context.request, context.response);
             }
             finally {
-#if !Core
                 if (context.timer != null) {
                     context.timer.Dispose();
                     context.timer = null;
                 }
-#endif
             }
         }
     }

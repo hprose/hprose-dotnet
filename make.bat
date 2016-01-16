@@ -212,6 +212,7 @@ set HPROSE_SRC=%HPROSE_SRC% src\System\Runtime\Serialization\DataContractAttribu
 set HPROSE_SRC=%HPROSE_SRC% src\System\Runtime\Serialization\DataMemberAttribute.cs
 set HPROSE_SRC=%HPROSE_SRC% src\System\Threading\ReaderWriterLock.cs
 set HPROSE_SRC=%HPROSE_SRC% src\System\Threading\SynchronizationContext.cs
+set HPROSE_SRC=%HPROSE_SRC% src\System\Threading\Timer.cs
 set HPROSE_SRC=%HPROSE_SRC% src\System\Windows\Forms\WindowsFormsSynchronizationContext.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\Extension.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\HproseException.cs
