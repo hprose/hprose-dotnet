@@ -12,7 +12,7 @@
  *                                                        *
  * hprose reader class for C#.                            *
  *                                                        *
- * LastModified: Jan 17, 2015                             *
+ * LastModified: Jan 16, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -27,7 +27,7 @@ using System.IO;
 using System.Text;
 using System.Reflection;
 using Hprose.Common;
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
 using Hprose.Reflection;
 #endif
 
@@ -528,13 +528,13 @@ namespace Hprose.IO {
 #else
             Hashtable fields = HproseHelper.GetFields(type);
 #endif
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
             string[] names = new string[count];
             object[] values = new object[count];
 #endif
             FieldTypeInfo field;
             for (int i = 0; i < count; ++i) {
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
                 names[i] = ReadString();
                 if (fields.TryGetValue(names[i], out field)) {
 #elif !(dotNET10 || dotNET11 || dotNETCF10)
@@ -544,7 +544,7 @@ namespace Hprose.IO {
                 if (fields.ContainsKey(name)) {
                     field = (FieldTypeInfo)fields[name];
 #endif
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
                     values[i] = Unserialize(field.type, field.typeEnum);
 #else
                     field.info.SetValue(obj, Unserialize(field.type, field.typeEnum));
@@ -554,7 +554,7 @@ namespace Hprose.IO {
                     Unserialize();
                 }
             }
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
             ObjectFieldModeUnserializer.Get(type, names).Unserialize(obj, values);
 #endif
         }
@@ -565,13 +565,13 @@ namespace Hprose.IO {
 #else
             Hashtable properties = HproseHelper.GetProperties(type);
 #endif
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
             string[] names = new string[count];
             object[] values = new object[count];
 #endif
             PropertyTypeInfo property;
             for (int i = 0; i < count; ++i) {
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
                 names[i] = ReadString();
                 if (properties.TryGetValue(names[i], out property)) {
 #elif !(dotNET10 || dotNET11 || dotNETCF10)
@@ -581,7 +581,7 @@ namespace Hprose.IO {
                 if (properties.ContainsKey(name)) {
                     property = (PropertyTypeInfo)properties[name];
 #endif
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
                     values[i] = Unserialize(property.type, property.typeEnum);
 #elif (dotNET10 || dotNET11)
                     PropertyAccessor.Get(property.info).SetValue(obj, Unserialize(property.type, property.typeEnum));
@@ -595,7 +595,7 @@ namespace Hprose.IO {
                     Unserialize();
                 }
             }
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
             ObjectPropertyModeUnserializer.Get(type, names).Unserialize(obj, values);
 #endif
         }
@@ -606,13 +606,13 @@ namespace Hprose.IO {
 #else
             Hashtable members = HproseHelper.GetMembers(type);
 #endif
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
             string[] names = new string[count];
             object[] values = new object[count];
 #endif
             MemberTypeInfo member;
             for (int i = 0; i < count; ++i) {
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
                 names[i] = ReadString();
                 if (members.TryGetValue(names[i], out member)) {
 #elif !(dotNET10 || dotNET11 || dotNETCF10)
@@ -622,7 +622,7 @@ namespace Hprose.IO {
                 if (members.ContainsKey(name)) {
                     member = (MemberTypeInfo)members[name];
 #endif
-#if (PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if (PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
                     if (member.info is FieldInfo) {
                         FieldInfo field = (FieldInfo)member.info;
                         field.SetValue(obj, Unserialize(member.type, member.typeEnum));
@@ -645,7 +645,7 @@ namespace Hprose.IO {
                     Unserialize();
                 }
             }
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
             ObjectMemberModeUnserializer.Get(type, names).Unserialize(obj, values);
 #endif
         }
@@ -889,7 +889,7 @@ namespace Hprose.IO {
         }
 
         private void ReadObjectFields(object obj, Type type, int count, string[] memberNames) {
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
             object[] values = new object[count];
 #endif
 #if !(dotNET10 || dotNET11 || dotNETCF10)
@@ -905,7 +905,7 @@ namespace Hprose.IO {
                 if (fields.ContainsKey(memberNames[i])) {
                     field = (FieldTypeInfo)fields[memberNames[i]];
 #endif
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
                     values[i] = Unserialize(field.type, field.typeEnum);
 #else
                     field.info.SetValue(obj, Unserialize(field.type, field.typeEnum));
@@ -915,13 +915,13 @@ namespace Hprose.IO {
                     Unserialize();
                 }
             }
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
             ObjectFieldModeUnserializer.Get(type, memberNames).Unserialize(obj, values);
 #endif
         }
 
         private void ReadObjectProperties(object obj, Type type, int count, string[] memberNames) {
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
             object[] values = new object[count];
 #endif
 #if !(dotNET10 || dotNET11 || dotNETCF10)
@@ -937,7 +937,7 @@ namespace Hprose.IO {
                 if (properties.ContainsKey(memberNames[i])) {
                     property = (PropertyTypeInfo)properties[memberNames[i]];
 #endif
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
                     values[i] = Unserialize(property.type, property.typeEnum);
 #elif (dotNET10 || dotNET11)
                     PropertyAccessor.Get(property.info).SetValue(obj, Unserialize(property.type, property.typeEnum));
@@ -951,13 +951,13 @@ namespace Hprose.IO {
                     Unserialize();
                 }
             }
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
             ObjectPropertyModeUnserializer.Get(type, memberNames).Unserialize(obj, values);
 #endif
         }
 
         private void ReadObjectMembers(object obj, Type type, int count, string[] memberNames) {
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
             object[] values = new object[count];
 #endif
 #if !(dotNET10 || dotNET11 || dotNETCF10)
@@ -973,7 +973,7 @@ namespace Hprose.IO {
                 if (members.ContainsKey(memberNames[i])) {
                     member = (MemberTypeInfo)members[memberNames[i]];
 #endif
-#if (PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if (PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
                     if (member.info is FieldInfo) {
                         FieldInfo field = (FieldInfo)member.info;
                         field.SetValue(obj, Unserialize(member.type, member.typeEnum));
@@ -996,7 +996,7 @@ namespace Hprose.IO {
                     Unserialize();
                 }
             }
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
             ObjectMemberModeUnserializer.Get(type, memberNames).Unserialize(obj, values);
 #endif
         }
@@ -1141,7 +1141,7 @@ namespace Hprose.IO {
                 default: throw UnexpectedTag(tag);
             }
         }
-#if !Core
+#if !(Core || PORTABLE)
         public DBNull ReadDBNull() {
             int tag = stream.ReadByte();
             switch (tag) {
@@ -2563,7 +2563,7 @@ namespace Hprose.IO {
             }
         }
 
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
         public ArrayList ReadArrayList() {
             int tag = stream.ReadByte();
             switch (tag) {
@@ -3176,7 +3176,7 @@ namespace Hprose.IO {
         }
 #endif
 
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
         public HashMap ReadHashMap() {
             int tag = stream.ReadByte();
             switch (tag) {
@@ -3560,7 +3560,7 @@ namespace Hprose.IO {
             switch (typeEnum) {
                 case TypeEnum.Null: return Unserialize();
                 case TypeEnum.Object: return ReadObject();
-#if !Core
+#if !(Core || PORTABLE)
                 case TypeEnum.DBNull: return ReadDBNull();
 #endif
                 case TypeEnum.Boolean: return ReadBoolean();
@@ -3609,7 +3609,7 @@ namespace Hprose.IO {
                 case TypeEnum.BytesArray: return ReadBytesArray();
                 case TypeEnum.OtherTypeArray: return ReadOtherTypeArray(type);
                 case TypeEnum.BitArray: return ReadBitArray();
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
                 case TypeEnum.ArrayList: return ReadArrayList();
                 case TypeEnum.Queue: return ReadQueue();
                 case TypeEnum.Stack: return ReadStack();

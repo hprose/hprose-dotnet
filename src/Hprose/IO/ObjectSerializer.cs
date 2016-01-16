@@ -12,11 +12,11 @@
  *                                                        *
  * Object Serializer class for C#.                        *
  *                                                        *
- * LastModified: Apr 17, 2014                             *
+ * LastModified: Jan 16, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
 using System;
 using System.Collections.Generic;
 using System.Reflection;

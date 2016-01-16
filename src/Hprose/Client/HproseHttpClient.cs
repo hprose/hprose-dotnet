@@ -12,7 +12,7 @@
  *                                                        *
  * hprose http client class for C#.                       *
  *                                                        *
- * LastModified: Jun 18, 2015                             *
+ * LastModified: Jan 16, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -22,7 +22,7 @@ using System.Collections;
 using System.Collections.Generic;
 #endif
 using System.IO;
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
 using System.IO.Compression;
 #elif WINDOWS_PHONE
 using System.Net.Browser;
@@ -30,7 +30,7 @@ using System.Net.Browser;
 using System.Net;
 using Hprose.IO;
 using Hprose.Common;
-#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETCF20 || SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETCF20 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
 using System.Security.Cryptography.X509Certificates;
 #endif
 using System.Threading;
@@ -80,7 +80,7 @@ namespace Hprose.Client {
 #if !Core
 		private int timeout = 30000;
 #endif
-#if !(SILVERLIGHT || WINDOWS_PHONE)
+#if !(SILVERLIGHT || WINDOWS_PHONE || PORTABLE)
         private ICredentials credentials = null;
 #if !Core
         private bool keepAlive = true;
@@ -153,7 +153,7 @@ namespace Hprose.Client {
         }
 #endif
 
-#if !(SILVERLIGHT || WINDOWS_PHONE)
+#if !(SILVERLIGHT || WINDOWS_PHONE || PORTABLE)
         public ICredentials Credentials {
             get {
                 return credentials;
@@ -232,7 +232,7 @@ namespace Hprose.Client {
 #endif
             request.Method = "POST";
             request.ContentType = "application/hprose";
-#if !(SILVERLIGHT || WINDOWS_PHONE)
+#if !(SILVERLIGHT || WINDOWS_PHONE || PORTABLE)
             request.Credentials = credentials;
 #if !Core
 #if !(PocketPC || Smartphone || WindowsCE)
@@ -300,7 +300,7 @@ namespace Hprose.Client {
             cookieManager.SetCookie(response.Headers.GetValues("Set-Cookie2"), request.RequestUri.Host);
 #endif
             Stream istream = response.GetResponseStream();
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
             string contentEncoding = response.ContentEncoding.ToLower();
             if (contentEncoding.IndexOf("deflate") > -1) {
                 istream = new DeflateStream(istream, CompressionMode.Decompress);
@@ -323,7 +323,7 @@ namespace Hprose.Client {
 #else
             istream.Dispose();
 #endif
-#if dotNET45
+#if dotNET45 || PORTABLE
             response.Dispose();
 #else
             response.Close();
@@ -332,7 +332,7 @@ namespace Hprose.Client {
         }
 
         // SyncInvoke
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
         protected override MemoryStream SendAndReceive(MemoryStream data) {
             HttpWebRequest request = GetRequest();
             Send(data, request.GetRequestStream());
@@ -351,7 +351,11 @@ namespace Hprose.Client {
                     }
                 }
                 else {
+#if PORTABLE
+                    context.response.Dispose();
+#else
                     context.response.Close();
+#endif
                 }
                 if (context.timer != null) {
                     context.timer.Dispose();

@@ -12,7 +12,7 @@
  *                                                        *
  * hprose writer class for C#.                            *
  *                                                        *
- * LastModified: Apr 17, 2014                             *
+ * LastModified: Jan 16, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -29,7 +29,7 @@ using System.IO;
 using System.Text;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
 using System.Runtime.Serialization;
 using Hprose.Reflection;
 #endif
@@ -258,7 +258,7 @@ namespace Hprose.IO {
                     default: WriteArrayWithRef((Array)obj); break;
                 }
             }
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
             else if (obj is ArrayList) WriteListWithRef((IList)obj);
 #endif
             else if (obj is IList) {
@@ -276,7 +276,7 @@ namespace Hprose.IO {
             else if (obj is ICollection) {
                 WriteCollectionWithRef((ICollection)obj);
             }
-#if !Core
+#if !(Core || PORTABLE)
             else if (obj is DBNull) {
                 WriteNull();
             }
@@ -294,7 +294,7 @@ namespace Hprose.IO {
                     return;
                 }
 #endif
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
                 if (HproseHelper.typeofISerializable.IsAssignableFrom(type)) {
                     throw new HproseException(type.Name + " is a ISerializable type, hprose can't support it.");
                 }
@@ -1348,7 +1348,7 @@ namespace Hprose.IO {
 
         private void WriteSerializableObject(object obj, Type type) {
             if (mode == HproseMode.FieldMode) {
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
                 ObjectSerializer.Get(type).SerializeFields(obj, this);
 #else
 #if !(dotNET10 || dotNET11 || dotNETCF10)
@@ -1371,7 +1371,7 @@ namespace Hprose.IO {
 #endif
             }
             else {
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
                 ObjectSerializer.Get(type).SerializeProperties(obj, this);
 #else
 #if !(dotNET10 || dotNET11 || dotNETCF10)
@@ -1402,7 +1402,7 @@ namespace Hprose.IO {
         }
 
         private void WriteDataContractObject(object obj, Type type) {
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
             ObjectSerializer.Get(type).SerializeMembers(obj, this);
 #else
 #if !(dotNET10 || dotNET11 || dotNETCF10)

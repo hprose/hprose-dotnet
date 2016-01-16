@@ -12,12 +12,12 @@
  *                                                        *
  * CtorAccessor class for C#.                             *
  *                                                        *
- * LastModified: Apr 17, 2014                             *
+ * LastModified: Jan 16, 2016                             *
  * Authors: Ma Bingyao <andot@hprose.com>                 *
  *                                                        *
 \**********************************************************/
 
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
 using System;
 using System.Collections;
 using System.Collections.Generic;

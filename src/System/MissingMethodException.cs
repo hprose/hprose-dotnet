@@ -1,7 +1,7 @@
 /* MissingMethodException class.
  * This library is free. You can redistribute it and/or modify it.
  */
-#if Core
+#if (Core || PORTABLE)
 
 namespace System {
     public class MissingMethodException : MissingMemberException {

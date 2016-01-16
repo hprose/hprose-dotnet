@@ -34,6 +34,15 @@ namespace Hprose {
         public const string dotNET_Version = "1.0.5000.0";
         public const string dotNET_Name = "Mono";
         #endif
+    #elif PORTABLE
+        public const string dotNET_Name = ".NET Portable Framework";
+        #if (Profile2 || Profile4)
+        public const string dotNET_Version = "4.0.20.0";
+        #elif Profile3
+        public const string dotNET_Version = "4.0.40.0";
+        #elif (Profile5 || Profile6)
+        public const string dotNET_Version = "4.0.60.0";
+        #endif
     #else
         #if WINDOWS_PHONE
             #if WP81
@@ -118,7 +127,11 @@ namespace Hprose {
         public const string dotNET_Name = "Silverlight 2";
         #endif
     #endif
-    #if SL5
+    #if PORTABLE
+        #if (Profile2 || Profile3 || Profile4 || Profile5 || Profile6)
+            public const string dotNET_MajorVersion = "4.0";
+        #endif
+    #elif SL5
         public const string dotNET_MajorVersion = "5.0";
     #elif (dotNET45 || WP81)
         public const string dotNET_MajorVersion = "4.5";

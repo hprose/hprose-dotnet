@@ -12,11 +12,11 @@
  *                                                        *
  * hprose tcp client class for C#.                        *
  *                                                        *
- * LastModified: Apr 2, 2015                              *
+ * LastModified: Jan 16, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
 using System;
 #if (dotNET10 || dotNET11 || dotNETCF10)
 using System.Collections;

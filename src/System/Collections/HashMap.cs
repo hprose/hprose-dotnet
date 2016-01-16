@@ -1,7 +1,7 @@
 /* HashMap class.
  * This library is free. You can redistribute it and/or modify it.
  */
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
 using System;
 namespace System.Collections {
     public class HashMap: Hashtable, IDictionary, ICollection, IEnumerable, ICloneable {

@@ -12,7 +12,7 @@
  *                                                        *
  * hprose InvocationHandler class for C#.                 *
  *                                                        *
- * LastModified: Jun 9, 2015                              *
+ * LastModified: Jan 16, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -24,12 +24,12 @@ using System.Reflection;
 using System.Threading;
 using Hprose.IO;
 using Hprose.Reflection;
-#if dotNET4 || SL5 || WP80
+#if (dotNET4 || SL5 || WP80) && !(SL4 || WP70 || WP71)
 using System.Threading.Tasks;
 #endif
 
 namespace Hprose.Common {
-#if dotNET4 || SL5 || WP80
+#if (dotNET4 || SL5 || WP80) && !(SL4 || WP70 || WP71)
     interface ITaskCreator {
         Task GetTask(HproseInvoker invoker, string methodName, object[] args, bool byRef, HproseResultMode resultMode, bool simple);
     }
@@ -67,7 +67,7 @@ namespace Hprose.Common {
         private static void CheckResultType(HproseResultMode resultMode, Type returnType) {
             if (resultMode != HproseResultMode.Normal &&
                 returnType != null &&
-#if dotNET4 || SL5 || WP80
+#if (dotNET4 || SL5 || WP80) && !(SL4 || WP70 || WP71)
                 returnType != typeof(Task<object>) &&
                 returnType != typeof(Task<byte[]>) &&
                 returnType != typeof(Task<MemoryStream>) &&
@@ -125,7 +125,7 @@ namespace Hprose.Common {
                     break;
                 }
             }
-#if dotNET4 || SL5 || WP80
+#if (dotNET4 || SL5 || WP80) && !(SL4 || WP70 || WP71)
 #if Core
             if (returnType.GetTypeInfo().IsGenericType &&
                 returnType.GetGenericTypeDefinition() == typeof(Task<>)) {

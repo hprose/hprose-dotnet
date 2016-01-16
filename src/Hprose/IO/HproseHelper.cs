@@ -12,7 +12,7 @@
  *                                                        *
  * hprose helper class for C#.                            *
  *                                                        *
- * LastModified: May 31, 2015                             *
+ * LastModified: Jan 16, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -30,7 +30,7 @@ using System.Runtime.Serialization;
 #endif
 using System.Threading;
 using Hprose.Common;
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
 using Hprose.Reflection;
 #endif
 
@@ -125,14 +125,14 @@ namespace Hprose.IO {
     }
     public sealed class HproseHelper {
         private static readonly UTF8Encoding utf8Encoding = new UTF8Encoding();
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
         public static readonly Type typeofArrayList = typeof(ArrayList);
         public static readonly Type typeofQueue = typeof(Queue);
         public static readonly Type typeofStack = typeof(Stack);
         public static readonly Type typeofHashMap = typeof(HashMap);
         public static readonly Type typeofHashtable = typeof(Hashtable);
 #endif
-#if !Core
+#if !(Core || PORTABLE)
         public static readonly Type typeofDBNull = typeof(DBNull);
 #endif
         public static readonly Type typeofBoolean = typeof(Boolean);
@@ -265,11 +265,11 @@ namespace Hprose.IO {
         public static readonly Type typeofGIList = typeof(IList<>);
 #endif
 
-#if (dotNET35 || dotNET4 || SILVERLIGHT || WINDOWS_PHONE || Core)
+#if (dotNET35 || dotNET4 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
         public static readonly Type typeofDataContract = typeof(DataContractAttribute);
         public static readonly Type typeofDataMember = typeof(DataMemberAttribute);
 #endif
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
         public static readonly Type typeofISerializable = typeof(ISerializable);
 #endif
 
@@ -279,7 +279,7 @@ namespace Hprose.IO {
         internal static readonly Hashtable typeMap = new Hashtable();
 #endif
         static HproseHelper() {
-#if !Core
+#if !(Core || PORTABLE)
             typeMap[typeofDBNull] = TypeEnum.DBNull;
 #endif
             typeMap[typeofObject] = TypeEnum.Object;
@@ -331,7 +331,7 @@ namespace Hprose.IO {
             typeMap[typeofICollection] = TypeEnum.ICollection;
             typeMap[typeofIDictionary] = TypeEnum.IDictionary;
             typeMap[typeofIList] = TypeEnum.IList;
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
             typeMap[typeofArrayList] = TypeEnum.ArrayList;
             typeMap[typeofHashMap] = TypeEnum.HashMap;
             typeMap[typeofHashtable] = TypeEnum.Hashtable;
@@ -538,7 +538,7 @@ namespace Hprose.IO {
                 if (typeofIList.IsAssignableFrom(type)) return TypeEnum.List;
 #endif
             }
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
             if (typeofISerializable.IsAssignableFrom(type)) return TypeEnum.UnSupportedType;
 #endif
             return TypeEnum.OtherType;
@@ -548,7 +548,7 @@ namespace Hprose.IO {
         private static readonly Dictionary<Type, Dictionary<string, FieldTypeInfo>> fieldsCache = new Dictionary<Type, Dictionary<string, FieldTypeInfo>>();
         private static readonly Dictionary<Type, Dictionary<string, PropertyTypeInfo>> propertiesCache = new Dictionary<Type, Dictionary<string, PropertyTypeInfo>>();
         private static readonly Dictionary<Type, Dictionary<string, MemberTypeInfo>> membersCache = new Dictionary<Type, Dictionary<string, MemberTypeInfo>>();
-#if (PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if (PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
         private static readonly Dictionary<Type, ConstructorInfo> ctorCache = new Dictionary<Type, ConstructorInfo>();
         private static readonly Dictionary<ConstructorInfo, object[]> argsCache = new Dictionary<ConstructorInfo, object[]>();
 #endif
@@ -571,17 +571,17 @@ namespace Hprose.IO {
 #endif
 #endif
 
-#if (PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE)
+#if (PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || PORTABLE)
         private static readonly Assembly[] assemblies = new Assembly[] {
             Assembly.GetCallingAssembly(),
             Assembly.GetExecutingAssembly()
         };
-#elif !Core
+#elif !(Core || PORTABLE)
         private static readonly Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
 #endif
 
         public static bool IsSerializable(Type type) {
-#if (PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE)
+#if (PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || PORTABLE)
             const TypeAttributes sa = TypeAttributes.Serializable;
             return (type.Attributes & sa) == sa;
 #elif Core
@@ -600,7 +600,7 @@ namespace Hprose.IO {
             if (type.GetTypeInfo().IsDefined(typeofDataContract, false)) {
                 return GetDataMembersWithoutCache(type);
             }
-#elif (dotNET35 || dotNET4 || SILVERLIGHT || WINDOWS_PHONE)
+#elif (dotNET35 || dotNET4 || SILVERLIGHT || WINDOWS_PHONE || PORTABLE)
             if (type.IsDefined(typeofDataContract, false)) {
                 return GetDataMembersWithoutCache(type);
             }
@@ -685,7 +685,7 @@ namespace Hprose.IO {
             }
             return members;
         }
-#elif (dotNET35 || dotNET4 || SILVERLIGHT || WINDOWS_PHONE)
+#elif (dotNET35 || dotNET4 || SILVERLIGHT || WINDOWS_PHONE || PORTABLE)
         private static Dictionary<string, MemberTypeInfo> GetDataMembersWithoutCache(Type type) {
             Dictionary<string, MemberTypeInfo> members = new Dictionary<string, MemberTypeInfo>(StringComparer.OrdinalIgnoreCase);
             BindingFlags bindingflags = BindingFlags.Public |
@@ -830,8 +830,8 @@ namespace Hprose.IO {
 #else
             Hashtable fields = new Hashtable(caseInsensitiveHashCodeProvider, caseInsensitiveComparer);
 #endif
-#if dotNET45
             FieldAttributes ns = FieldAttributes.NotSerialized;
+#if dotNET45
             while (type != typeofObject && IsSerializable(type)) {
                 TypeInfo typeInfo = type.GetTypeInfo();
                 IEnumerable<FieldInfo> fiarray = typeInfo.DeclaredFields;
@@ -855,7 +855,7 @@ namespace Hprose.IO {
                 FieldInfo[] fiarray = type.GetFields(bindingflags);
                 foreach (FieldInfo fi in fiarray) {
                     string name;
-                    if (!fi.IsNotSerialized &&
+                    if (((fi.Attributes & ns) != ns) &&
                         !fields.ContainsKey(name = fi.Name)) {
                         name = char.ToLower(name[0]) + name.Substring(1);
                         fields[name] = new FieldTypeInfo(fi);
@@ -1011,7 +1011,7 @@ namespace Hprose.IO {
             return type;
         }
 
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
         public static object NewInstance(Type type) {
             return CtorAccessor.Get(type).NewInstance();
         }

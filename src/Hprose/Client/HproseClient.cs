@@ -12,7 +12,7 @@
  *                                                        *
  * hprose client class for C#.                            *
  *                                                        *
- * LastModified: Apr 17, 2014                             *
+ * LastModified: Jan 16, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -167,7 +167,7 @@ namespace Hprose.Client {
         private static Dictionary<string, HproseClientCreator> clientFactories = new Dictionary<string, HproseClientCreator>();
 #endif
         static HproseClient() {
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue;
             RegisterClientFactory("tcp", new HproseClientCreator(HproseTcpClient.Create));
             RegisterClientFactory("tcp4", new HproseClientCreator(HproseTcpClient.Create));
@@ -259,7 +259,7 @@ namespace Hprose.Client {
             this.uri = uri;
         }
 
-#if !(PocketPC || Smartphone || WindowsCE || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
         public object UseService(Type type) {
             return UseService(type, null);
         }
@@ -395,7 +395,7 @@ namespace Hprose.Client {
         public object Invoke(string functionName, object[] arguments, Type returnType, bool byRef, HproseResultMode resultMode) {
             return Invoke(functionName, arguments, returnType, byRef, resultMode, false);
         }
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
         public object Invoke(string functionName, object[] arguments, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
             HproseClientContext context = new HproseClientContext(this);
             object result = DoInput(SendAndReceive(
@@ -712,7 +712,7 @@ namespace Hprose.Client {
         }
 
         // SyncInvoke
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core)
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
         protected abstract MemoryStream SendAndReceive(MemoryStream data);
 #endif
         // AsyncInvoke
