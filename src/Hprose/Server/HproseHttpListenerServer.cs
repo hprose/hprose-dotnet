@@ -37,7 +37,7 @@ namespace Hprose.Server {
         private int tCount = 2;
 
         public HproseHttpListenerServer(string url) {
-            Url = url;
+            Url = url.Replace("0.0.0.0", "*");
         }
 
         public HproseHttpListenerServer()
