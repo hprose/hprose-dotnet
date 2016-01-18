@@ -1,4 +1,4 @@
-#if !dotNETCF10
+#if !(dotNETCF10 || dotNETMF)
 using System;
 using System.Runtime.InteropServices;
 

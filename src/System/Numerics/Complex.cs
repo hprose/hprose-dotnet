@@ -5,11 +5,15 @@ using System.Runtime.InteropServices;
 namespace System.Numerics {
 
     [StructLayout(LayoutKind.Sequential)]
+#if !dotNETMF
     public struct Complex :
 #if !(dotNET10 || dotNET11 || dotNETCF10)
     IEquatable<Complex>,
 #endif
     IFormattable {
+#else
+    public struct Complex {
+#endif
         private const double LOG_10_INV = 0.43429448190325;
         private double m_real;
         private double m_imaginary;
@@ -193,18 +197,29 @@ namespace System.Numerics {
             return new Complex((double)value, 0.0);
         }
 
+#if !dotNETMF
         public static explicit operator Complex(decimal value) {
             return new Complex((double)value, 0.0);
         }
+#endif
 
         public override string ToString() {
+#if !dotNETMF
             return string.Format(CultureInfo.CurrentCulture, "({0}, {1})", new object[] { this.m_real, this.m_imaginary });
+#else
+            return "(" + this.m_real + ", " + this.m_imaginary + ")";
+#endif
         }
 
         public string ToString(string format) {
+#if !dotNETMF
             return string.Format(CultureInfo.CurrentCulture, "({0}, {1})", new object[] { this.m_real.ToString(format, CultureInfo.CurrentCulture), this.m_imaginary.ToString(format, CultureInfo.CurrentCulture) });
+#else
+            return "(" + this.m_real.ToString(format) + ", " + this.m_imaginary.ToString(format) + ")";
+#endif
         }
 
+#if !dotNETMF
         public string ToString(IFormatProvider provider) {
             return string.Format(provider, "({0}, {1})", new object[] { this.m_real, this.m_imaginary });
         }
@@ -212,6 +227,7 @@ namespace System.Numerics {
         public string ToString(string format, IFormatProvider provider) {
             return string.Format(provider, "({0}, {1})", new object[] { this.m_real.ToString(format, provider), this.m_imaginary.ToString(format, provider) });
         }
+#endif
 
         public override int GetHashCode() {
             int num = 0x5f5e0fd;

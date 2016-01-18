@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace System.Numerics {
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
     internal static class NumericsHelpers {
 #else
     internal class NumericsHelpers {
@@ -213,7 +213,7 @@ namespace System.Numerics {
             goto Label_0058;
         }
 
-#if !dotNETCF10
+#if !(dotNETCF10 || dotNETMF)
         public static double GetDoubleFromParts(int sign, int exp, ulong man) {
             DoubleUlong @ulong;
             @ulong.dbl = 0.0;
