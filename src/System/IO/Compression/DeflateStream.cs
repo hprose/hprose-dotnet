@@ -1,4 +1,4 @@
-#if (dotNET10 || dotNET11 || PocketPC || Smartphone || WindowsCE) && !dotNETCF35 && !dotNETCF39 && !MONO
+#if (dotNET10 || dotNET11 || PocketPC || Smartphone || WindowsCE || dotNETMF) && !dotNETCF35 && !dotNETCF39 && !MONO
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -10,14 +10,15 @@ namespace System.IO.Compression {
         private bool _leaveOpen;
         private CompressionMode _mode;
         private Stream _stream;
-        private int asyncOperations;
         private byte[] buffer;
         private const int bufferSize = 0x1000;
         private Deflater deflater;
         private Inflater inflater;
+#if !dotNETMF
+        private int asyncOperations;
         private readonly AsyncWriteDelegate m_AsyncWriterDelegate;
         private readonly AsyncCallback m_CallBack;
-
+#endif
         public DeflateStream(Stream stream, CompressionMode mode)
             : this(stream, mode, false, false) {
         }
@@ -39,7 +40,9 @@ namespace System.IO.Compression {
                         throw new ArgumentException("The base stream is not readable.", "stream");
                     }
                     this.inflater = new Inflater(usingGZip);
+#if !dotNETMF
                     this.m_CallBack = new AsyncCallback(this.ReadCallback);
+#endif
                     break;
 
                 case CompressionMode.Compress:
@@ -47,8 +50,10 @@ namespace System.IO.Compression {
                         throw new ArgumentException("The base stream is not writeable.", "stream");
                     }
                     this.deflater = new Deflater(usingGZip);
+#if !dotNETMF
                     this.m_AsyncWriterDelegate = new AsyncWriteDelegate(this.InternalWrite);
                     this.m_CallBack = new AsyncCallback(this.WriteCallback);
+#endif
                     break;
 
                 default:
@@ -57,6 +62,7 @@ namespace System.IO.Compression {
             this.buffer = new byte[0x1000];
         }
 
+#if !dotNETMF
         public override IAsyncResult BeginRead(byte[] array, int offset, int count, AsyncCallback asyncCallback, object asyncState) {
             IAsyncResult result2;
             this.EnsureDecompressionMode();
@@ -109,6 +115,7 @@ namespace System.IO.Compression {
             }
             return result2;
         }
+#endif
 
         void IDisposable.Dispose() {
             try {
@@ -141,6 +148,7 @@ namespace System.IO.Compression {
             }
         }
 
+#if !dotNETMF
         public override int EndRead(IAsyncResult asyncResult) {
             this.EnsureDecompressionMode();
             if (this.asyncOperations != 1) {
@@ -199,6 +207,7 @@ namespace System.IO.Compression {
                 throw ((Exception)result.Result);
             }
         }
+#endif
 
         private void EnsureCompressionMode() {
             if (this._mode != CompressionMode.Compress) {
@@ -214,11 +223,12 @@ namespace System.IO.Compression {
 
         public override void Flush() {
             if (this._stream == null) {
-                throw new ObjectDisposedException(null, "Can not access a closed Stream.");
+                throw new ObjectDisposedException("Can not access a closed Stream.", null);
             }
         }
 
-        internal void InternalWrite(byte[] array, int offset, int count, bool isAsync) {
+#if !dotNETMF
+        internal void InternalWrite(byte[] array, int offset, int count, bool isAsync = false) {
             int deflateOutput;
             while (!this.deflater.NeedsInput()) {
                 deflateOutput = this.deflater.GetDeflateOutput(this.buffer);
@@ -246,7 +256,24 @@ namespace System.IO.Compression {
                 }
             }
         }
-
+#else
+        internal void InternalWrite(byte[] array, int offset, int count) {
+            int deflateOutput;
+            while (!this.deflater.NeedsInput()) {
+                deflateOutput = this.deflater.GetDeflateOutput(this.buffer);
+                if (deflateOutput != 0) {
+                    this._stream.Write(this.buffer, 0, deflateOutput);
+                }
+            }
+            this.deflater.SetInput(array, offset, count);
+            while (!this.deflater.NeedsInput()) {
+                deflateOutput = this.deflater.GetDeflateOutput(this.buffer);
+                if (deflateOutput != 0) {
+                    this._stream.Write(this.buffer, 0, deflateOutput);
+                }
+            }
+        }
+#endif
         public override int Read(byte[] array, int offset, int count) {
             this.EnsureDecompressionMode();
             this.ValidateParameters(array, offset, count);
@@ -268,6 +295,7 @@ namespace System.IO.Compression {
             return (count - length);
         }
 
+#if !dotNETMF
         private void ReadCallback(IAsyncResult baseStreamResult) {
             DeflateStreamAsyncResult asyncState = (DeflateStreamAsyncResult)baseStreamResult.AsyncState;
             asyncState.m_CompletedSynchronously &= baseStreamResult.CompletedSynchronously;
@@ -293,7 +321,7 @@ namespace System.IO.Compression {
                 asyncState.InvokeCallback(0);
             }
         }
-
+#endif
         public override long Seek(long offset, SeekOrigin origin) {
             throw new NotSupportedException("This operation is not supported.");
         }
@@ -316,16 +344,16 @@ namespace System.IO.Compression {
                 throw new ArgumentException("Offset plus count is larger than the length of target array.");
             }
             if (this._stream == null) {
-                throw new ObjectDisposedException(null, "Can not access a closed Stream.");
+                throw new ObjectDisposedException("Can not access a closed Stream.", null);
             }
         }
 
         public override void Write(byte[] array, int offset, int count) {
             this.EnsureCompressionMode();
             this.ValidateParameters(array, offset, count);
-            this.InternalWrite(array, offset, count, false);
+            this.InternalWrite(array, offset, count);
         }
-
+#if !dotNETMF
         private void WriteCallback(IAsyncResult asyncResult) {
             DeflateStreamAsyncResult asyncState = (DeflateStreamAsyncResult)asyncResult.AsyncState;
             asyncState.m_CompletedSynchronously &= asyncResult.CompletedSynchronously;
@@ -338,7 +366,7 @@ namespace System.IO.Compression {
             }
             asyncState.InvokeCallback(null);
         }
-
+#endif
         public Stream BaseStream {
             get {
                 return this._stream;
