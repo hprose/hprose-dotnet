@@ -8,23 +8,27 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * IHproseFilter.cs                                       *
+ * ByRefAttribute.cs                                      *
  *                                                        *
- * hprose filter interface for C#.                        *
+ * ByRef Attribute for C#.                                *
  *                                                        *
- * LastModified: Jan 16, 2016                             *
+ * LastModified: Jan 18, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 using System;
-using System.IO;
+using System.Reflection;
 
 namespace Hprose.Common {
-#if dotNETMF
-    [CLSCompliantAttribute(false)]
-#endif
-    public interface IHproseFilter {
-        MemoryStream InputFilter(MemoryStream inStream, HproseContext context);
-        MemoryStream OutputFilter(MemoryStream outStream, HproseContext context);
+	[AttributeUsage(AttributeTargets.Method, AllowMultiple=false)]
+    public class ByRefAttribute : System.Attribute {
+    	private bool byRef;
+    	public ByRefAttribute(bool byRef) {
+    		this.byRef = byRef;
+    	}
+    	public bool Value {
+    		get { return byRef; }
+    		set { byRef = value; }
+    	}
     }
 }

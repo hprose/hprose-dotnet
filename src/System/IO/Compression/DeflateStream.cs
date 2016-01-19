@@ -228,7 +228,7 @@ namespace System.IO.Compression {
         }
 
 #if !dotNETMF
-        internal void InternalWrite(byte[] array, int offset, int count, bool isAsync = false) {
+        internal void InternalWrite(byte[] array, int offset, int count, bool isAsync) {
             int deflateOutput;
             while (!this.deflater.NeedsInput()) {
                 deflateOutput = this.deflater.GetDeflateOutput(this.buffer);
@@ -257,7 +257,7 @@ namespace System.IO.Compression {
             }
         }
 #else
-        internal void InternalWrite(byte[] array, int offset, int count) {
+        internal void InternalWrite(byte[] array, int offset, int count, bool isAsync) {
             int deflateOutput;
             while (!this.deflater.NeedsInput()) {
                 deflateOutput = this.deflater.GetDeflateOutput(this.buffer);
@@ -351,7 +351,7 @@ namespace System.IO.Compression {
         public override void Write(byte[] array, int offset, int count) {
             this.EnsureCompressionMode();
             this.ValidateParameters(array, offset, count);
-            this.InternalWrite(array, offset, count);
+            this.InternalWrite(array, offset, count, false);
         }
 #if !dotNETMF
         private void WriteCallback(IAsyncResult asyncResult) {

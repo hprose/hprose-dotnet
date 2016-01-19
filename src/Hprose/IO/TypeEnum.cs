@@ -12,7 +12,7 @@
  *                                                        *
  * type enum for C#.                                      *
  *                                                        *
- * LastModified: Jan 17, 2015                             *
+ * LastModified: Jan 19, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -75,8 +75,9 @@ namespace Hprose.IO {
         IList,
         Dictionary,
         List,
-
+#if !dotNETMF
         BitArray,
+#endif
         OtherType,
         OtherTypeArray,
 #if !(SILVERLIGHT || WINDOWS_PHONE || Core)
@@ -86,7 +87,7 @@ namespace Hprose.IO {
         Queue,
         Stack,
 #endif
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
 
         NullableBoolean,
         NullableChar,

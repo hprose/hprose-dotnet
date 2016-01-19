@@ -12,12 +12,12 @@
  *                                                        *
  * Proxy class for C#.                                    *
  *                                                        *
- * LastModified: Jan 16, 2016                             *
+ * LastModified: Jan 18, 2016                             *
  * Authors: Ma Bingyao <andot@hprose.com>                 *
  *                                                        *
 \**********************************************************/
 
-#if !(PocketPC || Smartphone || WindowsCE || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS || dotNETMF)
 using System;
 using System.Collections;
 #if !(dotNET10 || dotNET11)

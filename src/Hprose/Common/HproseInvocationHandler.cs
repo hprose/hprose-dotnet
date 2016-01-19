@@ -12,7 +12,7 @@
  *                                                        *
  * hprose InvocationHandler class for C#.                 *
  *                                                        *
- * LastModified: Jan 16, 2016                             *
+ * LastModified: Jan 18, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -55,7 +55,7 @@ namespace Hprose.Common {
             this.invoker = invoker;
             this.ns = ns;
         }
-
+#if !dotNETMF
         private static Type[] GetTypes(ParameterInfo[] parameters) {
             int n = parameters.Length;
             Type[] types = new Type[n];
@@ -64,6 +64,7 @@ namespace Hprose.Common {
             }
             return types;
         }
+#endif
         private static void CheckResultType(HproseResultMode resultMode, Type returnType) {
             if (resultMode != HproseResultMode.Normal &&
                 returnType != null &&
@@ -80,50 +81,35 @@ namespace Hprose.Common {
                 throw new HproseException("Can't Convert MemoryStream to Type: " + returnType.ToString());
             }
         }
-        public object Invoke(object proxy, MethodInfo method, object[] args) {
-            ParameterInfo[] parameters = method.GetParameters();
+        public object Invoke(object proxy, string methodName, Type[] paramTypes, Type returnType, object[] attrs, object[] args) {
             HproseResultMode resultMode = HproseResultMode.Normal;
             bool simple = false;
-            string methodName = method.Name;
-#if dotNET45
-            Attribute rmAttr = method.GetCustomAttribute(typeof(ResultModeAttribute), true);
-            if (rmAttr != null) {
-                resultMode = (rmAttr as ResultModeAttribute).Value;
-            }
-            Attribute smAttr = method.GetCustomAttribute(typeof(SimpleModeAttribute), true);
-            if (smAttr != null) {
-                simple = (smAttr as SimpleModeAttribute).Value;
-            }
-            Attribute mnAttr = method.GetCustomAttribute(typeof(MethodNameAttribute), true);
-            if (mnAttr != null) {
-                methodName = (mnAttr as MethodNameAttribute).Value;
-            }
-#else
-            object[] resultModes = method.GetCustomAttributes(typeof(ResultModeAttribute), true);
-            if (resultModes.Length == 1) {
-                resultMode = (resultModes[0] as ResultModeAttribute).Value;
-            }
-            object[] simpleModes = method.GetCustomAttributes(typeof(SimpleModeAttribute), true);
-            if (simpleModes.Length == 1) {
-                simple = (simpleModes[0] as SimpleModeAttribute).Value;
-            }
-            object[] methodNames = method.GetCustomAttributes(typeof(MethodNameAttribute), true);
-            if (methodNames.Length == 1) {
-                methodName = (methodNames[0] as MethodNameAttribute).Value;
-            }
-#endif
-            if (ns != null && ns != "") {
-                methodName = ns + '_' + methodName;
-            }
-            Type returnType = method.ReturnType;
-            CheckResultType(resultMode, returnType);
             bool byRef = false;
-            Type[] paramTypes = GetTypes(parameters);
+#if !dotNETMF
             foreach (Type param in paramTypes) {
                 if (param.IsByRef) {
                     byRef = true;
                     break;
                 }
+            }
+#endif
+            foreach (object attr in attrs) {
+                if (attr is ResultModeAttribute) {
+                    resultMode = (attr as ResultModeAttribute).Value;
+                }
+                else if (attr is SimpleModeAttribute) {
+                    simple = (attr as SimpleModeAttribute).Value;
+                }
+                else if (attr is ByRefAttribute) {
+                    byRef = (attr as ByRefAttribute).Value;
+                }
+                else if (attr is MethodNameAttribute) {
+                    methodName = (attr as MethodNameAttribute).Value;
+                }
+            }
+            CheckResultType(resultMode, returnType);
+            if (ns != null && ns != "") {
+                methodName = ns + '_' + methodName;
             }
 #if (dotNET4 || SL5 || WP80) && !(SL4 || WP70 || WP71)
 #if Core
@@ -208,7 +194,7 @@ namespace Hprose.Common {
                 invoker.Invoke(methodName, tmpargs, callback, errorEvent, returnType, resultMode, simple);
                 return null;
             }
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
 #if Core
             if ((n > 0) && paramTypes[n - 1].GetTypeInfo().IsGenericType &&
                            paramTypes[n - 1].GetGenericTypeDefinition() == typeof(HproseCallback<>)) {
@@ -280,6 +266,14 @@ namespace Hprose.Common {
                 returnType = null;
             }
             return invoker.Invoke(methodName, args, returnType, byRef, resultMode, simple);
+        }
+        public object Invoke(object proxy, MethodInfo method, object[] args) {
+#if !dotNETMF
+            Invoke(proxy, method.Name, GetTypes(method.GetParameters()), method.ReturnType, method.GetCustomAttributes(true), args);
+#else
+// TODO: Rewrite the IInvocationHandler and Proxy for .NET MF
+            return null;
+#endif
         }
     }
 }
