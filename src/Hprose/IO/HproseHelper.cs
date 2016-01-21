@@ -12,7 +12,7 @@
  *                                                        *
  * hprose helper class for C#.                            *
  *                                                        *
- * LastModified: Jan 18, 2016                             *
+ * LastModified: Jan 21, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -451,40 +451,28 @@ namespace Hprose.IO {
         private static bool IsGenericIList(Type type) {
 #if Core
             Type[] args = type.GenericTypeArguments;
-            TypeInfo typeInfo = type.GetTypeInfo();
-            return (args.Length == 1 &&
-                    typeofGIList.MakeGenericType(args).GetTypeInfo().IsAssignableFrom(typeInfo));
 #else
             Type[] args = type.GetGenericArguments();
-            return (args.Length == 1 &&
-                    typeofGIList.MakeGenericType(args).IsAssignableFrom(type));
 #endif
+            return (args.Length == 1 && IsAssignableFrom(typeofGIList.MakeGenericType(args), type));
         }
 
         private static bool IsGenericIDictionary(Type type) {
 #if Core
             Type[] args = type.GenericTypeArguments;
-            TypeInfo typeInfo = type.GetTypeInfo();
-            return (args.Length == 2 &&
-                    typeofGIDictionary.MakeGenericType(args).GetTypeInfo().IsAssignableFrom(typeInfo));
 #else
             Type[] args = type.GetGenericArguments();
-            return (args.Length == 2 &&
-                    typeofGIDictionary.MakeGenericType(args).IsAssignableFrom(type));
 #endif
+            return (args.Length == 2 && IsAssignableFrom(typeofGIDictionary.MakeGenericType(args), type));
         }
 
         private static bool IsGenericICollection(Type type) {
 #if Core
             Type[] args = type.GenericTypeArguments;
-            TypeInfo typeInfo = type.GetTypeInfo();
-            return (args.Length == 1 &&
-                    typeofGICollection.MakeGenericType(args).GetTypeInfo().IsAssignableFrom(typeInfo));
 #else
             Type[] args = type.GetGenericArguments();
-            return (args.Length == 1 &&
-                    typeofGICollection.MakeGenericType(args).IsAssignableFrom(type));
 #endif
+            return (args.Length == 1 && IsAssignableFrom(typeofGICollection.MakeGenericType(args), type));
         }
 #endif
 
@@ -501,11 +489,19 @@ namespace Hprose.IO {
 
         internal static bool IsAssignableFrom(Type t, Type type) {
 #if dotNETMF
-            Type[] interfaces = type.GetInterfaces();
-            foreach(Type i in interfaces) {
-                if (i == t) return true;
+            if (t == type) return true;
+            if (t.IsInterface) {
+                Type[] interfaces = type.GetInterfaces();
+                foreach(Type i in interfaces) {
+                    if (i == t) return true;
+                }
+                return false;
             }
-            return false;
+            else {
+                return type.IsSubclassOf(t);
+            }
+#elif Core
+            return t.GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
 #else
             return t.IsAssignableFrom(type);
 #endif
@@ -1364,7 +1360,7 @@ namespace Hprose.IO {
         }
 
 #if (PORTABLE && (Profile23 || Profile24 || Profile46 || Profile47))
-        public static BigInteger ToBigInteger(String value) {
+        public static BigInteger ToBigInteger(string value) {
             int length = value.Length;
             int i = 0;
             long sign = 1;
@@ -1420,9 +1416,136 @@ namespace Hprose.IO {
 #if dotNET45
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        public static BigInteger ToBigInteger(String value) {
+        public static BigInteger ToBigInteger(string value) {
             return BigInteger.Parse(value);
         }
 #endif
+
+        public static bool ToBoolean(string value) {
+            if (value == null) return false;
+            value = value.ToLower();
+            string t = bool.TrueString.ToLower();
+            string f = bool.FalseString.ToLower();
+            if (value == t) return true;
+            if (value == f) return false;
+            value = value.Trim();
+            if (value == t) return true;
+            if (value == f) return false;
+            throw new FormatException("Bad Boolean Format");
+        }
+
+        public static Guid ToGuid(string data) {
+            int num = 0, a = 0, b = 0, c = 0;
+            byte d, e, f, g, h, i, j, k;
+            int[] table = new int[]{0,1,2,3,4,5,6,7,8,9,
+                                    0,0,0,0,0,0,0,10,11,
+                                    12,13,14,15,0,0,0,0,
+                                    0,0,0,0,0,0,0,0,0,0,
+                                    0,0,0,0,0,0,0,0,0,0,
+                                    0,0,10,11,12,13,14,15};
+            try {
+                for (int n = 0; n < 8; ++n) {
+                    a = (a << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                for (int n = 0; n < 4; ++n) {
+                    b = (b << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                for (int n = 0; n < 4; ++n) {
+                    c = (c << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                d = (byte)(table[data[num + 1] - '0'] << 4 | table[data[num + 2] - '0']);
+                e = (byte)(table[data[num + 3] - '0'] << 4 | table[data[num + 4] - '0']);
+                num += 5;
+                f = (byte)(table[data[num + 1] - '0'] << 4 | table[data[num + 2] - '0']);
+                g = (byte)(table[data[num + 3] - '0'] << 4 | table[data[num + 4] - '0']);
+                h = (byte)(table[data[num + 5] - '0'] << 4 | table[data[num + 6] - '0']);
+                i = (byte)(table[data[num + 7] - '0'] << 4 | table[data[num + 8] - '0']);
+                j = (byte)(table[data[num + 9] - '0'] << 4 | table[data[num + 10] - '0']);
+                k = (byte)(table[data[num + 11] - '0'] << 4 | table[data[num + 12] - '0']);
+                return new Guid(a, (short)b ,(short)c, d, e, f, g, h, i, j, k); 
+            }
+            catch (IndexOutOfRangeException) {
+                throw new FormatException("Unrecognized Guid Format");
+            }
+        }
+
+        public static Guid ToGuid(char[] data) {
+            int num = 0, a = 0, b = 0, c = 0;
+            byte d, e, f, g, h, i, j, k;
+            int[] table = new int[]{0,1,2,3,4,5,6,7,8,9,
+                                    0,0,0,0,0,0,0,10,11,
+                                    12,13,14,15,0,0,0,0,
+                                    0,0,0,0,0,0,0,0,0,0,
+                                    0,0,0,0,0,0,0,0,0,0,
+                                    0,0,10,11,12,13,14,15};
+            try {
+                for (int n = 0; n < 8; ++n) {
+                    a = (a << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                for (int n = 0; n < 4; ++n) {
+                    b = (b << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                for (int n = 0; n < 4; ++n) {
+                    c = (c << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                d = (byte)(table[data[num + 1] - '0'] << 4 | table[data[num + 2] - '0']);
+                e = (byte)(table[data[num + 3] - '0'] << 4 | table[data[num + 4] - '0']);
+                num += 5;
+                f = (byte)(table[data[num + 1] - '0'] << 4 | table[data[num + 2] - '0']);
+                g = (byte)(table[data[num + 3] - '0'] << 4 | table[data[num + 4] - '0']);
+                h = (byte)(table[data[num + 5] - '0'] << 4 | table[data[num + 6] - '0']);
+                i = (byte)(table[data[num + 7] - '0'] << 4 | table[data[num + 8] - '0']);
+                j = (byte)(table[data[num + 9] - '0'] << 4 | table[data[num + 10] - '0']);
+                k = (byte)(table[data[num + 11] - '0'] << 4 | table[data[num + 12] - '0']);
+                return new Guid(a, (short)b ,(short)c, d, e, f, g, h, i, j, k); 
+            }
+            catch (IndexOutOfRangeException) {
+                throw new FormatException("Unrecognized Guid Format");
+            }
+        }
+
+        public static Guid ToGuid(byte[] data) {
+            int num = 0, a = 0, b = 0, c = 0;
+            byte d, e, f, g, h, i, j, k;
+            int[] table = new int[]{0,1,2,3,4,5,6,7,8,9,
+                                    0,0,0,0,0,0,0,10,11,
+                                    12,13,14,15,0,0,0,0,
+                                    0,0,0,0,0,0,0,0,0,0,
+                                    0,0,0,0,0,0,0,0,0,0,
+                                    0,0,10,11,12,13,14,15};
+            try {
+                for (int n = 0; n < 8; ++n) {
+                    a = (a << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                for (int n = 0; n < 4; ++n) {
+                    b = (b << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                for (int n = 0; n < 4; ++n) {
+                    c = (c << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                d = (byte)(table[data[num + 1] - '0'] << 4 | table[data[num + 2] - '0']);
+                e = (byte)(table[data[num + 3] - '0'] << 4 | table[data[num + 4] - '0']);
+                num += 5;
+                f = (byte)(table[data[num + 1] - '0'] << 4 | table[data[num + 2] - '0']);
+                g = (byte)(table[data[num + 3] - '0'] << 4 | table[data[num + 4] - '0']);
+                h = (byte)(table[data[num + 5] - '0'] << 4 | table[data[num + 6] - '0']);
+                i = (byte)(table[data[num + 7] - '0'] << 4 | table[data[num + 8] - '0']);
+                j = (byte)(table[data[num + 9] - '0'] << 4 | table[data[num + 10] - '0']);
+                k = (byte)(table[data[num + 11] - '0'] << 4 | table[data[num + 12] - '0']);
+                return new Guid(a, (short)b ,(short)c, d, e, f, g, h, i, j, k); 
+            }
+            catch (IndexOutOfRangeException) {
+                throw new FormatException("Unrecognized Guid Format");
+            }
+        }
     }
 }
