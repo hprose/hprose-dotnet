@@ -12,18 +12,20 @@
  *                                                        *
  * hprose http listener service class for C#.             *
  *                                                        *
- * LastModified: May 30, 2015                             *
+ * LastModified: Jan 23, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 #if !(dotNET10 || dotNET11 || ClientOnly || Smartphone)
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+#if !dotNETMF
+using System.Collections.Generic;
 using System.Security.Principal;
+#endif
 using Hprose.Common;
 
 namespace Hprose.Server {
@@ -34,11 +36,17 @@ namespace Hprose.Server {
         private bool p3pEnabled = false;
         private bool getEnabled = true;
         private bool compressionEnabled = false;
+#if !dotNETMF
         private Dictionary<string, bool> origins = new Dictionary<string, bool>();
+#else
+        private Hashtable origins = new Hashtable();
+#endif
         public event SendHeaderEvent OnSendHeader = null;
 
+#if !dotNETMF
         [ThreadStatic]
         private static HttpListenerContext currentContext;
+#endif
 
         protected override object[] FixArguments(Type[] argumentTypes, object[] arguments, int count, HproseContext context) {
             HproseHttpListenerContext currentContext = (HproseHttpListenerContext)context;
@@ -59,9 +67,11 @@ namespace Hprose.Server {
                 else if (argType == typeof(HttpListenerResponse)) {
                     args[count] = currentContext.Response;
                 }
+#if !dotNETMF
                 else if (argType == typeof(IPrincipal)) {
                     args[count] = currentContext.User;
                 }
+#endif
                 return args;
             }
             return arguments;
@@ -76,11 +86,13 @@ namespace Hprose.Server {
             }
         }
 
+#if !dotNETMF
         public static new HttpListenerContext CurrentContext {
             get {
                 return currentContext;
             }
         }
+#endif
 
         public bool IsCrossDomainEnabled {
             get {
@@ -143,6 +155,7 @@ namespace Hprose.Server {
             return ostream;
         }
 
+#if !dotNETMF
         private class NonBlockingWriteContext {
             public HproseHttpListenerContext currentContext;
             public Stream ostream;
@@ -244,6 +257,7 @@ namespace Hprose.Server {
             context.buffer = new byte[context.bufferlength];
             context.istream.BeginRead(context.buffer, 0, context.bufferlength, new AsyncCallback(NonBlockingReadCallback), context);
         }
+#endif
 
         private void SendHeader(HproseHttpListenerContext currentContext) {
             if (OnSendHeader != null) {
@@ -253,22 +267,40 @@ namespace Hprose.Server {
             HttpListenerResponse response = currentContext.Response;
             response.ContentType = "text/plain";
             if (p3pEnabled) {
+#if !dotNETMF
                 response.AddHeader("P3P",
                     "CP=\"CAO DSP COR CUR ADM DEV TAI PSA PSD " +
                     "IVAi IVDi CONi TELo OTPi OUR DELi SAMi " +
                     "OTRi UNRi PUBi IND PHY ONL UNI PUR FIN " +
                     "COM NAV INT DEM CNT STA POL HEA PRE GOV\"");
+#else
+                response.Headers.Add("P3P",
+                    "CP=\"CAO DSP COR CUR ADM DEV TAI PSA PSD " +
+                    "IVAi IVDi CONi TELo OTPi OUR DELi SAMi " +
+                    "OTRi UNRi PUBi IND PHY ONL UNI PUR FIN " +
+                    "COM NAV INT DEM CNT STA POL HEA PRE GOV\"");
+#endif
             }
             if (crossDomainEnabled) {
                 string origin = request.Headers["Origin"];
                 if (origin != null && origin != "" && origin != "null") {
+#if !dotNETMF
                     if (origins.Count == 0 || origins.ContainsKey(origin)) {
                         response.AddHeader("Access-Control-Allow-Origin", origin);
                         response.AddHeader("Access-Control-Allow-Credentials", "true");
+#else
+                    if (origins.Count == 0 || origins.Contains(origin)) {
+                        response.Headers.Add("Access-Control-Allow-Origin", origin);
+                        response.Headers.Add("Access-Control-Allow-Credentials", "true");
+#endif
                     }
                 }
                 else {
+#if !dotNETMF
                     response.AddHeader("Access-Control-Allow-Origin", "*");
+#else
+                    response.Headers.Add("Access-Control-Allow-Origin", "*");
+#endif
                 }
             }
             if (compressionEnabled) {
@@ -276,19 +308,31 @@ namespace Hprose.Server {
                 if (acceptEncoding != null) {
                     acceptEncoding = acceptEncoding.ToLower();
                     if (acceptEncoding.IndexOf("deflate") > -1) {
+#if !dotNETMF
                         response.AddHeader("Content-Encoding", "deflate");
+#else
+                        response.Headers.Add("Content-Encoding", "deflate");
+#endif
                     }
                     else if (acceptEncoding.IndexOf("gzip") > -1) {
+#if !dotNETMF
                         response.AddHeader("Content-Encoding", "gzip");
+#else
+                        response.Headers.Add("Content-Encoding", "gzip");
+#endif
                     }
                 }
             }
         }
 
+#if dotNETMF
+        [CLSCompliantAttribute(false)]
+#endif
         protected void Handle(HttpListenerContext httpListenerContext) {
             Handle(httpListenerContext, null);
         }
 
+#if !dotNETMF
         protected void Handle(HttpListenerContext httpListenerContext, HproseHttpListenerMethods methods) {
             HproseHttpListenerContext context = new HproseHttpListenerContext(httpListenerContext);
             SendHeader(context);
@@ -314,6 +358,44 @@ namespace Hprose.Server {
                 context.Response.Close();
             }
         }
+#else
+        [CLSCompliantAttribute(false)]
+        protected void Handle(HttpListenerContext httpListenerContext, HproseHttpListenerMethods methods) {
+            HproseHttpListenerContext context = new HproseHttpListenerContext(httpListenerContext);
+            SendHeader(context);
+            string method = context.Request.HttpMethod;
+            if (method == "GET") {
+                if (getEnabled) {
+                    MemoryStream data = DoFunctionList(methods, context);
+                    data.WriteTo(GetOutputStream(context));
+                }
+                else {
+                    context.Response.StatusCode = 403;
+                    context.Response.Close();
+                }
+            }
+            else if (method == "POST") {
+                int len = (int)context.Request.ContentLength64;
+                Stream stream = context.Request.InputStream;
+                MemoryStream data = new MemoryStream();
+                int length = (len > 4096 || len < 0) ? 4096 : len;
+                byte[] buffer = new byte[length];
+                for(;;) {
+                    int n = stream.Read(buffer, 0, length);
+                    if (n > 0) {
+                        data.Write(buffer, 0, n);
+                    }
+                    else {
+                        break;
+                    }
+                }
+                Handle(data, methods, context).WriteTo(GetOutputStream(context));
+            }
+            else {
+                context.Response.Close();
+            }
+        }
+#endif
     }
 }
 #endif

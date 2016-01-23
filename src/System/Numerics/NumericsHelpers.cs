@@ -310,11 +310,19 @@ namespace System.Numerics {
             if (sign < 0) {
                 uu |= 9223372036854775808L;
             }
+#if !dotNETMF
+            return BitConverter.ToDouble(BitConverter.GetBytes(uu), 0);
+#else
             return BitConverter.Int64BitsToDouble((long)uu);
+#endif
         }
 
         public static void GetDoubleParts(double dbl, out int sign, out int exp, out ulong man, out bool fFinite) {
+#if !dotNETMF
+            ulong uu = BitConverter.ToUInt64(BitConverter.GetBytes(dbl), 0);
+#else
             ulong uu = (ulong)BitConverter.DoubleToInt64Bits(dbl);
+#endif
             sign = 1 - (((int)(uu >> 0x3e)) & 2);
             man = uu & ((ulong)0xfffffffffffffL);
             exp = ((int)(uu >> 0x34)) & 0x7ff;

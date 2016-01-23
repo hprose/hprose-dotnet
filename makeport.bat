@@ -162,6 +162,7 @@ set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\InvokeHelper.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\MethodNameAttribute.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\ResultModeAttribute.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\SimpleModeAttribute.cs
+set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\ByRefAttribute.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Reflection\Proxy.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Reflection\IInvocationHandler.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Reflection\CtorAccessor.cs

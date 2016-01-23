@@ -12,12 +12,12 @@
  *                                                        *
  * hprose client class for C#.                            *
  *                                                        *
- * LastModified: Jan 16, 2016                             *
+ * LastModified: Jan 22, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 using System;
-#if (dotNET10 || dotNET11 || dotNETCF10)
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
 using System.Collections;
 #else
 using System.Collections.Generic;
@@ -30,7 +30,7 @@ using System.Text;
 using System.Threading;
 using Hprose.IO;
 using Hprose.Common;
-#if !(PocketPC || Smartphone || WindowsCE || WINDOWS_PHONE || Core || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || WINDOWS_PHONE || Core || Unity_iOS || dotNETMF)
 using Hprose.Reflection;
 #endif
 
@@ -38,6 +38,8 @@ namespace Hprose.Client {
     public abstract class HproseClient : HproseInvoker {
         private static readonly object[] nullArgs = new object[0];
         public event HproseErrorEvent OnError = null;
+
+#if !dotNETMF
         private static SynchronizationContext syncContext = SynchronizationContext.Current;
         public static SynchronizationContext SynchronizationContext {
             get {
@@ -50,6 +52,7 @@ namespace Hprose.Client {
                 syncContext = value;
             }
         }
+
         private abstract class AsyncInvokeContextBase {
             private HproseClient client;
             private Type returnType;
@@ -156,10 +159,16 @@ namespace Hprose.Client {
         }
 #endif
         private HproseMode mode;
+#endif
         protected string uri = null;
 
+#if !dotNETMF
         public delegate HproseClient HproseClientCreator(string uri, HproseMode mode);
-#if (dotNET10 || dotNET11 || dotNETCF10)
+#else
+        public delegate HproseClient HproseClientCreator(string uri);
+#endif
+
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         private readonly ArrayList filters = new ArrayList();
         private static Hashtable clientFactories = new Hashtable();
 #else
@@ -167,7 +176,7 @@ namespace Hprose.Client {
         private static Dictionary<string, HproseClientCreator> clientFactories = new Dictionary<string, HproseClientCreator>();
 #endif
         static HproseClient() {
-#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
+#if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || dotNETMF)
             ServicePointManager.DefaultConnectionLimit = Int32.MaxValue;
             RegisterClientFactory("tcp", new HproseClientCreator(HproseTcpClient.Create));
             RegisterClientFactory("tcp4", new HproseClientCreator(HproseTcpClient.Create));
@@ -177,6 +186,7 @@ namespace Hprose.Client {
             RegisterClientFactory("https", new HproseClientCreator(HproseHttpClient.Create));
         }
 
+#if !dotNETMF
         public static HproseClient Create(string uri) {
             return HproseClient.Create(uri, HproseMode.MemberMode);
         }
@@ -194,11 +204,22 @@ namespace Hprose.Client {
             }
             throw new HproseException("The " + u.Scheme + " client isn't implemented.");
         }
+#else
+        public static HproseClient Create(string uri) {
+            Uri u = new Uri(uri);
+            HproseClientCreator creator = (HproseClientCreator)clientFactories[u.Scheme];
+            if (creator != null) {
+                return creator(uri);
+            }
+            throw new HproseException("The " + u.Scheme + " client isn't implemented.");
+        }
+#endif
 
         public static void RegisterClientFactory(string scheme, HproseClientCreator creator) {
             clientFactories[scheme.ToLower()] = creator;
         }
 
+#if !dotNETMF
         protected HproseClient()
             : this(null, HproseMode.MemberMode) {
         }
@@ -217,13 +238,27 @@ namespace Hprose.Client {
         	}
             this.mode = mode;
         }
+#else
+        protected HproseClient()
+            : this(null) {
+        }
 
+        protected HproseClient(string uri) {
+        	if (uri != null) {
+	            UseService(uri);
+        	}
+        }
+#endif
+
+#if dotNETMF
+        [CLSCompliantAttribute(false)]
+#endif
         public IHproseFilter Filter {
             get {
                 if (filters.Count == 0) {
                     return null;
                 }
-#if (dotNET10 || dotNET11 || dotNETCF10)
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 return (IHproseFilter)filters[0];
 #else
                 return filters[0];
@@ -239,12 +274,18 @@ namespace Hprose.Client {
             }
         }
 
+#if dotNETMF
+        [CLSCompliantAttribute(false)]
+#endif
         public void AddFilter(IHproseFilter filter) {
             filters.Add(filter);
         }
 
+#if dotNETMF
+        [CLSCompliantAttribute(false)]
+#endif
         public bool RemoveFilter(IHproseFilter filter) {
-#if (dotNET10 || dotNET11 || dotNETCF10)
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             if (filters.Contains(filter)) {
                 filters.Remove(filter);
                 return true;
@@ -259,7 +300,7 @@ namespace Hprose.Client {
             this.uri = uri;
         }
 
-#if !(PocketPC || Smartphone || WindowsCE || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS || dotNETMF)
         public object UseService(Type type) {
             return UseService(type, null);
         }
@@ -301,7 +342,7 @@ namespace Hprose.Client {
             UseService(uri);
             return UseService(types, ns);
         }
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public T UseService<T>() {
             return UseService<T>(null);
         }
@@ -321,7 +362,7 @@ namespace Hprose.Client {
         }
 #endif
 #endif
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public T Invoke<T>(string functionName) {
             return (T)Invoke(functionName, nullArgs, typeof(T), false, HproseResultMode.Normal, false);
         }
@@ -437,7 +478,7 @@ namespace Hprose.Client {
         }
 
 #endif
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public void Invoke<T>(string functionName, HproseCallback<T> callback) {
             Invoke(functionName, nullArgs, callback, null, false, HproseResultMode.Normal, false);
         }
@@ -697,32 +738,75 @@ namespace Hprose.Client {
         public void Invoke(string functionName, object[] arguments, HproseCallback callback, HproseErrorEvent errorEvent, Type returnType, bool byRef, HproseResultMode resultMode) {
             Invoke(functionName, arguments, callback, errorEvent, returnType, byRef, resultMode, false);
         }
-        public void Invoke(string functionName, object[] arguments, HproseCallback callback, HproseErrorEvent errorEvent, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
-            (new AsyncInvokeContext(this, functionName, arguments, callback, errorEvent, returnType, byRef, resultMode, simple)).Invoke();
-        }
-
         public void Invoke(string functionName, HproseCallback1 callback, HproseErrorEvent errorEvent, Type returnType, HproseResultMode resultMode) {
             Invoke(functionName, nullArgs, callback, errorEvent, returnType, resultMode, false);
         }
         public void Invoke(string functionName, object[] arguments, HproseCallback1 callback, HproseErrorEvent errorEvent, Type returnType, HproseResultMode resultMode) {
             Invoke(functionName, arguments, callback, errorEvent, returnType, resultMode, false);
         }
+#if dotNETMF
+        public void Invoke(string functionName, object[] arguments, HproseCallback callback, HproseErrorEvent errorEvent, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
+            new Thread(new ThreadStart(delegate () {
+                try {
+                    Object result = Invoke(functionName, arguments, returnType, byRef, resultMode, simple);
+                    callback(result, arguments);
+                }
+                catch (Exception ex) {
+                    if (errorEvent != null) {
+                        errorEvent(functionName, ex);
+                    }
+                    else if (OnError != null) {
+                        OnError(functionName, ex);
+                    }
+                }
+            })).Start();
+        }
+        public void Invoke(string functionName, object[] arguments, HproseCallback1 callback, HproseErrorEvent errorEvent, Type returnType, HproseResultMode resultMode, bool simple) {
+            new Thread(new ThreadStart(delegate () {
+                try {
+                    Object result = Invoke(functionName, arguments, returnType, false, resultMode, simple);
+                    callback(result);
+                }
+                catch (Exception ex) {
+                    if (errorEvent != null) {
+                        errorEvent(functionName, ex);
+                    }
+                    else if (OnError != null) {
+                        OnError(functionName, ex);
+                    }
+                }
+            })).Start();
+        }
+#else
+        public void Invoke(string functionName, object[] arguments, HproseCallback callback, HproseErrorEvent errorEvent, Type returnType, bool byRef, HproseResultMode resultMode, bool simple) {
+            (new AsyncInvokeContext(this, functionName, arguments, callback, errorEvent, returnType, byRef, resultMode, simple)).Invoke();
+        }
         public void Invoke(string functionName, object[] arguments, HproseCallback1 callback, HproseErrorEvent errorEvent, Type returnType, HproseResultMode resultMode, bool simple) {
             (new AsyncInvokeContext1(this, functionName, arguments, callback, errorEvent, returnType, resultMode, simple)).Invoke();
         }
-
+#endif
+        
         // SyncInvoke
 #if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
+#if dotNETMF
+        [CLSCompliantAttribute(false)]
+#endif
         protected abstract MemoryStream SendAndReceive(MemoryStream data);
 #endif
+
+#if !dotNETMF
         // AsyncInvoke
         protected abstract IAsyncResult BeginSendAndReceive(MemoryStream data, AsyncCallback callback);
-
         protected abstract MemoryStream EndSendAndReceive(IAsyncResult asyncResult);
+#endif
 
         private MemoryStream DoOutput(string functionName, object[] arguments, bool byRef, bool simple, HproseClientContext context) {
             MemoryStream outData = new MemoryStream();
+#if !dotNETMF
             HproseWriter writer = new HproseWriter(outData, mode, simple);
+#else
+            HproseWriter writer = new HproseWriter(outData, simple);
+#endif
             outData.WriteByte(HproseTags.TagCall);
             writer.WriteString(functionName);
             if ((arguments != null) && (arguments.Length > 0 || byRef)) {
@@ -735,7 +819,7 @@ namespace Hprose.Client {
             outData.WriteByte(HproseTags.TagEnd);
             outData.Position = 0;
             for (int i = 0, n = filters.Count; i < n; ++i) {
-#if (dotNET10 || dotNET11 || dotNETCF10)
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 IHproseFilter filter = (IHproseFilter)filters[i];
                 outData = filter.OutputFilter(outData, context);
 #else
@@ -763,7 +847,7 @@ namespace Hprose.Client {
         private object DoInput(MemoryStream inData, object[] arguments, Type returnType, HproseResultMode resultMode, HproseClientContext context) {
             for (int i = filters.Count - 1; i >= 0; --i) {
                 inData.Position = 0;
-#if (dotNET10 || dotNET11 || dotNETCF10)
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 IHproseFilter filter = (IHproseFilter)filters[i];
                 inData = filter.InputFilter(inData, context);
 #else
@@ -784,7 +868,11 @@ namespace Hprose.Client {
                 return MemoryStreamToType(inData, returnType);
             }
             object result = null;
+#if !dotNETMF
             HproseReader reader = new HproseReader(inData, mode);
+#else
+            HproseReader reader = new HproseReader(inData);
+#endif
             while ((tag = inData.ReadByte()) != HproseTags.TagEnd) {
                 switch (tag) {
                     case HproseTags.TagResult:

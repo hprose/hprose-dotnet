@@ -18,6 +18,9 @@
 \**********************************************************/
 
 using System;
+#if Core
+using System.Collections.Generic;
+#endif
 using System.IO;
 using System.Numerics;
 using System.Reflection;
@@ -81,7 +84,11 @@ namespace Hprose.Common {
                 throw new HproseException("Can't Convert MemoryStream to Type: " + returnType.ToString());
             }
         }
+#if Core
+        public object Invoke(object proxy, string methodName, Type[] paramTypes, Type returnType, IEnumerable<Attribute> attrs, object[] args) {
+#else
         public object Invoke(object proxy, string methodName, Type[] paramTypes, Type returnType, object[] attrs, object[] args) {
+#endif
             HproseResultMode resultMode = HproseResultMode.Normal;
             bool simple = false;
             bool byRef = false;
@@ -267,13 +274,11 @@ namespace Hprose.Common {
             }
             return invoker.Invoke(methodName, args, returnType, byRef, resultMode, simple);
         }
-        public object Invoke(object proxy, MethodInfo method, object[] args) {
+
 #if !dotNETMF
-            Invoke(proxy, method.Name, GetTypes(method.GetParameters()), method.ReturnType, method.GetCustomAttributes(true), args);
-#else
-// TODO: Rewrite the IInvocationHandler and Proxy for .NET MF
-            return null;
-#endif
+        public object Invoke(object proxy, MethodInfo method, object[] args) {
+            return Invoke(proxy, method.Name, GetTypes(method.GetParameters()), method.ReturnType, method.GetCustomAttributes(true), args);
         }
+#endif
     }
 }

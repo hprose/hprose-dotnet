@@ -860,7 +860,7 @@ namespace Hprose.IO {
                     if (((fi.Attributes & ns) != ns) &&
                         !fi.IsStatic &&
                         !fields.ContainsKey(name = fi.Name)) {
-                        name = name[0].ToLower() + name.Substring(1);
+                        name = char.ToLower(name[0]) + name.Substring(1);
                         fields[name] = new FieldTypeInfo(fi);
                     }
                 }
@@ -878,10 +878,11 @@ namespace Hprose.IO {
 #if !dotNETMF
                     if (((fi.Attributes & ns) != ns) &&
                         !fields.ContainsKey(name = fi.Name)) {
+                        name = char.ToLower(name[0]) + name.Substring(1);
 #else
                     if (!fields.Contains(name = fi.Name)) {
-#endif
                         name = name[0].ToLower() + name.Substring(1);
+#endif
                         fields[name] = new FieldTypeInfo(fi);
                     }
                 }
