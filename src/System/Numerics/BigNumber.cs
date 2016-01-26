@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 
 namespace System.Numerics {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
     internal static class BigNumber {
 #else
     internal class BigNumber {
@@ -30,14 +30,18 @@ namespace System.Numerics {
                     case 'r':
                     case 'R':
                         if (digits > 0) {
-                            format = string.Format(CultureInfo.InvariantCulture, "D{0}", new object[] { digits.ToString(CultureInfo.InvariantCulture) });
+                            format = "D" + digits;
                         }
                         else {
                             format = "D";
                         }
                         break;
                 }
+#if !dotNETMF
                 return value._sign.ToString(format, info);
+#else
+                return value._sign.ToString(format);
+#endif
             }
             int num2 = BigInteger.Length(value._bits);
             try {
@@ -123,15 +127,23 @@ namespace System.Numerics {
                     flag = true;
                 }
                 if ((num2 < 8) || flag) {
-                    str = string.Format(CultureInfo.InvariantCulture, "{0}1", new object[] { format });
+                    str = format + "1";
+#if !dotNETMF
                     builder.Append(num2.ToString(str, info));
+#else
+                    builder.Append(num2.ToString(str));
+#endif
                     index--;
                 }
             }
             if (index > -1) {
-                str = string.Format(CultureInfo.InvariantCulture, "{0}2", new object[] { format });
+                str = format + "2";
                 while (index > -1) {
+#if !dotNETMF
                     builder.Append(buffer[index--].ToString(str, info));
+#else
+                    builder.Append(buffer[index--].ToString(str));
+#endif
                 }
             }
             if ((digits > 0) && (digits > builder.Length)) {

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace System.Numerics {
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
     internal static class NumericsHelpers {
 #else
     internal class NumericsHelpers {
@@ -213,7 +213,7 @@ namespace System.Numerics {
             goto Label_0058;
         }
 
-#if !dotNETCF10
+#if !(dotNETCF10 || dotNETMF)
         public static double GetDoubleFromParts(int sign, int exp, ulong man) {
             DoubleUlong @ulong;
             @ulong.dbl = 0.0;
@@ -276,11 +276,10 @@ namespace System.Numerics {
             }
         }
 #else
-        public static unsafe double GetDoubleFromParts(int sign, int exp, ulong man) {
-            double dbl = 0.0;
-            ulong* uu = (ulong*)&dbl;
+        public static double GetDoubleFromParts(int sign, int exp, ulong man) {
+            ulong uu;
             if (man == 0L) {
-                *uu = 0L;
+                uu = 0L;
             }
             else {
                 int num = CbitHighZero(man) - 11;
@@ -293,30 +292,37 @@ namespace System.Numerics {
                 exp -= num;
                 exp += 0x433;
                 if (exp >= 0x7ff) {
-                    *uu = 0x7ff0000000000000L;
+                    uu = 0x7ff0000000000000L;
                 }
                 else if (exp <= 0) {
                     exp--;
                     if (exp < -52) {
-                        *uu = 0L;
+                        uu = 0L;
                     }
                     else {
-                        *uu = man >> -exp;
+                        uu = man >> -exp;
                     }
                 }
                 else {
-                    *uu = (man & ((ulong)0xfffffffffffffL)) | (((ulong)exp) << 0x34);
+                    uu = (man & ((ulong)0xfffffffffffffL)) | (((ulong)exp) << 0x34);
                 }
             }
             if (sign < 0) {
-                *uu |= 9223372036854775808L;
+                uu |= 9223372036854775808L;
             }
-            return dbl;
+#if !dotNETMF
+            return BitConverter.ToDouble(BitConverter.GetBytes(uu), 0);
+#else
+            return BitConverter.Int64BitsToDouble((long)uu);
+#endif
         }
 
-        public static unsafe void GetDoubleParts(double dbl, out int sign, out int exp, out ulong man, out bool fFinite) {
-            ulong uu = 0L;
-            *((double*)&uu) = dbl;
+        public static void GetDoubleParts(double dbl, out int sign, out int exp, out ulong man, out bool fFinite) {
+#if !dotNETMF
+            ulong uu = BitConverter.ToUInt64(BitConverter.GetBytes(dbl), 0);
+#else
+            ulong uu = (ulong)BitConverter.DoubleToInt64Bits(dbl);
+#endif
             sign = 1 - (((int)(uu >> 0x3e)) & 2);
             man = uu & ((ulong)0xfffffffffffffL);
             exp = ((int)(uu >> 0x34)) & 0x7ff;

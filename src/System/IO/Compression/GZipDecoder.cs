@@ -1,4 +1,4 @@
-#if (dotNET10 || dotNET11 || PocketPC || Smartphone || WindowsCE) && !dotNETCF35 && !dotNETCF39 && !MONO
+#if (dotNET10 || dotNET11 || PocketPC || Smartphone || WindowsCE || dotNETMF) && !dotNETCF35 && !dotNETCF39 && !MONO
 using System;
 using System.IO;
 

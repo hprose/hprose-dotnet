@@ -12,12 +12,12 @@
  *                                                        *
  * hprose invoker extension class for C#.                 *
  *                                                        *
- * LastModified: Feb 18, 2014                             *
+ * LastModified: Jan 18, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
 #if (dotNET2 || dotNETCF20 || SL2)
 #define NET_2_0
 #endif

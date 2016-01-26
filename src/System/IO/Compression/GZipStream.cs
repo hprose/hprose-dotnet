@@ -1,4 +1,4 @@
-#if (dotNET10 || dotNET11 || PocketPC || Smartphone || WindowsCE) && !dotNETCF35 && !dotNETCF39 && !MONO
+#if (dotNET10 || dotNET11 || PocketPC || Smartphone || WindowsCE || dotNETMF) && !dotNETCF35 && !dotNETCF39 && !MONO
 using System;
 using System.IO;
 
@@ -15,6 +15,7 @@ namespace System.IO.Compression {
             this.deflateStream = new DeflateStream(stream, mode, leaveOpen, true);
         }
 
+#if !dotNETMF
         public override IAsyncResult BeginRead(byte[] array, int offset, int count, AsyncCallback asyncCallback, object asyncState) {
             if (this.deflateStream == null) {
                 throw new InvalidOperationException("Can not access a closed Stream.");
@@ -28,6 +29,7 @@ namespace System.IO.Compression {
             }
             return this.deflateStream.BeginWrite(array, offset, count, asyncCallback, asyncState);
         }
+#endif
 
         void IDisposable.Dispose() {
             if (this.deflateStream != null) {
@@ -36,6 +38,7 @@ namespace System.IO.Compression {
             this.deflateStream = null;
         }
 
+#if !dotNETMF
         public override int EndRead(IAsyncResult asyncResult) {
             if (this.deflateStream == null) {
                 throw new InvalidOperationException("Can not access a closed Stream.");
@@ -49,17 +52,18 @@ namespace System.IO.Compression {
             }
             this.deflateStream.EndWrite(asyncResult);
         }
+#endif
 
         public override void Flush() {
             if (this.deflateStream == null) {
-                throw new ObjectDisposedException(null, "Can not access a closed Stream.");
+                throw new ObjectDisposedException("Can not access a closed Stream.", null);
             }
             this.deflateStream.Flush();
         }
 
         public override int Read(byte[] array, int offset, int count) {
             if (this.deflateStream == null) {
-                throw new ObjectDisposedException(null, "Can not access a closed Stream.");
+                throw new ObjectDisposedException("Can not access a closed Stream.", null);
             }
             return this.deflateStream.Read(array, offset, count);
         }
@@ -74,7 +78,7 @@ namespace System.IO.Compression {
 
         public override void Write(byte[] array, int offset, int count) {
             if (this.deflateStream == null) {
-                throw new ObjectDisposedException(null, "Can not access a closed Stream.");
+                throw new ObjectDisposedException("Can not access a closed Stream.", null);
             }
             this.deflateStream.Write(array, offset, count);
         }

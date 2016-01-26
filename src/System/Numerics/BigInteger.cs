@@ -6,8 +6,11 @@ using System.Runtime.InteropServices;
 namespace System.Numerics {
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct BigInteger : IFormattable, IComparable
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+    public struct BigInteger : IComparable
+#if !dotNETMF
+        , IFormattable
+#endif
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         , IComparable<BigInteger>, IEquatable<BigInteger>
 #endif
     {
@@ -155,6 +158,7 @@ namespace System.Numerics {
             return (GetDiffLength(this._bits, other._bits, cu) == 0);
         }
 
+#if !dotNETMF
         public int CompareTo(long other) {
             int num;
             if (this._bits == null) {
@@ -185,6 +189,7 @@ namespace System.Numerics {
             ulong num2 = (num == 2) ? NumericsHelpers.MakeUlong(this._bits[1], this._bits[0]) : ((ulong)this._bits[0]);
             return num2.CompareTo(other);
         }
+#endif
 
         public int CompareTo(BigInteger other) {
             int num;
@@ -315,17 +320,19 @@ namespace System.Numerics {
             return BigNumber.FormatBigInteger(this, null, NumberFormatInfo.CurrentInfo);
         }
 
-        public string ToString(IFormatProvider provider) {
-            return BigNumber.FormatBigInteger(this, null, NumberFormatInfo.GetInstance(provider));
-        }
-
         public string ToString(string format) {
             return BigNumber.FormatBigInteger(this, format, NumberFormatInfo.CurrentInfo);
+        }
+
+#if !dotNETMF
+        public string ToString(IFormatProvider provider) {
+            return BigNumber.FormatBigInteger(this, null, NumberFormatInfo.GetInstance(provider));
         }
 
         public string ToString(string format, IFormatProvider provider) {
             return BigNumber.FormatBigInteger(this, format, NumberFormatInfo.GetInstance(provider));
         }
+#endif
 
         public BigInteger(int value) {
             if (value == -2147483648) {
@@ -385,16 +392,7 @@ namespace System.Numerics {
             }
         }
 
-        public BigInteger(float value) {
-            if (float.IsInfinity(value)) {
-                throw new OverflowException("BigInteger cannot represent infinity.");
-            }
-            if (float.IsNaN(value)) {
-                throw new OverflowException("The value is not a number.");
-            }
-            this._sign = 0;
-            this._bits = null;
-            this.SetBitsFromDouble((double)value);
+        public BigInteger(float value): this((double)value) {
         }
 
         public BigInteger(double value) {
@@ -409,6 +407,7 @@ namespace System.Numerics {
             this.SetBitsFromDouble(value);
         }
 
+#if !dotNETMF
         public BigInteger(decimal value) {
             int[] bits = decimal.GetBits(decimal.Truncate(value));
             int num = 3;
@@ -435,6 +434,7 @@ namespace System.Numerics {
                 this._sign = ((bits[3] & -2147483648) != 0) ? -1 : 1;
             }
         }
+#endif
 
         [CLSCompliant(false)]
         public BigInteger(byte[] value) {
@@ -817,7 +817,7 @@ namespace System.Numerics {
         }
 
         private static void ModPowUpdateResult(ref BigIntegerBuilder regRes, ref BigIntegerBuilder regVal, ref BigIntegerBuilder regMod, ref BigIntegerBuilder regTmp) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             NumericsHelpers.Swap<BigIntegerBuilder>(ref regRes, ref regTmp);
 #else
             NumericsHelpers.Swap(ref regRes, ref regTmp);
@@ -827,7 +827,7 @@ namespace System.Numerics {
         }
 
         private static void ModPowSquareModValue(ref BigIntegerBuilder regVal, ref BigIntegerBuilder regMod, ref BigIntegerBuilder regTmp) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             NumericsHelpers.Swap<BigIntegerBuilder>(ref regVal, ref regTmp);
 #else
             NumericsHelpers.Swap(ref regVal, ref regTmp);
@@ -948,7 +948,7 @@ namespace System.Numerics {
             int num11 = exponent;
         Label_0122:
             if ((num11 & 1) != 0) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 NumericsHelpers.Swap<BigIntegerBuilder>(ref a, ref b);
 #else
                 NumericsHelpers.Swap(ref a, ref b);
@@ -957,7 +957,7 @@ namespace System.Numerics {
             }
             num11 = num11 >> 1;
             if (num11 != 0) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 NumericsHelpers.Swap<BigIntegerBuilder>(ref builder, ref b);
 #else
                 NumericsHelpers.Swap(ref builder, ref b);
@@ -1012,9 +1012,11 @@ namespace System.Numerics {
             return new BigInteger(value);
         }
 
+#if !dotNETMF
         public static explicit operator BigInteger(decimal value) {
             return new BigInteger(value);
         }
+#endif
 
         [CLSCompliant(false)]
         public static implicit operator BigInteger(string value) {
@@ -1120,7 +1122,7 @@ namespace System.Numerics {
 
         public static explicit operator decimal(BigInteger value) {
             if (value._bits == null) {
-                return value._sign;
+                return new decimal(value._sign);
             }
             int num = Length(value._bits);
             if (num > 3) {

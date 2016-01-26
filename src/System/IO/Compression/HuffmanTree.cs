@@ -1,4 +1,4 @@
-#if (dotNET10 || dotNET11 || PocketPC || Smartphone || WindowsCE) && !dotNETCF35 && !dotNETCF39 && !MONO
+#if (dotNET10 || dotNET11 || PocketPC || Smartphone || WindowsCE || dotNETMF) && !dotNETCF35 && !dotNETCF39 && !MONO
 using System;
 using System.IO;
 
@@ -109,7 +109,7 @@ namespace System.IO.Compression {
             if (input.AvailableBits == 0) {
                 return -1;
             }
-            int index = this.table[(int)((IntPtr)(num & this.tableMask))];
+            int index = this.table[(num & this.tableMask)];
             if (index < 0) {
                 uint num3 = ((uint)1) << this.tableBits;
                 do {

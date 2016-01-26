@@ -12,14 +12,14 @@
  *                                                        *
  * hprose service class for C#.                           *
  *                                                        *
- * LastModified: May 30, 2015                             *
+ * LastModified: Jan 23, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 #if !ClientOnly
 using System;
 using System.Collections;
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
 using System.Collections.Generic;
 #endif
 using System.IO;
@@ -30,20 +30,21 @@ using Hprose.Common;
 namespace Hprose.Server {
 
     public abstract class HproseService {
-
+#if !dotNETMF
         private HproseMode mode = HproseMode.MemberMode;
+#endif
         private bool debugEnabled = false;
         protected HproseMethods gMethods = null;
         public event BeforeInvokeEvent OnBeforeInvoke = null;
         public event AfterInvokeEvent OnAfterInvoke = null;
         public event SendErrorEvent OnSendError = null;
-#if (dotNET10 || dotNET11 || dotNETCF10)
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         private readonly ArrayList filters = new ArrayList();
 #else
         private readonly List<IHproseFilter> filters = new List<IHproseFilter>();
 #endif
 
-#if !Smartphone
+#if !(Smartphone || dotNETMF)
         [ThreadStatic]
         private static HproseContext currentContext;
 
@@ -66,6 +67,7 @@ namespace Hprose.Server {
             }
         }
 
+ #if !dotNETMF
         public HproseMode Mode {
             get {
                 return mode;
@@ -74,6 +76,7 @@ namespace Hprose.Server {
                 mode = value;
             }
         }
+#endif
 
         public bool IsDebugEnabled {
             get {
@@ -84,12 +87,15 @@ namespace Hprose.Server {
             }
         }
 
+#if dotNETMF
+        [CLSCompliantAttribute(false)]
+#endif
         public IHproseFilter Filter {
             get {
                 if (filters.Count == 0) {
                     return null;
                 }
-#if (dotNET10 || dotNET11 || dotNETCF10)
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 return (IHproseFilter)filters[0];
 #else
                 return filters[0];
@@ -105,12 +111,18 @@ namespace Hprose.Server {
             }
         }
 
+#if dotNETMF
+        [CLSCompliantAttribute(false)]
+#endif
         public void AddFilter(IHproseFilter filter) {
             filters.Add(filter);
         }
 
+#if dotNETMF
+        [CLSCompliantAttribute(false)]
+#endif
         public bool RemoveFilter(IHproseFilter filter) {
-#if (dotNET10 || dotNET11 || dotNETCF10)
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             if (filters.Contains(filter)) {
                 filters.Remove(filter);
                 return true;
@@ -119,22 +131,6 @@ namespace Hprose.Server {
 #else
             return filters.Remove(filter);
 #endif
-        }
-
-        public void Add(MethodInfo method, object obj, string aliasName) {
-            GlobalMethods.AddMethod(method, obj, aliasName);
-        }
-
-        public void Add(MethodInfo method, object obj, string aliasName, HproseResultMode mode) {
-            GlobalMethods.AddMethod(method, obj, aliasName, mode);
-        }
-
-        public void Add(MethodInfo method, object obj, string aliasName, bool simple) {
-            GlobalMethods.AddMethod(method, obj, aliasName, simple);
-        }
-
-        public void Add(MethodInfo method, object obj, string aliasName, HproseResultMode mode, bool simple) {
-            GlobalMethods.AddMethod(method, obj, aliasName, mode, simple);
         }
 
         public void Add(string methodName, object obj, Type[] paramTypes, string aliasName) {
@@ -199,6 +195,23 @@ namespace Hprose.Server {
 
         public void Add(string methodName, Type type, Type[] paramTypes, HproseResultMode mode, bool simple) {
             GlobalMethods.AddMethod(methodName, type, paramTypes, mode, simple);
+        }
+
+#if !dotNETMF
+        public void Add(MethodInfo method, object obj, string aliasName) {
+            GlobalMethods.AddMethod(method, obj, aliasName);
+        }
+
+        public void Add(MethodInfo method, object obj, string aliasName, HproseResultMode mode) {
+            GlobalMethods.AddMethod(method, obj, aliasName, mode);
+        }
+
+        public void Add(MethodInfo method, object obj, string aliasName, bool simple) {
+            GlobalMethods.AddMethod(method, obj, aliasName, simple);
+        }
+
+        public void Add(MethodInfo method, object obj, string aliasName, HproseResultMode mode, bool simple) {
+            GlobalMethods.AddMethod(method, obj, aliasName, mode, simple);
         }
 
         public void Add(string methodName, object obj, string aliasName) {
@@ -456,6 +469,7 @@ namespace Hprose.Server {
         public void Add(Type type, HproseResultMode mode, bool simple) {
             GlobalMethods.AddStaticMethods(type, mode, simple);
         }
+#endif
 
         public void AddMissingMethod(string methodName, object obj) {
             GlobalMethods.AddMissingMethod(methodName, obj);
@@ -492,7 +506,7 @@ namespace Hprose.Server {
         private MemoryStream ResponseEnd(MemoryStream data, HproseContext context) {
             data.Position = 0;
             for (int i = 0, n = filters.Count; i < n; ++i) {
-#if (dotNET10 || dotNET11 || dotNETCF10)
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 IHproseFilter filter = (IHproseFilter)filters[i];
                 data = filter.OutputFilter(data, context);
 #else
@@ -516,22 +530,38 @@ namespace Hprose.Server {
             return arguments;
         }
 
+#if dotNETMF
+        [CLSCompliantAttribute(false)]
+#endif
         protected MemoryStream SendError(Exception e, HproseContext context) {
             if (OnSendError != null) {
                 OnSendError(e, context);
             }
             string error = debugEnabled ? e.ToString(): e.Message;
+#if !dotNETMF
             MemoryStream data = new MemoryStream(4096);
             HproseWriter writer = new HproseWriter(data, mode, true);
+#else
+            MemoryStream data = new MemoryStream();
+            HproseWriter writer = new HproseWriter(data, true);
+#endif
             data.WriteByte(HproseTags.TagError);
             writer.WriteString(error);
             data.WriteByte(HproseTags.TagEnd);
             return ResponseEnd(data, context);
         }
 
+#if dotNETMF
+        [CLSCompliantAttribute(false)]
+#endif
         protected MemoryStream DoInvoke(MemoryStream istream, HproseMethods methods, HproseContext context) {
+#if !dotNETMF
             HproseReader reader = new HproseReader(istream, mode);
             MemoryStream data = new MemoryStream(4096);
+#else
+            HproseReader reader = new HproseReader(istream);
+            MemoryStream data = new MemoryStream();
+#endif
             int tag;
             do {
                 reader.Reset();
@@ -619,7 +649,11 @@ namespace Hprose.Server {
                 else {
                     data.WriteByte(HproseTags.TagResult);
                     bool simple = remoteMethod.simple;
+#if !dotNETMF
                     HproseWriter writer = new HproseWriter(data, mode, simple);
+#else
+                    HproseWriter writer = new HproseWriter(data, simple);
+#endif
                     if (remoteMethod.mode == HproseResultMode.Serialized) {
                         data.Write((byte[])result, 0, ((byte[])result).Length);
                     }
@@ -637,19 +671,38 @@ namespace Hprose.Server {
             return ResponseEnd(data, context);
         }
 
+#if dotNETMF
+        [CLSCompliantAttribute(false)]
+#endif
         protected MemoryStream DoFunctionList(HproseMethods methods, HproseContext context) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if dotNETMF
+            ArrayList names = new ArrayList();
+            foreach (object name in GlobalMethods.AllNames) {
+                names.Add(name);
+            }
+#elif !(dotNET10 || dotNET11 || dotNETCF10)
             List<string> names = new List<string>(GlobalMethods.AllNames);
 #else
             ArrayList names = new ArrayList(GlobalMethods.AllNames);
 #endif
             if (methods != null) {
+#if dotNETMF
+                foreach (object name in methods.AllNames) {
+                    names.Add(name);
+                }
+#else
                 names.AddRange(methods.AllNames);
+#endif
             }
+#if !dotNETMF
             MemoryStream data = new MemoryStream(4096);
             HproseWriter writer = new HproseWriter(data, mode, true);
+#else
+            MemoryStream data = new MemoryStream();
+            HproseWriter writer = new HproseWriter(data, true);
+#endif
             data.WriteByte(HproseTags.TagFunctions);
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             writer.WriteList((IList<string>)names);
 #else
             writer.WriteList((IList)names);
@@ -664,14 +717,17 @@ namespace Hprose.Server {
             }
         }
 
+#if dotNETMF
+        [CLSCompliantAttribute(false)]
+#endif
         protected MemoryStream Handle(MemoryStream istream, HproseMethods methods, HproseContext context) {
-#if !Smartphone
+#if !(Smartphone || dotNETMF)
             currentContext = context;
 #endif
             try {
                 istream.Position = 0;
                 for (int i = filters.Count - 1; i >= 0; --i) {
-#if (dotNET10 || dotNET11 || dotNETCF10)
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                     IHproseFilter filter = (IHproseFilter)filters[i];
                     istream = filter.InputFilter(istream, context);
 #else
@@ -691,7 +747,7 @@ namespace Hprose.Server {
             catch (Exception e) {
                 return SendError(e, context);
             }
-#if !Smartphone
+#if !(Smartphone || dotNETMF)
             finally {
                 currentContext = null;
             }

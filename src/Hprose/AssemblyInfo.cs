@@ -55,6 +55,9 @@ namespace Hprose {
         #elif (Profile31 || Profile32 || Profile44 || Profile84 || Profile151 || Profile157)        
             public const string dotNET_Version = "4.0.30319.17929";
         #endif
+    #elif dotNETMF
+        public const string dotNET_Version = "4.4.0.0";
+        public const string dotNET_Name = ".NET Micro Framework";
     #else
         #if WINDOWS_PHONE
             #if WP81
@@ -151,6 +154,8 @@ namespace Hprose {
         public const string dotNET_MajorVersion = "5.0";
     #elif (dotNET45 || WP81)
         public const string dotNET_MajorVersion = "4.5";
+    #elif dotNETMF
+        public const string dotNET_MajorVersion = "4.4";
     #elif (dotNET4 || SL4 || WP80)
         public const string dotNET_MajorVersion = "4.0";
     #elif (WP70 || WP71)

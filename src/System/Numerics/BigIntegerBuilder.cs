@@ -112,7 +112,7 @@ namespace System.Numerics {
                 }
             }
             bits = this._rgu;
-#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETCF20)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETCF20 || dotNETMF)
             Array.Resize<uint>(ref bits, this._iuLast + 1);
 #else
             Resize(ref bits, this._iuLast + 1);
@@ -614,7 +614,7 @@ namespace System.Numerics {
             else {
                 BigIntegerBuilder regQuo = new BigIntegerBuilder();
                 ModDivCore(ref this, ref regDen, true, ref regQuo);
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 NumericsHelpers.Swap<BigIntegerBuilder>(ref this, ref regQuo);
 #else
                 NumericsHelpers.Swap(ref this, ref regQuo);
@@ -625,7 +625,7 @@ namespace System.Numerics {
         public void ModDiv(ref BigIntegerBuilder regDen, ref BigIntegerBuilder regQuo) {
             if (regDen._iuLast == 0) {
                 regQuo.Set(this.DivMod(regDen._uSmall));
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 NumericsHelpers.Swap<BigIntegerBuilder>(ref this, ref regQuo);
 #else
                 NumericsHelpers.Swap(ref this, ref regQuo);
@@ -851,7 +851,7 @@ namespace System.Numerics {
         Label_0000:
             if (iu > this._iuLast) {
                 if ((this._iuLast + 1) == this._rgu.Length) {
-#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETCF20)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETCF20 || dotNETMF)
                     Array.Resize<uint>(ref this._rgu, this._iuLast + 2);
 #else
                     Resize(ref this._rgu, this._iuLast + 2);
@@ -927,7 +927,7 @@ namespace System.Numerics {
             num2 = reg1._iuLast + 1;
             int b = reg2._iuLast + 1;
             if (num2 < b) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 NumericsHelpers.Swap<BigIntegerBuilder>(ref reg1, ref reg2);
                 NumericsHelpers.Swap<int>(ref num2, ref b);
 #else
@@ -961,7 +961,7 @@ namespace System.Numerics {
                 num5 = (num5 << num6) | (reg2._rgu[num2 - 3] >> (0x20 - num6));
             }
             if (a < num5) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 NumericsHelpers.Swap<ulong>(ref a, ref num5);
                 NumericsHelpers.Swap<BigIntegerBuilder>(ref reg1, ref reg2);
 #else
@@ -1084,7 +1084,7 @@ namespace System.Numerics {
             }
             return cbit;
         }
-#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETCF20)
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETCF20 || dotNETMF)
         private static void Resize(ref uint[] array, int newSize) {
             if (newSize < 0) {
                 throw new ArgumentOutOfRangeException("The number must be greater than or equal to zero.");

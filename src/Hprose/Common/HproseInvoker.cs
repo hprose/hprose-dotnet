@@ -12,7 +12,7 @@
  *                                                        *
  * hprose invoker class for C#.                           *
  *                                                        *
- * LastModified: Feb 22, 2014                             *
+ * LastModified: Jan 18, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -20,7 +20,7 @@ using System;
 
 namespace Hprose.Common {
     public interface HproseInvoker {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         T Invoke<T>(string functionName);
         T Invoke<T>(string functionName, HproseResultMode resultMode);
         T Invoke<T>(string functionName, object[] arguments);
@@ -50,7 +50,7 @@ namespace Hprose.Common {
         object Invoke(string functionName, object[] arguments, Type returnType, bool byRef, HproseResultMode resultMode);
         object Invoke(string functionName, object[] arguments, Type returnType, bool byRef, HproseResultMode resultMode, bool simple);
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         void Invoke<T>(string functionName, HproseCallback<T> callback);
         void Invoke<T>(string functionName, HproseCallback<T> callback, HproseResultMode resultMode);
         void Invoke<T>(string functionName, object[] arguments, HproseCallback<T> callback);

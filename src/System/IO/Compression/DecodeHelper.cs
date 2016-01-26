@@ -1,4 +1,4 @@
-#if (dotNET10 || dotNET11 || PocketPC || Smartphone || WindowsCE) && !dotNETCF35 && !dotNETCF39 && !MONO
+#if (dotNET10 || dotNET11 || PocketPC || Smartphone || WindowsCE || dotNETMF) && !dotNETCF35 && !dotNETCF39 && !MONO
 using System;
 
 namespace System.IO.Compression {
@@ -39,7 +39,7 @@ namespace System.IO.Compression {
         public static uint UpdateCrc32(uint crc32, byte[] buffer, int offset, int length) {
             crc32 ^= uint.MaxValue;
             while (--length >= 0) {
-                crc32 = crcTable[(int)((IntPtr)((crc32 ^ buffer[offset++]) & 0xff))] ^ (crc32 >> 8);
+                crc32 = crcTable[((crc32 ^ buffer[offset++]) & 0xff)] ^ (crc32 >> 8);
             }
             crc32 ^= uint.MaxValue;
             return crc32;

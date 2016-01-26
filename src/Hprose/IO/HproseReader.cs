@@ -12,13 +12,13 @@
  *                                                        *
  * hprose reader class for C#.                            *
  *                                                        *
- * LastModified: Jan 16, 2016                             *
+ * LastModified: Jan 20, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 using System;
 using System.Collections;
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
 using System.Collections.Generic;
 #endif
 using System.Globalization;
@@ -27,7 +27,7 @@ using System.IO;
 using System.Text;
 using System.Reflection;
 using Hprose.Common;
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS || dotNETMF)
 using Hprose.Reflection;
 #endif
 
@@ -47,7 +47,7 @@ namespace Hprose.IO {
         public void Reset() {}
     }
     sealed class RealReaderRefer : ReaderRefer {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         private List<object> references = new List<object>();
 #else
         private ArrayList references = new ArrayList();
@@ -64,15 +64,18 @@ namespace Hprose.IO {
     }
     public sealed class HproseReader {
         public Stream stream;
+#if !dotNETMF
         private HproseMode mode;
+#endif
         private ReaderRefer refer;
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         private List<object> classref = new List<object>();
         private Dictionary<object, string[]> membersref = new Dictionary<object, string[]>();
 #else
         private ArrayList classref = new ArrayList();
         private Hashtable membersref = new Hashtable();
 #endif
+#if !dotNETMF
         public HproseReader(Stream stream)
             : this(stream, HproseMode.MemberMode, false) {
         }
@@ -87,7 +90,15 @@ namespace Hprose.IO {
             this.mode = mode;
             this.refer = (simple ? new FakeReaderRefer() as ReaderRefer : new RealReaderRefer() as ReaderRefer);
         }
-
+#else
+        public HproseReader(Stream stream)
+            : this(stream, false) {
+        }
+        public HproseReader(Stream stream, bool simple) {
+            this.stream = stream;
+            this.refer = (simple ? new FakeReaderRefer() as ReaderRefer : new RealReaderRefer() as ReaderRefer);
+        }
+#endif
         public HproseException UnexpectedTag(int tag) {
             return UnexpectedTag(tag, null);
         }
@@ -227,6 +238,7 @@ namespace Hprose.IO {
             return result;
         }
 
+#if !dotNETMF
         public decimal ReadIntAsDecimal() {
             decimal result = 0.0M;
             decimal sign = 1.0M;
@@ -246,11 +258,13 @@ namespace Hprose.IO {
             }
             return result;
         }
+#endif
 
         private float ParseFloat(StringBuilder value) {
             return ParseFloat(value.ToString());
         }
 
+#if !dotNETMF
         private float ParseFloat(String value) {
             try {
                 return float.Parse(value);
@@ -261,6 +275,11 @@ namespace Hprose.IO {
                         float.PositiveInfinity;
             }
         }
+#else
+        private float ParseFloat(String value) {
+            return (float)ParseDouble(value);
+        }
+#endif
 
         private double ParseDouble(StringBuilder value) {
             return ParseDouble(value.ToString());
@@ -427,8 +446,12 @@ namespace Hprose.IO {
 
         private MemoryStream ReadCharsAsStream() {
             int count = ReadInt(HproseTags.TagQuote);
+#if !dotNETMF
             // here count is capacity, not the real size
             MemoryStream ms = new MemoryStream(count * 3);
+#else
+            MemoryStream ms = new MemoryStream();
+#endif
             for (int i = 0; i < count; ++i) {
                 int c = stream.ReadByte();
                 switch (c >> 4) {
@@ -500,7 +523,11 @@ namespace Hprose.IO {
                 off += size;
                 len -= size;
             }
+#if !dotNETMF
             MemoryStream ms = new MemoryStream(b, 0, len, true);
+#else
+            MemoryStream ms = new MemoryStream(b);
+#endif
             stream.ReadByte();
             refer.Set(ms);
             return ms;
@@ -508,7 +535,7 @@ namespace Hprose.IO {
 
         private IDictionary ReadObjectAsMap(IDictionary map) {
             object c = classref[ReadInt(HproseTags.TagOpenbrace)];
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             string[] memberNames = membersref[c];
 #else
             string[] memberNames = (string[])membersref[c];
@@ -523,28 +550,28 @@ namespace Hprose.IO {
         }
 
         private void ReadMapAsObjectFields(object obj, Type type, int count) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             Dictionary<string, FieldTypeInfo> fields = HproseHelper.GetFields(type);
 #else
             Hashtable fields = HproseHelper.GetFields(type);
 #endif
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS || dotNETMF)
             string[] names = new string[count];
             object[] values = new object[count];
 #endif
             FieldTypeInfo field;
             for (int i = 0; i < count; ++i) {
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS || dotNETMF)
                 names[i] = ReadString();
                 if (fields.TryGetValue(names[i], out field)) {
-#elif !(dotNET10 || dotNET11 || dotNETCF10)
+#elif !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 if (fields.TryGetValue(ReadString(), out field)) {
 #else
                 string name = ReadString();
-                if (fields.ContainsKey(name)) {
+                if (fields.Contains(name)) {
                     field = (FieldTypeInfo)fields[name];
 #endif
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS || dotNETMF)
                     values[i] = Unserialize(field.type, field.typeEnum);
 #else
                     field.info.SetValue(obj, Unserialize(field.type, field.typeEnum));
@@ -554,11 +581,12 @@ namespace Hprose.IO {
                     Unserialize();
                 }
             }
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS || dotNETMF)
             ObjectFieldModeUnserializer.Get(type, names).Unserialize(obj, values);
 #endif
         }
 
+#if !dotNETMF
         private void ReadMapAsObjectProperties(object obj, Type type, int count) {
 #if !(dotNET10 || dotNET11 || dotNETCF10)
             Dictionary<string, PropertyTypeInfo> properties = HproseHelper.GetProperties(type);
@@ -649,12 +677,14 @@ namespace Hprose.IO {
             ObjectMemberModeUnserializer.Get(type, names).Unserialize(obj, values);
 #endif
         }
+#endif
 
         private object ReadMapAsObject(Type type) {
             int count = ReadInt(HproseTags.TagOpenbrace);
             object obj = HproseHelper.NewInstance(type);
             if (obj == null) throw new HproseException("Can not make an instance of type: " + type.FullName);
             refer.Set(obj);
+#if !dotNETMF
             if ((mode != HproseMode.MemberMode) && HproseHelper.IsSerializable(type)) {
                 if (mode == HproseMode.FieldMode) {
                     ReadMapAsObjectFields(obj, type, count);
@@ -666,6 +696,9 @@ namespace Hprose.IO {
             else {
                 ReadMapAsObjectMembers(obj, type, count);
             }
+#else
+            ReadMapAsObjectFields(obj, type, count);
+#endif
             stream.ReadByte();
             return obj;
         }
@@ -697,11 +730,7 @@ namespace Hprose.IO {
         private object ReadRef(Type type) {
             object obj = ReadRef();
             if (obj.GetType() == type) return obj;
-#if Core
-            if (type.GetTypeInfo().IsAssignableFrom(obj.GetType().GetTypeInfo())) return obj;
-#else
-            if (type.IsAssignableFrom(obj.GetType())) return obj;
-#endif
+            if (HproseHelper.IsAssignableFrom(type, obj.GetType())) return obj;
             throw CastError(obj, type);
         }
 
@@ -762,19 +791,27 @@ namespace Hprose.IO {
                         }
                     }
                 }
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 DateTimeKind kind = (tag == HproseTags.TagUTC ? DateTimeKind.Utc : DateTimeKind.Local);
                 datetime = new DateTime(year, month, day, hour, minute, second, millisecond, kind);
 #else
                 datetime = new DateTime(year, month, day, hour, minute, second, millisecond);
+#if dotNETMF
+                DateTimeKind kind = (tag == HproseTags.TagUTC ? DateTimeKind.Utc : DateTimeKind.Local);
+                datetime = DateTime.SpecifyKind(datetime, kind);
+#endif
 #endif
             }
             else {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 DateTimeKind kind = (tag == HproseTags.TagUTC ? DateTimeKind.Utc : DateTimeKind.Local);
                 datetime = new DateTime(year, month, day, 0, 0, 0, kind);
 #else
                 datetime = new DateTime(year, month, day);
+#if dotNETMF
+                DateTimeKind kind = (tag == HproseTags.TagUTC ? DateTimeKind.Utc : DateTimeKind.Local);
+                datetime = DateTime.SpecifyKind(datetime, kind);
+#endif
 #endif
             }
             refer.Set(datetime);
@@ -806,11 +843,15 @@ namespace Hprose.IO {
                     }
                 }
             }
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             DateTimeKind kind = (tag == HproseTags.TagUTC ? DateTimeKind.Utc : DateTimeKind.Local);
             DateTime datetime = new DateTime(1970, 1, 1, hour, minute, second, millisecond, kind);
 #else
             DateTime datetime = new DateTime(1970, 1, 1, hour, minute, second, millisecond);
+#if dotNETMF
+            DateTimeKind kind = (tag == HproseTags.TagUTC ? DateTimeKind.Utc : DateTimeKind.Local);
+            datetime = DateTime.SpecifyKind(datetime, kind);
+#endif
 #endif
             refer.Set(datetime);
             return datetime;
@@ -847,11 +888,9 @@ namespace Hprose.IO {
         }
 
         public Guid ReadGuidWithoutTag() {
-            char[] buf = new char[38];
-            for (int i = 0; i < 38; ++i) {
-                buf[i] = (char)stream.ReadByte();
-            }
-            Guid guid = new Guid(new String(buf));
+            byte[] buf = new byte[38];
+            stream.Read(buf, 0, 38);
+            Guid guid = HproseHelper.ToGuid(buf);
             refer.Set(guid);
             return guid;
         }
@@ -860,6 +899,8 @@ namespace Hprose.IO {
             int count = ReadInt(HproseTags.TagOpenbrace);
 #if (dotNET10 || dotNET11 || dotNETCF10)
             ArrayList a = new ArrayList(count);
+#elif dotNETMF
+            ArrayList a = new ArrayList();
 #else
             List<object> a = new List<object>(count);
 #endif
@@ -873,7 +914,7 @@ namespace Hprose.IO {
 
         public IDictionary ReadMapWithoutTag() {
             int count = ReadInt(HproseTags.TagOpenbrace);
-#if (dotNET10 || dotNET11 || dotNETCF10)
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             HashMap map = new HashMap(count);
 #else
             HashMap<object, object> map = new HashMap<object, object>(count);
@@ -889,23 +930,23 @@ namespace Hprose.IO {
         }
 
         private void ReadObjectFields(object obj, Type type, int count, string[] memberNames) {
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS || dotNETMF)
             object[] values = new object[count];
 #endif
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             Dictionary<string, FieldTypeInfo> fields = HproseHelper.GetFields(type);
 #else
             Hashtable fields = HproseHelper.GetFields(type);
 #endif
             FieldTypeInfo field;
             for (int i = 0; i < count; ++i) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 if (fields.TryGetValue(memberNames[i], out field)) {
 #else
-                if (fields.ContainsKey(memberNames[i])) {
+                if (fields.Contains(memberNames[i])) {
                     field = (FieldTypeInfo)fields[memberNames[i]];
 #endif
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS || dotNETMF)
                     values[i] = Unserialize(field.type, field.typeEnum);
 #else
                     field.info.SetValue(obj, Unserialize(field.type, field.typeEnum));
@@ -915,11 +956,12 @@ namespace Hprose.IO {
                     Unserialize();
                 }
             }
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS || dotNETMF)
             ObjectFieldModeUnserializer.Get(type, memberNames).Unserialize(obj, values);
 #endif
         }
 
+#if !dotNETMF
         private void ReadObjectProperties(object obj, Type type, int count, string[] memberNames) {
 #if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
             object[] values = new object[count];
@@ -1000,10 +1042,11 @@ namespace Hprose.IO {
             ObjectMemberModeUnserializer.Get(type, memberNames).Unserialize(obj, values);
 #endif
         }
+#endif
 
         public object ReadObjectWithoutTag(Type type) {
             object c = classref[ReadInt(HproseTags.TagOpenbrace)];
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             string[] memberNames = membersref[c];
 #else
             string[] memberNames = (string[])membersref[c];
@@ -1012,16 +1055,10 @@ namespace Hprose.IO {
             object obj = null;
             if (c is Type) {
                 Type cls = (Type)c;
-                if ((type == null) ||
-#if Core
-                    type.GetTypeInfo().IsAssignableFrom(cls.GetTypeInfo())
-#else
-                    type.IsAssignableFrom(cls)
-#endif
-                ) type = cls;
+                if ((type == null) || HproseHelper.IsAssignableFrom(type, cls)) type = cls;
             }
             if (type == null) {
-#if (dotNET10 || dotNET11 || dotNETCF10)
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 Hashtable map = new Hashtable(count);
 #else
                 Dictionary<string, object> map = new Dictionary<string, object>(count);
@@ -1036,6 +1073,7 @@ namespace Hprose.IO {
                 obj = HproseHelper.NewInstance(type);
                 if (obj == null) throw new HproseException("Can not make an instance of type: " + type.FullName);
                 refer.Set(obj);
+#if !dotNETMF
                 if ((mode != HproseMode.MemberMode) && HproseHelper.IsSerializable(type)) {
                     if (mode == HproseMode.FieldMode) {
                         ReadObjectFields(obj, type, count, memberNames);
@@ -1047,12 +1085,15 @@ namespace Hprose.IO {
                 else {
                     ReadObjectMembers(obj, type, count, memberNames);
                 }
+#else
+                ReadObjectFields(obj, type, count, memberNames);
+#endif
             }
             stream.ReadByte();
             return obj;
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public T Unserialize<T>() {
             return (T)Unserialize(typeof(T), HproseHelper.GetTypeEnum(typeof(T)));
         }
@@ -1174,9 +1215,9 @@ namespace Hprose.IO {
                 case HproseTags.TagFalse: return false;
                 case HproseTags.TagNaN: return true;
                 case HproseTags.TagInfinity: stream.ReadByte(); return true;
-                case HproseTags.TagUTF8Char: return "\00".IndexOf(ReadUTF8CharAsChar()) == -1;
-                case HproseTags.TagString: return bool.Parse(ReadStringWithoutTag());
-                case HproseTags.TagRef: return Convert.ToBoolean(ReadRef());
+                case HproseTags.TagUTF8Char: char c = ReadUTF8CharAsChar(); return (c != '\0') && (c != '0');
+                case HproseTags.TagString: return HproseHelper.ToBoolean(ReadStringWithoutTag());
+                case HproseTags.TagRef: return HproseHelper.ToBoolean(ReadRef().ToString());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofBoolean);
             }
         }
@@ -1186,7 +1227,7 @@ namespace Hprose.IO {
             return (tag == HproseTags.TagNull) ? false : ReadBooleanWithTag(tag);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public bool? ReadNullableBoolean() {
             int tag = stream.ReadByte();
             if (tag == HproseTags.TagNull) {
@@ -1210,11 +1251,11 @@ namespace Hprose.IO {
                 case '7':
                 case '8':
                 case '9': return (char)tag;
-                case HproseTags.TagInteger: return Convert.ToChar(ReadIntWithoutTag());
-                case HproseTags.TagLong: return Convert.ToChar(ReadLongWithoutTag());
+                case HproseTags.TagInteger: return (char)(ReadIntWithoutTag());
+                case HproseTags.TagLong: return (char)(ReadLongWithoutTag());
                 case HproseTags.TagUTF8Char: return ReadUTF8CharAsChar();
-                case HproseTags.TagString: return Convert.ToChar(ReadStringWithoutTag());
-                case HproseTags.TagRef: return Convert.ToChar(ReadRef());
+                case HproseTags.TagString: return (ReadStringWithoutTag())[0];
+                case HproseTags.TagRef: return (ReadRef().ToString())[0];
                 default: throw CastError(TagToString(tag), HproseHelper.typeofChar);
             }
         }
@@ -1224,7 +1265,7 @@ namespace Hprose.IO {
             return (tag == HproseTags.TagNull) ? (char)0 : ReadCharWithTag(tag);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public char? ReadNullableChar() {
             int tag = stream.ReadByte();
             if (tag == HproseTags.TagNull) {
@@ -1248,19 +1289,15 @@ namespace Hprose.IO {
                 case '7': return 7;
                 case '8': return 8;
                 case '9': return 9;
-                case HproseTags.TagInteger: return Convert.ToSByte(ReadIntWithoutTag());
-                case HproseTags.TagLong: return Convert.ToSByte(ReadLongWithoutTag());
-                case HproseTags.TagDouble: return Convert.ToSByte(ReadDoubleWithoutTag());
+                case HproseTags.TagInteger: return (sbyte)(ReadIntWithoutTag());
+                case HproseTags.TagLong: return (sbyte)(ReadLongWithoutTag());
+                case HproseTags.TagDouble: return (sbyte)(ReadDoubleWithoutTag());
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
                 case HproseTags.TagUTF8Char: return Convert.ToSByte(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToSByte(ReadStringWithoutTag());
-#if dotNETCF10
-                case HproseTags.TagRef: return Convert.ToSByte(Convert.ToInt32(ReadRef()));
-#else
-                case HproseTags.TagRef: return Convert.ToSByte(ReadRef());
-#endif
+                case HproseTags.TagRef: return Convert.ToSByte(ReadRef().ToString());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofSByte);
             }
         }
@@ -1271,7 +1308,7 @@ namespace Hprose.IO {
             return (tag == HproseTags.TagNull) ? (sbyte)0 : ReadSByteWithTag(tag);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         [CLSCompliantAttribute(false)]
         public sbyte? ReadNullableSByte() {
             int tag = stream.ReadByte();
@@ -1296,19 +1333,15 @@ namespace Hprose.IO {
                 case '7': return 7;
                 case '8': return 8;
                 case '9': return 9;
-                case HproseTags.TagInteger: return Convert.ToByte(ReadIntWithoutTag());
-                case HproseTags.TagLong: return Convert.ToByte(ReadLongWithoutTag());
-                case HproseTags.TagDouble: return Convert.ToByte(ReadDoubleWithoutTag());
+                case HproseTags.TagInteger: return (byte)(ReadIntWithoutTag());
+                case HproseTags.TagLong: return (byte)(ReadLongWithoutTag());
+                case HproseTags.TagDouble: return (byte)(ReadDoubleWithoutTag());
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
                 case HproseTags.TagUTF8Char: return Convert.ToByte(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToByte(ReadStringWithoutTag());
-#if dotNETCF10
-                case HproseTags.TagRef: return Convert.ToByte(Convert.ToInt32(ReadRef()));
-#else
-                case HproseTags.TagRef: return Convert.ToByte(ReadRef());
-#endif
+                case HproseTags.TagRef: return Convert.ToByte(ReadRef().ToString());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofByte);
             }
         }
@@ -1318,7 +1351,7 @@ namespace Hprose.IO {
             return (tag == HproseTags.TagNull) ? (byte)0 : ReadByteWithTag(tag);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public byte? ReadNullableByte() {
             int tag = stream.ReadByte();
             if (tag == HproseTags.TagNull) {
@@ -1342,19 +1375,15 @@ namespace Hprose.IO {
                 case '7': return 7;
                 case '8': return 8;
                 case '9': return 9;
-                case HproseTags.TagInteger: return Convert.ToInt16(ReadIntWithoutTag());
-                case HproseTags.TagLong: return Convert.ToInt16(ReadLongWithoutTag());
-                case HproseTags.TagDouble: return Convert.ToInt16(ReadDoubleWithoutTag());
+                case HproseTags.TagInteger: return (short)(ReadIntWithoutTag());
+                case HproseTags.TagLong: return (short)(ReadLongWithoutTag());
+                case HproseTags.TagDouble: return (short)(ReadDoubleWithoutTag());
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
                 case HproseTags.TagUTF8Char: return Convert.ToInt16(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToInt16(ReadStringWithoutTag());
-#if dotNETCF10
-                case HproseTags.TagRef: return Convert.ToInt16(Convert.ToInt32(ReadRef()));
-#else
-                case HproseTags.TagRef: return Convert.ToInt16(ReadRef());
-#endif
+                case HproseTags.TagRef: return Convert.ToInt16(ReadRef().ToString());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofInt16);
             }
         }
@@ -1364,7 +1393,7 @@ namespace Hprose.IO {
             return (tag == HproseTags.TagNull) ? (short)0 : ReadInt16WithTag(tag);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public short? ReadNullableInt16() {
             int tag = stream.ReadByte();
             if (tag == HproseTags.TagNull) {
@@ -1388,15 +1417,15 @@ namespace Hprose.IO {
                 case '7': return 7;
                 case '8': return 8;
                 case '9': return 9;
-                case HproseTags.TagInteger: return Convert.ToUInt16(ReadIntWithoutTag());
-                case HproseTags.TagLong: return Convert.ToUInt16(ReadLongWithoutTag());
-                case HproseTags.TagDouble: return Convert.ToUInt16(ReadDoubleWithoutTag());
+                case HproseTags.TagInteger: return (ushort)(ReadIntWithoutTag());
+                case HproseTags.TagLong: return (ushort)(ReadLongWithoutTag());
+                case HproseTags.TagDouble: return (ushort)(ReadDoubleWithoutTag());
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
                 case HproseTags.TagUTF8Char: return Convert.ToUInt16(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToUInt16(ReadStringWithoutTag());
-                case HproseTags.TagRef: return Convert.ToUInt16(ReadRef());
+                case HproseTags.TagRef: return Convert.ToUInt16(ReadRef().ToString());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofUInt16);
             }
         }
@@ -1407,7 +1436,7 @@ namespace Hprose.IO {
             return (tag == HproseTags.TagNull) ? (ushort)0 : ReadUInt16WithTag(tag);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         [CLSCompliantAttribute(false)]
         public ushort? ReadNullableUInt16() {
             int tag = stream.ReadByte();
@@ -1433,14 +1462,14 @@ namespace Hprose.IO {
                 case '8': return 8;
                 case '9': return 9;
                 case HproseTags.TagInteger: return ReadIntWithoutTag();
-                case HproseTags.TagLong: return Convert.ToInt32(ReadLongWithoutTag());
-                case HproseTags.TagDouble: return Convert.ToInt32(ReadDoubleWithoutTag());
+                case HproseTags.TagLong: return (int)(ReadLongWithoutTag());
+                case HproseTags.TagDouble: return (int)(ReadDoubleWithoutTag());
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
                 case HproseTags.TagUTF8Char: return Convert.ToInt32(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToInt32(ReadStringWithoutTag());
-                case HproseTags.TagRef: return Convert.ToInt32(ReadRef());
+                case HproseTags.TagRef: return Convert.ToInt32(ReadRef().ToString());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofInt32);
             }
         }
@@ -1450,7 +1479,7 @@ namespace Hprose.IO {
             return (tag == HproseTags.TagNull) ? 0 : ReadInt32WithTag(tag);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public int? ReadNullableInt32() {
             int tag = stream.ReadByte();
             if (tag == HproseTags.TagNull) {
@@ -1474,15 +1503,15 @@ namespace Hprose.IO {
                 case '7': return 7;
                 case '8': return 8;
                 case '9': return 9;
-                case HproseTags.TagInteger: return Convert.ToUInt32(ReadIntWithoutTag());
-                case HproseTags.TagLong: return Convert.ToUInt32(ReadLongWithoutTag());
-                case HproseTags.TagDouble: return Convert.ToUInt32(ReadDoubleWithoutTag());
+                case HproseTags.TagInteger: return (uint)(ReadIntWithoutTag());
+                case HproseTags.TagLong: return (uint)(ReadLongWithoutTag());
+                case HproseTags.TagDouble: return (uint)(ReadDoubleWithoutTag());
                 case HproseTags.TagEmpty: return 0;
                 case HproseTags.TagTrue: return 1;
                 case HproseTags.TagFalse: return 0;
                 case HproseTags.TagUTF8Char: return Convert.ToUInt32(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToUInt32(ReadStringWithoutTag());
-                case HproseTags.TagRef: return Convert.ToUInt32(ReadRef());
+                case HproseTags.TagRef: return Convert.ToUInt32(ReadRef().ToString());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofUInt32);
             }
         }
@@ -1493,7 +1522,7 @@ namespace Hprose.IO {
             return (tag == HproseTags.TagNull) ? 0 : ReadUInt32WithTag(tag);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         [CLSCompliantAttribute(false)]
         public uint? ReadNullableUInt32() {
             int tag = stream.ReadByte();
@@ -1520,7 +1549,7 @@ namespace Hprose.IO {
                 case '9': return 9L;
                 case HproseTags.TagInteger: return ReadLongWithoutTag();
                 case HproseTags.TagLong: return ReadLongWithoutTag();
-                case HproseTags.TagDouble: return Convert.ToInt64(ReadDoubleWithoutTag());
+                case HproseTags.TagDouble: return (long)(ReadDoubleWithoutTag());
                 case HproseTags.TagEmpty: return 0L;
                 case HproseTags.TagTrue: return 1L;
                 case HproseTags.TagFalse: return 0L;
@@ -1528,7 +1557,7 @@ namespace Hprose.IO {
                 case HproseTags.TagTime: return ReadTimeWithoutTag().Ticks;
                 case HproseTags.TagUTF8Char: return Convert.ToInt64(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToInt64(ReadStringWithoutTag());
-                case HproseTags.TagRef: return Convert.ToInt64(ReadRef());
+                case HproseTags.TagRef: return Convert.ToInt64(ReadRef().ToString());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofInt64);
             }
         }
@@ -1538,7 +1567,7 @@ namespace Hprose.IO {
             return (tag == HproseTags.TagNull) ? 0L : ReadInt64WithTag(tag);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public long? ReadNullableInt64() {
             int tag = stream.ReadByte();
             if (tag == HproseTags.TagNull) {
@@ -1562,15 +1591,15 @@ namespace Hprose.IO {
                 case '7': return 7L;
                 case '8': return 8L;
                 case '9': return 9L;
-                case HproseTags.TagInteger: return Convert.ToUInt64(ReadLongWithoutTag());
-                case HproseTags.TagLong: return Convert.ToUInt64(ReadLongWithoutTag());
-                case HproseTags.TagDouble: return Convert.ToUInt64(ReadDoubleWithoutTag());
+                case HproseTags.TagInteger: return (ulong)(ReadLongWithoutTag());
+                case HproseTags.TagLong: return (ulong)(ReadLongWithoutTag());
+                case HproseTags.TagDouble: return (ulong)(ReadDoubleWithoutTag());
                 case HproseTags.TagEmpty: return 0L;
                 case HproseTags.TagTrue: return 1L;
                 case HproseTags.TagFalse: return 0L;
                 case HproseTags.TagUTF8Char: return Convert.ToUInt64(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToUInt64(ReadStringWithoutTag());
-                case HproseTags.TagRef: return Convert.ToUInt64(ReadRef());
+                case HproseTags.TagRef: return Convert.ToUInt64(ReadRef().ToString());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofUInt64);
             }
         }
@@ -1581,7 +1610,7 @@ namespace Hprose.IO {
             return (tag == HproseTags.TagNull) ? 0L : ReadUInt64WithTag(tag);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         [CLSCompliantAttribute(false)]
         public ulong? ReadNullableUInt64() {
             int tag = stream.ReadByte();
@@ -1612,13 +1641,21 @@ namespace Hprose.IO {
                 case HproseTags.TagEmpty: return 0.0F;
                 case HproseTags.TagTrue: return 1.0F;
                 case HproseTags.TagFalse: return 0.0F;
+#if !dotNETMF
                 case HproseTags.TagNaN: return float.NaN;
                 case HproseTags.TagInfinity: return (stream.ReadByte() == HproseTags.TagPos) ?
                                                      float.PositiveInfinity :
                                                      float.NegativeInfinity;
                 case HproseTags.TagUTF8Char: return Convert.ToSingle(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToSingle(ReadStringWithoutTag());
-                case HproseTags.TagRef: return Convert.ToSingle(ReadRef());
+                case HproseTags.TagRef: return Convert.ToSingle(ReadRef().ToString());
+#else
+                case HproseTags.TagNaN: return (float)(double.NaN);
+                case HproseTags.TagInfinity: return (float)ReadInfinityWithoutTag();
+                case HproseTags.TagUTF8Char: return (float)Convert.ToDouble(ReadUTF8CharWithoutTag());
+                case HproseTags.TagString: return (float)Convert.ToDouble(ReadStringWithoutTag());
+                case HproseTags.TagRef: return (float)Convert.ToDouble(ReadRef().ToString());
+#endif
                 default: throw CastError(TagToString(tag), HproseHelper.typeofSingle);
             }
         }
@@ -1628,7 +1665,7 @@ namespace Hprose.IO {
             return (tag == HproseTags.TagNull) ? 0.0F : ReadSingleWithTag(tag);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public float? ReadNullableSingle() {
             int tag = stream.ReadByte();
             if (tag == HproseTags.TagNull) {
@@ -1662,7 +1699,7 @@ namespace Hprose.IO {
                 case HproseTags.TagInfinity: return ReadInfinityWithoutTag();
                 case HproseTags.TagUTF8Char: return Convert.ToDouble(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return Convert.ToDouble(ReadStringWithoutTag());
-                case HproseTags.TagRef: return Convert.ToDouble(ReadRef());
+                case HproseTags.TagRef: return Convert.ToDouble(ReadRef().ToString());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofDouble);
             }
         }
@@ -1672,7 +1709,7 @@ namespace Hprose.IO {
             return (tag == HproseTags.TagNull) ? 0.0 : ReadDoubleWithTag(tag);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public double? ReadNullableDouble() {
             int tag = stream.ReadByte();
             if (tag == HproseTags.TagNull) {
@@ -1684,6 +1721,7 @@ namespace Hprose.IO {
         }
 #endif
 
+#if !dotNETMF
         private decimal ReadDecimalWithTag(int tag) {
             switch (tag) {
                 case '0': return 0.0M;
@@ -1713,8 +1751,9 @@ namespace Hprose.IO {
             int tag = stream.ReadByte();
             return (tag == HproseTags.TagNull) ? 0.0M : ReadDecimalWithTag(tag);
         }
+#endif
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public decimal? ReadNullableDecimal() {
             int tag = stream.ReadByte();
             if (tag == HproseTags.TagNull) {
@@ -1744,8 +1783,12 @@ namespace Hprose.IO {
                 case HproseTags.TagEmpty: return new DateTime(0L);
                 case HproseTags.TagDate: return ReadDateWithoutTag();
                 case HproseTags.TagTime: return ReadTimeWithoutTag();
+#if !dotNETMF
                 case HproseTags.TagString: return Convert.ToDateTime(ReadStringWithoutTag());
                 case HproseTags.TagRef: return Convert.ToDateTime(ReadRef());
+#else
+                case HproseTags.TagRef: return (DateTime)ReadRef();
+#endif
                 default: throw CastError(TagToString(tag), HproseHelper.typeofDateTime);
             }
         }
@@ -1755,7 +1798,7 @@ namespace Hprose.IO {
             return (tag == HproseTags.TagNull) ? DateTime.MinValue : ReadDateTimeWithTag(tag);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public DateTime? ReadNullableDateTime() {
             int tag = stream.ReadByte();
             if (tag == HproseTags.TagNull) {
@@ -1801,7 +1844,7 @@ namespace Hprose.IO {
                 case HproseTags.TagRef: {
                     object obj = ReadRef();
                     if (obj is char[]) return new String((char[])obj);
-                    return Convert.ToString(obj);
+                    return obj.ToString();
                 }
                 default: throw CastError(TagToString(tag), HproseHelper.typeofString);
             }
@@ -1837,7 +1880,8 @@ namespace Hprose.IO {
                 case HproseTags.TagRef: {
                     object obj = ReadRef();
                     if (obj is char[]) return new StringBuilder(new String((char[])obj));
-                    return new StringBuilder(Convert.ToString(obj));
+                    if (obj is StringBuilder) return (StringBuilder)obj;
+                    return new StringBuilder(obj.ToString());
                 }
                 default: throw CastError(TagToString(tag), HproseHelper.typeofStringBuilder);
             }
@@ -1847,13 +1891,13 @@ namespace Hprose.IO {
             switch (tag) {
                 case HproseTags.TagBytes: return new Guid(ReadBytesWithoutTag());
                 case HproseTags.TagGuid: return ReadGuidWithoutTag();
-                case HproseTags.TagString: return new Guid(ReadStringWithoutTag());
+                case HproseTags.TagString: return HproseHelper.ToGuid(ReadStringWithoutTag());
                 case HproseTags.TagRef: {
                     object obj = ReadRef();
                     if (obj is Guid) return (Guid)obj;
                     if (obj is byte[]) return new Guid((byte[])obj);
-                    if (obj is string) return new Guid((string)obj);
-                    if (obj is char[]) return new Guid(new string((char[])obj));
+                    if (obj is string) return HproseHelper.ToGuid((string)obj);
+                    if (obj is char[]) return HproseHelper.ToGuid((char[])obj);
                     throw CastError(obj, HproseHelper.typeofGuid);
                 }
                 default: throw CastError(TagToString(tag), HproseHelper.typeofGuid);
@@ -1864,7 +1908,7 @@ namespace Hprose.IO {
             return ReadGuidWithTag(stream.ReadByte());
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public Guid? ReadNullableGuid() {
             int tag = stream.ReadByte();
             if (tag == HproseTags.TagNull) {
@@ -1898,7 +1942,7 @@ namespace Hprose.IO {
                 case HproseTags.TagTime: return new BigInteger(ReadTimeWithoutTag().Ticks);
                 case HproseTags.TagUTF8Char: return HproseHelper.ToBigInteger(ReadUTF8CharWithoutTag());
                 case HproseTags.TagString: return HproseHelper.ToBigInteger(ReadStringWithoutTag());
-                case HproseTags.TagRef: return HproseHelper.ToBigInteger(Convert.ToString(ReadRef()));
+                case HproseTags.TagRef: return HproseHelper.ToBigInteger(ReadRef().ToString());
                 default: throw CastError(TagToString(tag), HproseHelper.typeofBigInteger);
             }
         }
@@ -1908,7 +1952,7 @@ namespace Hprose.IO {
             return (tag == HproseTags.TagNull) ? BigInteger.Zero : ReadBigIntegerWithTag(tag);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public BigInteger? ReadNullableBigInteger() {
             int tag = stream.ReadByte();
             if (tag == HproseTags.TagNull) {
@@ -1934,14 +1978,23 @@ namespace Hprose.IO {
                 case '9': return new TimeSpan(9L);
                 case HproseTags.TagInteger: return new TimeSpan(ReadLongWithoutTag());
                 case HproseTags.TagLong: return new TimeSpan(ReadLongWithoutTag());
-                case HproseTags.TagDouble: return new TimeSpan(Convert.ToInt64(ReadDoubleWithoutTag()));
+                case HproseTags.TagDouble: return new TimeSpan((long)(ReadDoubleWithoutTag()));
                 case HproseTags.TagEmpty: return TimeSpan.Zero;
                 case HproseTags.TagTrue: return new TimeSpan(1L);
                 case HproseTags.TagFalse: return TimeSpan.Zero;
                 case HproseTags.TagDate: return new TimeSpan(ReadDateWithoutTag().Ticks);
                 case HproseTags.TagTime: return new TimeSpan(ReadTimeWithoutTag().Ticks);
+#if !dotNETMF
                 case HproseTags.TagString: return new TimeSpan(Convert.ToDateTime(ReadStringWithoutTag()).Ticks);
                 case HproseTags.TagRef: return new TimeSpan(Convert.ToDateTime(ReadRef()).Ticks);
+#else
+                case HproseTags.TagRef: {
+                    object obj = ReadRef();
+                    if (obj is DateTime) return new TimeSpan(((DateTime)ReadRef()).Ticks);
+                    if (obj is TimeSpan) return (TimeSpan)obj;
+                    throw CastError(TagToString(tag), HproseHelper.typeofTimeSpan);
+                } 
+#endif
                 default: throw CastError(TagToString(tag), HproseHelper.typeofTimeSpan);
             }
         }
@@ -1951,7 +2004,7 @@ namespace Hprose.IO {
             return (tag == HproseTags.TagNull) ? TimeSpan.Zero : ReadTimeSpanWithTag(tag);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public TimeSpan? ReadNullableTimeSpan() {
             int tag = stream.ReadByte();
             if (tag == HproseTags.TagNull) {
@@ -1963,6 +2016,9 @@ namespace Hprose.IO {
         }
 #endif
 
+#if dotNETMF
+        [CLSCompliantAttribute(false)]
+#endif
         public MemoryStream ReadStream() {
             int tag = stream.ReadByte();
             switch (tag) {
@@ -1975,6 +2031,7 @@ namespace Hprose.IO {
             }
         }
 
+#if !dotNETMF
         public object ReadEnum(Type type) {
             int tag = stream.ReadByte();
             switch (tag) {
@@ -2003,6 +2060,7 @@ namespace Hprose.IO {
                 default: throw CastError(TagToString(tag), type);
             }
         }
+#endif
 
         public void ReadArray(Type[] types, object[] a, int count) {
             refer.Set(a);
@@ -2071,7 +2129,7 @@ namespace Hprose.IO {
                     object obj = ReadRef();
                     if (obj is char[]) return (char[])obj;
                     if (obj is string) return ((string)obj).ToCharArray();
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                     if (obj is List<char>) return ((List<char>)obj).ToArray();
 #endif
                     throw CastError(obj, HproseHelper.typeofCharArray);
@@ -2124,7 +2182,7 @@ namespace Hprose.IO {
                     if (obj is byte[]) return (byte[])obj;
                     if (obj is Guid) return ((Guid)obj).ToByteArray();
                     if (obj is MemoryStream) return ((MemoryStream)obj).ToArray();
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                     if (obj is List<byte>) return ((List<byte>)obj).ToArray();
 #endif
                     throw CastError(obj, HproseHelper.typeofByteArray);
@@ -2288,6 +2346,7 @@ namespace Hprose.IO {
             }
         }
 
+#if !dotNETMF
         public decimal[] ReadDecimalArray() {
             int tag = stream.ReadByte();
             switch (tag) {
@@ -2306,6 +2365,7 @@ namespace Hprose.IO {
                 default: throw CastError(TagToString(tag), HproseHelper.typeofDecimalArray);
             }
         }
+#endif
 
         public DateTime[] ReadDateTimeArray() {
             int tag = stream.ReadByte();
@@ -2463,21 +2523,25 @@ namespace Hprose.IO {
 
         private Array ReadArray(Type type) {
             int count = ReadInt(HproseTags.TagOpenbrace);
-#if !dotNETCF10
+#if !(dotNETCF10 || dotNETMF)
             int rank = type.GetArrayRank();
 #endif
             Type elementType = type.GetElementType();
             TypeEnum elementTypeEnum = HproseHelper.GetTypeEnum(elementType);
             Array a;
-#if !dotNETCF10
+#if !(dotNETCF10 || dotNETMF)
             if (rank == 1) {
 #endif
                 a = Array.CreateInstance(elementType, count);
                 refer.Set(a);
                 for (int i = 0; i < count; ++i) {
+#if !dotNETMF
                     a.SetValue(Unserialize(elementType, elementTypeEnum), i);
+#else
+                    ((IList)a)[i] = Unserialize(elementType, elementTypeEnum);
+#endif
                 }
-#if !dotNETCF10
+#if !(dotNETCF10 || dotNETMF)
             }
             else {
                 int i;
@@ -2544,6 +2608,7 @@ namespace Hprose.IO {
             }
         }
 
+#if !dotNETMF
         public BitArray ReadBitArray() {
             int tag = stream.ReadByte();
             switch (tag) {
@@ -2562,6 +2627,7 @@ namespace Hprose.IO {
                 default: throw CastError(TagToString(tag), HproseHelper.typeofBitArray);
             }
         }
+#endif
 
 #if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
         public ArrayList ReadArrayList() {
@@ -2570,7 +2636,11 @@ namespace Hprose.IO {
                 case HproseTags.TagNull: return null;
                 case HproseTags.TagList: {
                     int count = ReadInt(HproseTags.TagOpenbrace);
+#if !dotNETMF
                     ArrayList a = new ArrayList(count);
+#else
+                    ArrayList a = new ArrayList();
+#endif
                     refer.Set(a);
                     for (int i = 0; i < count; ++i) {
                         a.Add(Unserialize());
@@ -2589,7 +2659,11 @@ namespace Hprose.IO {
                 case HproseTags.TagNull: return null;
                 case HproseTags.TagList: {
                     int count = ReadInt(HproseTags.TagOpenbrace);
+#if !dotNETMF
                     Queue a = new Queue(count);
+#else
+                    Queue a = new Queue();
+#endif
                     refer.Set(a);
                     for (int i = 0; i < count; ++i) {
                         a.Enqueue(Unserialize());
@@ -2608,7 +2682,7 @@ namespace Hprose.IO {
                 case HproseTags.TagNull: return null;
                 case HproseTags.TagList: {
                     int count = ReadInt(HproseTags.TagOpenbrace);
-#if !dotNETCF10
+#if !(dotNETCF10 || dotNETMF)
                     Stack a = new Stack(count);
 #else
                     Stack a = new Stack();
@@ -2645,7 +2719,7 @@ namespace Hprose.IO {
             }
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public List<T> ReadList<T>() {
             int tag = stream.ReadByte();
             switch (tag) {
@@ -3257,7 +3331,7 @@ namespace Hprose.IO {
             }
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         private HashMap<TKey, TValue> ReadListAsHashMap<TKey, TValue>() {
             int count = ReadInt(HproseTags.TagOpenbrace);
             HashMap<TKey, TValue> map = new HashMap<TKey, TValue>(count);
@@ -3575,7 +3649,6 @@ namespace Hprose.IO {
                 case TypeEnum.UInt64: return ReadUInt64();
                 case TypeEnum.Single: return ReadSingle();
                 case TypeEnum.Double: return ReadDouble();
-                case TypeEnum.Decimal: return ReadDecimal();
                 case TypeEnum.DateTime: return ReadDateTime();
                 case TypeEnum.String: return ReadString();
                 case TypeEnum.StringBuilder: return ReadStringBuilder();
@@ -3584,7 +3657,6 @@ namespace Hprose.IO {
                 case TypeEnum.TimeSpan: return ReadTimeSpan();
                 case TypeEnum.Stream:
                 case TypeEnum.MemoryStream: return ReadStream();
-                case TypeEnum.Enum: return ReadEnum(type);
                 case TypeEnum.ObjectArray: return ReadObjectArray();
                 case TypeEnum.BooleanArray: return ReadBooleanArray();
                 case TypeEnum.CharArray: return ReadCharArray();
@@ -3598,7 +3670,6 @@ namespace Hprose.IO {
                 case TypeEnum.UInt64Array: return ReadUInt64Array();
                 case TypeEnum.SingleArray: return ReadSingleArray();
                 case TypeEnum.DoubleArray: return ReadDoubleArray();
-                case TypeEnum.DecimalArray: return ReadDecimalArray();
                 case TypeEnum.DateTimeArray: return ReadDateTimeArray();
                 case TypeEnum.StringArray: return ReadStringArray();
                 case TypeEnum.StringBuilderArray: return ReadStringBuilderArray();
@@ -3608,7 +3679,12 @@ namespace Hprose.IO {
                 case TypeEnum.CharsArray: return ReadCharsArray();
                 case TypeEnum.BytesArray: return ReadBytesArray();
                 case TypeEnum.OtherTypeArray: return ReadOtherTypeArray(type);
+#if !dotNETMF
+                case TypeEnum.Decimal: return ReadDecimal();
+                case TypeEnum.Enum: return ReadEnum(type);
+                case TypeEnum.DecimalArray: return ReadDecimalArray();
                 case TypeEnum.BitArray: return ReadBitArray();
+#endif
 #if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
                 case TypeEnum.ArrayList: return ReadArrayList();
                 case TypeEnum.Queue: return ReadQueue();
@@ -3616,7 +3692,7 @@ namespace Hprose.IO {
                 case TypeEnum.Hashtable:
                 case TypeEnum.HashMap: return ReadHashMap();
 #endif
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 case TypeEnum.NullableBoolean: return ReadNullableBoolean();
                 case TypeEnum.NullableChar: return ReadNullableChar();
                 case TypeEnum.NullableSByte: return ReadNullableSByte();
@@ -3706,8 +3782,11 @@ namespace Hprose.IO {
             throw new HproseException("Can not unserialize this type: " + type.FullName);
         }
 
+#if dotNETMF
+        [CLSCompliantAttribute(false)]
+#endif
         public MemoryStream ReadRaw() {
-            MemoryStream ostream = new MemoryStream(4096);
+            MemoryStream ostream = new MemoryStream();
             ReadRaw(ostream);
             return ostream;
         }

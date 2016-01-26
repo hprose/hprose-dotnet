@@ -12,11 +12,11 @@
  *                                                        *
  * hprose Invoke Helper class for C#.                     *
  *                                                        *
- * LastModified: Feb 22, 2014                             *
+ * LastModified: Jan 18, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
 using System;
 
 namespace Hprose.Common {

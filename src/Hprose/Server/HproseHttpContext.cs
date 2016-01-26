@@ -16,7 +16,7 @@
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-#if !(ClientOnly || ClientProfile || Smartphone)
+#if !(ClientOnly || ClientProfile || Smartphone || dotNETMF)
 using System.Web;
 using System.Web.SessionState;
 using Hprose.Common;

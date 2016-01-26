@@ -12,13 +12,13 @@
  *                                                        *
  * hprose writer class for C#.                            *
  *                                                        *
- * LastModified: Jan 16, 2016                             *
+ * LastModified: Jan 20, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 using System;
 using System.Collections;
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
 using System.Collections.Generic;
 #endif
 #if dotNET45
@@ -29,7 +29,7 @@ using System.IO;
 using System.Text;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS || dotNETMF)
 using System.Runtime.Serialization;
 using Hprose.Reflection;
 #endif
@@ -37,7 +37,7 @@ using Hprose.Common;
 
 namespace Hprose.IO {
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
     class IdentityEqualityComparer : IEqualityComparer<object> {
         bool IEqualityComparer<object>.Equals(object x, object y) {
             return object.ReferenceEquals(x, y);
@@ -56,7 +56,7 @@ namespace Hprose.IO {
             return obj.GetHashCode();
         }
     }
-#elif !dotNETCF10
+#elif !(dotNETCF10 || dotNETMF)
     public class IdentityHashcodeProvider : IHashCodeProvider {
         public int GetHashCode(object obj) {
             return obj.GetHashCode();
@@ -91,15 +91,19 @@ namespace Hprose.IO {
 
     sealed class RealWriterRefer : WriterRefer {
         private HproseWriter writer;
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10|| dotNETMF)
         private Dictionary<object, int> references;
 #else
         private Hashtable references;
 #endif
         private int lastref = 0;
+#if !dotNETMF
         public RealWriterRefer(HproseWriter writer, HproseMode mode) {
+#else
+        public RealWriterRefer(HproseWriter writer) {
+#endif
             this.writer = writer;
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10|| dotNETMF)
             if (mode == HproseMode.FieldMode) {
                 references = new Dictionary<object, int>(new IdentityEqualityComparer());
             }
@@ -113,7 +117,7 @@ namespace Hprose.IO {
             else {
                 references = new Hashtable();
             }
-#elif !dotNETCF10
+#elif !(dotNETCF10 || dotNETMF)
             if (mode == HproseMode.FieldMode) {
                 references = new Hashtable(new IdentityHashcodeProvider(), new IdentityComparer());
             }
@@ -131,9 +135,13 @@ namespace Hprose.IO {
             references[obj] = lastref++;
         }
         public bool Write(object obj) {
+#if !dotNETMF
             if (references.ContainsKey(obj)) {
+#else
+            if (references.Contains(obj)) {
+#endif
                 writer.stream.WriteByte(HproseTags.TagRef);
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 writer.WriteInt(references[obj], writer.stream);
 #else
                 writer.WriteInt((int)references[obj], writer.stream);
@@ -151,8 +159,10 @@ namespace Hprose.IO {
 
     public sealed class HproseWriter {
         public Stream stream;
+#if !dotNETMF
         private HproseMode mode;
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#endif
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         private static Dictionary<Type, SerializeCache> fieldsCache = new Dictionary<Type, SerializeCache>();
         private static Dictionary<Type, SerializeCache> propertiesCache = new Dictionary<Type, SerializeCache>();
         private static Dictionary<Type, SerializeCache> membersCache = new Dictionary<Type, SerializeCache>();
@@ -173,6 +183,7 @@ namespace Hprose.IO {
                                                          (byte)'7',(byte)'5',(byte)'8',(byte)'0',(byte)'8'};
         private int lastclassref = 0;
 
+#if !dotNETMF
         public HproseWriter(Stream stream)
             : this(stream, HproseMode.MemberMode, false) {
         }
@@ -190,6 +201,16 @@ namespace Hprose.IO {
             this.mode = mode;
             this.refer = (simple ? new FakeWriterRefer() as WriterRefer : new RealWriterRefer(this, mode) as WriterRefer);
         }
+#else
+        public HproseWriter(Stream stream)
+            : this(stream, false) {
+        }
+
+        public HproseWriter(Stream stream, bool simple) {
+            this.stream = stream;
+            this.refer = (simple ? new FakeWriterRefer() as WriterRefer : new RealWriterRefer(this) as WriterRefer);
+        }
+#endif
 
         public void Serialize(object obj) {
             if (obj == null) WriteNull();
@@ -262,7 +283,7 @@ namespace Hprose.IO {
             else if (obj is ArrayList) WriteListWithRef((IList)obj);
 #endif
             else if (obj is IList) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 if (obj is IList<int>) WriteListWithRef((IList<int>)obj);
                 else if (obj is IList<string>) WriteListWithRef((IList<string>)obj);
                 else if (obj is IList<double>) WriteListWithRef((IList<double>)obj);
@@ -283,7 +304,7 @@ namespace Hprose.IO {
 #endif
             else {
                 Type type = obj.GetType();
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
 #if !Core
                 Type typeinfo = type;
 #else
@@ -294,7 +315,7 @@ namespace Hprose.IO {
                     return;
                 }
 #endif
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
+#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || dotNETMF)
                 if (HproseHelper.typeofISerializable.IsAssignableFrom(type)) {
                     throw new HproseException(type.Name + " is a ISerializable type, hprose can't support it.");
                 }
@@ -412,7 +433,11 @@ namespace Hprose.IO {
         }
 
         public void WriteEnum(object value, Type type) {
+#if !dotNETMF
             switch (HproseHelper.GetTypeEnum(Enum.GetUnderlyingType(type))) {
+#else
+            switch (HproseHelper.GetTypeEnum(type.GetField("value__").FieldType)) {
+#endif
                 case TypeEnum.Int32: WriteInteger((int)value); break;
                 case TypeEnum.Byte: WriteInteger((byte)value); break;
                 case TypeEnum.SByte: WriteInteger((sbyte)value); break;
@@ -425,10 +450,10 @@ namespace Hprose.IO {
         }
 
         public void WriteDouble(float d) {
-            if (float.IsNaN(d)) {
+            if (double.IsNaN(d)) {
                 stream.WriteByte(HproseTags.TagNaN);
             }
-            else if (float.IsInfinity(d)) {
+            else if (double.IsInfinity(d)) {
                 stream.WriteByte(HproseTags.TagInfinity);
                 if (d > 0) {
                     stream.WriteByte(HproseTags.TagPos);
@@ -1110,8 +1135,10 @@ namespace Hprose.IO {
 
         public void WriteArray(Array array) {
             refer.Set(array);
+#if !dotNETMF
             int rank = array.Rank;
             if (rank == 1) {
+#endif
                 int length = array.Length;
                 stream.WriteByte(HproseTags.TagList);
                 if (length > 0) WriteInt(length, stream);
@@ -1120,6 +1147,7 @@ namespace Hprose.IO {
                     Serialize(array.GetValue(i));
                 }
                 stream.WriteByte(HproseTags.TagClosebrace);
+#if !dotNETMF
             }
             else {
                 int i;
@@ -1167,12 +1195,14 @@ namespace Hprose.IO {
                 }
                 stream.WriteByte(HproseTags.TagClosebrace);
             }
+#endif
         }
 
         public void WriteArrayWithRef(Array array) {
             if (!refer.Write(array)) WriteArray(array);
         }
 
+#if !dotNETMF
         public void WriteBitArray(BitArray array) {
             refer.Set(array);
             int length = array.Length;
@@ -1188,6 +1218,7 @@ namespace Hprose.IO {
         public void WriteBitArrayWithRef(BitArray array) {
             if (!refer.Write(array)) WriteBitArray(array);
         }
+#endif
 
         public void WriteList(IList list) {
             refer.Set(list);
@@ -1238,7 +1269,7 @@ namespace Hprose.IO {
             if (!refer.Write(collection)) WriteCollection(collection);
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public void WriteList(IList<double> list) {
             refer.Set(list);
             int length = list.Count;
@@ -1316,7 +1347,7 @@ namespace Hprose.IO {
         public void WriteObject(object obj) {
             Type type = obj.GetType();
             int cr;
-#if (dotNET10 || dotNET11 || dotNETCF10)
+#if (dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             object crobj;
             if ((crobj = classref[type]) != null) {
                 cr = (int)crobj;
@@ -1333,25 +1364,30 @@ namespace Hprose.IO {
             stream.WriteByte(HproseTags.TagObject);
             WriteInt(cr, stream);
             stream.WriteByte(HproseTags.TagOpenbrace);
+#if !dotNETMF
             if ((mode != HproseMode.MemberMode) && HproseHelper.IsSerializable(type)) {
                 WriteSerializableObject(obj, type);
             }
             else {
                 WriteDataContractObject(obj, type);
             }
+#else
+            WriteSerializableObject(obj, type);
+#endif
             stream.WriteByte(HproseTags.TagClosebrace);
         }
-
         public void WriteObjectWithRef(object obj) {
             if (!refer.Write(obj)) WriteObject(obj);
         }
 
         private void WriteSerializableObject(object obj, Type type) {
+#if !dotNETMF
             if (mode == HproseMode.FieldMode) {
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
+#endif
+#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS || dotNETMF)
                 ObjectSerializer.Get(type).SerializeFields(obj, this);
 #else
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 ICollection<FieldTypeInfo> fields = HproseHelper.GetFields(type).Values;
                 foreach (FieldTypeInfo field in fields) {
 #else
@@ -1369,6 +1405,7 @@ namespace Hprose.IO {
                     Serialize(value);
                 }
 #endif
+#if !dotNETMF
             }
             else {
 #if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
@@ -1399,8 +1436,10 @@ namespace Hprose.IO {
                 }
 #endif
             }
+#endif
         }
 
+#if !dotNETMF
         private void WriteDataContractObject(object obj, Type type) {
 #if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
             ObjectSerializer.Get(type).SerializeMembers(obj, this);
@@ -1435,15 +1474,19 @@ namespace Hprose.IO {
             }
 #endif
         }
-
+#endif
         private int WriteClass(Type type) {
             SerializeCache cache = null;
+#if !dotNETMF
             if ((mode != HproseMode.MemberMode) && HproseHelper.IsSerializable(type)) {
                 cache = WriteSerializableClass(type);
             }
             else {
                 cache = WriteDataContractClass(type);
             }
+#else
+            cache = WriteSerializableClass(type);
+#endif
             stream.Write(cache.data, 0, cache.data.Length);
             refer.AddCount(cache.refcount);
             int cr = lastclassref++;
@@ -1454,15 +1497,18 @@ namespace Hprose.IO {
         private SerializeCache WriteSerializableClass(Type type) {
             SerializeCache cache = null;
             ICollection c = null;
+#if !dotNETMF
             if (mode == HproseMode.FieldMode) {
+#endif
                 c = fieldsCache;
                 lock (c.SyncRoot) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                     fieldsCache.TryGetValue(type, out cache);
 #else
                     cache = (SerializeCache)fieldsCache[type];
 #endif
                 }
+#if !dotNETMF
             }
             else {
                 c = propertiesCache;
@@ -1474,26 +1520,31 @@ namespace Hprose.IO {
 #endif
                 }
             }
+#endif
             if (cache == null) {
                 cache = new SerializeCache();
                 MemoryStream cachestream = new MemoryStream();
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 ICollection<string> keys;
 #else
                 ICollection keys;
 #endif
+#if !dotNETMF
                 if (mode == HproseMode.FieldMode) {
                     keys = HproseHelper.GetFields(type).Keys;
                 }
                 else {
                     keys = HproseHelper.GetProperties(type).Keys;
                 }
+#else
+                keys = HproseHelper.GetFields(type).Keys;
+#endif
                 int count = keys.Count;
                 cachestream.WriteByte(HproseTags.TagClass);
                 WriteUTF8String(HproseHelper.GetClassName(type), cachestream);
                 if (count > 0) WriteInt(count, cachestream);
                 cachestream.WriteByte(HproseTags.TagOpenbrace);
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 foreach (string key in keys) {
                     cachestream.WriteByte(HproseTags.TagString);
                     WriteUTF8String(key, cachestream);
@@ -1506,11 +1557,14 @@ namespace Hprose.IO {
                 }
                 cachestream.WriteByte(HproseTags.TagClosebrace);
                 cache.data = cachestream.ToArray();
+#if !dotNETMF
                 if (mode == HproseMode.FieldMode) {
+#endif
                     c = fieldsCache;
                     lock (c.SyncRoot) {
                         fieldsCache[type] = cache;
                     }
+#if !dotNETMF
                 }
                 else {
                     c = propertiesCache;
@@ -1518,10 +1572,12 @@ namespace Hprose.IO {
                         propertiesCache[type] = cache;
                     }
                 }
+#endif
             }
             return cache;
         }
 
+#if !dotNETMF
         private SerializeCache WriteDataContractClass(Type type) {
             SerializeCache cache = null;
             ICollection c = membersCache;
@@ -1565,6 +1621,7 @@ namespace Hprose.IO {
             }
             return cache;
         }
+#endif
 
         private void WriteAsciiString(string s) {
             int size = s.Length;

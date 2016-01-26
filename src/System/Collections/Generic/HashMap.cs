@@ -1,7 +1,7 @@
 /* HashMap class.
  * This library is free. You can redistribute it and/or modify it.
  */
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
 using System;
 namespace System.Collections.Generic {
     public class HashMap<TKey, TValue>: IDictionary<TKey, TValue>, IDictionary,

@@ -228,6 +228,7 @@ set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\InvokeHelper.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\MethodNameAttribute.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\ResultModeAttribute.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\SimpleModeAttribute.cs
+set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Common\ByRefAttribute.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Reflection\Proxy.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Reflection\IInvocationHandler.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Reflection\CtorAccessor.cs
@@ -779,12 +780,12 @@ set CF_REFERENCE=
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v1.0\WindowsCE\mscorlib.dll"
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v1.0\WindowsCE\System.dll"
 set CF_REFERENCE=%CF_REFERENCE% -reference:"%CF_PATH%\v1.0\WindowsCE\System.Windows.Forms.dll"
-"%CSC%" -out:dist\Hprose.Client\Release\net10-cf\Hprose.Client.dll -define:Smartphone;dotNETCF10;ClientOnly -noconfig -nostdlib -filealign:512 -target:library -optimize+ -unsafe+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
-"%CSC%" -out:dist\Hprose\Release\net10-cf\Hprose.dll -define:Smartphone;dotNETCF10 -noconfig -nostdlib -filealign:512 -target:library -optimize+ -unsafe+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+"%CSC%" -out:dist\Hprose.Client\Release\net10-cf\Hprose.Client.dll -define:Smartphone;dotNETCF10;ClientOnly -noconfig -nostdlib -filealign:512 -target:library -optimize+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+"%CSC%" -out:dist\Hprose\Release\net10-cf\Hprose.dll -define:Smartphone;dotNETCF10 -noconfig -nostdlib -filealign:512 -target:library -optimize+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 echo start compile hprose for .NET Compact Framework 1.0 Debug
-"%CSC%" -out:dist\Hprose.Client\Debug\net10-cf\Hprose.Client.dll -define:Smartphone;dotNETCF10;ClientOnly -noconfig -nostdlib -filealign:512 -target:library -optimize+ -debug+ -unsafe+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
-"%CSC%" -out:dist\Hprose\Debug\net10-cf\Hprose.dll -define:Smartphone;dotNETCF10 -noconfig -nostdlib -filealign:512 -target:library -optimize+ -debug+ -unsafe+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+"%CSC%" -out:dist\Hprose.Client\Debug\net10-cf\Hprose.Client.dll -define:Smartphone;dotNETCF10;ClientOnly -noconfig -nostdlib -filealign:512 -target:library -optimize+ -debug+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
+"%CSC%" -out:dist\Hprose\Debug\net10-cf\Hprose.dll -define:Smartphone;dotNETCF10 -noconfig -nostdlib -filealign:512 -target:library -optimize+ -debug+ %CF_REFERENCE% %NUMERICS_SRC% %HPROSE_SRC% %HPROSE_INFO%
 
 set CSC=c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\Csc.exe
 
@@ -918,3 +919,4 @@ set HPROSE_INFO=
 set CSC=
 
 call makeport.bat
+call makemf.bat

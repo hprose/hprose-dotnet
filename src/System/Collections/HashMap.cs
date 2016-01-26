@@ -11,17 +11,30 @@ namespace System.Collections {
         }
         public HashMap(int capacity): base(capacity) {
         }
+#if !dotNETMF
         public HashMap(int capacity, float loadFactor) : base(capacity, loadFactor) {
         }
         public HashMap(IDictionary value) : base(value) {
         }
+#else
+        public HashMap(int capacity, int maxLoadFactor) : base(capacity, maxLoadFactor) {
+        }
+#endif
+#if !dotNETMF
         public override object Clone() {
+#else
+        public new object Clone() {
+#endif
             HashMap m = (HashMap)base.Clone();
             m.valueOfNullKey = valueOfNullKey;
             m.hasNullKey = hasNullKey;
             return m;
         }
+#if !dotNETMF
         public override object this[object key] {
+#else
+        public new object this[object key] {
+#endif
             get {
                 if (key == null) return valueOfNullKey;
                 return base[key];
@@ -36,7 +49,11 @@ namespace System.Collections {
                 }
             }
         }
+#if !dotNETMF
         public override void Add(object key, object value) {
+#else
+        public new void Add(object key, object value) {
+#endif
             if (key == null) {
                 if (hasNullKey) return;
                 valueOfNullKey = value;
@@ -46,18 +63,32 @@ namespace System.Collections {
                 base.Add(key, value);
             }
         }
+#if !dotNETMF
         public override bool Contains(object key) {
-            return ContainsKey(key);
+#else
+        public new bool Contains(object key) {
+#endif
+            if (key == null) return hasNullKey;
+            return base.Contains(key);
         }
+#if !dotNETMF
         public override void CopyTo(Array array, int arrayIndex) {
+#else
+        public new void CopyTo(Array array, int arrayIndex) {
+#endif
             if (hasNullKey) {
                 base.CopyTo(array, arrayIndex + 1);
+#if !dotNETMF
                 array.SetValue(new DictionaryEntry(null, valueOfNullKey), arrayIndex);
+#else
+                ((IList)array)[arrayIndex] = new DictionaryEntry(null, valueOfNullKey);
+#endif
             }
             else {
                 base.CopyTo(array, arrayIndex);
             }
         }
+#if !dotNETMF
         public override bool ContainsKey(object key) {
             if (key == null) return hasNullKey;
             return base.ContainsKey(key);
@@ -66,7 +97,12 @@ namespace System.Collections {
             if (hasNullKey && (valueOfNullKey == value)) return true;
             return base.ContainsValue(value);
         }
+#endif
+#if !dotNETMF
         public override void Remove(object key) {
+#else
+        public new void Remove(object key) {
+#endif
             if (key == null) {
                 valueOfNullKey = null;
                 hasNullKey = false;
@@ -75,16 +111,25 @@ namespace System.Collections {
                 base.Remove(key);
             }
         }
+#if !dotNETMF
         public override int Count {
+#else
+        public new int Count {
+#endif
             get {
                 return base.Count + (hasNullKey ? 1 : 0);
             }
         }
+#if !dotNETMF
         public override void Clear() {
+#else
+        public new void Clear() {
+#endif
             valueOfNullKey = null;
             hasNullKey = false;
             base.Clear();
         }
+#if !dotNETMF
         public override IDictionaryEnumerator GetEnumerator() {
             IDictionaryEnumerator e = base.GetEnumerator();
             if (hasNullKey) {
@@ -94,6 +139,7 @@ namespace System.Collections {
                 return e;
             }
         }
+#endif
         IEnumerator IEnumerable.GetEnumerator() {
             IEnumerator e = base.GetEnumerator();
             if (hasNullKey) {
@@ -103,18 +149,30 @@ namespace System.Collections {
                 return e;
             }
         }
+#if !dotNETMF
         public override ICollection Keys {
+#else
+        public new ICollection Keys {
+#endif
             get {
                 return new KeysCollection(this, base.Keys);
             }
         }
+#if !dotNETMF
         public override ICollection Values {
+#else
+        public new ICollection Values {
+#endif
             get {
                 return new ValuesCollection(this, base.Values);
             }
         }
 
-        private class HashMapEnumerator: IDictionaryEnumerator, IEnumerator, ICloneable {
+        private class HashMapEnumerator:
+#if !dotNETMF
+        IDictionaryEnumerator, 
+#endif
+        IEnumerator, ICloneable {
             private IEnumerator e;
             private object v;
             private int p;
@@ -172,7 +230,11 @@ namespace System.Collections {
                     if (p == 0) {
                         return null;
                     }
+#if !dotNETMF
                     return ((IDictionaryEnumerator)e).Key;
+#else
+                    return ((DictionaryEntry)e.Current).Key;
+#endif
                 }
             }
             public virtual object Value {
@@ -180,7 +242,11 @@ namespace System.Collections {
                     if (p == 0) {
                         return v;
                     }
+#if !dotNETMF
                     return ((IDictionaryEnumerator)e).Value;
+#else
+                    return ((DictionaryEntry)e.Current).Value;
+#endif
                 }
             }
         }
@@ -196,7 +262,11 @@ namespace System.Collections {
             public virtual void CopyTo(Array array, int arrayIndex) {
                 if (m.hasNullKey) {
                     keys.CopyTo(array, arrayIndex + 1);
+#if !dotNETMF
                     array.SetValue(null, arrayIndex);
+#else
+                    ((IList)array)[arrayIndex] = null;
+#endif
                 }
                 else {
                     keys.CopyTo(array, arrayIndex);
@@ -238,7 +308,11 @@ namespace System.Collections {
             public virtual void CopyTo(Array array, int arrayIndex) {
                 if (m.hasNullKey) {
                     values.CopyTo(array, arrayIndex + 1);
+#if !dotNETMF
                     array.SetValue(m.valueOfNullKey, arrayIndex);
+#else
+                    ((IList)array)[arrayIndex] = m.valueOfNullKey;
+#endif
                 }
                 else {
                     values.CopyTo(array, arrayIndex);

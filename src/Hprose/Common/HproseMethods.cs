@@ -12,13 +12,13 @@
  *                                                        *
  * hprose remote methods class for C#.                    *
  *                                                        *
- * LastModified: Apr 7, 2014                              *
+ * LastModified: Jan 16, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 using System;
 using System.Collections;
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
 using System.Collections.Generic;
 #endif
 using System.Reflection;
@@ -26,7 +26,9 @@ using System.Reflection;
 namespace Hprose.Common {
     public class HproseMethods {
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if dotNETMF
+        internal Hashtable remoteMethods = new Hashtable();
+#elif !(dotNET10 || dotNET11 || dotNETCF10)
         internal Dictionary<string, Dictionary<int, HproseMethod>> remoteMethods = new Dictionary<string, Dictionary<int, HproseMethod>>(StringComparer.OrdinalIgnoreCase);
 #elif MONO
         internal Hashtable remoteMethods = new Hashtable(StringComparer.OrdinalIgnoreCase);
@@ -37,25 +39,33 @@ namespace Hprose.Common {
         }
 
         internal HproseMethod GetMethod(string aliasName, int paramCount) {
+#if dotNETMF
+            if (!remoteMethods.Contains(aliasName)) {
+#else
             if (!remoteMethods.ContainsKey(aliasName)) {
+#endif
                 return null;
             }
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             Dictionary<int, HproseMethod> methods = remoteMethods[aliasName];
 #else
             Hashtable methods = (Hashtable)remoteMethods[aliasName];
 #endif
+#if dotNETMF
+            if (!methods.Contains(paramCount)) {
+#else
             if (!methods.ContainsKey(paramCount)) {
+#endif
                 return null;
             }
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             return methods[paramCount];
 #else
             return (HproseMethod)methods[paramCount];
 #endif
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public ICollection<string> AllNames {
 #else
         public ICollection AllNames {
@@ -83,7 +93,7 @@ namespace Hprose.Common {
         }
 
         internal void AddMethod(string aliasName, HproseMethod method) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             Dictionary<int, HproseMethod> methods;
             if (remoteMethods.ContainsKey(aliasName)) {
                 methods = remoteMethods[aliasName];
@@ -93,7 +103,7 @@ namespace Hprose.Common {
             }
 #else
             Hashtable methods;
-            if (remoteMethods.ContainsKey(aliasName)) {
+            if (remoteMethods.Contains(aliasName)) {
                 methods = (Hashtable)remoteMethods[aliasName];
             }
             else {
@@ -111,6 +121,7 @@ namespace Hprose.Common {
             remoteMethods[aliasName] = methods;
         }
 
+#if !dotNETMF
         public void AddMethod(MethodInfo method, object obj, string aliasName) {
             AddMethod(aliasName, new HproseMethod(method, obj));
         }
@@ -126,7 +137,7 @@ namespace Hprose.Common {
         public void AddMethod(MethodInfo method, object obj, string aliasName, HproseResultMode mode, bool simple) {
             AddMethod(aliasName, new HproseMethod(method, obj, mode, simple));
         }
-
+#endif
         public void AddMethod(string methodName, object obj, Type[] paramTypes, string aliasName) {
             AddMethod(aliasName, new HproseMethod(methodName, obj, paramTypes));
         }
@@ -190,7 +201,7 @@ namespace Hprose.Common {
         public void AddMethod(string methodName, Type type, Type[] paramTypes, HproseResultMode mode, bool simple) {
             AddMethod(methodName, new HproseMethod(methodName, type, paramTypes, mode, simple));
         }
-
+#if !dotNETMF
         private void AddMethod(string methodName, object obj, Type type, string aliasName) {
             AddMethod(methodName, obj, type, aliasName, HproseResultMode.Normal, false);
         }
@@ -612,7 +623,7 @@ namespace Hprose.Common {
             }
 #endif
         }
-
+#endif
         public void AddMissingMethod(string methodName, object obj) {
             AddMethod(methodName, obj, new Type[] { typeof(string), typeof(object[]) }, "*");
         }

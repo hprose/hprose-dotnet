@@ -12,7 +12,7 @@
  *                                                        *
  * hprose http listener server class for C#.              *
  *                                                        *
- * LastModified: May 30, 2015                             *
+ * LastModified: Jan 23, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -26,12 +26,20 @@ using Hprose.Common;
 
 namespace Hprose.Server {
     public class HproseHttpListenerServer : HproseHttpListenerService {
+#if !dotNETMF
         private HttpListener Listener = new HttpListener();
+#else
+        private HttpListener Listener = null;
+#endif
         private string url = null;
         private string crossDomainXmlFile = null;
-        private string crossDomainXmlContent = null;
         private string clientAccessPolicyXmlFile = null;
+#if !dotNETMF
+        private string crossDomainXmlContent = null;
         private string clientAccessPolicyXmlContent = null;
+#endif
+        private byte[] crossDomainXml = null;
+        private byte[] clientAccessPolicyXml = null;
         private string lastModified = null;
         private string etag = null;
         private int tCount = 2;
@@ -50,8 +58,12 @@ namespace Hprose.Server {
             }
             set {
                 url = value;
+#if !dotNETMF
                 Listener.Prefixes.Clear();
                 Listener.Prefixes.Add(url);
+#else
+                Listener = new HttpListener(url);
+#endif
             }
         }
 
@@ -70,6 +82,7 @@ namespace Hprose.Server {
             }
         }
 
+#if !dotNETMF
         public string CrossDomainXmlFile {
             get {
                 return crossDomainXmlFile;
@@ -77,6 +90,7 @@ namespace Hprose.Server {
             set {
                 crossDomainXmlFile = value;
                 crossDomainXmlContent = File.ReadAllText(value);
+                crossDomainXml = Encoding.ASCII.GetBytes(crossDomainXmlContent);
             }
         }
 
@@ -86,6 +100,18 @@ namespace Hprose.Server {
             }
             set {
                 crossDomainXmlContent = value;
+                crossDomainXml = Encoding.ASCII.GetBytes(value);
+                crossDomainXmlFile = null;
+            }
+        }
+
+        public byte[] CrossDomainXml {
+            get {
+                return crossDomainXml;
+            }
+            set {
+                crossDomainXmlContent = Encoding.ASCII.GetString(value);
+                crossDomainXml = value;
                 crossDomainXmlFile = null;
             }
         }
@@ -97,6 +123,7 @@ namespace Hprose.Server {
             set {
                 clientAccessPolicyXmlFile = value;
                 clientAccessPolicyXmlContent = File.ReadAllText(value);
+                clientAccessPolicyXml = Encoding.ASCII.GetBytes(clientAccessPolicyXmlContent);
             }
         }
 
@@ -106,9 +133,62 @@ namespace Hprose.Server {
             }
             set {
                 clientAccessPolicyXmlContent = value;
+                clientAccessPolicyXml = Encoding.ASCII.GetBytes(value);
                 clientAccessPolicyXmlFile = null;
             }
         }
+
+        public byte[] ClientAccessPolicyXml {
+            get {
+                return clientAccessPolicyXml;
+            }
+            set {
+                clientAccessPolicyXmlContent = Encoding.ASCII.GetString(value);
+                clientAccessPolicyXml = value;
+                clientAccessPolicyXmlFile = null;
+            }
+        }
+#else
+        public string CrossDomainXmlFile {
+            get {
+                return crossDomainXmlFile;
+            }
+            set {
+                crossDomainXmlFile = value;
+                crossDomainXml = File.ReadAllBytes(value);
+            }
+        }
+
+        public byte[] CrossDomainXml {
+            get {
+                return crossDomainXml;
+            }
+            set {
+                crossDomainXml = value;
+                crossDomainXmlFile = null;
+            }
+        }
+
+        public string ClientAccessPolicyXmlFile {
+            get {
+                return clientAccessPolicyXmlFile;
+            }
+            set {
+                clientAccessPolicyXmlFile = value;
+                clientAccessPolicyXml = File.ReadAllBytes(value);
+            }
+        }
+
+        public byte[] ClientAccessPolicyXml {
+            get {
+                return clientAccessPolicyXml;
+            }
+            set {
+                clientAccessPolicyXml = value;
+                clientAccessPolicyXmlFile = null;
+            }
+        }
+#endif
 
         private bool CrossDomainXmlHandler(HttpListenerContext context) {
             HttpListenerRequest request = context.Request;
@@ -119,9 +199,13 @@ namespace Hprose.Server {
                     response.StatusCode = 304;
                 }
                 else {
-                    byte[] crossDomainXml = Encoding.ASCII.GetBytes(crossDomainXmlContent);
+#if !dotNETMF
                     response.AppendHeader("Last-Modified", lastModified);
                     response.AppendHeader("Etag", etag);
+#else
+                    response.Headers.Add("Last-Modified", lastModified);
+                    response.Headers.Add("Etag", etag);
+#endif
                     response.ContentType = "text/xml";
                     response.ContentLength64 = crossDomainXml.Length;
                     response.SendChunked = false;
@@ -143,9 +227,13 @@ namespace Hprose.Server {
                     response.StatusCode = 304;
                 }
                 else {
-                    byte[] clientAccessPolicyXml = Encoding.ASCII.GetBytes(clientAccessPolicyXmlContent);
+#if !dotNETMF
                     response.AppendHeader("Last-Modified", lastModified);
                     response.AppendHeader("Etag", etag);
+#else
+                    response.Headers.Add("Last-Modified", lastModified);
+                    response.Headers.Add("Etag", etag);
+#endif
                     response.ContentType = "text/xml";
                     response.ContentLength64 = clientAccessPolicyXml.Length;
                     response.SendChunked = false;
@@ -158,7 +246,34 @@ namespace Hprose.Server {
             return false;
         }
 
-        public void Start() {
+        public void Stop() {
+            if (Listener.IsListening) {
+                Listener.Stop();
+            }
+        }
+
+        public void Close() {
+            Listener.Close();
+#if !dotNETMF
+            Listener = new HttpListener();
+            Listener.Prefixes.Add(url);
+#else
+            Listener = new HttpListener(url);
+#endif
+        }
+
+        public void Abort() {
+            Listener.Abort();
+#if !dotNETMF
+            Listener = new HttpListener();
+            Listener.Prefixes.Add(url);
+#else
+            Listener = new HttpListener(url);
+#endif
+        }
+
+ #if !dotNETMF
+         public void Start() {
             if (Listener.IsListening) {
                 return;
             }
@@ -170,37 +285,41 @@ namespace Hprose.Server {
             }
         }
 
-        public void Stop() {
-            if (Listener.IsListening) {
-                Listener.Stop();
-            }
-        }
-
-        public void Close() {
-            Listener.Close();
-            Listener = new HttpListener();
-            Listener.Prefixes.Add(url);
-        }
-
-        public void Abort() {
-            Listener.Abort();
-            Listener = new HttpListener();
-            Listener.Prefixes.Add(url);
-        }
-
         private void GetContext(IAsyncResult result) {
             HttpListenerContext context = null;
             try {
                 context = Listener.EndGetContext(result);
                 Listener.BeginGetContext(GetContext, Listener);
-                if (clientAccessPolicyXmlContent != null && ClientAccessPolicyXmlHandler(context)) return;
-                if (crossDomainXmlContent != null && CrossDomainXmlHandler(context)) return;
+                if (clientAccessPolicyXml != null && ClientAccessPolicyXmlHandler(context)) return;
+                if (crossDomainXml != null && CrossDomainXmlHandler(context)) return;
                 Handle(context);
             }
             catch (Exception e) {
                 FireErrorEvent(e, new HproseHttpListenerContext(context));
             }
         }
+#else
+         public void Start() {
+            if (Listener.IsListening) {
+                return;
+            }
+            lastModified = DateTime.Now.ToString("R");
+            etag = '"' + new Random().Next().ToString("x") + ":" + new Random().Next().ToString() + '"';
+            Listener.Start();
+            HttpListenerContext context = null;
+            while (Listener.IsListening) {
+                try {
+                    context = Listener.GetContext();
+                    if (clientAccessPolicyXml != null && ClientAccessPolicyXmlHandler(context)) continue;
+                    if (crossDomainXml != null && CrossDomainXmlHandler(context)) continue;
+                    Handle(context);
+                }
+                catch (Exception e) {
+                    FireErrorEvent(e, new HproseHttpListenerContext(context));
+                }
+            }
+        }
+#endif
     }
 }
 #endif

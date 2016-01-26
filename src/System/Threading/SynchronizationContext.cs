@@ -6,7 +6,6 @@ namespace System.Threading {
 	public delegate void SendOrPostCallback(object state);
     public class SynchronizationContext {
         private static SynchronizationContext currentContext = new WindowsFormsSynchronizationContext();
-
         public SynchronizationContext() {
         }
 

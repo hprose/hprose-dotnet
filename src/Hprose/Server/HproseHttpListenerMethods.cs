@@ -12,14 +12,16 @@
  *                                                        *
  * hprose http listener remote methods class for C#.      *
  *                                                        *
- * LastModified: May 30, 2015                             *
+ * LastModified: Jan 23, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 #if !(dotNET10 || dotNET11 || ClientOnly || Smartphone)
 using System;
 using System.Net;
+#if !dotNETMF
 using System.Security.Principal;
+#endif
 using Hprose.Common;
 
 namespace Hprose.Server {
@@ -28,12 +30,14 @@ namespace Hprose.Server {
             int i = paramTypes.Length;
             if (i > 0) {
                 Type paramType = paramTypes[i - 1];
-                if (paramType == typeof(HproseContext) ||
-                    paramType == typeof(HproseHttpListenerContext) ||
-                    paramType == typeof(HttpListenerContext) ||
-                    paramType == typeof(HttpListenerRequest) ||
+                if (paramType == typeof(HttpListenerRequest) ||
                     paramType == typeof(HttpListenerResponse) ||
-                    paramType == typeof(IPrincipal)) {
+#if !dotNETMF
+                    paramType == typeof(IPrincipal) ||
+#endif
+                    paramType == typeof(HproseContext) ||
+                    paramType == typeof(HproseHttpListenerContext) ||
+                    paramType == typeof(HttpListenerContext)) {
                     --i;
                 }
             }

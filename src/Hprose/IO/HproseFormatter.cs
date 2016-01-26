@@ -12,7 +12,7 @@
  *                                                        *
  * hprose formatter class for C#.                         *
  *                                                        *
- * LastModified: Apr 11, 2011                             *
+ * LastModified: Jan 21, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -26,16 +26,12 @@ using System.Reflection;
 
 namespace Hprose.IO {
     public sealed class HproseFormatter {
+#if dotNETMF
+        [CLSCompliantAttribute(false)]
+#endif
         public static MemoryStream Serialize(object obj) {
             MemoryStream stream = new MemoryStream();
             HproseWriter writer = new HproseWriter(stream);
-            writer.Serialize(obj);
-            return stream;
-        }
-
-        public static MemoryStream Serialize(object obj, HproseMode mode) {
-            MemoryStream stream = new MemoryStream();
-            HproseWriter writer = new HproseWriter(stream, mode);
             writer.Serialize(obj);
             return stream;
         }
@@ -45,15 +41,39 @@ namespace Hprose.IO {
             writer.Serialize(obj);
         }
 
+        public static object Unserialize(byte[] data) {
+            MemoryStream stream = new MemoryStream(data);
+            HproseReader reader = new HproseReader(stream);
+            return reader.Unserialize();
+        }
+
+        public static object Unserialize(byte[] data, Type type) {
+            MemoryStream stream = new MemoryStream(data);
+            HproseReader reader = new HproseReader(stream);
+            return reader.Unserialize(type);
+        }
+
+        public static object Unserialize(Stream stream) {
+            HproseReader reader = new HproseReader(stream);
+            return reader.Unserialize();
+        }
+
+        public static object Unserialize(Stream stream, Type type) {
+            HproseReader reader = new HproseReader(stream);
+            return reader.Unserialize(type);
+        }
+
+#if !dotNETMF
+        public static MemoryStream Serialize(object obj, HproseMode mode) {
+            MemoryStream stream = new MemoryStream();
+            HproseWriter writer = new HproseWriter(stream, mode);
+            writer.Serialize(obj);
+            return stream;
+        }
+
         public static void Serialize(object obj, Stream stream, HproseMode mode) {
             HproseWriter writer = new HproseWriter(stream, mode);
             writer.Serialize(obj);
-        }
-
-        public static object Unserialize(byte[] data) {
-                MemoryStream stream = new MemoryStream(data);
-            HproseReader reader = new HproseReader(stream);
-            return reader.Unserialize();
         }
 
         public static object Unserialize(byte[] data, HproseMode mode) {
@@ -68,11 +88,6 @@ namespace Hprose.IO {
             return reader.Unserialize(type);
         }
 
-        public static object Unserialize(Stream stream) {
-            HproseReader reader = new HproseReader(stream);
-            return reader.Unserialize();
-        }
-
         public static object Unserialize(Stream stream, HproseMode mode) {
             HproseReader reader = new HproseReader(stream, mode);
             return reader.Unserialize();
@@ -82,8 +97,9 @@ namespace Hprose.IO {
             HproseReader reader = new HproseReader(stream, mode);
             return reader.Unserialize(type);
         }
+#endif
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public static T Unserialize<T>(byte[] data) {
             MemoryStream stream = new MemoryStream(data);
             HproseReader reader = new HproseReader(stream);

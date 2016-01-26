@@ -12,12 +12,12 @@
  *                                                        *
  * hprose helper class for C#.                            *
  *                                                        *
- * LastModified: Jan 16, 2016                             *
+ * LastModified: Jan 21, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 using System;
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
 using System.Collections.Generic;
 #endif
 using System.IO;
@@ -25,18 +25,18 @@ using System.Text;
 using System.Collections;
 using System.Numerics;
 using System.Reflection;
-#if !(PocketPC || Smartphone || WindowsCE)
+#if !(PocketPC || Smartphone || WindowsCE || dotNETMF)
 using System.Runtime.Serialization;
 #endif
 using System.Threading;
 using Hprose.Common;
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
+#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS || dotNETMF)
 using Hprose.Reflection;
 #endif
 using System.Runtime.CompilerServices; 
 
 namespace Hprose.IO {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
     interface IGListReader {
         object ReadList(HproseReader reader);
     }
@@ -136,11 +136,13 @@ namespace Hprose.IO {
 #if !(Core || PORTABLE)
         public static readonly Type typeofDBNull = typeof(DBNull);
 #endif
+#if !dotNETMF
+        public static readonly Type typeofBitArray = typeof(BitArray);
+#endif
         public static readonly Type typeofBoolean = typeof(Boolean);
         public static readonly Type typeofBooleanArray = typeof(Boolean[]);
         public static readonly Type typeofBigInteger = typeof(BigInteger);
         public static readonly Type typeofBigIntegerArray = typeof(BigInteger[]);
-        public static readonly Type typeofBitArray = typeof(BitArray);
         public static readonly Type typeofByte = typeof(Byte);
         public static readonly Type typeofByteArray = typeof(Byte[]);
         public static readonly Type typeofBytesArray = typeof(Byte[][]);
@@ -184,7 +186,7 @@ namespace Hprose.IO {
         public static readonly Type typeofUInt32Array = typeof(UInt32[]);
         public static readonly Type typeofUInt64 = typeof(UInt64);
         public static readonly Type typeofUInt64Array = typeof(UInt64[]);
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public static readonly Type typeofNullableBoolean = typeof(Nullable<Boolean>);
         public static readonly Type typeofNullableChar = typeof(Nullable<Char>);
         public static readonly Type typeofNullableSByte = typeof(Nullable<SByte>);
@@ -270,11 +272,11 @@ namespace Hprose.IO {
         public static readonly Type typeofDataContract = typeof(DataContractAttribute);
         public static readonly Type typeofDataMember = typeof(DataMemberAttribute);
 #endif
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
+#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || dotNETMF)
         public static readonly Type typeofISerializable = typeof(ISerializable);
 #endif
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         internal static readonly Dictionary<Type, TypeEnum> typeMap = new Dictionary<Type, TypeEnum>();
 #else
         internal static readonly Hashtable typeMap = new Hashtable();
@@ -328,10 +330,12 @@ namespace Hprose.IO {
             typeMap[typeofCharsArray] = TypeEnum.CharsArray;
             typeMap[typeofMemoryStream] = TypeEnum.MemoryStream;
             typeMap[typeofStream] = TypeEnum.Stream;
-            typeMap[typeofBitArray] = TypeEnum.BitArray;
             typeMap[typeofICollection] = TypeEnum.ICollection;
             typeMap[typeofIDictionary] = TypeEnum.IDictionary;
             typeMap[typeofIList] = TypeEnum.IList;
+#if !dotNETMF
+            typeMap[typeofBitArray] = TypeEnum.BitArray;
+#endif
 #if !(SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
             typeMap[typeofArrayList] = TypeEnum.ArrayList;
             typeMap[typeofHashMap] = TypeEnum.HashMap;
@@ -339,7 +343,7 @@ namespace Hprose.IO {
             typeMap[typeofQueue] = TypeEnum.Queue;
             typeMap[typeofStack] = TypeEnum.Stack;
 #endif
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             typeMap[typeofNullableBoolean] = TypeEnum.NullableBoolean;
             typeMap[typeofNullableChar] = TypeEnum.NullableChar;
             typeMap[typeofNullableSByte] = TypeEnum.NullableSByte;
@@ -423,7 +427,7 @@ namespace Hprose.IO {
 #endif
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         private static bool IsGenericList(Type type) {
             return (type.GetGenericTypeDefinition() == typeofList);
         }
@@ -447,45 +451,33 @@ namespace Hprose.IO {
         private static bool IsGenericIList(Type type) {
 #if Core
             Type[] args = type.GenericTypeArguments;
-            TypeInfo typeInfo = type.GetTypeInfo();
-            return (args.Length == 1 &&
-                    typeofGIList.MakeGenericType(args).GetTypeInfo().IsAssignableFrom(typeInfo));
 #else
             Type[] args = type.GetGenericArguments();
-            return (args.Length == 1 &&
-                    typeofGIList.MakeGenericType(args).IsAssignableFrom(type));
 #endif
+            return (args.Length == 1 && IsAssignableFrom(typeofGIList.MakeGenericType(args), type));
         }
 
         private static bool IsGenericIDictionary(Type type) {
 #if Core
             Type[] args = type.GenericTypeArguments;
-            TypeInfo typeInfo = type.GetTypeInfo();
-            return (args.Length == 2 &&
-                    typeofGIDictionary.MakeGenericType(args).GetTypeInfo().IsAssignableFrom(typeInfo));
 #else
             Type[] args = type.GetGenericArguments();
-            return (args.Length == 2 &&
-                    typeofGIDictionary.MakeGenericType(args).IsAssignableFrom(type));
 #endif
+            return (args.Length == 2 && IsAssignableFrom(typeofGIDictionary.MakeGenericType(args), type));
         }
 
         private static bool IsGenericICollection(Type type) {
 #if Core
             Type[] args = type.GenericTypeArguments;
-            TypeInfo typeInfo = type.GetTypeInfo();
-            return (args.Length == 1 &&
-                    typeofGICollection.MakeGenericType(args).GetTypeInfo().IsAssignableFrom(typeInfo));
 #else
             Type[] args = type.GetGenericArguments();
-            return (args.Length == 1 &&
-                    typeofGICollection.MakeGenericType(args).IsAssignableFrom(type));
 #endif
+            return (args.Length == 1 && IsAssignableFrom(typeofGICollection.MakeGenericType(args), type));
         }
 #endif
 
         internal static TypeEnum GetArrayTypeEnum(Type type) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             TypeEnum t;
             if (typeMap.TryGetValue(type, out t)) return t;
 #else
@@ -495,9 +487,29 @@ namespace Hprose.IO {
             return TypeEnum.OtherTypeArray;
         }
 
+        internal static bool IsAssignableFrom(Type t, Type type) {
+#if dotNETMF
+            if (t == type) return true;
+            if (t.IsInterface) {
+                Type[] interfaces = type.GetInterfaces();
+                foreach(Type i in interfaces) {
+                    if (i == t) return true;
+                }
+                return false;
+            }
+            else {
+                return type.IsSubclassOf(t);
+            }
+#elif Core
+            return t.GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
+#else
+            return t.IsAssignableFrom(type);
+#endif
+        }
+
         internal static TypeEnum GetTypeEnum(Type type) {
             if (type == null) return TypeEnum.Null;
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             TypeEnum t;
             if (typeMap.TryGetValue(type, out t)) return t;
 #else
@@ -511,10 +523,12 @@ namespace Hprose.IO {
             if (typeInfo.IsEnum) return TypeEnum.Enum;
 #else
             if (type.IsArray) return TypeEnum.OtherTypeArray;
+ #if !dotNETMF
             if (type.IsByRef) return GetTypeEnum(type.GetElementType());
+#endif
             if (type.IsEnum) return TypeEnum.Enum;
 #endif
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
 #if Core
             if (typeInfo.IsGenericType) {
 #else
@@ -535,17 +549,17 @@ namespace Hprose.IO {
                 if (typeofIDictionary.GetTypeInfo().IsAssignableFrom(typeInfo)) return TypeEnum.Dictionary;
                 if (typeofIList.GetTypeInfo().IsAssignableFrom(typeInfo)) return TypeEnum.List;
 #else
-                if (typeofIDictionary.IsAssignableFrom(type)) return TypeEnum.Dictionary;
-                if (typeofIList.IsAssignableFrom(type)) return TypeEnum.List;
+                if (IsAssignableFrom(typeofIDictionary, type)) return TypeEnum.Dictionary;
+                if (IsAssignableFrom(typeofIList, type)) return TypeEnum.List;
 #endif
             }
-#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
+#if !(PocketPC || Smartphone || WindowsCE || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || dotNETMF)
             if (typeofISerializable.IsAssignableFrom(type)) return TypeEnum.UnSupportedType;
 #endif
             return TypeEnum.OtherType;
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         private static readonly Dictionary<Type, Dictionary<string, FieldTypeInfo>> fieldsCache = new Dictionary<Type, Dictionary<string, FieldTypeInfo>>();
         private static readonly Dictionary<Type, Dictionary<string, PropertyTypeInfo>> propertiesCache = new Dictionary<Type, Dictionary<string, PropertyTypeInfo>>();
         private static readonly Dictionary<Type, Dictionary<string, MemberTypeInfo>> membersCache = new Dictionary<Type, Dictionary<string, MemberTypeInfo>>();
@@ -566,7 +580,7 @@ namespace Hprose.IO {
         private static readonly Hashtable membersCache = new Hashtable();
         private static readonly Hashtable ctorCache = new Hashtable();
         private static readonly Hashtable argsCache = new Hashtable();
-#if !MONO
+#if !(MONO || dotNETMF)
         private static readonly CaseInsensitiveHashCodeProvider caseInsensitiveHashCodeProvider = new CaseInsensitiveHashCodeProvider();
         private static readonly CaseInsensitiveComparer caseInsensitiveComparer = new CaseInsensitiveComparer();
 #endif
@@ -592,6 +606,7 @@ namespace Hprose.IO {
 #endif
         }
 
+#if !dotNETMF
 #if !(dotNET10 || dotNET11 || dotNETCF10)
         private static Dictionary<string, MemberTypeInfo> GetMembersWithoutCache(Type type) {
 #else
@@ -726,11 +741,11 @@ namespace Hprose.IO {
 #if !(dotNET10 || dotNET11 || dotNETCF10)
                 Dictionary<string, MemberTypeInfo> result;
                 if (membersCache.TryGetValue(type, out result)) {
-                    return result;
 #else
-                if (membersCache.ContainsKey(type)) {
-                    return (Hashtable)membersCache[type];
+                Hashtable result;
+                if ((result = (Hashtable)membersCache[type]) != null) {
 #endif
+                    return result;
                 }
             }
 #if !(dotNET10 || dotNET11 || dotNETCF10)
@@ -799,12 +814,11 @@ namespace Hprose.IO {
 #if !(dotNET10 || dotNET11 || dotNETCF10)
                 Dictionary<string, PropertyTypeInfo> result;
                 if (propertiesCache.TryGetValue(type, out result)) {
-                    return result;
 #else
                 Hashtable result;
                 if ((result = (Hashtable)propertiesCache[type]) != null) {
-                    return result;
 #endif
+                    return result;
                 }
             }
 #if !(dotNET10 || dotNET11 || dotNETCF10)
@@ -818,20 +832,25 @@ namespace Hprose.IO {
             }
             return properties;
         }
+#endif
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         private static Dictionary<string, FieldTypeInfo> GetFieldsWithoutCache(Type type) {
 #else
         private static Hashtable GetFieldsWithoutCache(Type type) {
 #endif
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if dotNETMF
+            Hashtable fields = new Hashtable();
+#elif !(dotNET10 || dotNET11 || dotNETCF10)
             Dictionary<string, FieldTypeInfo> fields = new Dictionary<string, FieldTypeInfo>(StringComparer.OrdinalIgnoreCase);
 #elif MONO
             Hashtable fields = new Hashtable(StringComparer.OrdinalIgnoreCase);
 #else
             Hashtable fields = new Hashtable(caseInsensitiveHashCodeProvider, caseInsensitiveComparer);
 #endif
+#if !dotNETMF
             FieldAttributes ns = FieldAttributes.NotSerialized;
+#endif
 #if dotNET45
             while (type != typeofObject && IsSerializable(type)) {
                 TypeInfo typeInfo = type.GetTypeInfo();
@@ -856,9 +875,14 @@ namespace Hprose.IO {
                 FieldInfo[] fiarray = type.GetFields(bindingflags);
                 foreach (FieldInfo fi in fiarray) {
                     string name;
+#if !dotNETMF
                     if (((fi.Attributes & ns) != ns) &&
                         !fields.ContainsKey(name = fi.Name)) {
                         name = char.ToLower(name[0]) + name.Substring(1);
+#else
+                    if (!fields.Contains(name = fi.Name)) {
+                        name = name[0].ToLower() + name.Substring(1);
+#endif
                         fields[name] = new FieldTypeInfo(fi);
                     }
                 }
@@ -868,25 +892,24 @@ namespace Hprose.IO {
             return fields;
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         internal static Dictionary<string, FieldTypeInfo> GetFields(Type type) {
 #else
         internal static Hashtable GetFields(Type type) {
 #endif
             ICollection fc = fieldsCache;
             lock (fc.SyncRoot) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 Dictionary<string, FieldTypeInfo> result;
                 if (fieldsCache.TryGetValue(type, out result)) {
-                    return result;
 #else
                 Hashtable result;
                 if ((result = (Hashtable)fieldsCache[type]) != null) {
-                    return result;
 #endif
+                    return result;
                 }
             }
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             Dictionary<string, FieldTypeInfo> fields;
 #else
             Hashtable fields;
@@ -898,10 +921,29 @@ namespace Hprose.IO {
             return fields;
         }
 
+#if dotNETMF
+        public static string Replace(string str, char[] oldChars, char newChar) {
+            char[] charArray = str.ToCharArray();
+            for (int i = charArray.Length - 1; i >= 0; i--) {
+                foreach (char oldChar in oldChars) {
+                    if (charArray[i] == oldChar) {
+                        charArray[i] = newChar;
+                        break;
+                    } 
+                }
+            }
+            return new String(charArray);
+        }
+#endif
+
         public static string GetClassName(Type type) {
             string className = HproseClassManager.GetClassAlias(type);
             if (className == null) {
+#if dotNETMF
+                className = Replace(type.FullName, new char[]{'.', '+'}, '_');
+#else
                 className = type.FullName.Replace('.', '_').Replace('+', '_');
+#endif
                 int index = className.IndexOf('`');
                 if (index > 0) {
                     className = className.Substring(0, index);
@@ -928,7 +970,7 @@ namespace Hprose.IO {
             return type;
         }
 #endif
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         private static Type GetNestedType(StringBuilder name, List<int> positions, int i, char c) {
 #else
         private static Type GetNestedType(StringBuilder name, ArrayList positions, int i, char c) {
@@ -936,7 +978,7 @@ namespace Hprose.IO {
             int length = positions.Count;
             Type type;
             if (i < length) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 name[positions[i++]] = c;
 #else
                 name[(int)positions[i++]] = c;
@@ -952,7 +994,7 @@ namespace Hprose.IO {
             return type;
         }
 
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         private static Type GetType(StringBuilder name, List<int> positions, int i, char c) {
 #else
         private static Type GetType(StringBuilder name, ArrayList positions, int i, char c) {
@@ -960,7 +1002,7 @@ namespace Hprose.IO {
             int length = positions.Count;
             Type type;
             if (i < length) {
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
                 name[positions[i++]] = c;
 #else
                 name[(int)positions[i++]] = c;
@@ -984,7 +1026,7 @@ namespace Hprose.IO {
             if (HproseClassManager.ContainsClass(className)) {
                 return HproseClassManager.GetClass(className);
             }
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
             List<int> positions = new List<int>();
 #else
             ArrayList positions = new ArrayList();
@@ -1012,7 +1054,13 @@ namespace Hprose.IO {
             return type;
         }
 
-#if !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS)
+#if dotNETMF
+        public static object NewInstance(Type type) {
+            ConstructorInfo ctor = type.GetConstructor(new Type[0]);
+            if (ctor != null) return ctor.Invoke(new object[0]);
+            return null;
+        }
+#elif !(PocketPC || Smartphone || WindowsCE || dotNET10 || dotNET11 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE || Unity_iOS || dotNETMF)
         public static object NewInstance(Type type) {
             return CtorAccessor.Get(type).NewInstance();
         }
@@ -1162,7 +1210,7 @@ namespace Hprose.IO {
             }
         }
 #endif
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         internal static IGIListReader GetIGIListReader(Type type) {
             ICollection cache = gIListReaderCache;
             IGIListReader listReader = null;
@@ -1305,7 +1353,7 @@ namespace Hprose.IO {
         }
 #endif
         internal static String ReadWrongInfo(MemoryStream istream) {
-#if dotNET10 || dotNET11 || dotNETCF10
+#if dotNET10 || dotNET11 || dotNETCF10 || dotNETMF
             return new String(utf8Encoding.GetChars(istream.ToArray(), 0, (int)istream.Length));
 #else
             return utf8Encoding.GetString(istream.ToArray(), 0, (int)istream.Length);
@@ -1313,7 +1361,7 @@ namespace Hprose.IO {
         }
 
 #if (PORTABLE && (Profile23 || Profile24 || Profile46 || Profile47))
-        public static BigInteger ToBigInteger(String value) {
+        public static BigInteger ToBigInteger(string value) {
             int length = value.Length;
             int i = 0;
             long sign = 1;
@@ -1369,9 +1417,136 @@ namespace Hprose.IO {
 #if dotNET45
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        public static BigInteger ToBigInteger(String value) {
+        public static BigInteger ToBigInteger(string value) {
             return BigInteger.Parse(value);
         }
 #endif
+
+        public static bool ToBoolean(string value) {
+            if (value == null) return false;
+            value = value.ToLower();
+            string t = bool.TrueString.ToLower();
+            string f = bool.FalseString.ToLower();
+            if (value == t) return true;
+            if (value == f) return false;
+            value = value.Trim();
+            if (value == t) return true;
+            if (value == f) return false;
+            throw new FormatException("Bad Boolean Format");
+        }
+
+        public static Guid ToGuid(string data) {
+            int num = 0, a = 0, b = 0, c = 0;
+            byte d, e, f, g, h, i, j, k;
+            int[] table = new int[]{0,1,2,3,4,5,6,7,8,9,
+                                    0,0,0,0,0,0,0,10,11,
+                                    12,13,14,15,0,0,0,0,
+                                    0,0,0,0,0,0,0,0,0,0,
+                                    0,0,0,0,0,0,0,0,0,0,
+                                    0,0,10,11,12,13,14,15};
+            try {
+                for (int n = 0; n < 8; ++n) {
+                    a = (a << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                for (int n = 0; n < 4; ++n) {
+                    b = (b << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                for (int n = 0; n < 4; ++n) {
+                    c = (c << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                d = (byte)(table[data[num + 1] - '0'] << 4 | table[data[num + 2] - '0']);
+                e = (byte)(table[data[num + 3] - '0'] << 4 | table[data[num + 4] - '0']);
+                num += 5;
+                f = (byte)(table[data[num + 1] - '0'] << 4 | table[data[num + 2] - '0']);
+                g = (byte)(table[data[num + 3] - '0'] << 4 | table[data[num + 4] - '0']);
+                h = (byte)(table[data[num + 5] - '0'] << 4 | table[data[num + 6] - '0']);
+                i = (byte)(table[data[num + 7] - '0'] << 4 | table[data[num + 8] - '0']);
+                j = (byte)(table[data[num + 9] - '0'] << 4 | table[data[num + 10] - '0']);
+                k = (byte)(table[data[num + 11] - '0'] << 4 | table[data[num + 12] - '0']);
+                return new Guid(a, (short)b ,(short)c, d, e, f, g, h, i, j, k); 
+            }
+            catch (IndexOutOfRangeException) {
+                throw new FormatException("Unrecognized Guid Format");
+            }
+        }
+
+        public static Guid ToGuid(char[] data) {
+            int num = 0, a = 0, b = 0, c = 0;
+            byte d, e, f, g, h, i, j, k;
+            int[] table = new int[]{0,1,2,3,4,5,6,7,8,9,
+                                    0,0,0,0,0,0,0,10,11,
+                                    12,13,14,15,0,0,0,0,
+                                    0,0,0,0,0,0,0,0,0,0,
+                                    0,0,0,0,0,0,0,0,0,0,
+                                    0,0,10,11,12,13,14,15};
+            try {
+                for (int n = 0; n < 8; ++n) {
+                    a = (a << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                for (int n = 0; n < 4; ++n) {
+                    b = (b << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                for (int n = 0; n < 4; ++n) {
+                    c = (c << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                d = (byte)(table[data[num + 1] - '0'] << 4 | table[data[num + 2] - '0']);
+                e = (byte)(table[data[num + 3] - '0'] << 4 | table[data[num + 4] - '0']);
+                num += 5;
+                f = (byte)(table[data[num + 1] - '0'] << 4 | table[data[num + 2] - '0']);
+                g = (byte)(table[data[num + 3] - '0'] << 4 | table[data[num + 4] - '0']);
+                h = (byte)(table[data[num + 5] - '0'] << 4 | table[data[num + 6] - '0']);
+                i = (byte)(table[data[num + 7] - '0'] << 4 | table[data[num + 8] - '0']);
+                j = (byte)(table[data[num + 9] - '0'] << 4 | table[data[num + 10] - '0']);
+                k = (byte)(table[data[num + 11] - '0'] << 4 | table[data[num + 12] - '0']);
+                return new Guid(a, (short)b ,(short)c, d, e, f, g, h, i, j, k); 
+            }
+            catch (IndexOutOfRangeException) {
+                throw new FormatException("Unrecognized Guid Format");
+            }
+        }
+
+        public static Guid ToGuid(byte[] data) {
+            int num = 0, a = 0, b = 0, c = 0;
+            byte d, e, f, g, h, i, j, k;
+            int[] table = new int[]{0,1,2,3,4,5,6,7,8,9,
+                                    0,0,0,0,0,0,0,10,11,
+                                    12,13,14,15,0,0,0,0,
+                                    0,0,0,0,0,0,0,0,0,0,
+                                    0,0,0,0,0,0,0,0,0,0,
+                                    0,0,10,11,12,13,14,15};
+            try {
+                for (int n = 0; n < 8; ++n) {
+                    a = (a << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                for (int n = 0; n < 4; ++n) {
+                    b = (b << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                for (int n = 0; n < 4; ++n) {
+                    c = (c << 4) | table[data[++num] - '0']; 
+                }
+                ++num;
+                d = (byte)(table[data[num + 1] - '0'] << 4 | table[data[num + 2] - '0']);
+                e = (byte)(table[data[num + 3] - '0'] << 4 | table[data[num + 4] - '0']);
+                num += 5;
+                f = (byte)(table[data[num + 1] - '0'] << 4 | table[data[num + 2] - '0']);
+                g = (byte)(table[data[num + 3] - '0'] << 4 | table[data[num + 4] - '0']);
+                h = (byte)(table[data[num + 5] - '0'] << 4 | table[data[num + 6] - '0']);
+                i = (byte)(table[data[num + 7] - '0'] << 4 | table[data[num + 8] - '0']);
+                j = (byte)(table[data[num + 9] - '0'] << 4 | table[data[num + 10] - '0']);
+                k = (byte)(table[data[num + 11] - '0'] << 4 | table[data[num + 12] - '0']);
+                return new Guid(a, (short)b ,(short)c, d, e, f, g, h, i, j, k); 
+            }
+            catch (IndexOutOfRangeException) {
+                throw new FormatException("Unrecognized Guid Format");
+            }
+        }
     }
 }
