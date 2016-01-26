@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Hprose</id>
-        <version>1.5.3</version>
+        <version>1.5.4</version>
         <title>Hprose for .NET</title>
         <authors>Ma Bingyao</authors>
         <owners>Ma Bingyao&lt;andot@hprose.com&gt;</owners>
@@ -43,6 +43,7 @@ It is a modern, lightweight, cross-language, cross-platform, object-oriented, hi
         <releaseNotes>This is the first stable version of Hprose for .NET.
 It supports .NET Framework 1.0 ~ 4.6.1.
 It supports .NET CompactFramework 1.0 ~ 3.9.
+It supports .NET Micro Framework 4.4.
 It supports .NET Framework Client Profile 3.5 ~ 4.0.
 It supports Mono, MonoAndroid, MonoTouch, Xamarin.iOS, Xamarin.TVOS, Xamarin.WatchOS.
 It supports Unity, Unity iOS and Unity Web.
@@ -81,6 +82,7 @@ It supports NuGet install.</releaseNotes>
         <file src="dist/Hprose/Debug/xamarinios/Hprose.dll" target="lib/xamarinios" />
         <file src="dist/Hprose/Debug/xamarintvos/Hprose.dll" target="lib/xamarintvos" />
         <file src="dist/Hprose/Debug/xamarinwatchos/Hprose.dll" target="lib/xamarinwatchos" />
+        <file src="dist/Hprose/Debug/netmf/Hprose.dll" target="lib/netmf" />
 
         <file src="dist/Hprose/Debug/net10/Hprose.pdb" target="lib/net10" />
         <file src="dist/Hprose/Debug/net11/Hprose.pdb" target="lib/net11" />
@@ -103,6 +105,7 @@ It supports NuGet install.</releaseNotes>
         <file src="dist/Hprose/Debug/xamarinios/Hprose.pdb" target="lib/xamarinios" />
         <file src="dist/Hprose/Debug/xamarintvos/Hprose.pdb" target="lib/xamarintvos" />
         <file src="dist/Hprose/Debug/xamarinwatchos/Hprose.pdb" target="lib/xamarinwatchos" />
+        <file src="dist/Hprose/Debug/netmf/Hprose.pdb" target="lib/netmf" />
 
         <file src="src/**/*.cs" target="src" />
     </files>

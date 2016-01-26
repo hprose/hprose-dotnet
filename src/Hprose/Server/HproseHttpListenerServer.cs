@@ -45,7 +45,7 @@ namespace Hprose.Server {
         private int tCount = 2;
 
         public HproseHttpListenerServer(string url) {
-            Url = url.Replace("0.0.0.0", "*");
+            Url = url;
         }
 
         public HproseHttpListenerServer()
@@ -58,6 +58,10 @@ namespace Hprose.Server {
             }
             set {
                 url = value;
+                int p = value.IndexOf("://0.0.0.0");
+                if (p > 0) {
+                    url = value.Substring(0, p) + "://*" + value.Substring(p + 10);
+                }
 #if !dotNETMF
                 Listener.Prefixes.Clear();
                 Listener.Prefixes.Add(url);
