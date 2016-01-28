@@ -12,7 +12,7 @@
  *                                                        *
  * hprose tcp client class for C#.                        *
  *                                                        *
- * LastModified: Jan 23, 2016                             *
+ * LastModified: Jan 28, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -63,7 +63,7 @@ namespace Hprose.Client {
         }
 
         public override void UseService(string uri) {
-            if (this.uri != null) {
+            if (this.uri != null && this.uri != uri) {
                 pool.Close(this.uri);
             }
             base.UseService(uri);
