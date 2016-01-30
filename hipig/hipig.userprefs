@@ -1,0 +1,12 @@
+﻿<Properties StartupItem="hipig/hipig.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" ActiveRuntime="Mono 4.2.2" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="hipig/Program.cs">
+    <Files>
+      <File FileName="hipig/Program.cs" Line="122" Column="13" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
