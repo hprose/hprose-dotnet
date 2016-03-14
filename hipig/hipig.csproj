@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{EBDF43B1-5BB4-495B-AE69-7FF5D548D84D}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>hipig</RootNamespace>
+    <RootNamespace>Hprose</RootNamespace>
     <AssemblyName>hipig</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
+    <ReleaseVersion>1.1</ReleaseVersion>
+    <SynchReleaseVersion>false</SynchReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -25,13 +25,29 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Hprose.Client">
-      <HintPath>Hprose.Client.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Hprose\Common\ByRefAttribute.cs" />
+    <Compile Include="Hprose\Common\Extension.cs" />
+    <Compile Include="Hprose\Common\HproseCallback.cs" />
+    <Compile Include="Hprose\Common\HproseContext.cs" />
+    <Compile Include="Hprose\Common\HproseException.cs" />
+    <Compile Include="Hprose\Common\HproseInvocationHandler.cs" />
+    <Compile Include="Hprose\Common\HproseInvoker.cs" />
+    <Compile Include="Hprose\Common\HproseMethod.cs" />
+    <Compile Include="Hprose\Common\HproseMethods.cs" />
+    <Compile Include="Hprose\Common\HproseResultMode.cs" />
+    <Compile Include="Hprose\Common\InvokeHelper.cs" />
+    <Compile Include="Hprose\Common\MethodNameAttribute.cs" />
+    <Compile Include="Hprose\Common\ResultModeAttribute.cs" />
+    <Compile Include="Hprose\Common\SimpleModeAttribute.cs" />
+    <Compile Include="Hprose\Reflection\IInvocationHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Hprose\Reflection\" />
+  </ItemGroup>
 </Project>
