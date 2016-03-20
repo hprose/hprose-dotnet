@@ -1,190 +1,263 @@
 ﻿using System;
-using System.Collections.Generic;
-using Microsoft.CSharp;
+using System.CodeDom;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.CodeDom;
-using System.IO;
+using CommandLine;
 using Hprose.Common;
-using Microsoft.VisualBasic;
+using NLog;
+using ServiceStack;
 
-namespace Hprose {
-    class HIPIG {
-        public static CodeTypeDeclaration ImplementIt(Type it) {
-            string name = it.Name;
-            if (name.Length > 1 && name[0] == 'I' && name[1] >= 'A' && name[1] <= 'Z') {
-                name = name.Substring(1);
+namespace hipig
+{
+    internal class Program
+    {
+        private static readonly Logger __logger = LogManager.GetCurrentClassLogger();
+
+        private static void Main(string[] args)
+        {
+            args = new[] {"-r"}.Union(args).ToArray();
+            var result = Parser.Default.ParseArguments<Options>(args);
+            var mapResult = result.MapResult(
+                options =>
+                {
+                    var json = options.ToJson();
+                    __logger.Trace(json);
+                    return BuildProxy(options);
+                },
+                errors =>
+                {
+                    __logger.Error(errors);
+                    return false;
+                });
+            if (!mapResult)
+            {
+                Console.ReadKey(true);
             }
-            name += "Impl";
-            CodeTypeDeclaration proxyClass = new CodeTypeDeclaration(name);
-            proxyClass.BaseTypes.Add(typeof(HproseInvocationHandler));
-            proxyClass.BaseTypes.Add(it);
+        }
 
-            CodeConstructor constructor = new CodeConstructor();
-            constructor.Attributes = MemberAttributes.Public;
-            constructor.Parameters.Add( new CodeParameterDeclarationExpression(typeof(HproseInvoker), "invoker") );
-            constructor.Parameters.Add( new CodeParameterDeclarationExpression(typeof(String), "ns") );
-            constructor.BaseConstructorArgs.Add(new CodeVariableReferenceExpression("invoker"));
-            constructor.BaseConstructorArgs.Add(new CodeVariableReferenceExpression("ns"));
-            proxyClass.Members.Add(constructor);
+        private static bool BuildProxy(Options options)
+        {
+            if (string.IsNullOrEmpty(options.OutputFileName))
+            {
+                const string fileNameExtension = ".cs";
+                options.OutputFileName = Path.GetFileNameWithoutExtension(options.Assembly) + fileNameExtension;
+            }
 
-            CodeConstructor constructor2 = new CodeConstructor();
-            constructor2.Attributes = MemberAttributes.Public;
-            constructor2.Parameters.Add( new CodeParameterDeclarationExpression(typeof(HproseInvoker), "invoker") );
-            constructor2.ChainedConstructorArgs.Add(new CodeVariableReferenceExpression("invoker"));
-            constructor2.ChainedConstructorArgs.Add(new CodePrimitiveExpression(""));
+            var codeDomProvider = CodeDomProvider.CreateProvider(
+                Equals(
+                    Path.GetExtension(options.OutputFileName), ".vb")
+                    ? "VisualBasic"
+                    : "CSharp");
+
+            var interfaces = Assembly
+                .LoadFrom(options.Assembly)
+                .GetTypes()
+                .Where(type => type.IsInterface)
+                .ToArray();
+            if (options.InterfacesName.Any())
+            {
+                interfaces = interfaces
+                    .Where(type =>
+                        options.InterfacesName.Contains(type.Name)
+                        || options.InterfacesName.Contains(type.FullName))
+                    .ToArray();
+            }
+
+            var codeCompileUnit = new CodeCompileUnit();
+            var codeNamespace = new CodeNamespace(options.NameSpace);
+            codeCompileUnit.Namespaces.Add(codeNamespace);
+            foreach (var type in interfaces)
+            {
+                codeNamespace.Types.Add(ImplementInterface(type, options));
+            }
+
+            var codeGeneratorOptions = new CodeGeneratorOptions
+            {
+                BracingStyle = "C"
+            };
+            using (TextWriter textWriter = new StreamWriter(options.OutputFileName, false, Encoding.UTF8))
+            {
+                codeDomProvider.GenerateCodeFromNamespace(codeNamespace, textWriter, codeGeneratorOptions);
+            }
+            return true;
+        }
+
+        public static CodeTypeDeclaration ImplementInterface(Type @interface, Options options)
+        {
+            var proxyName = @interface.Name;
+            if (proxyName.Length > 1 && proxyName[0] == 'I' && proxyName[1] >= 'A' && proxyName[1] <= 'Z')
+            {
+                proxyName = proxyName.Substring(1);
+            }
+            proxyName += options.ClassTail;
+
+            var proxyClass = new CodeTypeDeclaration(proxyName);
+            proxyClass.BaseTypes.Add(typeof (HproseInvocationHandler));
+            proxyClass.BaseTypes.Add(@interface);
+
+            const string invoker = nameof(invoker);
+            const string ns = nameof(ns);
+
+            var constructor1 = new CodeConstructor
+            {
+                Attributes = MemberAttributes.Public
+            };
+            constructor1.Parameters.Add(new CodeParameterDeclarationExpression(typeof (HproseInvoker), invoker));
+            constructor1.Parameters.Add(new CodeParameterDeclarationExpression(typeof (string), ns));
+            constructor1.BaseConstructorArgs.Add(new CodeVariableReferenceExpression(invoker));
+            constructor1.BaseConstructorArgs.Add(new CodeVariableReferenceExpression(ns));
+            proxyClass.Members.Add(constructor1);
+
+            var constructor2 = new CodeConstructor
+            {
+                Attributes = MemberAttributes.Public
+            };
+            constructor2.Parameters.Add(new CodeParameterDeclarationExpression(typeof (HproseInvoker), invoker));
+            constructor2.ChainedConstructorArgs.Add(new CodeVariableReferenceExpression(invoker));
+            constructor2.ChainedConstructorArgs.Add(new CodePrimitiveExpression(string.Empty));
             proxyClass.Members.Add(constructor2);
 
-            List<Type> its = new List<Type>();
-            its.AddRange(it.GetInterfaces());
-            its.Add(it);
-            foreach (Type t in its) {
-                foreach (MethodInfo m in t.GetMethods(BindingFlags.Instance | BindingFlags.Public)) {
-                    CodeMemberMethod method = new CodeMemberMethod();
-                    method.Name = m.Name;
-                    method.Attributes = MemberAttributes.Public;
-                    ParameterInfo[] pis = m.GetParameters();
-                    foreach (ParameterInfo p in pis) {
-                        CodeParameterDeclarationExpression cpde = new CodeParameterDeclarationExpression(p.ParameterType, p.Name);
-                        if (p.IsOut) cpde.Direction = FieldDirection.Out;
-                        if (p.ParameterType.IsByRef) cpde.Direction = FieldDirection.Ref;
-                        method.Parameters.Add(cpde);
+            var interfaceTypes = new List<Type>();
+            interfaceTypes.AddRange(@interface.GetInterfaces());
+            interfaceTypes.Add(@interface);
+            var methodHashs = new HashSet<string>();
+            foreach (var type in interfaceTypes)
+            {
+                foreach (var methodInfo in type.GetMethods(BindingFlags.Instance | BindingFlags.Public))
+                {
+                    var methodHashBuilder = new StringBuilder(methodInfo.Name);
+                    var parameterInfos = methodInfo.GetParameters();
+                    var parameterTypes = new CodeExpression[parameterInfos.Length];
+                    for (var index = 0; index < parameterInfos.Length; index++)
+                    {
+                        methodHashBuilder.AppendFormat("_{0}", parameterInfos[index].ParameterType.FullName);
+                        parameterTypes[index] = new CodeTypeOfExpression(parameterInfos[index].ParameterType);
                     }
-                    method.ReturnType = new CodeTypeReference(m.ReturnType);
+                    var methodHash = methodHashBuilder.ToString();
+                    if (methodHashs.Contains(methodHash))
+                    {
+                        continue;
+                    }
+                    methodHashs.Add(methodHash);
 
-                    CodeExpression[] types = new CodeExpression[pis.Length];
-                    for (int i = 0; i < pis.Length; i++) {
-                        types[i] = new CodeTypeOfExpression(pis[i].ParameterType);
+                    var method = new CodeMemberMethod
+                    {
+                        Name = methodInfo.Name,
+                        Attributes = MemberAttributes.Public
+                    };
+                    foreach (var parameterInfo in parameterInfos)
+                    {
+                        var codeParameterDeclarationExpression =
+                            new CodeParameterDeclarationExpression(parameterInfo.ParameterType, parameterInfo.Name);
+                        if (parameterInfo.IsOut)
+                        {
+                            codeParameterDeclarationExpression.Direction = FieldDirection.Out;
+                        }
+                        if (parameterInfo.ParameterType.IsByRef)
+                        {
+                            codeParameterDeclarationExpression.Direction = FieldDirection.Ref;
+                        }
+                        method.Parameters.Add(codeParameterDeclarationExpression);
+                    }
+                    method.ReturnType = new CodeTypeReference(methodInfo.ReturnType);
+
+                    var hproseAttributes = new List<CodeExpression>();
+                    foreach (var customAttribute in methodInfo
+                        .GetCustomAttributes(true)
+                        .Where(attr =>
+                            attr is ResultModeAttribute
+                            || attr is SimpleModeAttribute
+                            || attr is ByRefAttribute
+                            || attr is MethodNameAttribute)
+                        .OfType<Attribute>())
+                    {
+                        var resultModeAttribute = customAttribute as ResultModeAttribute;
+                        if (null != resultModeAttribute)
+                        {
+                            hproseAttributes.Add(new CodeObjectCreateExpression(
+                                typeof (ResultModeAttribute),
+                                new CodePrimitiveExpression(resultModeAttribute.Value)));
+                            continue;
+                        }
+                        var simpleModeAttribute = customAttribute as SimpleModeAttribute;
+                        if (null != simpleModeAttribute)
+                        {
+                            hproseAttributes.Add(new CodeObjectCreateExpression(
+                                typeof (SimpleModeAttribute),
+                                new CodePrimitiveExpression(simpleModeAttribute.Value)));
+                            continue;
+                        }
+                        var byRefAttribute = customAttribute as ByRefAttribute;
+                        if (null != byRefAttribute)
+                        {
+                            hproseAttributes.Add(new CodeObjectCreateExpression(
+                                typeof (ByRefAttribute),
+                                new CodePrimitiveExpression(byRefAttribute.Value)));
+                            continue;
+                        }
+                        var methodNameAttribute = customAttribute as MethodNameAttribute;
+                        if (null != methodNameAttribute)
+                        {
+                            hproseAttributes.Add(new CodeObjectCreateExpression(
+                                typeof (MethodNameAttribute),
+                                new CodePrimitiveExpression(methodNameAttribute.Value)));
+                        }
                     }
 
-                    var customAttrs = m.GetCustomAttributes(true);
-                    var n = 0;
-                    foreach (var attr in customAttrs) {
-                        string attrName = attr.GetType().Name;
-                        if (attrName == "ResultModeAttribute" ||
-                            attrName == "SimpleModeAttribute" ||
-                            attrName == "ByRefAttribute" ||
-                            attrName == "MethodNameAttribute") {
-                            n++;
-                        }
-                    }
-                    CodeExpression[] attrs = new CodeExpression[n];
-                    n = 0;
-                    foreach (var attr in customAttrs) {
-                        string attrName = attr.GetType().Name;
-                        if (attrName == "ResultModeAttribute") {
-                            attrs[n++] = new CodeObjectCreateExpression(typeof(ResultModeAttribute), new CodeSnippetExpression("HproseResultMode." + attr.GetType().GetProperty("Value").GetValue(attr).ToString()));
-                        }
-                        else if (attrName == "SimpleModeAttribute") {
-                            attrs[n++] = new CodeObjectCreateExpression(typeof(SimpleModeAttribute), new CodePrimitiveExpression(attr.GetType().GetProperty("Value").GetValue(attr)));
-                        }
-                        else if (attrName == "ByRefAttribute") {
-                            attrs[n++] = new CodeObjectCreateExpression(typeof(ByRefAttribute), new CodePrimitiveExpression(attr.GetType().GetProperty("Value").GetValue(attr)));
-                        }
-                        else if (attrName == "MethodNameAttribute") {
-                            attrs[n++] = new CodeObjectCreateExpression(typeof(MethodNameAttribute), new CodePrimitiveExpression(attr.GetType().GetProperty("Value").GetValue(attr)));
-                        }
+                    var parameterValues = new CodeExpression[parameterInfos.Length];
+                    for (var i = 0; i < parameterInfos.Length; i++)
+                    {
+                        parameterValues[i] = new CodeVariableReferenceExpression(parameterInfos[i].Name);
                     }
 
-                    CodeExpression[] args = new CodeExpression[pis.Length];
-                    for (int i = 0; i < pis.Length; i++) {
-                        args[i] = new CodeVariableReferenceExpression(pis[i].Name);
+                    CodeExpression[] codeExpressions =
+                    {
+                        new CodeThisReferenceExpression(),
+                        new CodePrimitiveExpression(method.Name),
+                        parameterTypes.Any()
+                            ? new CodeArrayCreateExpression(typeof (Type[]), parameterTypes)
+                            : new CodeArrayCreateExpression(typeof (Type[]), 0),
+                        new CodeTypeOfExpression(method.ReturnType),
+                        hproseAttributes.Any()
+                            ? new CodeArrayCreateExpression(typeof (Attribute[]), hproseAttributes.ToArray())
+                            : new CodeArrayCreateExpression(typeof (Attribute[]), 0),
+                        parameterValues.Any()
+                            ? new CodeArrayCreateExpression(typeof (object[]), parameterValues)
+                            : new CodeArrayCreateExpression(typeof (object[]), 0)
+                    };
+                    if (methodInfo.ReturnType != typeof (void))
+                    {
+                        method.Statements.Add(
+                            new CodeMethodReturnStatement(
+                                new CodeCastExpression(
+                                    method.ReturnType,
+                                    new CodeMethodInvokeExpression(
+                                        new CodeThisReferenceExpression(),
+                                        nameof(HproseInvocationHandler.Invoke),
+                                        codeExpressions
+                                        )
+                                    )
+                                )
+                            );
                     }
-                    if (m.ReturnType != typeof(void)) {
-                        method.Statements.Add(new CodeMethodReturnStatement(new CodeCastExpression(method.ReturnType, new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), "Invoke", new CodeExpression[] {
-                            new CodeThisReferenceExpression(),
-                            new CodePrimitiveExpression(method.Name),
-                            (types.Length == 0) ? new CodeArrayCreateExpression(typeof(Type[]), 0) : new CodeArrayCreateExpression(typeof(Type[]), types),
-                            new CodeTypeOfExpression(method.ReturnType),
-                            (attrs.Length == 0) ? new CodeArrayCreateExpression(typeof(Attribute[]), 0) : new CodeArrayCreateExpression(typeof(Attribute[]), attrs),
-                            (args.Length == 0) ? new CodeArrayCreateExpression(typeof(object[]), 0) : new CodeArrayCreateExpression(typeof(object[]), args)
-                        }))));
-                    }
-                    else {
-                        method.Statements.Add(new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), "Invoke", new CodeExpression[] {
-                            new CodeThisReferenceExpression(),
-                            new CodePrimitiveExpression(method.Name),
-                            (types.Length == 0) ? new CodeArrayCreateExpression(typeof(Type[]), 0) : new CodeArrayCreateExpression(typeof(Type[]), types),
-                            new CodeTypeOfExpression(method.ReturnType),
-                            (attrs.Length == 0) ? new CodeArrayCreateExpression(typeof(Attribute[]), 0) : new CodeArrayCreateExpression(typeof(Attribute[]), attrs),
-                            (args.Length == 0) ? new CodeArrayCreateExpression(typeof(object[]), 0) : new CodeArrayCreateExpression(typeof(object[]), args)
-                        }));
+                    else
+                    {
+                        method.Statements.Add(
+                            new CodeMethodInvokeExpression(
+                                new CodeThisReferenceExpression(),
+                                nameof(HproseInvocationHandler.Invoke),
+                                codeExpressions
+                                )
+                            );
                     }
                     proxyClass.Members.Add(method);
                 }
             }
             return proxyClass;
-        }
-        public static void Main(string[] args) {
-
-            if (args.Length == 0) {
-                Console.WriteLine("Hprose Invocation Proxy Implementation Generator 1.1");
-                Console.WriteLine("Copyright (c) 2008-2016 http://hprose.com");
-                Console.WriteLine("hipig -i:IExample -r:IExample.dll -o:Example.cs");
-                Console.WriteLine("  -i:InterfaceName    Interface name");
-                Console.WriteLine("  -o:OutputFileName   Output files");
-                Console.WriteLine("  -r:Assembly         Imports metadata from the specified assembly");
-                return;
-            }
-            string reference = "";
-            string interfaceName = "";
-            string output = "ServiceProxyImpl.cs";
-
-            foreach (string a in args) {
-                if (a.StartsWith("-r:")) {
-                    reference = a.Substring(a.IndexOf(":") + 1);
-                    if (reference[0] == '"') reference = reference.Substring(1);
-                    if (reference[reference.Length - 1] == '"') reference = reference.Substring(0, reference.Length - 1);
-                }
-                if (a.StartsWith("-i:")) {
-                    interfaceName = a.Substring(a.IndexOf(":") + 1);
-                    if (interfaceName[0] == '"') interfaceName = interfaceName.Substring(1);
-                    if (interfaceName[interfaceName.Length - 1] == '"') interfaceName = interfaceName.Substring(0, interfaceName.Length - 1);
-                }
-                if (a.StartsWith("-o:")) {
-                    output = a.Substring(a.IndexOf(":") + 1);
-                    if (output[0] == '"') output = output.Substring(1);
-                    if (output[output.Length - 1] == '"') output = output.Substring(0, output.Length - 1);
-                }
-            }
-            if (reference == "") {
-                Console.WriteLine("You need to specify the assembly.");
-                return;
-            }
-
-            Type[] types = Assembly.LoadFrom(reference).GetTypes();
-
-            CodeCompileUnit compunit = new CodeCompileUnit();
-            CodeNamespace ns = new CodeNamespace(types[0].Namespace);
-            compunit.Namespaces.Add(ns);
-            ns.Imports.Add(new CodeNamespaceImport("System"));
-            ns.Imports.Add(new CodeNamespaceImport("System.Reflection"));
-            ns.Imports.Add(new CodeNamespaceImport("Hprose.Common"));
-            foreach (Type t in types) {
-                if (t.IsInterface) {
-                    if ((interfaceName == "") || (interfaceName == t.Name)) {
-                        ns.Types.Add(ImplementIt(t));
-                    }
-                }
-            }
-            StringBuilder fileContent = new StringBuilder();
-            CodeGeneratorOptions options = new CodeGeneratorOptions();
-            CodeDomProvider codePrivoder;
-            if (output.EndsWith(".cs")) {
-                codePrivoder = CodeDomProvider.CreateProvider("CSharp");
-            }
-            else if (output.EndsWith(".vb")) {
-                codePrivoder = CodeDomProvider.CreateProvider("VisualBasic");
-            }
-            else {
-                Console.WriteLine("Output source file must have a .cs or .vb extension");
-                return;
-            }
-            using (StringWriter sw = new StringWriter(fileContent)) {
-                codePrivoder.GenerateCodeFromNamespace(ns, sw, options);
-            }
-            File.WriteAllText(output, fileContent.ToString());
         }
     }
 }

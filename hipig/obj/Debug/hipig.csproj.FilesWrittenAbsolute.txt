@@ -1,3 +1,0 @@
-/Users/andot/Git/hprose-dotnet/hipig/obj/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
-/Users/andot/Git/hprose-dotnet/hipig/bin/Debug/hipig.exe
-/Users/andot/Git/hprose-dotnet/hipig/obj/Debug/hipig.exe

@@ -2,10 +2,15 @@
 
 Copyright (c) 2008-2016 http://hprose.com
 
-```hipig -i:IExample -r:IExample.dll -o:Example.cs```
+**Simple**
+```hipig ExampleAssambly.dll```
+**Full**
+```hipig -r ExampleAssambly.dll -i IExample,IExampleInterface -o ExampleAssambly.cs -n Hprose.InvocationProxy -t Proxy```
 
 ```
-  -i:InterfaceName    Interface name
-  -o:OutputFileName   Output files
   -r:Assembly         Imports metadata from the specified assembly
+  -i:InterfaceName1[..,InterfaceNameN]    Interfaces name
+  -o:OutputFileName   Output file
+  -n:NameSpace        generate class in namespace
+  -t:ClassTail        generate class name append the tail
 ```

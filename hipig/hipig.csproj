@@ -1,53 +1,78 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EBDF43B1-5BB4-495B-AE69-7FF5D548D84D}</ProjectGuid>
+    <ProjectGuid>{3FA8940D-6713-43FD-B68B-2B10A29C99AF}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Hprose</RootNamespace>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>hipig</RootNamespace>
     <AssemblyName>hipig</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <ReleaseVersion>1.1</ReleaseVersion>
-    <SynchReleaseVersion>false</SynchReleaseVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommandLine, Version=2.0.275.0, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommandLineParser.2.0.275-beta\lib\net45\CommandLine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Hprose.Client, Version=4.0.30319.34209, Culture=neutral, PublicKeyToken=eb8819713de2ccff, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hprose.Client.1.5.4\lib\net461\Hprose.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.2.3\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ServiceStack.Text, Version=4.0.54.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Text.4.0.54\lib\net40\ServiceStack.Text.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Numerics" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Hprose\Common\ByRefAttribute.cs" />
-    <Compile Include="Hprose\Common\Extension.cs" />
-    <Compile Include="Hprose\Common\HproseCallback.cs" />
-    <Compile Include="Hprose\Common\HproseContext.cs" />
-    <Compile Include="Hprose\Common\HproseException.cs" />
-    <Compile Include="Hprose\Common\HproseInvocationHandler.cs" />
-    <Compile Include="Hprose\Common\HproseInvoker.cs" />
-    <Compile Include="Hprose\Common\HproseMethod.cs" />
-    <Compile Include="Hprose\Common\HproseMethods.cs" />
-    <Compile Include="Hprose\Common\HproseResultMode.cs" />
-    <Compile Include="Hprose\Common\InvokeHelper.cs" />
-    <Compile Include="Hprose\Common\MethodNameAttribute.cs" />
-    <Compile Include="Hprose\Common\ResultModeAttribute.cs" />
-    <Compile Include="Hprose\Common\SimpleModeAttribute.cs" />
-    <Compile Include="Hprose\Reflection\IInvocationHandler.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Folder Include="Hprose\Reflection\" />
+    <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>
