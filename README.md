@@ -4,11 +4,9 @@
 
 Full Version:
 [![NuGet](https://img.shields.io/nuget/v/Hprose.svg)](https://www.nuget.org/packages/Hprose)
-[![NuGet](https://img.shields.io/nuget/dt/Hprose.svg)](https://www.nuget.org/packages/Hprose/)
 
 Client Version:
 [![NuGet](https://img.shields.io/nuget/v/Hprose.Client.svg)](https://www.nuget.org/packages/Hprose.Client)
-[![NuGet](https://img.shields.io/nuget/dt/Hprose.Client.svg)](https://www.nuget.org/packages/Hprose.Client/)
 
 *Hprose* is a High Performance Remote Object Service Engine.
 
