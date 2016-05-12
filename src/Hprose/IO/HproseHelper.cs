@@ -12,7 +12,7 @@
  *                                                        *
  * hprose helper class for C#.                            *
  *                                                        *
- * LastModified: Jan 21, 2016                             *
+ * LastModified: May 12, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -25,7 +25,7 @@ using System.Text;
 using System.Collections;
 using System.Numerics;
 using System.Reflection;
-#if !(PocketPC || Smartphone || WindowsCE || dotNETMF)
+#if !dotNETMF
 using System.Runtime.Serialization;
 #endif
 using System.Threading;
@@ -267,7 +267,9 @@ namespace Hprose.IO {
         public static readonly Type typeofGIDictionary = typeof(IDictionary<,>);
         public static readonly Type typeofGIList = typeof(IList<>);
 #endif
-
+#if !dotNETMF
+        public static readonly Type typeofIgnoreDataMember = typeof(IgnoreDataMemberAttribute);
+#endif
 #if (dotNET35 || dotNET4 || SILVERLIGHT || WINDOWS_PHONE || Core || PORTABLE)
         public static readonly Type typeofDataContract = typeof(DataContractAttribute);
         public static readonly Type typeofDataMember = typeof(DataMemberAttribute);
@@ -628,12 +630,14 @@ namespace Hprose.IO {
 #else
             Hashtable members = new Hashtable(caseInsensitiveHashCodeProvider, caseInsensitiveComparer);
 #endif
+            FieldAttributes ns = FieldAttributes.NotSerialized;
 #if dotNET45
             IEnumerable<PropertyInfo> piarray = type.GetRuntimeProperties();
             foreach (PropertyInfo pi in piarray) {
                 string name;
-                if (pi.CanRead && pi.CanWrite &&
-                    pi.GetMethod.IsPublic && !pi.GetMethod.IsStatic && !pi.SetMethod.IsStatic &&
+                if (pi.GetMethod.IsPublic && !pi.GetMethod.IsStatic && !pi.SetMethod.IsStatic &&
+                    pi.CanRead && pi.CanWrite &&
+                    !pi.IsDefined(typeofIgnoreDataMember, false) &&
                     pi.GetIndexParameters().GetLength(0) == 0 &&
                     !members.ContainsKey(name = pi.Name)) {
                     name = char.ToLower(name[0]) + name.Substring(1);
@@ -643,7 +647,10 @@ namespace Hprose.IO {
             IEnumerable<FieldInfo> fiarray = type.GetRuntimeFields();
             foreach (FieldInfo fi in fiarray) {
                 string name;
-                if (fi.IsPublic && !fi.IsStatic && !members.ContainsKey(name = fi.Name)) {
+                if (fi.IsPublic && !fi.IsStatic &&
+                    !fi.IsDefined(typeofIgnoreDataMember, false) &&
+                    ((fi.Attributes & ns) != ns) &&
+                    !members.ContainsKey(name = fi.Name)) {
                     name = char.ToLower(name[0]) + name.Substring(1);
                     members[name] = new MemberTypeInfo(fi);
                 }
@@ -656,6 +663,7 @@ namespace Hprose.IO {
             foreach (PropertyInfo pi in piarray) {
                 string name;
                 if (pi.CanRead && pi.CanWrite && pi.GetGetMethod() != null &&
+                    !pi.IsDefined(typeofIgnoreDataMember, false) &&
                     pi.GetIndexParameters().GetLength(0) == 0 &&
                     !members.ContainsKey(name = pi.Name)) {
                     name = char.ToLower(name[0]) + name.Substring(1);
@@ -666,7 +674,9 @@ namespace Hprose.IO {
             FieldInfo[] fiarray = type.GetFields(bindingflags);
             foreach (FieldInfo fi in fiarray) {
                 string name;
-                if (!members.ContainsKey(name = fi.Name)) {
+                if (!fi.IsDefined(typeofIgnoreDataMember, false) &&
+                    ((fi.Attributes & ns) != ns) &&
+                    !members.ContainsKey(name = fi.Name)) {
                     name = char.ToLower(name[0]) + name.Substring(1);
                     members[name] = new MemberTypeInfo(fi);
                 }
@@ -682,6 +692,7 @@ namespace Hprose.IO {
             foreach (PropertyInfo pi in piarray) {
                 string name;
                 if (pi.IsDefined(typeofDataMember, false) &&
+                    !pi.IsDefined(typeofIgnoreDataMember, false) &&
                     pi.CanRead && pi.CanWrite &&
                     !pi.GetMethod.IsStatic && !pi.SetMethod.IsStatic &&
                     pi.GetIndexParameters().GetLength(0) == 0 &&
@@ -691,9 +702,12 @@ namespace Hprose.IO {
                 }
             }
             IEnumerable<FieldInfo> fiarray = type.GetRuntimeFields();
+            FieldAttributes ns = FieldAttributes.NotSerialized;
             foreach (FieldInfo fi in fiarray) {
                 string name;
                 if (fi.IsDefined(typeofDataMember, false) &&
+                    !fi.IsDefined(typeofIgnoreDataMember, false) &&
+                    ((fi.Attributes & ns) != ns) &&
                     !fi.IsStatic && !members.ContainsKey(name = fi.Name)) {
                     name = char.ToLower(name[0]) + name.Substring(1);
                     members[name] = new MemberTypeInfo(fi);
@@ -711,6 +725,7 @@ namespace Hprose.IO {
             foreach (PropertyInfo pi in piarray) {
                 string name;
                 if (pi.IsDefined(typeofDataMember, false) &&
+                    !pi.IsDefined(typeofIgnoreDataMember, false) &&
                     pi.CanRead && pi.CanWrite &&
                     pi.GetIndexParameters().GetLength(0) == 0 &&
                     !members.ContainsKey(name = pi.Name)) {
@@ -719,9 +734,12 @@ namespace Hprose.IO {
                 }
             }
             FieldInfo[] fiarray = type.GetFields(bindingflags);
+            FieldAttributes ns = FieldAttributes.NotSerialized;
             foreach (FieldInfo fi in fiarray) {
                 string name;
                 if (fi.IsDefined(typeofDataMember, false) &&
+                    !fi.IsDefined(typeofIgnoreDataMember, false) &&
+                    ((fi.Attributes & ns) != ns) &&
                     !members.ContainsKey(name = fi.Name)) {
                     name = char.ToLower(name[0]) + name.Substring(1);
                     members[name] = new MemberTypeInfo(fi);
@@ -778,6 +796,7 @@ namespace Hprose.IO {
                 foreach (PropertyInfo pi in piarray) {
                     string name;
                     if (pi.CanRead && pi.CanWrite &&
+                        !pi.IsDefined(typeofIgnoreDataMember, false) &&
                         pi.GetMethod.IsPublic && pi.SetMethod.IsPublic &&
                         !pi.GetMethod.IsStatic && !pi.SetMethod.IsStatic &&
                         pi.GetIndexParameters().GetLength(0) == 0 &&
@@ -793,6 +812,7 @@ namespace Hprose.IO {
                 foreach (PropertyInfo pi in piarray) {
                     string name;
                     if (pi.CanRead && pi.CanWrite &&
+                        !pi.IsDefined(typeofIgnoreDataMember, false) &&
                         pi.GetIndexParameters().GetLength(0) == 0 &&
                         !properties.ContainsKey(name = pi.Name)) {
                         name = char.ToLower(name[0]) + name.Substring(1);
@@ -858,6 +878,7 @@ namespace Hprose.IO {
                 foreach (FieldInfo fi in fiarray) {
                     string name;
                     if (((fi.Attributes & ns) != ns) &&
+                        !fi.IsDefined(typeofIgnoreDataMember, false) &&
                         !fi.IsStatic &&
                         !fields.ContainsKey(name = fi.Name)) {
                         name = char.ToLower(name[0]) + name.Substring(1);
@@ -877,6 +898,7 @@ namespace Hprose.IO {
                     string name;
 #if !dotNETMF
                     if (((fi.Attributes & ns) != ns) &&
+                        !fi.IsDefined(typeofIgnoreDataMember, false) &&
                         !fields.ContainsKey(name = fi.Name)) {
                         name = char.ToLower(name[0]) + name.Substring(1);
 #else

@@ -210,6 +210,7 @@ set HPROSE_SRC=%HPROSE_SRC% src\System\IO\Compression\MatchState.cs
 set HPROSE_SRC=%HPROSE_SRC% src\System\IO\Compression\OutputWindow.cs
 set HPROSE_SRC=%HPROSE_SRC% src\System\Runtime\Serialization\DataContractAttribute.cs
 set HPROSE_SRC=%HPROSE_SRC% src\System\Runtime\Serialization\DataMemberAttribute.cs
+set HPROSE_SRC=%HPROSE_SRC% src\System\Runtime\Serialization\IgnoreDataMemberAttribute.cs
 set HPROSE_SRC=%HPROSE_SRC% src\System\Threading\ReaderWriterLock.cs
 set HPROSE_SRC=%HPROSE_SRC% src\System\Threading\SynchronizationContext.cs
 set HPROSE_SRC=%HPROSE_SRC% src\System\Threading\Timer.cs
