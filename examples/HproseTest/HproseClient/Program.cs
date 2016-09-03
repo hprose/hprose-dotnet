@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Hprose.Client;
 using Hprose.IO;
 using Hprose.Common;
+using System.Diagnostics;
+using System.Threading;
 
 namespace HproseClient
 {
@@ -34,7 +36,9 @@ namespace HproseClient
         static void Main(string[] args)
         {
             HproseClassManager.Register(typeof(User), "User");
-            client = new HproseHttpClient("http://localhost:2012/");
+            client = new HproseHttpClient(" http://121.42.178.193:22012/");
+            client.KeepAlive = true;
+/*
             List<User> users = new List<User>();
             User user1 = new User();
             user1.name = "李雷";
@@ -54,6 +58,22 @@ namespace HproseClient
             Hello();
             MemoryStream stream = (MemoryStream)HproseFormatter.Serialize(SendUsers(users));
             Console.WriteLine(Encoding.UTF8.GetString(stream.ToArray()));
+*/
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var ts = new List<Thread>();
+            for (int i = 0; i < 200; i++) {
+                ts.Add(new Thread(() => {
+                    for (int j = 1; j < 10; j++) {
+                        client.Invoke<String>("hello", new Object[] { "abc123" + j });
+                    }
+                }));
+            }
+            ts.ForEach(a => a.Start());
+            ts.ForEach(a => a.Join());
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.ElapsedMilliseconds);
+            Console.WriteLine(stopwatch.ElapsedMilliseconds / 2000.0);
             Console.ReadLine();
         }
     }

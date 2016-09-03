@@ -12,7 +12,7 @@
  *                                                        *
  * type enum for C#.                                      *
  *                                                        *
- * LastModified: Jan 19, 2016                             *
+ * LastModified: Sep 3, 2016                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -34,6 +34,7 @@ namespace Hprose.IO {
         UInt32,
         Int64,
         UInt64,
+        IntPtr,
         Single,
         Double,
         Decimal,
@@ -58,6 +59,7 @@ namespace Hprose.IO {
         UInt32Array,
         Int64Array,
         UInt64Array,
+        IntPtrArray,
         SingleArray,
         DoubleArray,
         DecimalArray,
@@ -99,6 +101,7 @@ namespace Hprose.IO {
         NullableUInt32,
         NullableInt64,
         NullableUInt64,
+        NullableIntPtr,
         NullableSingle,
         NullableDouble,
         NullableDecimal,
@@ -127,6 +130,7 @@ namespace Hprose.IO {
         UInt32List,
         Int64List,
         UInt64List,
+        IntPtrList,
         SingleList,
         DoubleList,
         DecimalList,
@@ -150,6 +154,7 @@ namespace Hprose.IO {
         UInt32IList,
         Int64IList,
         UInt64IList,
+        IntPtrIList,
         SingleIList,
         DoubleIList,
         DecimalIList,

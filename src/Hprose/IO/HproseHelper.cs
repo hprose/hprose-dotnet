@@ -12,7 +12,7 @@
  *                                                        *
  * hprose helper class for C#.                            *
  *                                                        *
- * LastModified: May 12, 2016                             *
+ * LastModified: Sep 3, 2016                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -186,6 +186,8 @@ namespace Hprose.IO {
         public static readonly Type typeofUInt32Array = typeof(UInt32[]);
         public static readonly Type typeofUInt64 = typeof(UInt64);
         public static readonly Type typeofUInt64Array = typeof(UInt64[]);
+        public static readonly Type typeofIntPtr = typeof(IntPtr);
+        public static readonly Type typeofIntPtrArray = typeof(IntPtr[]);
 #if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public static readonly Type typeofNullableBoolean = typeof(Nullable<Boolean>);
         public static readonly Type typeofNullableChar = typeof(Nullable<Char>);
@@ -197,6 +199,7 @@ namespace Hprose.IO {
         public static readonly Type typeofNullableUInt32 = typeof(Nullable<UInt32>);
         public static readonly Type typeofNullableInt64 = typeof(Nullable<Int64>);
         public static readonly Type typeofNullableUInt64 = typeof(Nullable<UInt64>);
+        public static readonly Type typeofNullableIntPtr = typeof(Nullable<IntPtr>);
         public static readonly Type typeofNullableSingle = typeof(Nullable<Single>);
         public static readonly Type typeofNullableDouble = typeof(Nullable<Double>);
         public static readonly Type typeofNullableDecimal = typeof(Nullable<Decimal>);
@@ -216,6 +219,7 @@ namespace Hprose.IO {
         public static readonly Type typeofUInt32List = typeof(List<UInt32>);
         public static readonly Type typeofInt64List = typeof(List<Int64>);
         public static readonly Type typeofUInt64List = typeof(List<UInt64>);
+        public static readonly Type typeofIntPtrList = typeof(List<IntPtr>);
         public static readonly Type typeofSingleList = typeof(List<Single>);
         public static readonly Type typeofDoubleList = typeof(List<Double>);
         public static readonly Type typeofDecimalList = typeof(List<Decimal>);
@@ -239,6 +243,7 @@ namespace Hprose.IO {
         public static readonly Type typeofUInt32IList = typeof(IList<UInt32>);
         public static readonly Type typeofInt64IList = typeof(IList<Int64>);
         public static readonly Type typeofUInt64IList = typeof(IList<UInt64>);
+        public static readonly Type typeofIntPtrIList = typeof(IList<IntPtr>);
         public static readonly Type typeofSingleIList = typeof(IList<Single>);
         public static readonly Type typeofDoubleIList = typeof(IList<Double>);
         public static readonly Type typeofDecimalIList = typeof(IList<Decimal>);
@@ -298,6 +303,7 @@ namespace Hprose.IO {
             typeMap[typeofUInt32] = TypeEnum.UInt32;
             typeMap[typeofInt64] = TypeEnum.Int64;
             typeMap[typeofUInt64] = TypeEnum.UInt64;
+            typeMap[typeofIntPtr] = TypeEnum.IntPtr;
             typeMap[typeofSingle] = TypeEnum.Single;
             typeMap[typeofDouble] = TypeEnum.Double;
             typeMap[typeofDecimal] = TypeEnum.Decimal;
@@ -319,6 +325,7 @@ namespace Hprose.IO {
             typeMap[typeofUInt32Array] = TypeEnum.UInt32Array;
             typeMap[typeofInt64Array] = TypeEnum.Int64Array;
             typeMap[typeofUInt64Array] = TypeEnum.UInt64Array;
+            typeMap[typeofIntPtrArray] = TypeEnum.IntPtrArray;
             typeMap[typeofSingleArray] = TypeEnum.SingleArray;
             typeMap[typeofDoubleArray] = TypeEnum.DoubleArray;
             typeMap[typeofDecimalArray] = TypeEnum.DecimalArray;
@@ -356,6 +363,7 @@ namespace Hprose.IO {
             typeMap[typeofNullableUInt32] = TypeEnum.NullableUInt32;
             typeMap[typeofNullableInt64] = TypeEnum.NullableInt64;
             typeMap[typeofNullableUInt64] = TypeEnum.NullableUInt64;
+            typeMap[typeofNullableIntPtr] = TypeEnum.NullableIntPtr;
             typeMap[typeofNullableSingle] = TypeEnum.NullableSingle;
             typeMap[typeofNullableDouble] = TypeEnum.NullableDouble;
             typeMap[typeofNullableDecimal] = TypeEnum.NullableDecimal;
@@ -375,6 +383,7 @@ namespace Hprose.IO {
             typeMap[typeofUInt32List] = TypeEnum.UInt32List;
             typeMap[typeofInt64List] = TypeEnum.Int64List;
             typeMap[typeofUInt64List] = TypeEnum.UInt64List;
+            typeMap[typeofIntPtrList] = TypeEnum.IntPtrList;
             typeMap[typeofSingleList] = TypeEnum.SingleList;
             typeMap[typeofDoubleList] = TypeEnum.DoubleList;
             typeMap[typeofDecimalList] = TypeEnum.DecimalList;
@@ -398,6 +407,7 @@ namespace Hprose.IO {
             typeMap[typeofUInt32IList] = TypeEnum.UInt32IList;
             typeMap[typeofInt64IList] = TypeEnum.Int64IList;
             typeMap[typeofUInt64IList] = TypeEnum.UInt64IList;
+            typeMap[typeofIntPtrIList] = TypeEnum.IntPtrIList;
             typeMap[typeofSingleIList] = TypeEnum.SingleIList;
             typeMap[typeofDoubleIList] = TypeEnum.DoubleIList;
             typeMap[typeofDecimalIList] = TypeEnum.DecimalIList;

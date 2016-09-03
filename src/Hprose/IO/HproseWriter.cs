@@ -12,7 +12,7 @@
  *                                                        *
  * hprose writer class for C#.                            *
  *                                                        *
- * LastModified: Jan 20, 2016                             *
+ * LastModified: Sep 3, 2016                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -226,6 +226,9 @@ namespace Hprose.IO {
                 else if (obj is uint) WriteLong((uint)obj);
                 else if (obj is ulong) WriteLong((ulong)obj);
                 else if (obj is long) WriteLong((long)obj);
+#if !dotNETMF
+                else if (obj is IntPtr) WriteIntPtr((IntPtr)obj);
+#endif
                 else if (obj is float) WriteDouble((float)obj);
                 else if (obj is decimal) WriteDouble((decimal)obj);
                 else if (obj is DateTime) WriteDateWithRef((DateTime)obj);
@@ -265,6 +268,9 @@ namespace Hprose.IO {
                     case TypeEnum.UInt32Array: WriteArrayWithRef((uint[])obj); break;
                     case TypeEnum.Int64Array: WriteArrayWithRef((long[])obj); break;
                     case TypeEnum.UInt64Array: WriteArrayWithRef((ulong[])obj); break;
+#if !dotNETMF
+                    case TypeEnum.IntPtrArray: WriteArrayWithRef((IntPtr[])obj); break;
+#endif
                     case TypeEnum.SingleArray: WriteArrayWithRef((float[])obj); break;
                     case TypeEnum.DoubleArray: WriteArrayWithRef((double[])obj); break;
                     case TypeEnum.DecimalArray: WriteArrayWithRef((decimal[])obj); break;
@@ -425,6 +431,17 @@ namespace Hprose.IO {
                 stream.WriteByte(HproseTags.TagSemicolon);
             }
         }
+
+#if !dotNETMF
+        public void WriteIntPtr(IntPtr ip) {
+            if (IntPtr.Size == 4) {
+                WriteInteger(ip.ToInt32());
+            }
+            else {
+                WriteLong(ip.ToInt64());
+            }
+        }
+#endif
 
         public void WriteLong(BigInteger l) {
             stream.WriteByte(HproseTags.TagLong);
@@ -890,6 +907,26 @@ namespace Hprose.IO {
 
         [CLSCompliantAttribute(false)]
         public void WriteArrayWithRef(ulong[] array) {
+            if (!refer.Write(array)) WriteArray(array);
+        }
+
+#if !dotNETMF
+        [CLSCompliantAttribute(false)]
+        public void WriteArray(IntPtr[] array) {
+            refer.Set(array);
+            int length = array.Length;
+            stream.WriteByte(HproseTags.TagList);
+            if (length > 0) WriteInt(length, stream);
+            stream.WriteByte(HproseTags.TagOpenbrace);
+            for (int i = 0; i < length; ++i) {
+                WriteIntPtr(array[i]);
+            }
+            stream.WriteByte(HproseTags.TagClosebrace);
+        }
+#endif
+
+        [CLSCompliantAttribute(false)]
+        public void WriteArrayWithRef(IntPtr[] array) {
             if (!refer.Write(array)) WriteArray(array);
         }
 

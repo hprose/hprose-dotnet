@@ -12,7 +12,7 @@
  *                                                        *
  * hprose reader class for C#.                            *
  *                                                        *
- * LastModified: Jan 20, 2016                             *
+ * LastModified: Sep 3, 2016                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -1623,6 +1623,51 @@ namespace Hprose.IO {
         }
 #endif
 
+#if !dotNETMF
+        private IntPtr ReadIntPtrWithTag(int tag) {
+            switch (tag) {
+                case '0': return IntPtr.Zero;
+                case '1': return new IntPtr(1);
+                case '2': return new IntPtr(2);
+                case '3': return new IntPtr(3);
+                case '4': return new IntPtr(4);
+                case '5': return new IntPtr(5);
+                case '6': return new IntPtr(6);
+                case '7': return new IntPtr(7);
+                case '8': return new IntPtr(8);
+                case '9': return new IntPtr(9);
+                case HproseTags.TagInteger: return new IntPtr(ReadIntWithoutTag());
+                case HproseTags.TagLong: return new IntPtr(ReadLongWithoutTag());
+                case HproseTags.TagDouble: return new IntPtr((long)ReadDoubleWithoutTag());
+                case HproseTags.TagEmpty: return IntPtr.Zero;
+                case HproseTags.TagTrue: return new IntPtr(1);
+                case HproseTags.TagFalse: return IntPtr.Zero;
+                case HproseTags.TagUTF8Char: return new IntPtr(Convert.ToInt64(ReadUTF8CharWithoutTag()));
+                case HproseTags.TagString: return new IntPtr(Convert.ToInt64(ReadStringWithoutTag()));
+                case HproseTags.TagRef: return new IntPtr(Convert.ToInt64(ReadRef().ToString()));
+                default: throw CastError(TagToString(tag), HproseHelper.typeofIntPtr);
+            }
+        }
+
+        public IntPtr ReadIntPtr() {
+            int tag = stream.ReadByte();
+            return (tag == HproseTags.TagNull) ? IntPtr.Zero : ReadIntPtrWithTag(tag);
+        }
+#endif
+
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
+        [CLSCompliantAttribute(false)]
+        public IntPtr? ReadNullableIntPtr() {
+            int tag = stream.ReadByte();
+            if (tag == HproseTags.TagNull) {
+                return null;
+            }
+            else {
+                return ReadIntPtrWithTag(tag);
+            }
+        }
+#endif
+
         private float ReadSingleWithTag(int tag) {
             switch (tag) {
                 case '0': return 0.0F;
@@ -2308,6 +2353,27 @@ namespace Hprose.IO {
             }
         }
 
+#if !dotNETMF
+        public IntPtr[] ReadIntPtrArray() {
+            int tag = stream.ReadByte();
+            switch (tag) {
+                case HproseTags.TagNull: return null;
+                case HproseTags.TagList: {
+                    int count = ReadInt(HproseTags.TagOpenbrace);
+                    IntPtr[] a = new IntPtr[count];
+                    refer.Set(a);
+                    for (int i = 0; i < count; ++i) {
+                        a[i] = ReadIntPtr();
+                    }
+                    stream.ReadByte();
+                    return a;
+                }
+                case HproseTags.TagRef: return (IntPtr[])ReadRef();
+                default: throw CastError(TagToString(tag), HproseHelper.typeofIntPtrArray);
+            }
+        }
+#endif
+
         public float[] ReadSingleArray() {
             int tag = stream.ReadByte();
             switch (tag) {
@@ -2951,6 +3017,25 @@ namespace Hprose.IO {
                 }
                 case HproseTags.TagRef: return (List<ulong>)ReadRef();
                 default: throw CastError(TagToString(tag), HproseHelper.typeofUInt64List);
+            }
+        }
+
+        public List<IntPtr> ReadIntPtrList() {
+            int tag = stream.ReadByte();
+            switch (tag) {
+                case HproseTags.TagNull: return null;
+                case HproseTags.TagList: {
+                    int count = ReadInt(HproseTags.TagOpenbrace);
+                    List<IntPtr> a = new List<IntPtr>(count);
+                    refer.Set(a);
+                    for (int i = 0; i < count; ++i) {
+                        a.Add(ReadIntPtr());
+                    }
+                    stream.ReadByte();
+                    return a;
+                }
+                case HproseTags.TagRef: return (List<IntPtr>)ReadRef();
+                default: throw CastError(TagToString(tag), HproseHelper.typeofIntPtrList);
             }
         }
 
@@ -3647,6 +3732,9 @@ namespace Hprose.IO {
                 case TypeEnum.UInt32: return ReadUInt32();
                 case TypeEnum.Int64: return ReadInt64();
                 case TypeEnum.UInt64: return ReadUInt64();
+#if !dotNETMF
+                case TypeEnum.IntPtr: return ReadIntPtr();
+#endif
                 case TypeEnum.Single: return ReadSingle();
                 case TypeEnum.Double: return ReadDouble();
                 case TypeEnum.DateTime: return ReadDateTime();
@@ -3668,6 +3756,9 @@ namespace Hprose.IO {
                 case TypeEnum.UInt32Array: return ReadUInt32Array();
                 case TypeEnum.Int64Array: return ReadInt64Array();
                 case TypeEnum.UInt64Array: return ReadUInt64Array();
+#if !dotNETMF
+                case TypeEnum.IntPtrArray: return ReadIntPtrArray();
+#endif
                 case TypeEnum.SingleArray: return ReadSingleArray();
                 case TypeEnum.DoubleArray: return ReadDoubleArray();
                 case TypeEnum.DateTimeArray: return ReadDateTimeArray();
@@ -3703,6 +3794,7 @@ namespace Hprose.IO {
                 case TypeEnum.NullableUInt32: return ReadNullableUInt32();
                 case TypeEnum.NullableInt64: return ReadNullableInt64();
                 case TypeEnum.NullableUInt64: return ReadNullableUInt64();
+                case TypeEnum.NullableIntPtr: return ReadNullableIntPtr();
                 case TypeEnum.NullableSingle: return ReadNullableSingle();
                 case TypeEnum.NullableDouble: return ReadNullableDouble();
                 case TypeEnum.NullableDecimal: return ReadNullableDecimal();
@@ -3732,6 +3824,8 @@ namespace Hprose.IO {
                 case TypeEnum.Int64IList: return ReadInt64List();
                 case TypeEnum.UInt64List:
                 case TypeEnum.UInt64IList: return ReadUInt64List();
+                case TypeEnum.IntPtrList:
+                case TypeEnum.IntPtrIList: return ReadIntPtrList();
                 case TypeEnum.SingleList:
                 case TypeEnum.SingleIList: return ReadSingleList();
                 case TypeEnum.DoubleList:

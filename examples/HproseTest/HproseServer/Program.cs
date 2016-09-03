@@ -40,7 +40,7 @@ namespace HproseServer
             server.Add("Hello", ts, true);
             server.Add("SendUsers", ts);
             server.IsCrossDomainEnabled = true;
-            server.CrossDomainXmlFile = "crossdomain.xml";
+            //server.CrossDomainXmlFile = "crossdomain.xml";
             server.Start();
             Console.WriteLine("Server started.");
             Console.ReadLine();
