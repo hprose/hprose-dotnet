@@ -36,7 +36,7 @@ namespace HproseClient
         static void Main(string[] args)
         {
             HproseClassManager.Register(typeof(User), "User");
-            client = new HproseHttpClient(" http://121.42.178.193:22012/");
+            client = new HproseHttpClient(" http://localhost:2012/");
             client.KeepAlive = true;
 /*
             List<User> users = new List<User>();
