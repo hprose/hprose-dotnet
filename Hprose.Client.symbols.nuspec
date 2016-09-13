@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Hprose.Client</id>
-        <version>1.5.5</version>
+        <version>1.5.6</version>
         <title>Hprose Client for .NET</title>
         <authors>Ma Bingyao</authors>
         <owners>Ma Bingyao&lt;andot@hprose.com&gt;</owners>
@@ -40,7 +40,8 @@
         <summary>Hprose is a High Performance Remote Object Service Engine.
 
 It is a modern, lightweight, cross-language, cross-platform, object-oriented, high performance, remote dynamic communication middleware.</summary>
-        <releaseNotes>Added IntPtr support.
+        <releaseNotes>Added generic method interface support for client proxy.
+Added IntPtr support.
 It supports .NET Framework 1.0 ~ 4.6.1.
 It supports .NET CompactFramework 1.0 ~ 3.9.
 It supports .NET Micro Framework 4.4.

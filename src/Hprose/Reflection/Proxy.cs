@@ -12,7 +12,7 @@
  *                                                        *
  * Proxy class for C#.                                    *
  *                                                        *
- * LastModified: Jan 18, 2016                             *
+ * LastModified: Sep 14, 2016                             *
  * Authors: Ma Bingyao <andot@hprose.com>                 *
  *                                                        *
 \**********************************************************/
@@ -284,7 +284,16 @@ namespace Hprose.Reflection {
                              MethodAttributes.Final;
             }
             b = typeBuilder.DefineMethod(name, methodAttr, method.CallingConvention, method.ReturnType, paramTypes);
-
+#if !(dotNET10 || dotNET11)
+            if (method.IsGenericMethod) {
+                Type[] genericArguments = method.GetGenericArguments();
+                string[] typeParamNames = new string[genericArguments.Length];
+                for (int i = 0; i < genericArguments.Length; i++) {
+                    typeParamNames[i] = genericArguments[i].Name;
+                }
+                b.DefineGenericParameters(typeParamNames);
+            }
+#endif
             ILGenerator gen = b.GetILGenerator();
             LocalBuilder parameters = gen.DeclareLocal(typeofObjectArray);
             LocalBuilder result = gen.DeclareLocal(typeofObject);
