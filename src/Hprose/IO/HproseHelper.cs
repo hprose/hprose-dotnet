@@ -12,7 +12,7 @@
  *                                                        *
  * hprose helper class for C#.                            *
  *                                                        *
- * LastModified: Sep 3, 2016                              *
+ * LastModified: Sep 18, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -645,8 +645,9 @@ namespace Hprose.IO {
             IEnumerable<PropertyInfo> piarray = type.GetRuntimeProperties();
             foreach (PropertyInfo pi in piarray) {
                 string name;
-                if (pi.GetMethod.IsPublic && !pi.GetMethod.IsStatic && !pi.SetMethod.IsStatic &&
-                    pi.CanRead && pi.CanWrite &&
+                if (pi.CanRead && pi.CanWrite &&
+                    pi.GetMethod.IsPublic && !pi.GetMethod.IsStatic &&
+                    pi.SetMethod.IsPublic && !pi.SetMethod.IsStatic &&
                     !pi.IsDefined(typeofIgnoreDataMember, false) &&
                     pi.GetIndexParameters().GetLength(0) == 0 &&
                     !members.ContainsKey(name = pi.Name)) {
@@ -667,12 +668,11 @@ namespace Hprose.IO {
             }
 #else
             BindingFlags bindingflags = BindingFlags.Public |
-                                        BindingFlags.NonPublic |
                                         BindingFlags.Instance;
             PropertyInfo[] piarray = type.GetProperties(bindingflags);
             foreach (PropertyInfo pi in piarray) {
                 string name;
-                if (pi.CanRead && pi.CanWrite && pi.GetGetMethod() != null &&
+                if (pi.CanRead && pi.CanWrite &&
                     !pi.IsDefined(typeofIgnoreDataMember, false) &&
                     pi.GetIndexParameters().GetLength(0) == 0 &&
                     !members.ContainsKey(name = pi.Name)) {
@@ -701,9 +701,9 @@ namespace Hprose.IO {
             IEnumerable<PropertyInfo> piarray = type.GetRuntimeProperties();
             foreach (PropertyInfo pi in piarray) {
                 string name;
-                if (pi.IsDefined(typeofDataMember, false) &&
+                if (pi.CanRead && pi.CanWrite &&
+                    pi.IsDefined(typeofDataMember, false) &&
                     !pi.IsDefined(typeofIgnoreDataMember, false) &&
-                    pi.CanRead && pi.CanWrite &&
                     !pi.GetMethod.IsStatic && !pi.SetMethod.IsStatic &&
                     pi.GetIndexParameters().GetLength(0) == 0 &&
                     !members.ContainsKey(name = pi.Name)) {
@@ -734,9 +734,9 @@ namespace Hprose.IO {
             PropertyInfo[] piarray = type.GetProperties(bindingflags);
             foreach (PropertyInfo pi in piarray) {
                 string name;
-                if (pi.IsDefined(typeofDataMember, false) &&
+                if (pi.CanRead && pi.CanWrite &&
+                    pi.IsDefined(typeofDataMember, false) &&
                     !pi.IsDefined(typeofIgnoreDataMember, false) &&
-                    pi.CanRead && pi.CanWrite &&
                     pi.GetIndexParameters().GetLength(0) == 0 &&
                     !members.ContainsKey(name = pi.Name)) {
                     name = char.ToLower(name[0]) + name.Substring(1);
