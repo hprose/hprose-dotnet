@@ -29,8 +29,8 @@ namespace System.IO.Compression {
             uint num = 0;
             do {
                 num |= code & 1;
-                num = num << 1;
-                code = code >> 1;
+                num <<= 1;
+                code >>= 1;
             }
             while (--length > 0);
             return (num >> 1);

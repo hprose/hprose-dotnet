@@ -41,7 +41,8 @@ namespace System.IO.Compression {
             uint[] numArray2 = new uint[0x11];
             uint num2 = 0;
             for (int j = 1; j <= 0x10; j++) {
-                numArray2[j] = (num2 + numArray[j - 1]) << 1;
+                num2 = (num2 + numArray[j - 1]) << 1;
+                numArray2[j] = num2;
             }
             uint[] numArray3 = new uint[0x120];
             for (int k = 0; k < this.codeLengthArray.Length; k++) {
@@ -85,7 +86,7 @@ namespace System.IO.Compression {
                             if (num11 == 0) {
                                 table[num10] = (short)(-length);
                                 num11 = (short)(-length);
-                                length = (short)(length + 1);
+                                length++;
                             }
                             if ((index & num9) == 0) {
                                 table = this.left;
@@ -94,7 +95,7 @@ namespace System.IO.Compression {
                                 table = this.right;
                             }
                             num10 = -num11;
-                            num9 = num9 << 1;
+                            num9 <<= 1;
                             num8--;
                         }
                         while (num8 != 0);
@@ -111,16 +112,16 @@ namespace System.IO.Compression {
             }
             int index = this.table[(num & this.tableMask)];
             if (index < 0) {
-                uint num3 = ((uint)1) << this.tableBits;
+                uint num3 = 1u << this.tableBits;
                 do {
                     index = -index;
-                    if ((num & num3) == 0) {
+                    if ((num & num3) == 0u) {
                         index = this.left[index];
                     }
                     else {
                         index = this.right[index];
                     }
-                    num3 = num3 << 1;
+                    num3 <<= 1;
                 }
                 while (index < 0);
             }
