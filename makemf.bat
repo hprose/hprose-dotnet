@@ -117,7 +117,7 @@ set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Server\HproseTcpListenerMethods.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\Server\HproseTcpListenerServer.cs
 set HPROSE_SRC=%HPROSE_SRC% src\Hprose\AssemblyInfo.cs
 
-set HPROSE_INFO= src\AssemblyInfo.cs
+set HPROSE_INFO= src\Hprose\Properties\AssemblyInfo.cs
 
 set CSC=%PRO_PATH%\MSBuild\12.0\Bin\Csc.exe
 
