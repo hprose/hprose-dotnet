@@ -119,7 +119,7 @@ set HPROSE_SRC=%HPROSE_SRC% src\Hprose\AssemblyInfo.cs
 
 set HPROSE_INFO= src\Hprose\Properties\AssemblyInfo.cs
 
-set CSC=%PRO_PATH%\MSBuild\12.0\Bin\Csc.exe
+set CSC=%PRO_PATH%\MSBuild\14.0\Bin\Csc.exe
 
 echo start compile hprose for .NET Micro Framework Release
 set MF_PATH=%PRO_PATH%\Reference Assemblies\Microsoft\Framework\.NETMicroFramework\v4.4

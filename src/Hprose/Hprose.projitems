@@ -15,7 +15,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Client\HproseClientContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Client\HproseHttpClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Client\HproseTcpClient.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Client\HproseUnityHttpClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\ByRefAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\Extension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Common\HproseCallback.cs" />
