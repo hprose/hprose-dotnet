@@ -366,7 +366,7 @@ namespace System.Numerics {
             }
             return numArray;
         }
-#if !(dotNET10 || dotNET11 || dotNETCF10)
+#if !(dotNET10 || dotNET11 || dotNETCF10 || dotNETMF)
         public static void Swap<T>(ref T a, ref T b) {
             T local = a;
             a = b;
