@@ -12,7 +12,7 @@
  *                                                        *
  * hprose remote method class for C#.                     *
  *                                                        *
- * LastModified: Jan 18, 2016                             *
+ * LastModified: Dec 1, 2016                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -20,7 +20,7 @@ using System;
 using System.Reflection;
 
 namespace Hprose.Common {
-    class HproseMethod {
+    public class HproseMethod {
         public object obj;
         public MethodInfo method;
         public Type[] paramTypes;
