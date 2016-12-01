@@ -12,7 +12,7 @@
  *                                                        *
  * hprose remote methods class for C#.                    *
  *                                                        *
- * LastModified: Jan 16, 2016                             *
+ * LastModified: Dec 1, 2016                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -27,18 +27,18 @@ namespace Hprose.Common {
     public class HproseMethods {
 
 #if dotNETMF
-        internal Hashtable remoteMethods = new Hashtable();
+        public Hashtable remoteMethods = new Hashtable();
 #elif !(dotNET10 || dotNET11 || dotNETCF10)
-        internal Dictionary<string, Dictionary<int, HproseMethod>> remoteMethods = new Dictionary<string, Dictionary<int, HproseMethod>>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, Dictionary<int, HproseMethod>> remoteMethods = new Dictionary<string, Dictionary<int, HproseMethod>>(StringComparer.OrdinalIgnoreCase);
 #elif MONO
-        internal Hashtable remoteMethods = new Hashtable(StringComparer.OrdinalIgnoreCase);
+        public Hashtable remoteMethods = new Hashtable(StringComparer.OrdinalIgnoreCase);
 #else
-        internal Hashtable remoteMethods = new Hashtable(new CaseInsensitiveHashCodeProvider(), new CaseInsensitiveComparer());
+        public Hashtable remoteMethods = new Hashtable(new CaseInsensitiveHashCodeProvider(), new CaseInsensitiveComparer());
 #endif
         public HproseMethods() {
         }
 
-        internal HproseMethod GetMethod(string aliasName, int paramCount) {
+        public HproseMethod GetMethod(string aliasName, int paramCount) {
 #if dotNETMF
             if (!remoteMethods.Contains(aliasName)) {
 #else
