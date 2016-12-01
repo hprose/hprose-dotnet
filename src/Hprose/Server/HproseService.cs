@@ -12,7 +12,7 @@
  *                                                        *
  * hprose service class for C#.                           *
  *                                                        *
- * LastModified: Jan 23, 2016                             *
+ * LastModified: Dec 1, 2016                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -609,7 +609,7 @@ namespace Hprose.Server {
                     arguments = new object[0];
                 }
                 if (OnBeforeInvoke != null) {
-                    OnBeforeInvoke(name, arguments, byRef, context);
+                    OnBeforeInvoke(name, ref arguments, byRef, context);
                 }
                 if (remoteMethod == null) {
                     args = arguments;
@@ -637,7 +637,7 @@ namespace Hprose.Server {
                     Array.Copy(args, 0, arguments, 0, count);
                 }
                 if (OnAfterInvoke != null) {
-                    OnAfterInvoke(name, arguments, byRef, result, context);
+                    OnAfterInvoke(name, ref arguments, byRef, ref result, context);
                 }
                 if (remoteMethod.mode == HproseResultMode.RawWithEndTag) {
                     data.Write((byte[])result, 0, ((byte[])result).Length);
