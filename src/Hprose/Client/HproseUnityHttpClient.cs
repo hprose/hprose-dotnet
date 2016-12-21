@@ -17,6 +17,8 @@
  *                                                        *
 \**********************************************************/
 
+#if Unity
+
 using System;
 using System.Collections;
 using System.IO;
@@ -111,3 +113,5 @@ namespace Hprose.Client {
         }
     }
 }
+
+#endif
