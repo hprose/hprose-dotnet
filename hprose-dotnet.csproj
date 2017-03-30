@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{623A860E-7FA4-49B9-A693-FB65979FE3CC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>hprose_dotnet</RootNamespace>
+    <AssemblyName>hprose-dotnet</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;dotNET4</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HproseKeys.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="src\AssemblyInfo.cs" />
+    <Compile Include="src\Hprose\AssemblyInfo.cs" />
+    <Compile Include="src\Hprose\Client\CookieManager.cs" />
+    <Compile Include="src\Hprose\Client\HproseClient.cs" />
+    <Compile Include="src\Hprose\Client\HproseHttpClient.cs" />
+    <Compile Include="src\Hprose\Client\HproseTcpClient.cs" />
+    <Compile Include="src\Hprose\Common\Extension.cs" />
+    <Compile Include="src\Hprose\Common\HproseCallback.cs" />
+    <Compile Include="src\Hprose\Common\HproseException.cs" />
+    <Compile Include="src\Hprose\Common\HproseInvocationHandler.cs" />
+    <Compile Include="src\Hprose\Common\HproseInvoker.cs" />
+    <Compile Include="src\Hprose\Common\HproseMethod.cs" />
+    <Compile Include="src\Hprose\Common\HproseMethods.cs" />
+    <Compile Include="src\Hprose\Common\HproseResultMode.cs" />
+    <Compile Include="src\Hprose\Common\IHproseFilter.cs" />
+    <Compile Include="src\Hprose\Common\InvokeHelper.cs" />
+    <Compile Include="src\Hprose\Common\MethodNameAttribute.cs" />
+    <Compile Include="src\Hprose\Common\ResultModeAttribute.cs" />
+    <Compile Include="src\Hprose\Common\SimpleModeAttribute.cs" />
+    <Compile Include="src\Hprose\IO\HproseClassManager.cs" />
+    <Compile Include="src\Hprose\IO\HproseFormatter.cs" />
+    <Compile Include="src\Hprose\IO\HproseHelper.cs" />
+    <Compile Include="src\Hprose\IO\HproseMode.cs" />
+    <Compile Include="src\Hprose\IO\HproseReader.cs" />
+    <Compile Include="src\Hprose\IO\HproseTags.cs" />
+    <Compile Include="src\Hprose\IO\HproseWriter.cs" />
+    <Compile Include="src\Hprose\IO\ObjectSerializer.cs" />
+    <Compile Include="src\Hprose\IO\ObjectUnserializer.cs" />
+    <Compile Include="src\Hprose\IO\TypeEnum.cs" />
+    <Compile Include="src\Hprose\Reflection\CtorAccessor.cs" />
+    <Compile Include="src\Hprose\Reflection\IInvocationHandler.cs" />
+    <Compile Include="src\Hprose\Reflection\PropertyAccessor.cs" />
+    <Compile Include="src\Hprose\Reflection\Proxy.cs" />
+    <Compile Include="src\Hprose\Server\HproseHttpListenerMethods.cs" />
+    <Compile Include="src\Hprose\Server\HproseHttpListenerServer.cs" />
+    <Compile Include="src\Hprose\Server\HproseHttpListenerService.cs" />
+    <Compile Include="src\Hprose\Server\HproseHttpMethods.cs" />
+    <Compile Include="src\Hprose\Server\HproseHttpService.cs" />
+    <Compile Include="src\Hprose\Server\HproseService.cs" />
+    <Compile Include="src\Hprose\Server\HproseServiceEvent.cs" />
+    <Compile Include="src\Hprose\Server\HproseTcpListenerServer.cs" />
+    <Compile Include="src\Hprose\Server\HproseTcpMethods.cs" />
+    <Compile Include="src\System\Action.cs" />
+    <Compile Include="src\System\Collections\Generic\HashMap.cs" />
+    <Compile Include="src\System\Collections\HashMap.cs" />
+    <Compile Include="src\System\Func.cs" />
+    <Compile Include="src\System\IO\Compression\BlockType.cs" />
+    <Compile Include="src\System\IO\Compression\CompressionMode.cs" />
+    <Compile Include="src\System\IO\Compression\DecodeHelper.cs" />
+    <Compile Include="src\System\IO\Compression\DeflateInput.cs" />
+    <Compile Include="src\System\IO\Compression\Deflater.cs" />
+    <Compile Include="src\System\IO\Compression\DeflateStream.cs" />
+    <Compile Include="src\System\IO\Compression\DeflateStreamAsyncResult.cs" />
+    <Compile Include="src\System\IO\Compression\FastEncoder.cs" />
+    <Compile Include="src\System\IO\Compression\FastEncoderStatics.cs" />
+    <Compile Include="src\System\IO\Compression\FastEncoderWindow.cs" />
+    <Compile Include="src\System\IO\Compression\GZipDecoder.cs" />
+    <Compile Include="src\System\IO\Compression\GZIPHeaderState.cs" />
+    <Compile Include="src\System\IO\Compression\GZipStream.cs" />
+    <Compile Include="src\System\IO\Compression\HuffmanTree.cs" />
+    <Compile Include="src\System\IO\Compression\Inflater.cs" />
+    <Compile Include="src\System\IO\Compression\InflaterState.cs" />
+    <Compile Include="src\System\IO\Compression\InputBuffer.cs" />
+    <Compile Include="src\System\IO\Compression\Match.cs" />
+    <Compile Include="src\System\IO\Compression\MatchState.cs" />
+    <Compile Include="src\System\IO\Compression\OutputWindow.cs" />
+    <Compile Include="src\System\IO\InvalidDataException.cs" />
+    <Compile Include="src\System\MissingMethodException.cs" />
+    <Compile Include="src\System\NotImplementedException.cs" />
+    <Compile Include="src\System\Numerics\BigInteger.cs" />
+    <Compile Include="src\System\Numerics\BigIntegerBuilder.cs" />
+    <Compile Include="src\System\Numerics\BigNumber.cs" />
+    <Compile Include="src\System\Numerics\Complex.cs" />
+    <Compile Include="src\System\Numerics\DoubleUlong.cs" />
+    <Compile Include="src\System\Numerics\NumericsHelpers.cs" />
+    <Compile Include="src\System\SerializableAttribute.cs" />
+    <Compile Include="src\System\Threading\ReaderWriterLock.cs" />
+    <Compile Include="src\System\Threading\SynchronizationContext.cs" />
+    <Compile Include="src\System\Windows\Forms\WindowsFormsSynchronizationContext.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
