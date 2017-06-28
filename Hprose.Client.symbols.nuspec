@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Hprose.Client</id>
-        <version>1.5.6</version>
+        <version>1.5.7</version>
         <title>Hprose Client for .NET</title>
         <authors>Ma Bingyao</authors>
         <owners>Ma Bingyao&lt;andot@hprose.com&gt;</owners>
@@ -39,9 +39,7 @@
     This project is the implementation of Hprose for .NET (C#, Visual Basic...).</description>
         <summary>Hprose is a High Performance Remote Object Service Engine.
 
-It is a modern, lightweight, cross-language, cross-platform, object-oriented, high performance, remote dynamic communication middleware.</summary>
-        <releaseNotes>Added generic method interface support for client proxy.
-Added IntPtr support.
+It is a modern, lightweight, cross-language, cross-platform, object-oriented, high performance, remote dynamic communication middleware.
 It supports .NET Framework 1.0 ~ 4.6.1.
 It supports .NET CompactFramework 1.0 ~ 3.9.
 It supports .NET Micro Framework 4.4.
@@ -61,7 +59,13 @@ It supplies System.IO.Compression for .NET 1.x and .NET CompactFramework.
 It supplies full System.Action and System.Func definition for .NET Framework 2.0+, .NET CompactFramework 2.0+, SilverLight, Windows Phone and Mono.
 It supplies HashMap for null key Hashtable and Dictionary.
 It is faster, easier and robuster than any other Serialization and RPC.
-It supports NuGet install.</releaseNotes>
+It supports NuGet install.</summary>
+        <releaseNotes>Fixed get property without setter or getter.
+Fixed HuffmanTree.
+Fixed BigInteger .NET MF support.
+Changed HproseMethod to public.
+Changed remoteMethod to public.
+Changed args and result to ref.</releaseNotes>
         <copyright>Copyright (c) 2008-2016 http://hprose.com</copyright>
         <tags>Hprose RPC WebService WebAPI Serialize Serialization</tags>
     </metadata>
