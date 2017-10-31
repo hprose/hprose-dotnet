@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>8c426614-de9d-416b-9520-4ebc6ff804ec</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>System</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Action.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ArithmeticException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\Generic\HashMap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\HashMap.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FormatException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Func.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\BlockType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\CompressionMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\DecodeHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\DeflateInput.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\Deflater.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\DeflateStream.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\DeflateStreamAsyncResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\FastEncoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\FastEncoderStatics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\FastEncoderWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\GZipDecoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\GZIPHeaderState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\GZipStream.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\HuffmanTree.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\Inflater.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\InflaterState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\InputBuffer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\Match.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\MatchState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\Compression\OutputWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\InvalidDataException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MissingMethodException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NotImplementedException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Numerics\BigInteger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Numerics\BigIntegerBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Numerics\BigNumber.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Numerics\Complex.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Numerics\DoubleUlong.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Numerics\NumericsHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OverflowException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Runtime\Serialization\DataContractAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Runtime\Serialization\DataMemberAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Runtime\Serialization\IgnoreDataMemberAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SerializableAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Threading\ReaderWriterLock.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Threading\SynchronizationContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Threading\Timer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windows\Forms\WindowsFormsSynchronizationContext.cs" />
+  </ItemGroup>
+</Project>

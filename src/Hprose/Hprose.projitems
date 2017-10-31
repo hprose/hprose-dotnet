@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>48b521db-c345-415b-9e7b-82ff051a5d71</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Hprose</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Client\CookieManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Client\HproseClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Client\HproseClientContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Client\HproseHttpClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Client\HproseTcpClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\ByRefAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\Extension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\HproseCallback.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\HproseContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\HproseException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\HproseInvocationHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\HproseInvoker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\HproseMethod.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\HproseMethods.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\HproseResultMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\IHproseFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\InvokeHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\MethodNameAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\ResultModeAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\SimpleModeAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\HproseClassManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\HproseFormatter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\HproseHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\HproseMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\HproseReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\HproseTags.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\HproseWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\ObjectSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\ObjectUnserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\TypeEnum.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Properties\AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Reflection\CtorAccessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Reflection\IInvocationHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Reflection\PropertyAccessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Reflection\Proxy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Server\HproseHttpContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Server\HproseHttpListenerContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Server\HproseHttpListenerMethods.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Server\HproseHttpListenerServer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Server\HproseHttpListenerService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Server\HproseHttpMethods.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Server\HproseHttpService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Server\HproseService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Server\HproseServiceEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Server\HproseTcpListenerContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Server\HproseTcpListenerMethods.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Server\HproseTcpListenerServer.cs" />
+  </ItemGroup>
+</Project>
