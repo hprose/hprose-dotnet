@@ -1,4 +1,4 @@
-#if Core
+#if Core && !WINDOWS_UWP
 
 using System;
 using System.Diagnostics;

@@ -1,7 +1,7 @@
 /* MissingMethodException class.
  * This library is free. You can redistribute it and/or modify it.
  */
-#if (Core || PORTABLE || dotNETMF)
+#if (Core || PORTABLE || dotNETMF) && !WINDOWS_UWP
 
 namespace System {
     public class MissingMethodException : 

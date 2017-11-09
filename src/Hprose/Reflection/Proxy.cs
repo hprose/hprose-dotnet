@@ -163,7 +163,11 @@ namespace Hprose.Reflection {
 
             AssemblyName assemblyName = new AssemblyName();
             assemblyName.Name = "$Assembly" + strNumber;
+#if dotNET45
+            AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+#else
             AssemblyBuilder assemblyBuilder = domain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+#endif
             ModuleBuilder moduleBuilder;
 
             moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName);

@@ -1,6 +1,8 @@
+#if !NETCOREAPP2_0
 namespace Hprose {
     public class AssemblyInfo {
         public const string Version = "1.5";
+        public const string BuildNumber = "8";
     #if ClientOnly
         public const string Name = "Hprose Client";
         public const string FileName = "Hprose.Client.dll";
@@ -73,8 +75,23 @@ namespace Hprose {
                 public const string dotNET_Version = "3.7.10302.0";
                 public const string dotNET_Name = "WindowsPhone 7.0";
             #endif
+        #elif WINDOWS_UWP
+            public const string dotNET_Version = "10.0.10240.0";
+            public const string dotNET_Name = "Universal Windows";
+        #elif dotNET47
+            public const string dotNET_Version = "4.7.2046.0";
+            public const string dotNET_Name = ".NET Framework 4.7";
+        #elif dotNET462
+            public const string dotNET_Version = "4.6.1590.0";
+            public const string dotNET_Name = ".NET Framework 4.6.2";
+        #elif dotNET461
+            public const string dotNET_Version = "4.6.1055.0";
+            public const string dotNET_Name = ".NET Framework 4.6.1";
+        #elif dotNET46
+            public const string dotNET_Version = "4.6.81.0";
+            public const string dotNET_Name = ".NET Framework 4.6";
         #elif dotNET452
-            public const string dotNET_Version = "4.0.30319.34209";
+            public const string dotNET_Version = "4.0.30319.34211";
             public const string dotNET_Name = ".NET Framework 4.5.2";
         #elif dotNET451
             #if WP81
@@ -142,36 +159,6 @@ namespace Hprose {
             public const string dotNET_Name = "Silverlight 2";
         #endif
     #endif
-    #if PORTABLE
-        #if (Profile2 || Profile3 || Profile4 || Profile5 || Profile6 || Profile14 || Profile18 || Profile19 || Profile23 || Profile24 || Profile36 || Profile37 || Profile41 || Profile42 || Profile46 || Profile47 || Profile88 || Profile92 || Profile95 || Profile96 || Profile102 || Profile104 || Profile136 || Profile143 || Profile147 || Profile154 || Profile158 || Profile225 || Profile240 || Profile255 || Profile328 || Profile336 || Profile344)
-            public const string dotNET_MajorVersion = "4.0";
-        #elif (Profile7 || Profile49 || Profile75 || Profile78 || Profile111 || Profile259)
-            public const string dotNET_MajorVersion = "4.5";
-        #elif (Profile31 || Profile32 || Profile44 || Profile84 || Profile151 || Profile157)        
-            public const string dotNET_MajorVersion = "4.6";
-        #endif
-    #elif SL5
-        public const string dotNET_MajorVersion = "5.0";
-    #elif (dotNET45 || WP81)
-        public const string dotNET_MajorVersion = "4.5";
-    #elif dotNETMF
-        public const string dotNET_MajorVersion = "4.4";
-    #elif (dotNET4 || SL4 || WP80)
-        public const string dotNET_MajorVersion = "4.0";
-    #elif (WP70 || WP71)
-        public const string dotNET_MajorVersion = "3.7";
-    #elif dotNETCF39
-        public const string dotNET_MajorVersion = "3.9";
-    #elif (dotNET35 || dotNETCF35)
-        public const string dotNET_MajorVersion = "3.5";
-    #elif SL3
-        public const string dotNET_MajorVersion = "3.0";
-    #elif (dotNET2 || dotNETCF20 || SL2)
-        public const string dotNET_MajorVersion = "2.0";
-    #elif dotNET11
-        public const string dotNET_MajorVersion = "1.1";
-    #elif (dotNET10 || dotNETCF10)
-        public const string dotNET_MajorVersion = "1.0";
-    #endif
     }
 }
+#endif

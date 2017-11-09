@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <AssemblyName>Hprose.Client</AssemblyName>
+    <RootNamespace>Hprose.Client</RootNamespace>
+    <Version>1.5.8.0</Version>
+    <Authors>Ma Bingyao&lt;andot@hprose.com&gt;</Authors>
+    <Company></Company>
+    <Product>Hprose.Client 1.5 for .NET Core 2.0</Product>
+    <Copyright>\x00a9 http://www.hprose.com, All rights reserved.</Copyright>
+    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageProjectUrl>http://www.hprose.com</PackageProjectUrl>
+    <AssemblyVersion>2.0.2.0</AssemblyVersion>
+    <FileVersion>2.0.2.0</FileVersion>
+    <RepositoryUrl>https://github.com/hprose/hprose-dotnet</RepositoryUrl>
+    <PackageIconUrl>http://hprose.com/apple-touch-icon-180x180.png</PackageIconUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;ClientProfile;dotNET4;dotNET45;dotNET451;dotNET452;dotNET46;dotNET461;ClientOnly</DefineConstants>
+    <OutputPath>..\..\..\dist\Hprose.Client\Debug</OutputPath>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors></WarningsAsErrors>
+    <NoWarn>1701;1702;1705;3021</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;ClientProfile;dotNET4;dotNET45;dotNET451;dotNET452;dotNET46;dotNET461;ClientOnly</DefineConstants>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <OutputPath>..\..\..\dist\Hprose.Client\Release</OutputPath>
+    <NoWarn>1701;1702;1705;3021</NoWarn>
+  </PropertyGroup>
+
+  <Import Project="..\..\..\src\Hprose\Hprose.projitems" Label="Shared" />
+
+  <Import Project="..\..\..\src\System\System.projitems" Label="Shared" />
+
+</Project>

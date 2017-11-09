@@ -38,12 +38,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)IO\InvalidDataException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MissingMethodException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NotImplementedException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Numerics\BigInteger.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Numerics\BigIntegerBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Numerics\BigNumber.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Numerics\Complex.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Numerics\DoubleUlong.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Numerics\NumericsHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OverflowException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Runtime\Serialization\DataContractAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Runtime\Serialization\DataMemberAttribute.cs" />

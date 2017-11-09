@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\..\dist\Hprose\Debug\net462\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;dotNET4;dotNET45;dotNET451;dotNET452;dotNET46;dotNET461;dotNET462;ClientOnly</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;dotNET4;dotNET45;dotNET451;dotNET452;dotNET46;dotNET461;dotNET462</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -32,6 +32,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
