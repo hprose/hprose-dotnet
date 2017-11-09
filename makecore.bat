@@ -20,3 +20,5 @@ if not exist dist\Hprose.Client\Debug\netcoreapp2.0 mkdir dist\Hprose.Client\Deb
 
 dotnet build .\proj\netcoreapp2.0\Hprose\Hprose-netcoreapp2.csproj
 dotnet build .\proj\netcoreapp2.0\Hprose.Client\Hprose.Client-netcoreapp2.csproj
+dotnet build .\proj\netcoreapp2.0\Hprose\Hprose-netcoreapp2.csproj -c Release
+dotnet build .\proj\netcoreapp2.0\Hprose.Client\Hprose.Client-netcoreapp2.csproj -c Release
