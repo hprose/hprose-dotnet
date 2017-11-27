@@ -12,7 +12,7 @@
  *                                                        *
  * hprose context class for C#.                           *
  *                                                        *
- * LastModified: Jan 18, 2016                             *
+ * LastModified: Nov 28, 2017                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -123,7 +123,7 @@ namespace Hprose.Common {
             }
             return "";
         }
-        public void GetByte(string key, byte value) {
+        public void SetByte(string key, byte value) {
             userdata[key] = value;
         }
         public void SetShort(string key, short value) {
