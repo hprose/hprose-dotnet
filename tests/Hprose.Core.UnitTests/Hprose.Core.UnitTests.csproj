@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;net45;net451;net452;net46;net461;net462;net47;net471</TargetFrameworks>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" $(TargetFramework.Contains('netstandard1.')) ">
+		<_IsNetStandard1Defined>$([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants.Trim())', '(^|;)NETSTANDARD1($|;)'))</_IsNetStandard1Defined>
+		<DefineConstants Condition="!$(_IsNetStandard1Defined)">NETSTANDARD1;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" $(TargetFramework.Contains('netcoreapp1.')) ">
+		<_IsNetCoreApp1Defined>$([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants.Trim())', '(^|;)NETCOREAPP1($|;)'))</_IsNetCoreApp1Defined>
+		<DefineConstants Condition="!$(_IsNetCoreApp1Defined)">NETCOREAPP1;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.2.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.2.0" />
+  </ItemGroup>
+
+  <Import Project="..\..\src\Hprose.Collections\Hprose.Collections.projitems" Label="Shared" />
+
+  <Import Project="..\..\src\Hprose.IO\Hprose.IO.projitems" Label="Shared" />
+
+  <Import Project="..\..\src\Hprose.Reflection\Hprose.Reflection.projitems" Label="Shared" />
+
+  <Import Project="..\..\src\System\System.projitems" Label="Shared" />
+
+</Project>
