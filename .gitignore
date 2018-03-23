@@ -85,6 +85,7 @@ csx
 AppPackages/
 
 # Others
+.vs/
 [Bb]in
 [Oo]bj
 sql
@@ -102,5 +103,4 @@ Generated_Code #added for RIA/Silverlight projects
 _UpgradeReport_Files/
 Backup*/
 UpgradeLog*.XML
-/dist
-/dist
+*.bak
