@@ -1,0 +1,162 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;net20;net30;net35;net35-client;net40;net40-client;net45;net451;net452;net46;net461;net462;net47;net471;monoandroid71;xamarinmac20;xamarinios10;xamarintvos10;xamarinwatchos10;sl3;sl4;sl5</TargetFrameworks>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
+    <Version>2.0.0</Version>
+    <OutputType>Library</OutputType>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Ma Bingyao&lt;andot@hprose.com&gt;</Authors>
+    <Company>hprose.com</Company>
+    <Copyright>Copyright © http://www.hprose.com, All rights reserved.</Copyright>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <Product>Hprose.Core</Product>
+    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageProjectUrl>http://www.hprose.com</PackageProjectUrl>
+    <PackageIconUrl>http://hprose.com/apple-touch-icon-180x180.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/hprose/hprose-dotnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'monoandroid71' ">
+    <FileAlignment>512</FileAlignment>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <AndroidUseLatestPlatformSdk>true</AndroidUseLatestPlatformSdk>
+    <TargetFrameworkVersion>v7.1</TargetFrameworkVersion>
+    <TargetFrameworkIdentifier>MonoAndroid</TargetFrameworkIdentifier>
+    <LanguageTargets>$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets</LanguageTargets>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'xamarinmac20' ">
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'xamarinios10' ">
+    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
+    <TargetFrameworkIdentifier>Xamarin.iOS</TargetFrameworkIdentifier>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'xamarintvos10' ">
+    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
+    <TargetFrameworkIdentifier>Xamarin.TVOS</TargetFrameworkIdentifier>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'xamarinwatchos10' ">
+    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
+    <TargetFrameworkIdentifier>Xamarin.WatchOS</TargetFrameworkIdentifier>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" $(TargetFramework.Contains('xamarin')) ">
+    <LanguageTargets>$(MSBuildExtensionsPath)\$(TargetFrameworkIdentifier.Replace('.', '\'))\$(TargetFrameworkIdentifier).CSharp.targets</LanguageTargets>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net35-client' ">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net40-client' ">
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'sl3' ">
+    <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'sl4' ">
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'sl5' ">
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" $(TargetFramework.Contains('sl')) ">
+    <TargetFrameworkIdentifier>SilverLight</TargetFrameworkIdentifier>
+    <SilverlightVersion Condition="'$(SilverlightVersion)' == ''">$(TargetFrameworkVersion)</SilverlightVersion>
+    <SilverlightApplication>false</SilverlightApplication>
+    <ValidateXaml>true</ValidateXaml>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+		<_IsSilverLightDefined>$([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants.Trim())', '(^|;)SILVERLIGHT($|;)'))</_IsSilverLightDefined>
+		<DefineConstants Condition="!$(_IsSilverLightDefined)">SILVERLIGHT;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" $(TargetFramework.Contains('sl')) ">
+    <LanguageTargets>$(MSBuildProgramFiles32)\MSBuild\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets</LanguageTargets>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.Contains('monoandroid')) ">
+    <Reference Include="Mono.Android" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.Contains('xamarinmac')) ">
+    <Reference Include="Xamarin.Mac" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.Contains('xamarinios')) ">
+    <Reference Include="Xamarin.iOS" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.Contains('xamarintvos')) ">
+    <Reference Include="Xamarin.TVOS" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.Contains('xamarinwatchos')) ">
+    <Reference Include="Xamarin.WatchOS" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.Contains('sl')) ">
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'sl3' ">
+		<_IsSilverLight3Defined>$([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants.Trim())', '(^|;)SILVERLIGHT3($|;)'))</_IsSilverLight3Defined>
+		<DefineConstants Condition="!$(_IsSilverLight3Defined)">SILVERLIGHT3;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'sl4' ">
+		<_IsSilverLight4Defined>$([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants.Trim())', '(^|;)SILVERLIGHT4($|;)'))</_IsSilverLight4Defined>
+		<DefineConstants Condition="!$(_IsSilverLight4Defined)">SILVERLIGHT4;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'sl5' ">
+		<_IsSilverLight5Defined>$([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants.Trim())', '(^|;)SILVERLIGHT5($|;)'))</_IsSilverLight5Defined>
+		<DefineConstants Condition="!$(_IsSilverLight5Defined)">SILVERLIGHT5;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" $(TargetFramework.Contains('netstandard1.')) ">
+		<_IsNetStandard1Defined>$([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants.Trim())', '(^|;)NETSTANDARD1($|;)'))</_IsNetStandard1Defined>
+		<DefineConstants Condition="!$(_IsNetStandard1Defined)">NETSTANDARD1;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" $(TargetFramework.Contains('netcoreapp1.')) ">
+		<_IsNetCoreApp1Defined>$([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants.Trim())', '(^|;)NETCOREAPP1($|;)'))</_IsNetCoreApp1Defined>
+		<DefineConstants Condition="!$(_IsNetCoreApp1Defined)">NETCOREAPP1;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <Import Project="..\src\Hprose.Collections\Hprose.Collections.projitems" Label="Shared" />
+
+  <Import Project="..\src\Hprose.IO\Hprose.IO.projitems" Label="Shared" />
+
+  <Import Project="..\src\Hprose.Reflection\Hprose.Reflection.projitems" Label="Shared" />
+
+  <Import Project="..\src\System\System.projitems" Label="Shared" />
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <PropertyGroup Condition=" '$(TargetFrameworkIdentifier)' != '' ">
+      <Product>Hprose.Core for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion)</Product>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(TargetFrameworkProfile)' != '' ">
+      <Product>Hprose.Core for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion) $(TargetFrameworkProfile) Profile</Product>
+    </PropertyGroup>
+  </Target>
+
+</Project>
