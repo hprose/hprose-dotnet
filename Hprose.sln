@@ -1,0 +1,98 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1F8BC289-8A9D-4EDA-B400-469FD5983F4D}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.IO", "src\Hprose.IO\Hprose.IO.shproj", "{3BBAFD96-BCE6-4D52-A2B4-8ABD2250465F}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.Reflection", "src\Hprose.Reflection\Hprose.Reflection.shproj", "{E6D9923E-BAB1-42C5-8F14-54E5DF7CDBC0}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.Collections", "src\Hprose.Collections\Hprose.Collections.shproj", "{645EF886-F73B-46A5-A484-7EBE81209303}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.Common", "src\Hprose.Common\Hprose.Common.shproj", "{12DBE6FD-77F9-47A5-B255-056A9B23496A}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.Client", "src\Hprose.Client\Hprose.Client.shproj", "{26AF48AD-8F09-4146-BC18-D35529AFA89E}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.Server", "src\Hprose.Server\Hprose.Server.shproj", "{4221BD53-5C13-4AA8-98F7-15FE52D91AAF}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "System", "src\System\System.shproj", "{9C694A86-7F06-41CF-A3D5-9113A7591EC0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hprose.Core", "Hprose.Core\Hprose.Core.csproj", "{2D93D037-2300-4B33-8FCB-099D41AA579F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{30A67E52-BF38-4C95-8A80-B0A4F98658B2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hprose.Core.UnitTests", "tests\Hprose.Core.UnitTests\Hprose.Core.UnitTests.csproj", "{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\Hprose.Common\Hprose.Common.projitems*{12dbe6fd-77f9-47a5-b255-056a9b23496a}*SharedItemsImports = 13
+		src\Hprose.Client\Hprose.Client.projitems*{26af48ad-8f09-4146-bc18-d35529afa89e}*SharedItemsImports = 13
+		src\Hprose.IO\Hprose.IO.projitems*{3bbafd96-bce6-4d52-a2b4-8abd2250465f}*SharedItemsImports = 13
+		src\Hprose.Server\Hprose.Server.projitems*{4221bd53-5c13-4aa8-98f7-15fe52d91aaf}*SharedItemsImports = 13
+		src\Hprose.Collections\Hprose.Collections.projitems*{645ef886-f73b-46a5-a484-7ebe81209303}*SharedItemsImports = 13
+		src\System\System.projitems*{9c694a86-7f06-41cf-a3d5-9113a7591ec0}*SharedItemsImports = 13
+		src\Hprose.Reflection\Hprose.Reflection.projitems*{e6d9923e-bab1-42c5-8f14-54e5df7cdbc0}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|ARM = Debug|ARM
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|ARM = Release|ARM
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Debug|ARM.Build.0 = Debug|Any CPU
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Debug|x64.Build.0 = Debug|Any CPU
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Debug|x86.Build.0 = Debug|Any CPU
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Release|ARM.ActiveCfg = Release|Any CPU
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Release|ARM.Build.0 = Release|Any CPU
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Release|x64.ActiveCfg = Release|Any CPU
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Release|x64.Build.0 = Release|Any CPU
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Release|x86.ActiveCfg = Release|Any CPU
+		{2D93D037-2300-4B33-8FCB-099D41AA579F}.Release|x86.Build.0 = Release|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Debug|ARM.Build.0 = Debug|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Debug|x64.Build.0 = Debug|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Debug|x86.Build.0 = Debug|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Release|ARM.ActiveCfg = Release|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Release|ARM.Build.0 = Release|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Release|x64.ActiveCfg = Release|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Release|x64.Build.0 = Release|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Release|x86.ActiveCfg = Release|Any CPU
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3BBAFD96-BCE6-4D52-A2B4-8ABD2250465F} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
+		{E6D9923E-BAB1-42C5-8F14-54E5DF7CDBC0} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
+		{645EF886-F73B-46A5-A484-7EBE81209303} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
+		{12DBE6FD-77F9-47A5-B255-056A9B23496A} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
+		{26AF48AD-8F09-4146-BC18-D35529AFA89E} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
+		{4221BD53-5C13-4AA8-98F7-15FE52D91AAF} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
+		{9C694A86-7F06-41CF-A3D5-9113A7591EC0} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
+		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E} = {30A67E52-BF38-4C95-8A80-B0A4F98658B2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2EEAB779-9719-4703-8BDF-9C5F995D8A68}
+	EndGlobalSection
+EndGlobal
