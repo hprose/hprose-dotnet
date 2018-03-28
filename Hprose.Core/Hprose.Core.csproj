@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;net20;net30;net35;net35-client;net40;net40-client;net45;net451;net452;net46;net461;net462;net47;net471;monoandroid44;monoandroid50;monoandroid51;monoandroid60;monoandroid71;xamarinmac20;xamarinios10;xamarintvos10;xamarinwatchos10;sl3;sl4;sl5;wp8;wp81</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netcoreapp2.0;net45;net451;net452;net46;net461;net462;net47;net471;monoandroid44;monoandroid50;monoandroid51;monoandroid60;monoandroid71;xamarinmac20;xamarinios10;xamarintvos10;xamarinwatchos10</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
@@ -56,50 +56,6 @@
     <LanguageTargets>$(MSBuildExtensionsPath)\$(TargetFrameworkIdentifier.Replace('.', '\'))\$(TargetFrameworkIdentifier).CSharp.targets</LanguageTargets>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net35-client' ">
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net40-client' ">
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('sl')) ">
-    <_SilverLightVersion>$(TargetFramework[2])</_SilverLightVersion>
-    <TargetFrameworkVersion>v$(_SilverLightVersion).0</TargetFrameworkVersion>
-    <TargetFrameworkIdentifier>SilverLight</TargetFrameworkIdentifier>
-    <SilverlightVersion Condition="'$(SilverlightVersion)' == ''">$(TargetFrameworkVersion)</SilverlightVersion>
-    <SilverlightApplication>false</SilverlightApplication>
-    <ValidateXaml>true</ValidateXaml>
-    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
-		<_IsSilverLightDefined>$([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants.Trim())', '(^|;)SILVERLIGHT($|;)'))</_IsSilverLightDefined>
-		<DefineConstants Condition="!$(_IsSilverLightDefined)">SILVERLIGHT;SILVERLIGHT$(_SilverLightVersion);$(DefineConstants)</DefineConstants>
-    <LanguageTargets>$(MSBuildProgramFiles32)\MSBuild\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets</LanguageTargets>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'wp8' ">
-    <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'wp81' ">
-    <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('wp')) ">
-    <TargetFrameworkIdentifier>WindowsPhone</TargetFrameworkIdentifier>
-    <SilverlightVersion Condition="'$(SilverlightVersion)' == ''">$(TargetFrameworkVersion)</SilverlightVersion>
-    <SilverlightApplication>false</SilverlightApplication>
-    <ValidateXaml>true</ValidateXaml>
-    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
-		<_IsWindowsPhoneDefined>$([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants.Trim())', '(^|;)WINDOWS_PHONE($|;)'))</_IsWindowsPhoneDefined>
-		<DefineConstants Condition="!$(_IsWindowsPhoneDefined)">SILVERLIGHT;WINDOWS_PHONE;$(DefineConstants)</DefineConstants>
-    <LanguageTargets>$(MSBuildProgramFiles32)\MSBuild\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets</LanguageTargets>
-  </PropertyGroup>
-
   <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
     <Reference Include="Mono.Android" />
   </ItemGroup>
@@ -107,16 +63,6 @@
   <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin')) ">
     <Reference Include="$(TargetFrameworkIdentifier)" />
   </ItemGroup>
-
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netstandard1.')) ">
-		<_IsNetStandard1Defined>$([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants.Trim())', '(^|;)NETSTANDARD1($|;)'))</_IsNetStandard1Defined>
-		<DefineConstants Condition="!$(_IsNetStandard1Defined)">NETSTANDARD1;$(DefineConstants)</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcoreapp1.')) ">
-		<_IsNetCoreApp1Defined>$([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants.Trim())', '(^|;)NETCOREAPP1($|;)'))</_IsNetCoreApp1Defined>
-		<DefineConstants Condition="!$(_IsNetCoreApp1Defined)">NETCOREAPP1;$(DefineConstants)</DefineConstants>
-  </PropertyGroup>
 
   <Import Project="..\src\Hprose.Collections\Hprose.Collections.projitems" Label="Shared" />
 

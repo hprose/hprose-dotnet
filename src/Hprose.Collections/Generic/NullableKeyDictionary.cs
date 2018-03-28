@@ -12,7 +12,7 @@
  *                                                        *
  * NullableKeyDictionary class for C#.                    *
  *                                                        *
- * LastModified: Mar 8, 2018                              *
+ * LastModified: Mar 28, 2018                             *
  * Authors: Ma Bingyao <andot@hprose.com>                 *
  *                                                        *
 \**********************************************************/
@@ -23,16 +23,12 @@ using System.Runtime.InteropServices;
 
 namespace Hprose.Collections.Generic {
     [ComVisible(false)]
-#if !(NETSTANDARD1 || NETCOREAPP1 || NETFX_CORE || SILVERLIGHT)
     [Serializable]
-#endif
     public class NullableKeyDictionary<TKey, TValue> : Dictionary<NullableKey<TKey>, TValue>,
         ICollection<KeyValuePair<TKey, TValue>>,
         IDictionary<TKey, TValue>,
-#if !(NET20 || NET30 || NET35 || NET40 || SILVERLIGHT)
         IReadOnlyCollection<KeyValuePair<TKey, TValue>>,
         IReadOnlyDictionary<TKey, TValue>,
-#endif
         IEnumerable<KeyValuePair<TKey, TValue>> {
 
         public NullableKeyDictionary() : this(0, null) { }
@@ -65,11 +61,9 @@ namespace Hprose.Collections.Generic {
 
         ICollection<TKey> IDictionary<TKey, TValue>.Keys => Keys;
 
-#if !(NET20 || NET30 || NET35 || NET40 || SILVERLIGHT)
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
 
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
-#endif
 
         ICollection<TValue> IDictionary<TKey, TValue>.Values => Values;
 
@@ -112,9 +106,7 @@ namespace Hprose.Collections.Generic {
 
         IEnumerator IEnumerable.GetEnumerator() => CreateEnumerator();
 
-#if !(NETSTANDARD1 || NETCOREAPP1 || NETFX_CORE || SILVERLIGHT)
         [Serializable]
-#endif
         public new struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>, IDisposable, IEnumerator, IDictionaryEnumerator {
             private Dictionary<NullableKey<TKey>, TValue>.Enumerator _enumerator;
 
@@ -158,14 +150,9 @@ namespace Hprose.Collections.Generic {
             object IDictionaryEnumerator.Value => ((IDictionaryEnumerator)_enumerator).Value;
         }
 
-#if !(NETSTANDARD1 || NETCOREAPP1 || NETFX_CORE || SILVERLIGHT)
         [Serializable]
-#endif
         public sealed new class KeyCollection : ICollection<TKey>,
-#if !(NET20 || NET30 || NET35 || NET40 || SILVERLIGHT)
-
             IReadOnlyCollection<TKey>,
-#endif
             IEnumerable<TKey>, IEnumerable, ICollection {
 
             private Dictionary<NullableKey<TKey>, TValue> _dictionary;
@@ -227,9 +214,7 @@ namespace Hprose.Collections.Generic {
 
             object ICollection.SyncRoot => ((ICollection)_dictionary).SyncRoot;
 
-#if !(NETSTANDARD1 || NETCOREAPP1 || NETFX_CORE || SILVERLIGHT)
             [Serializable]
-#endif
             public struct Enumerator : IEnumerator<TKey>, IDisposable, IEnumerator {
                 private IEnumerator<NullableKey<TKey>> _enumerator;
 
