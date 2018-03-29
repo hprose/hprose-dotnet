@@ -17,6 +17,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)HproseMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HproseTags.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\BigIntegerSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\CharsSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\StringBuilderSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\StringSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\GuidSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DecimalSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DoubleSerializer.cs" />

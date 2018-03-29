@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Numerics;
+using System.Text;
 using Hprose.Collections.Generic;
 
 namespace Hprose.IO.Serializers {
@@ -47,6 +48,7 @@ namespace Hprose.IO.Serializers {
             _serializers[typeof(DateTime)] = DateTimeSerializer.Instance;
             _serializers[typeof(Guid)] = GuidSerializer.Instance;
             _serializers[typeof(string)] = StringSerializer.Instance;
+            _serializers[typeof(StringBuilder)] = StringBuilderSerializer.Instance;
             _serializers[typeof(char[])] = CharsSerializer.Instance;
 
             _serializers[typeof(bool?)] = NullableSerializer<bool>.Instance;
@@ -89,6 +91,7 @@ namespace Hprose.IO.Serializers {
             _serializers[typeof(NullableKey<DateTime?>)] = NullableKeySerializer<DateTime?>.Instance;
             _serializers[typeof(NullableKey<Guid?>)] = NullableKeySerializer<Guid?>.Instance;
             _serializers[typeof(NullableKey<string>)] = NullableKeySerializer<string>.Instance;
+            _serializers[typeof(NullableKey<StringBuilder>)] = NullableKeySerializer<StringBuilder>.Instance;
             _serializers[typeof(NullableKey<char[]>)] = NullableKeySerializer<char[]>.Instance;
         }
         public static void Register(Type type, Serializer serializer) {
