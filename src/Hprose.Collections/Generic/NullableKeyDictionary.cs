@@ -12,7 +12,7 @@
  *                                                        *
  * NullableKeyDictionary class for C#.                    *
  *                                                        *
- * LastModified: Mar 28, 2018                             *
+ * LastModified: Mar 29, 2018                             *
  * Authors: Ma Bingyao <andot@hprose.com>                 *
  *                                                        *
 \**********************************************************/
@@ -48,7 +48,7 @@ namespace Hprose.Collections.Generic {
 
         public bool IsReadOnly => false;
 
-        private KeyCollection _keys;
+        private volatile KeyCollection _keys;
 
         public new KeyCollection Keys {
             get {
@@ -96,7 +96,7 @@ namespace Hprose.Collections.Generic {
             if (array == null) {
                 collection.CopyTo(null, index);
             }
-            KeyValuePair<NullableKey<TKey>, TValue>[] arr = new KeyValuePair<NullableKey<TKey>, TValue>[array.Length - index];
+            var arr = new KeyValuePair<NullableKey<TKey>, TValue>[array.Length - index];
             collection.CopyTo(arr, 0);
             int count = collection.Count;
             for (int i = 0; i < count; i++) {
@@ -116,7 +116,7 @@ namespace Hprose.Collections.Generic {
 
             public KeyValuePair<TKey, TValue> Current {
                 get {
-                    KeyValuePair<NullableKey<TKey>, TValue> current = _enumerator.Current;
+                    var current = _enumerator.Current;
                     return new KeyValuePair<TKey, TValue>(current.Key, current.Value);
                 }
             }
@@ -130,7 +130,7 @@ namespace Hprose.Collections.Generic {
                         current1.Key = ((NullableKey<TKey>)current1.Key).Value;
                         return current1;
                     }
-                    KeyValuePair<NullableKey<TKey>, TValue> current2 = (KeyValuePair<NullableKey<TKey>, TValue>)current;
+                    var current2 = (KeyValuePair<NullableKey<TKey>, TValue>)current;
                     return new KeyValuePair<TKey, TValue>(current2.Key, current2.Value);
                 }
             }
@@ -139,7 +139,7 @@ namespace Hprose.Collections.Generic {
 
             DictionaryEntry IDictionaryEnumerator.Entry {
                 get {
-                    DictionaryEntry entry = ((IDictionaryEnumerator)_enumerator).Entry;
+                    var entry = ((IDictionaryEnumerator)_enumerator).Entry;
                     entry.Key = ((NullableKey<TKey>)entry.Key).Value;
                     return entry;
                 }
@@ -169,7 +169,7 @@ namespace Hprose.Collections.Generic {
                 if (array == null) {
                     _keyCollection.CopyTo(null, index);
                 }
-                NullableKey<TKey>[] arr = new NullableKey<TKey>[array.Length - index];
+                var arr = new NullableKey<TKey>[array.Length - index];
                 _keyCollection.CopyTo(arr, 0);
                 int count = _keyCollection.Count;
                 for (int i = 0; i < count; i++) {
@@ -203,7 +203,7 @@ namespace Hprose.Collections.Generic {
                     return;
                 }
                 ((ICollection)_keyCollection).CopyTo(array, index);
-                object[] array4 = array as object[];
+                var array4 = array as object[];
                 int count = _dictionary.Count;
                 for (int i = index; i < count; i++) {
                     array4[i] = ((NullableKey<TKey>)array4[i]).Value;

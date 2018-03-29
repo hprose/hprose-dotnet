@@ -22,21 +22,12 @@ namespace Hprose.Collections.Generic {
     public class NullableKeyEqualityComparer<T> : IEqualityComparer<NullableKey<T>> {
         private readonly IEqualityComparer<T> _comparer;
 
-        public IEqualityComparer<T> Comparer {
-            get { return _comparer; }
-        }
+        public IEqualityComparer<T> Comparer => _comparer;
 
-        public NullableKeyEqualityComparer(IEqualityComparer<T> comparer) {
-            _comparer = comparer;
-        }
+        public NullableKeyEqualityComparer(IEqualityComparer<T> comparer) => _comparer = comparer;
 
-        public bool Equals(NullableKey<T> x, NullableKey<T> y) {
-            return _comparer == null ? x.Equals(y) : _comparer.Equals(x.Value, y.Value);
-        }
+        public bool Equals(NullableKey<T> x, NullableKey<T> y) => _comparer?.Equals(x.Value, y.Value) ?? x.Equals(y);
 
-        public int GetHashCode(NullableKey<T> obj) {
-            if (obj.Value == null) return 0;
-            return _comparer == null ? obj.GetHashCode() : _comparer.GetHashCode(obj.Value);
-        }
+        public int GetHashCode(NullableKey<T> obj) => (obj.Value != null) ? (_comparer?.GetHashCode(obj.Value) ?? obj.GetHashCode()) : 0;
     }
 }
