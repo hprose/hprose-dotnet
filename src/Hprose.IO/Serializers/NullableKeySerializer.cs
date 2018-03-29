@@ -30,12 +30,13 @@ namespace Hprose.IO.Serializers {
             serializerT = serializer as Serializer<T>;
         }
         public override void Write(Writer writer, NullableKey<T> obj) {
-            if (obj != null) {
+            T value = obj.Value;
+            if (value != null) {
                 if (serializerT != null) {
-                    serializerT.Write(writer, obj.Value);
+                    serializerT.Write(writer, value);
                 }
                 else {
-                    serializer.Write(writer, obj.Value);
+                    serializer.Write(writer, value);
                 }
             }
             else {
