@@ -12,7 +12,7 @@ namespace Hprose.UnitTests.Collections.Generic {
                 { "Hello", "World" },
                 { null, "Null" }
             };
-            Assert.AreEqual<int>(dict.Count, 2);
+            Assert.AreEqual<int>(2, dict.Count);
         }
         [TestMethod]
         public void TestNullableKeyInt() {
@@ -20,7 +20,7 @@ namespace Hprose.UnitTests.Collections.Generic {
                 { 1, "Hello" },
                 { null, "Null" }
             };
-            Assert.AreEqual<int>(dict.Count, 2);
+            Assert.AreEqual<int>(2, dict.Count);
         }
         [TestMethod]
         public void TestEquals() {
