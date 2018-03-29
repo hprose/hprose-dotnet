@@ -20,6 +20,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\GuidSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DecimalSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DoubleSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\DateTimeSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\UIntPtrSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\IntPtrSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\TimeSpanSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\NullableSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\NullableKeySerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\SingleSerializer.cs" />
