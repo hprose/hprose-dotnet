@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Numerics;
+using Hprose.Collections.Generic;
 
 namespace Hprose.IO.Serializers {
     public static class SerializerFactory {
@@ -56,6 +57,21 @@ namespace Hprose.IO.Serializers {
             _serializers[typeof(decimal?)] = NullableSerializer<decimal>.Instance;
             _serializers[typeof(BigInteger?)] = NullableSerializer<BigInteger>.Instance;
             _serializers[typeof(Guid?)] = NullableSerializer<Guid>.Instance;
+            _serializers[typeof(NullableKey<bool?>)] = NullableKeySerializer<bool?>.Instance;
+            _serializers[typeof(NullableKey<char?>)] = NullableKeySerializer<char?>.Instance;
+            _serializers[typeof(NullableKey<byte?>)] = NullableKeySerializer<byte?>.Instance;
+            _serializers[typeof(NullableKey<sbyte?>)] = NullableKeySerializer<sbyte?>.Instance;
+            _serializers[typeof(NullableKey<short?>)] = NullableKeySerializer<short?>.Instance;
+            _serializers[typeof(NullableKey<ushort?>)] = NullableKeySerializer<ushort?>.Instance;
+            _serializers[typeof(NullableKey<int?>)] = NullableKeySerializer<int?>.Instance;
+            _serializers[typeof(NullableKey<uint?>)] = NullableKeySerializer<uint?>.Instance;
+            _serializers[typeof(NullableKey<long?>)] = NullableKeySerializer<long?>.Instance;
+            _serializers[typeof(NullableKey<ulong?>)] = NullableKeySerializer<ulong?>.Instance;
+            _serializers[typeof(NullableKey<float?>)] = NullableKeySerializer<float?>.Instance;
+            _serializers[typeof(NullableKey<double?>)] = NullableKeySerializer<double?>.Instance;
+            _serializers[typeof(NullableKey<decimal?>)] = NullableKeySerializer<decimal?>.Instance;
+            _serializers[typeof(NullableKey<BigInteger?>)] = NullableKeySerializer<BigInteger?>.Instance;
+            _serializers[typeof(NullableKey<Guid?>)] = NullableKeySerializer<Guid?>.Instance;
         }
         public static void Register(Type type, Serializer serializer) {
             _serializers[type] = serializer;

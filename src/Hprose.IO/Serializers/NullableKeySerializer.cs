@@ -1,0 +1,46 @@
+﻿/**********************************************************\
+|                                                          |
+|                          hprose                          |
+|                                                          |
+| Official WebSite: http://www.hprose.com/                 |
+|                   http://www.hprose.org/                 |
+|                                                          |
+\**********************************************************/
+/**********************************************************\
+ *                                                        *
+ * NullableKeySerializer.cs                               *
+ *                                                        *
+ * NullableKeySerializer class for C#.                    *
+ *                                                        *
+ * LastModified: Mar 29, 2018                             *
+ * Author: Ma Bingyao <andot@hprose.com>                  *
+ *                                                        *
+\**********************************************************/
+using System;
+using Hprose.Collections.Generic;
+
+namespace Hprose.IO.Serializers {
+    class NullableKeySerializer<T> : Serializer<NullableKey<T>> {
+        private static readonly NullableKeySerializer<T> _instance = new NullableKeySerializer<T>();
+        private readonly Serializer serializer;
+        private readonly Serializer<T> serializerT;
+        public static NullableKeySerializer<T> Instance => _instance;
+        public NullableKeySerializer() {
+            serializer = SerializerFactory.Get(typeof(T));
+            serializerT = serializer as Serializer<T>;
+        }
+        public override void Write(Writer writer, NullableKey<T> obj) {
+            if (obj != null) {
+                if (serializerT != null) {
+                    serializerT.Write(writer, obj.Value);
+                }
+                else {
+                    serializer.Write(writer, obj.Value);
+                }
+            }
+            else {
+                writer.Stream.WriteByte(HproseTags.TagNull);
+            }
+        }
+    }
+}

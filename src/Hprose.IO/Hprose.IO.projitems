@@ -21,6 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DecimalSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DoubleSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\NullableSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\NullableKeySerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\SingleSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\UInt64Serializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\Int64Serializer.cs" />
