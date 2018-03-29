@@ -16,7 +16,7 @@
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-using System;
+
 using Hprose.Collections.Generic;
 
 namespace Hprose.IO.Serializers {

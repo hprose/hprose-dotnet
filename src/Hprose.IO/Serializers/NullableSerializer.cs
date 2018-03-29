@@ -16,7 +16,7 @@
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-using System;
+
 namespace Hprose.IO.Serializers {
     class NullableSerializer<T> : Serializer<T?> where T : struct {
         private static readonly NullableSerializer<T> _instance = new NullableSerializer<T>();
