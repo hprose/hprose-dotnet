@@ -11,7 +11,33 @@
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Accessors\" />
     <Folder Include="$(MSBuildThisFileDirectory)Converters\" />
-    <Folder Include="$(MSBuildThisFileDirectory)Serializers\" />
     <Folder Include="$(MSBuildThisFileDirectory)Deserializers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)HproseMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HproseTags.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\BigIntegerSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\GuidSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\DecimalSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\DoubleSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\NullableSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\SingleSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\UInt64Serializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\Int64Serializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\UInt32Serializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\Int32Serializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\UInt16Serializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\Int16Serializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\ReferenceSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\SByteSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\ByteSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\CharSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\Serializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\BooleanSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\NullSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\SerializerFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\ValueWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\Writer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\WriterRefer.cs" />
   </ItemGroup>
 </Project>
