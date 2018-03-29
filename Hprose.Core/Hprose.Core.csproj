@@ -21,6 +21,7 @@
     <RepositoryType>git</RepositoryType>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
@@ -58,10 +59,12 @@
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
     <Reference Include="Mono.Android" />
+    <Reference Include="System.Numerics" />
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin')) ">
     <Reference Include="$(TargetFrameworkIdentifier)" />
+    <Reference Include="System.Numerics" />
   </ItemGroup>
 
   <Import Project="..\src\Hprose.Collections\Hprose.Collections.projitems" Label="Shared" />
