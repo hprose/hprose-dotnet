@@ -249,6 +249,15 @@ namespace Hprose.IO.Serializers {
             }
         }
 
+        public static void Write(Stream stream, UIntPtr n) {
+            if (UIntPtr.Size == 4) {
+                Write(stream, n.ToUInt32());
+            }
+            else {
+                Write(stream, n.ToUInt64());
+            }
+        }
+
         public static void Write(Stream stream, char c) {
             stream.WriteByte(TagUTF8Char);
             if (c < 0x80) {
@@ -287,6 +296,30 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagQuote);
         }
 
+        public static void Write(Stream stream, DateTime datetime) {
+            int year = datetime.Year;
+            int month = datetime.Month;
+            int day = datetime.Day;
+            int hour = datetime.Hour;
+            int minute = datetime.Minute;
+            int second = datetime.Second;
+            int millisecond = datetime.Millisecond;
+            byte tag = (datetime.Kind == DateTimeKind.Utc) ? TagUTC : TagSemicolon;
+            if ((hour == 0) && (minute == 0) && (second == 0) && (millisecond == 0)) {
+                WriteDate(stream, year, month, day);
+                stream.WriteByte(tag);
+            }
+            else if ((year == 1970) && (month == 1) && (day == 1)) {
+                WriteTime(stream, hour, minute, second, millisecond);
+                stream.WriteByte(tag);
+            }
+            else {
+                WriteDate(stream, year, month, day);
+                WriteTime(stream, hour, minute, second, millisecond);
+                stream.WriteByte(tag);
+            }
+        }
+
         public static void WriteDate(Stream stream, int year, int month, int day) {
             stream.WriteByte(TagDate);
             stream.WriteByte((byte)('0' + (year / 1000 % 10)));
@@ -315,28 +348,5 @@ namespace Hprose.IO.Serializers {
             }
         }
 
-        public static void WriteDateTime(Stream stream, DateTime datetime) {
-            int year = datetime.Year;
-            int month = datetime.Month;
-            int day = datetime.Day;
-            int hour = datetime.Hour;
-            int minute = datetime.Minute;
-            int second = datetime.Second;
-            int millisecond = datetime.Millisecond;
-            byte tag = (datetime.Kind == DateTimeKind.Utc) ? TagUTC : TagSemicolon;
-            if ((hour == 0) && (minute == 0) && (second == 0) && (millisecond == 0)) {
-                WriteDate(stream, year, month, day);
-                stream.WriteByte(tag);
-            }
-            else if ((year == 1970) && (month == 1) && (day == 1)) {
-                WriteTime(stream, hour, minute, second, millisecond);
-                stream.WriteByte(tag);
-            }
-            else {
-                WriteDate(stream, year, month, day);
-                WriteTime(stream, hour, minute, second, millisecond);
-                stream.WriteByte(tag);
-            }
-        }
     }
 }
