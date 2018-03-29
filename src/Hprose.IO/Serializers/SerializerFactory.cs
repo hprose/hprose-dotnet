@@ -42,6 +42,8 @@ namespace Hprose.IO.Serializers {
             _serializers[typeof(decimal)] = DecimalSerializer.Instance;
             _serializers[typeof(BigInteger)] = BigIntegerSerializer.Instance;
             _serializers[typeof(Guid)] = GuidSerializer.Instance;
+            _serializers[typeof(TimeSpan)] = TimeSpanSerializer.Instance;
+
             _serializers[typeof(bool?)] = NullableSerializer<bool>.Instance;
             _serializers[typeof(char?)] = NullableSerializer<char>.Instance;
             _serializers[typeof(byte?)] = NullableSerializer<byte>.Instance;
@@ -57,6 +59,8 @@ namespace Hprose.IO.Serializers {
             _serializers[typeof(decimal?)] = NullableSerializer<decimal>.Instance;
             _serializers[typeof(BigInteger?)] = NullableSerializer<BigInteger>.Instance;
             _serializers[typeof(Guid?)] = NullableSerializer<Guid>.Instance;
+            _serializers[typeof(TimeSpan?)] = NullableSerializer<TimeSpan>.Instance;
+
             _serializers[typeof(NullableKey<bool?>)] = NullableKeySerializer<bool?>.Instance;
             _serializers[typeof(NullableKey<char?>)] = NullableKeySerializer<char?>.Instance;
             _serializers[typeof(NullableKey<byte?>)] = NullableKeySerializer<byte?>.Instance;
@@ -72,6 +76,7 @@ namespace Hprose.IO.Serializers {
             _serializers[typeof(NullableKey<decimal?>)] = NullableKeySerializer<decimal?>.Instance;
             _serializers[typeof(NullableKey<BigInteger?>)] = NullableKeySerializer<BigInteger?>.Instance;
             _serializers[typeof(NullableKey<Guid?>)] = NullableKeySerializer<Guid?>.Instance;
+            _serializers[typeof(NullableKey<TimeSpan?>)] = NullableKeySerializer<TimeSpan?>.Instance;
         }
         public static void Register(Type type, Serializer serializer) {
             _serializers[type] = serializer;
