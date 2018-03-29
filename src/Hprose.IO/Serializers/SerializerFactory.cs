@@ -47,6 +47,7 @@ namespace Hprose.IO.Serializers {
             _serializers[typeof(DateTime)] = DateTimeSerializer.Instance;
             _serializers[typeof(Guid)] = GuidSerializer.Instance;
             _serializers[typeof(string)] = StringSerializer.Instance;
+            _serializers[typeof(char[])] = CharsSerializer.Instance;
 
             _serializers[typeof(bool?)] = NullableSerializer<bool>.Instance;
             _serializers[typeof(char?)] = NullableSerializer<char>.Instance;
@@ -88,6 +89,7 @@ namespace Hprose.IO.Serializers {
             _serializers[typeof(NullableKey<DateTime?>)] = NullableKeySerializer<DateTime?>.Instance;
             _serializers[typeof(NullableKey<Guid?>)] = NullableKeySerializer<Guid?>.Instance;
             _serializers[typeof(NullableKey<string>)] = NullableKeySerializer<string>.Instance;
+            _serializers[typeof(NullableKey<char[]>)] = NullableKeySerializer<char[]>.Instance;
         }
         public static void Register(Type type, Serializer serializer) {
             _serializers[type] = serializer;
