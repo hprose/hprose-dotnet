@@ -43,6 +43,15 @@ namespace Hprose.UnitTests.IO.Serializers {
                 writer.Serialize(a);
                 Assert.AreEqual("1n", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                string s = null;
+                writer.Serialize(s);
+                s = "hello";
+                writer.Serialize(s);
+                writer.Serialize(s);
+                Assert.AreEqual("ns5\"hello\"r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
         }
     }
 }

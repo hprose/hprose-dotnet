@@ -12,7 +12,7 @@
  *                                                        *
  * hprose ReferenceSerializer class for C#.               *
  *                                                        *
- * LastModified: Mar 29, 2018                             *
+ * LastModified: Mar 30, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -24,8 +24,13 @@ namespace Hprose.IO.Serializers {
         public virtual void Serialize(Writer writer, T obj) => writer.SetRef(obj);
 
         public override void Write(Writer writer, T obj) {
-            if (!writer.WriteRef(obj)) {
-                Serialize(writer, obj);
+            if (obj != null) {
+                if (!writer.WriteRef(obj)) {
+                    Serialize(writer, obj);
+                }
+            }
+            else {
+                writer.Stream.WriteByte(HproseTags.TagNull);
             }
         }
 
