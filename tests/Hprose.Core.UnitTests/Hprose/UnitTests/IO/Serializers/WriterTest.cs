@@ -55,6 +55,31 @@ namespace Hprose.UnitTests.IO.Serializers {
             }
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
+                var a = new byte[] {
+                    1 + '0', 2 + '0', 3 + '0', 4 + '0', 5 + '0'
+                };
+                writer.Serialize(a);
+                writer.Serialize(a);
+                Assert.AreEqual("b5\"12345\"r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var a = new char[] {
+                    '1', '2', '3', '4', '5'
+                };
+                writer.Serialize(a);
+                writer.Serialize(a);
+                Assert.AreEqual("s5\"12345\"r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize("");
+                writer.Serialize("A");
+                writer.Serialize("hello");
+                Assert.AreEqual("euAs5\"hello\"", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
                 var a = new NullableKey<int?>[] {
                     null,1,2,3,4,5
                 };
