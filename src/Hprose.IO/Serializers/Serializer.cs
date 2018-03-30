@@ -18,6 +18,7 @@
 \**********************************************************/
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Hprose.Collections.Generic;
 
 namespace Hprose.IO.Serializers {
@@ -89,6 +90,9 @@ namespace Hprose.IO.Serializers {
                 }
                 else if (genericType == typeof(NullableKey<>)) {
                     serializerType = typeof(NullableKeySerializer<>).MakeGenericType(genericArgs);
+                }
+                else if (typeof(IList<>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
+                    serializerType = typeof(ListSerializer<,>).MakeGenericType(type, genericArgs[0]);
                 }
             }
             return Activator.CreateInstance(serializerType) as ISerializer;

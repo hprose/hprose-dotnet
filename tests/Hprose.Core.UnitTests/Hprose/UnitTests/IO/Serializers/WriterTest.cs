@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Hprose.Collections.Generic;
 using Hprose.IO.Serializers;
 
@@ -69,6 +70,15 @@ namespace Hprose.UnitTests.IO.Serializers {
                 writer.Serialize(a);
                 writer.Serialize(a);
                 Assert.AreEqual("a7{n12345s5\"hello\"}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var a = new List<int?> {
+                    null, 1,2,3,4,5
+                };
+                writer.Serialize(a);
+                writer.Serialize(a);
+                Assert.AreEqual("a6{n12345}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
         }
     }
