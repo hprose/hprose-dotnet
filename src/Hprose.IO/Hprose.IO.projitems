@@ -18,6 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)HproseTags.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\BigIntegerSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\CharsSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\NullSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\StringBuilderSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\BytesSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\StringSerializer.cs" />
@@ -43,7 +44,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\CharSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\Serializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\BooleanSerializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Serializers\NullSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\DBNullSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\SerializerFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\ValueWriter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\Writer.cs" />

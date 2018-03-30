@@ -21,21 +21,6 @@ using Hprose.Collections.Generic;
 
 namespace Hprose.IO.Serializers {
     class NullableKeySerializer<T> : Serializer<NullableKey<T>> {
-        private static readonly NullableKeySerializer<T> _instance = new NullableKeySerializer<T>();
-        private readonly Serializer serializer;
-        private readonly Serializer<T> serializerT;
-        public static NullableKeySerializer<T> Instance => _instance;
-        public NullableKeySerializer() {
-            serializer = SerializerFactory.Get(typeof(T));
-            serializerT = serializer as Serializer<T>;
-        }
-        public override void Write(Writer writer, NullableKey<T> obj) {
-            if (serializerT != null) {
-                serializerT.Write(writer, obj.Value);
-            }
-            else {
-                serializer.Write(writer, obj.Value);
-            }
-        }
+        public override void Write(Writer writer, NullableKey<T> obj) => Serializer<T>.Instance.Write(writer, obj.Value);
     }
 }

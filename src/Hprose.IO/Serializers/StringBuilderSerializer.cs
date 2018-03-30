@@ -21,8 +21,6 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class StringBuilderSerializer : ReferenceSerializer<StringBuilder> {
-        private static readonly StringBuilderSerializer _instance = new StringBuilderSerializer();
-        public static StringBuilderSerializer Instance => _instance;
         public override void Serialize(Writer writer, StringBuilder obj) {
             base.Serialize(writer, obj);
             var stream = writer.Stream;

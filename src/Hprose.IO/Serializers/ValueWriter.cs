@@ -12,7 +12,7 @@
  *                                                        *
  * ValueWriter class for C#.                              *
  *                                                        *
- * LastModified: Mar 29, 2018                             *
+ * LastModified: Mar30, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -55,8 +55,8 @@ namespace Hprose.IO.Serializers {
 
         public static byte[] GetASCII(string s) {
             int size = s.Length;
-            byte[] buf = new byte[size--];
-            for (; size >= 0; size--) {
+            byte[] buf = new byte[size];
+            while (--size >= 0) {
                 buf[size] = (byte)s[size];
             }
             return buf;
@@ -193,9 +193,7 @@ namespace Hprose.IO.Serializers {
             }
         }
 
-        public static void Write(Stream stream, bool b) {
-            stream.WriteByte(b ? TagTrue : TagFalse);
-        }
+        public static void Write(Stream stream, bool b) => stream.WriteByte(b ? TagTrue : TagFalse);
 
         public static void Write(Stream stream, float n) {
             if (float.IsNaN(n)) {

@@ -12,7 +12,7 @@
  *                                                        *
  * GuidSerializer class for C#.                           *
  *                                                        *
- * LastModified: Mar 29, 2018                             *
+ * LastModified: Mar 30, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -22,8 +22,6 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class GuidSerializer : ReferenceSerializer<Guid> {
-        private static readonly GuidSerializer _instance = new GuidSerializer();
-        public static GuidSerializer Instance => _instance;
         public override void Serialize(Writer writer, Guid obj) {
             base.Serialize(writer, obj);
             Stream stream = writer.Stream;

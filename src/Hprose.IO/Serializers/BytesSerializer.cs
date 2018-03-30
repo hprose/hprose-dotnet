@@ -21,8 +21,6 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class BytesSerializer : ReferenceSerializer<byte[]> {
-        private static readonly BytesSerializer _instance = new BytesSerializer();
-        public static BytesSerializer Instance => _instance;
         public override void Serialize(Writer writer, byte[] obj) {
             base.Serialize(writer, obj);
             var stream = writer.Stream;

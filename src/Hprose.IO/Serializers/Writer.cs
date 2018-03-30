@@ -12,14 +12,13 @@
  *                                                        *
  * hprose Writer class for C#.                            *
  *                                                        *
- * LastModified: Mar 29, 2018                             *
+ * LastModified: Mar 30, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 using System;
 using System.IO;
 using System.Collections.Generic;
-using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     public class Writer {
@@ -37,30 +36,9 @@ namespace Hprose.IO.Serializers {
             _refer = simple ? null : new WriterRefer();
         }
 
-        public void Serialize(object obj) {
-            if (obj == null) {
-                Stream.WriteByte(TagNull);
-            }
-            else {
-                Serializer serializer = SerializerFactory.Get(obj.GetType());
-                serializer.Write(this, obj);
-            }
-        }
+        public void Serialize(object obj) => Serializer.Get(obj?.GetType()).Write(this, obj);
 
-        public void Serialize<T>(T obj) {
-            if (obj == null) {
-                Stream.WriteByte(TagNull);
-            }
-            else {
-                Serializer serializer = SerializerFactory.Get(typeof(T));
-                if (serializer is Serializer<T> serializerT) {
-                    serializerT.Write(this, obj);
-                }
-                else {
-                    serializer.Write(this, obj);
-                }
-            }
-        }
+        public void Serialize<T>(T obj) => Serializer<T>.Instance.Write(this, obj);
 
         internal bool WriteRef(object obj) => _refer?.Write(_stream, obj) ?? false;
 

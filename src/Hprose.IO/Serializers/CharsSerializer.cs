@@ -21,8 +21,6 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class CharsSerializer : ReferenceSerializer<char[]> {
-        private static readonly CharsSerializer _instance = new CharsSerializer();
-        public static CharsSerializer Instance => _instance;
         public override void Serialize(Writer writer, char[] obj) {
             base.Serialize(writer, obj);
             var stream = writer.Stream;

@@ -11,7 +11,7 @@ namespace Hprose.UnitTests.IO.Serializers {
         public void TestSerialize() {
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
-                writer.Serialize(null);
+                //writer.Serialize(null);
                 writer.Serialize(true);
                 writer.Serialize(false);
                 writer.Serialize('0');
@@ -19,7 +19,7 @@ namespace Hprose.UnitTests.IO.Serializers {
                 writer.Serialize('人');
                 writer.Serialize((byte)123);
                 writer.Serialize((sbyte)-123);
-                Assert.AreEqual("ntfu0uAu人i123;i-123;", ValueWriter.UTF8.GetString(stream.ToArray()));
+                Assert.AreEqual("tfu0uAu人i123;i-123;", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);

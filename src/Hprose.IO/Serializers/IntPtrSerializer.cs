@@ -12,7 +12,7 @@
  *                                                        *
  * IntPtrSerializer class for C#.                         *
  *                                                        *
- * LastModified: Mar 29, 2018                             *
+ * LastModified: Mar 30, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -20,8 +20,6 @@ using System;
 
 namespace Hprose.IO.Serializers {
     class IntPtrSerializer : Serializer<IntPtr> {
-        private static readonly IntPtrSerializer _instance = new IntPtrSerializer();
-        public static IntPtrSerializer Instance => _instance;
         public override void Write(Writer writer, IntPtr obj) => ValueWriter.Write(writer.Stream, obj);
     }
 }

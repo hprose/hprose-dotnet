@@ -8,24 +8,17 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * NullableSerializer.cs                                  *
+ * DBNullSerializer.cs                                    *
  *                                                        *
- * NullableSerializer class for C#.                       *
+ * DBNullSerializer class for C#.                         *
  *                                                        *
  * LastModified: Mar 30, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-
+using System;
 namespace Hprose.IO.Serializers {
-    class NullableSerializer<T> : Serializer<T?> where T : struct {
-        public override void Write(Writer writer, T? obj) {
-            if (obj.HasValue) {
-                Serializer<T>.Instance.Write(writer, obj.Value);
-            }
-            else {
-                writer.Stream.WriteByte(HproseTags.TagNull);
-            }
-        }
+    class DBNullSerializer : Serializer<DBNull> {
+        public override void Write(Writer writer, DBNull obj) => writer.Stream.WriteByte(HproseTags.TagNull);
     }
 }
