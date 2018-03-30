@@ -18,103 +18,93 @@
 \**********************************************************/
 using System;
 using System.Collections.Concurrent;
-using System.Numerics;
-using System.Text;
+using Hprose.Collections.Generic;
 
 namespace Hprose.IO.Serializers {
-    public abstract class Serializer {
-        internal static readonly ConcurrentDictionary<Type, Serializer> _serializers = new ConcurrentDictionary<Type, Serializer>();
+    interface ISerializer {
+        void Write(Writer writer, object obj);
+    }
+
+    public abstract class Serializer<T> : ISerializer {
+        static Serializer() => Serializer.Initialize();
+        private static volatile Serializer<T> _instance;
+        public static Serializer<T> Instance {
+            get {
+                if (_instance == null) {
+                    _instance = Serializer.GetInstance(typeof(T)) as Serializer<T>;
+                }
+                return _instance;
+            }
+        }
+        public abstract void Write(Writer writer, T obj);
+        void ISerializer.Write(Writer writer, object obj) => Write(writer, (T)obj);
+    }
+
+    public class Serializer : Serializer<object> {
+        static readonly ConcurrentDictionary<Type, Lazy<ISerializer>> _serializers = new ConcurrentDictionary<Type, Lazy<ISerializer>>();
         static Serializer() {
-            Register(new DBNullSerializer());
-            Register(new BooleanSerializer());
-            Register(new CharSerializer());
-            Register(new ByteSerializer());
-            Register(new SByteSerializer());
-            Register(new Int16Serializer());
-            Register(new UInt16Serializer());
-            Register(new Int32Serializer());
-            Register(new UInt32Serializer());
-            Register(new Int64Serializer());
-            Register(new UInt64Serializer());
-            Register(new SingleSerializer());
-            Register(new DoubleSerializer());
-            Register(new DecimalSerializer());
-            Register(new IntPtrSerializer());
-            Register(new UIntPtrSerializer());
-            Register(new BigIntegerSerializer());
-            Register(new TimeSpanSerializer());
-            Register(new DateTimeSerializer());
-            Register(new GuidSerializer());
-            Register(new StringSerializer());
-            Register(new StringBuilderSerializer());
-            Register(new CharsSerializer());
-            Register(new BytesSerializer());
-
-            Register(new NullableSerializer<bool>());
-            Register(new NullableSerializer<char>());
-            Register(new NullableSerializer<byte>());
-            Register(new NullableSerializer<sbyte>());
-            Register(new NullableSerializer<short>());
-            Register(new NullableSerializer<ushort>());
-            Register(new NullableSerializer<int>());
-            Register(new NullableSerializer<uint>());
-            Register(new NullableSerializer<long>());
-            Register(new NullableSerializer<ulong>());
-            Register(new NullableSerializer<float>());
-            Register(new NullableSerializer<double>());
-            Register(new NullableSerializer<decimal>());
-            Register(new NullableSerializer<IntPtr>());
-            Register(new NullableSerializer<UIntPtr>());
-            Register(new NullableSerializer<BigInteger>());
-            Register(new NullableSerializer<TimeSpan>());
-            Register(new NullableSerializer<DateTime>());
-            Register(new NullableSerializer<Guid>());
-
-            Register(new NullableKeySerializer<bool?>());
-            Register(new NullableKeySerializer<char?>());
-            Register(new NullableKeySerializer<byte?>());
-            Register(new NullableKeySerializer<sbyte?>());
-            Register(new NullableKeySerializer<short?>());
-            Register(new NullableKeySerializer<ushort?>());
-            Register(new NullableKeySerializer<int?>());
-            Register(new NullableKeySerializer<uint?>());
-            Register(new NullableKeySerializer<long?>());
-            Register(new NullableKeySerializer<ulong?>());
-            Register(new NullableKeySerializer<float?>());
-            Register(new NullableKeySerializer<double?>());
-            Register(new NullableKeySerializer<decimal?>());
-            Register(new NullableKeySerializer<IntPtr?>());
-            Register(new NullableKeySerializer<UIntPtr?>());
-            Register(new NullableKeySerializer<BigInteger?>());
-            Register(new NullableKeySerializer<TimeSpan?>());
-            Register(new NullableKeySerializer<DateTime?>());
-            Register(new NullableKeySerializer<Guid?>());
-            Register(new NullableKeySerializer<string>());
-            Register(new NullableKeySerializer<StringBuilder>());
-            Register(new NullableKeySerializer<char[]>());
-            Register(new NullableKeySerializer<byte[]>());
+            Register(() => new Serializer());
+            Register(() => new DBNullSerializer());
+            Register(() => new BooleanSerializer());
+            Register(() => new CharSerializer());
+            Register(() => new ByteSerializer());
+            Register(() => new SByteSerializer());
+            Register(() => new Int16Serializer());
+            Register(() => new UInt16Serializer());
+            Register(() => new Int32Serializer());
+            Register(() => new UInt32Serializer());
+            Register(() => new Int64Serializer());
+            Register(() => new UInt64Serializer());
+            Register(() => new SingleSerializer());
+            Register(() => new DoubleSerializer());
+            Register(() => new DecimalSerializer());
+            Register(() => new IntPtrSerializer());
+            Register(() => new UIntPtrSerializer());
+            Register(() => new BigIntegerSerializer());
+            Register(() => new TimeSpanSerializer());
+            Register(() => new DateTimeSerializer());
+            Register(() => new GuidSerializer());
+            Register(() => new StringSerializer());
+            Register(() => new StringBuilderSerializer());
+            Register(() => new CharsSerializer());
+            Register(() => new BytesSerializer());
         }
 
         public static void Initialize() { }
 
-        public static void Register<T>(Serializer<T> serializer) {
-            Serializer<T>._instance = serializer;
-            _serializers[typeof(T)] = serializer;
+        public static void Register<T>(Func<Serializer<T>> ctor) {
+            _serializers[typeof(T)] = new Lazy<ISerializer>(ctor);
         }
-        public static Serializer Get(Type type) {
-            if (type == null) {
-                return NullSerializer.Instance;
-            }
-            return _serializers[type];
-        }
-        public abstract void Write(Writer writer, object obj);
-    }
 
-    public abstract class Serializer<T> : Serializer {
-        static Serializer() => Initialize();
-        internal static Serializer<T> _instance;
-        public static Serializer<T> Instance => _instance;
-        public abstract void Write(Writer writer, T obj);
-        public override void Write(Writer writer, object obj) => Write(writer, (T)obj);
+        private static ISerializer NewInstance(Type type) {
+            Type serializerType = null;
+            if (type.IsArray) {
+                serializerType = typeof(ArraySerializer<>).MakeGenericType(type.GetElementType());
+            }
+            else if (type.IsConstructedGenericType) {
+                Type genericType = type.GetGenericTypeDefinition();
+                Type[] genericArgs = type.GetGenericArguments();
+                if (genericType == typeof(Nullable<>)) {
+                    serializerType = typeof(NullableSerializer<>).MakeGenericType(genericArgs);
+                }
+                else if (genericType == typeof(NullableKey<>)) {
+                    serializerType = typeof(NullableKeySerializer<>).MakeGenericType(genericArgs);
+                }
+            }
+            return Activator.CreateInstance(serializerType) as ISerializer;
+        }
+
+        internal static ISerializer GetInstance(Type type) {
+            return _serializers.GetOrAdd(type, t => new Lazy<ISerializer>(() => NewInstance(t))).Value;
+        }
+
+        public override void Write(Writer writer, object obj) {
+            if (obj == null) {
+                writer.Stream.WriteByte(HproseTags.TagNull);
+            }
+            else {
+                GetInstance(obj.GetType()).Write(writer, obj);
+            }
+        }
     }
 }

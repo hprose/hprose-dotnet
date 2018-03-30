@@ -11,7 +11,7 @@ namespace Hprose.UnitTests.IO.Serializers {
         public void TestSerialize() {
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
-                //writer.Serialize(null);
+                writer.Serialize(null);
                 writer.Serialize(true);
                 writer.Serialize(false);
                 writer.Serialize('0');
@@ -19,7 +19,7 @@ namespace Hprose.UnitTests.IO.Serializers {
                 writer.Serialize('人');
                 writer.Serialize((byte)123);
                 writer.Serialize((sbyte)-123);
-                Assert.AreEqual("tfu0uAu人i123;i-123;", ValueWriter.UTF8.GetString(stream.ToArray()));
+                Assert.AreEqual("ntfu0uAu人i123;i-123;", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
@@ -51,6 +51,24 @@ namespace Hprose.UnitTests.IO.Serializers {
                 writer.Serialize(s);
                 writer.Serialize(s);
                 Assert.AreEqual("ns5\"hello\"r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var a = new NullableKey<int?>[] {
+                    null,1,2,3,4,5
+                };
+                writer.Serialize(a);
+                writer.Serialize(a);
+                Assert.AreEqual("a6{n12345}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var a = new object[] {
+                    null, 1,2,3,4,5, "hello"
+                };
+                writer.Serialize(a);
+                writer.Serialize(a);
+                Assert.AreEqual("a7{n12345s5\"hello\"}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
         }
     }

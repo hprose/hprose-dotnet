@@ -36,7 +36,7 @@ namespace Hprose.IO.Serializers {
             _refer = simple ? null : new WriterRefer();
         }
 
-        public void Serialize(object obj) => Serializer.Get(obj?.GetType()).Write(this, obj);
+        public void Serialize(object obj) => Serializer.Instance.Write(this, obj);
 
         public void Serialize<T>(T obj) => Serializer<T>.Instance.Write(this, obj);
 
