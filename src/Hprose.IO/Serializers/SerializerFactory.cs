@@ -12,7 +12,7 @@
  *                                                        *
  * hprose serializer factory for C#.                      *
  *                                                        *
- * LastModified: Mar 29, 2018                             *
+ * LastModified: Mar 30, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -50,6 +50,7 @@ namespace Hprose.IO.Serializers {
             _serializers[typeof(string)] = StringSerializer.Instance;
             _serializers[typeof(StringBuilder)] = StringBuilderSerializer.Instance;
             _serializers[typeof(char[])] = CharsSerializer.Instance;
+            _serializers[typeof(byte[])] = BytesSerializer.Instance;
 
             _serializers[typeof(bool?)] = NullableSerializer<bool>.Instance;
             _serializers[typeof(char?)] = NullableSerializer<char>.Instance;
@@ -93,6 +94,7 @@ namespace Hprose.IO.Serializers {
             _serializers[typeof(NullableKey<string>)] = NullableKeySerializer<string>.Instance;
             _serializers[typeof(NullableKey<StringBuilder>)] = NullableKeySerializer<StringBuilder>.Instance;
             _serializers[typeof(NullableKey<char[]>)] = NullableKeySerializer<char[]>.Instance;
+            _serializers[typeof(NullableKey<byte[]>)] = NullableKeySerializer<byte[]>.Instance;
         }
         public static void Register(Type type, Serializer serializer) {
             _serializers[type] = serializer;
