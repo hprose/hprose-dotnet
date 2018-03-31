@@ -136,6 +136,12 @@ namespace Hprose.UnitTests.IO.Serializers {
                 writer.Serialize(dict);
                 Assert.AreEqual("m3{n12345}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(TypeCode.Boolean);
+                writer.Serialize(TypeCode.Byte);
+                Assert.AreEqual("36", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
         }
     }
 }

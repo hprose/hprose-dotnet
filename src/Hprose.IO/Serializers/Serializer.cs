@@ -79,7 +79,10 @@ namespace Hprose.IO.Serializers {
 
         private static ISerializer NewInstance(Type type) {
             Type serializerType = null;
-            if (type.IsArray) {
+            if (type.IsEnum) {
+                serializerType = typeof(EnumSerializer<>).MakeGenericType(type);
+            }
+            else if (type.IsArray) {
                 serializerType = typeof(ArraySerializer<>).MakeGenericType(type.GetElementType());
             }
             else if (type.IsConstructedGenericType) {
