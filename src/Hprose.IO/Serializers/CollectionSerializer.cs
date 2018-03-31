@@ -8,11 +8,11 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * ListSerializer.cs                                      *
+ * CollectionSerializer.cs                                *
  *                                                        *
- * ListSerializer class for C#.                           *
+ * CollectionSerializer class for C#.                     *
  *                                                        *
- * LastModified: Mar 30, 2018                             *
+ * LastModified: Mar 31, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
-    class ListSerializer<T, V> : ReferenceSerializer<T> where T : IList<V> {
+    class CollectionSerializer<T, V> : ReferenceSerializer<T> where T : ICollection<V> {
         public override void Serialize(Writer writer, T obj) {
             base.Serialize(writer, obj);
             var stream = writer.Stream;
