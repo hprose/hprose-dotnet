@@ -105,6 +105,37 @@ namespace Hprose.UnitTests.IO.Serializers {
                 writer.Serialize(a);
                 Assert.AreEqual("a6{n12345}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                ICollection<int?> a = new List<int?> {
+                    null, 1,2,3,4,5
+                };
+                writer.Serialize(a);
+                writer.Serialize(a);
+                Assert.AreEqual("a6{n12345}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var dict = new Dictionary<NullableKey<int?>, int> {
+                    { null, 1 },
+                    { 2, 3 },
+                    { 4, 5 }
+                };
+                writer.Serialize(dict);
+                writer.Serialize(dict);
+                Assert.AreEqual("m3{n12345}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                ICollection<KeyValuePair<NullableKey<int?>, int>> dict = new Dictionary<NullableKey<int?>, int> {
+                    { null, 1 },
+                    { 2, 3 },
+                    { 4, 5 }
+                };
+                writer.Serialize(dict);
+                writer.Serialize(dict);
+                Assert.AreEqual("m3{n12345}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
         }
     }
 }

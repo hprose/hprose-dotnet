@@ -85,14 +85,32 @@ namespace Hprose.IO.Serializers {
             else if (type.IsConstructedGenericType) {
                 Type genericType = type.GetGenericTypeDefinition();
                 Type[] genericArgs = type.GetGenericArguments();
-                if (genericType == typeof(Nullable<>)) {
-                    serializerType = typeof(NullableSerializer<>).MakeGenericType(genericArgs);
-                }
-                else if (genericType == typeof(NullableKey<>)) {
-                    serializerType = typeof(NullableKeySerializer<>).MakeGenericType(genericArgs);
-                }
-                else if (typeof(IList<>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
-                    serializerType = typeof(ListSerializer<,>).MakeGenericType(type, genericArgs[0]);
+                switch (genericArgs.Length) {
+                    case 1:
+                        if (genericType == typeof(Nullable<>)) {
+                            serializerType = typeof(NullableSerializer<>).MakeGenericType(genericArgs);
+                        }
+                        else if (genericType == typeof(NullableKey<>)) {
+                            serializerType = typeof(NullableKeySerializer<>).MakeGenericType(genericArgs);
+                        }
+                        else if (typeof(ICollection<>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
+                            if (genericArgs[0].IsConstructedGenericType) {
+                                Type genType = genericArgs[0].GetGenericTypeDefinition();
+                                if (genType == typeof(KeyValuePair<,>)) {
+                                    Type[] genArgs = genericArgs[0].GetGenericArguments();
+                                    serializerType = typeof(DictionarySerializer<,,>).MakeGenericType(type, genArgs[0], genArgs[1]);
+                                }
+                            }
+                            if (serializerType == null) {
+                                serializerType = typeof(CollectionSerializer<,>).MakeGenericType(type, genericArgs[0]);
+                            }
+                        }
+                        break;
+                    case 2:
+                        if (typeof(IDictionary<,>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
+                            serializerType = typeof(DictionarySerializer<,,>).MakeGenericType(type, genericArgs[0], genericArgs[1]);
+                        }
+                        break;
                 }
             }
             return Activator.CreateInstance(serializerType) as ISerializer;

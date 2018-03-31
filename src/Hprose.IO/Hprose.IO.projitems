@@ -16,7 +16,8 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)HproseMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HproseTags.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Serializers\ListSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\DictionarySerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\CollectionSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\BigIntegerSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\ArraySerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\CharsSerializer.cs" />
