@@ -67,6 +67,10 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
 
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('net45')) Or  $(TargetFramework.StartsWith('net46')) ">
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+  </ItemGroup>
+
   <Import Project="..\src\Hprose.Collections\Hprose.Collections.projitems" Label="Shared" />
 
   <Import Project="..\src\Hprose.IO\Hprose.IO.projitems" Label="Shared" />

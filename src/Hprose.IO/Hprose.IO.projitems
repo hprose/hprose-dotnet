@@ -16,7 +16,8 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)HproseMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HproseTags.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Serializers\EnumSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\ByteSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\ValueTupleSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DictionarySerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\CollectionSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\BigIntegerSerializer.cs" />
@@ -43,7 +44,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\Int16Serializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\ReferenceSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\SByteSerializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Serializers\ByteSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\EnumSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\CharSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\Serializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\BooleanSerializer.cs" />
