@@ -16,7 +16,7 @@
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
-
+using System.Collections;
 using System.Collections.Generic;
 using static Hprose.IO.HproseTags;
 
@@ -40,5 +40,22 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagClosebrace);
         }
     }
-
+    class DictionarySerializer<T> : ReferenceSerializer<T> where T : IDictionary {
+        public override void Serialize(Writer writer, T obj) {
+            base.Serialize(writer, obj);
+            var stream = writer.Stream;
+            int length = obj.Count;
+            stream.WriteByte(TagMap);
+            if (length > 0) {
+                ValueWriter.WriteInt(stream, length);
+            }
+            stream.WriteByte(TagOpenbrace);
+            var serializer = Serializer.Instance;
+            foreach (DictionaryEntry pair in obj) {
+                serializer.Write(writer, pair.Key);
+                serializer.Write(writer, pair.Value);
+            }
+            stream.WriteByte(TagClosebrace);
+        }
+    }
 }

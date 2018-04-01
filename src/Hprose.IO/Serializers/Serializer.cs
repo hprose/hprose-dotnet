@@ -71,6 +71,7 @@ namespace Hprose.IO.Serializers {
             Register(() => new CharsSerializer());
             Register(() => new BytesSerializer());
             Register(() => new ValueTupleSerializer());
+            Register(() => new BitArraySerializer());
         }
 
         public static void Initialize() { }
@@ -143,6 +144,12 @@ namespace Hprose.IO.Serializers {
                         }
                         break;
                 }
+            }
+            if (typeof(IDictionary).IsAssignableFrom(type)) {
+                return typeof(DictionarySerializer<>).MakeGenericType(type);
+            }
+            if (typeof(ICollection).IsAssignableFrom(type) && typeof(IEnumerable).IsAssignableFrom(type)) {
+                return typeof(EnumerableSerializer<>).MakeGenericType(type);
             }
             return null;
         }

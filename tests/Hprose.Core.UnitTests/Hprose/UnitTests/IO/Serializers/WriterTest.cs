@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using Hprose.Collections.Generic;
@@ -259,6 +260,42 @@ namespace Hprose.UnitTests.IO.Serializers {
                 writer.Serialize(a);
                 writer.Serialize(a);
                 Assert.AreEqual("a6{n12345}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+        }
+        [TestMethod]
+        public void TestSerializeArrayList() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var a = new ArrayList() {
+                    null, 1,2,3,4,5
+                };
+                writer.Serialize(a);
+                writer.Serialize(a);
+                Assert.AreEqual("a6{n12345}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+        }
+        [TestMethod]
+        public void TestSerializeHashtable() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var dict = new Hashtable {
+                    { new NullableKey<object>(null), 1 },
+                    { 2, 3 },
+                    { 4, 5 }
+                };
+                writer.Serialize(dict);
+                writer.Serialize(dict);
+                Assert.AreEqual("m3{4523n1}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+        }
+        [TestMethod]
+        public void TestSerializeBitArray() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var a = new BitArray(new bool[] { true, false, true, false, true, false });
+                writer.Serialize(a);
+                writer.Serialize(a);
+                Assert.AreEqual("a6{tftftf}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
         }
     }
