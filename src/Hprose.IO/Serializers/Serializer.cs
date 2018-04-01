@@ -17,6 +17,7 @@
  *                                                        *
 \**********************************************************/
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Hprose.Collections.Generic;
@@ -116,7 +117,11 @@ namespace Hprose.IO.Serializers {
                 }
                 switch (genericArgs.Length) {
                     case 1:
-                        if (typeof(ICollection<>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
+                        bool isGenericCollection = typeof(ICollection<>).MakeGenericType(genericArgs).IsAssignableFrom(type);
+                        bool isGenericIEnumerable = typeof(ICollection).IsAssignableFrom(type) &&
+                            typeof(IEnumerable<>).MakeGenericType(genericArgs).IsAssignableFrom(type);
+
+                        if (isGenericCollection || isGenericIEnumerable) {
                             if (genericArgs[0].IsConstructedGenericType) {
                                 Type genType = genericArgs[0].GetGenericTypeDefinition();
                                 if (genType == typeof(KeyValuePair<,>)) {
@@ -124,7 +129,12 @@ namespace Hprose.IO.Serializers {
                                     return typeof(DictionarySerializer<,,>).MakeGenericType(type, genArgs[0], genArgs[1]);
                                 }
                             }
+                        }
+                        if (isGenericCollection) {
                             return typeof(CollectionSerializer<,>).MakeGenericType(type, genericArgs[0]);
+                        }
+                        if (isGenericIEnumerable) {
+                            return typeof(EnumerableSerializer<,>).MakeGenericType(type, genericArgs[0]);
                         }
                         break;
                     case 2:

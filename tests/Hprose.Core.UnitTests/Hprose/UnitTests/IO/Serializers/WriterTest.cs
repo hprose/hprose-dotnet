@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using Hprose.Collections.Generic;
 using Hprose.IO.Serializers;
 
@@ -230,6 +231,34 @@ namespace Hprose.UnitTests.IO.Serializers {
                 var c = TupleExtensions.ToTuple((1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0));
                 writer.Serialize(c);
                 Assert.AreEqual("a1{1}a2{1s5\"hello\"}a3{12r2;}a4{123r2;}a5{1234r2;}a6{12345r2;}a7{123456r2;}a8{1234567r2;}r8;a9{12345678r2;}r9;a20{12345678901234567890}", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+        }
+        [TestMethod]
+        public void TestSerializeLinkedList() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var a = new LinkedList<int?>();
+                a.AddLast((int?)null);
+                a.AddLast(1);
+                a.AddLast(2);
+                a.AddLast(3);
+                a.AddLast(4);
+                a.AddLast(5);
+                writer.Serialize(a);
+                writer.Serialize(a);
+                Assert.AreEqual("a6{n12345}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+        }
+        [TestMethod]
+        public void TestSerializeBlockingCollection() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var a = new BlockingCollection<int?>() {
+                    null, 1,2,3,4,5
+                };
+                writer.Serialize(a);
+                writer.Serialize(a);
+                Assert.AreEqual("a6{n12345}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
         }
     }

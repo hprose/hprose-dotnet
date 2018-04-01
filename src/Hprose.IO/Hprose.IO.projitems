@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)HproseMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HproseTags.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\ByteSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\EnumerableSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\TupleSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\ValueTupleSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DictionarySerializer.cs" />
