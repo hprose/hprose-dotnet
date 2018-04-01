@@ -12,11 +12,13 @@
  *                                                        *
  * DBNullSerializer class for C#.                         *
  *                                                        *
- * LastModified: Mar 30, 2018                             *
+ * LastModified: Apr 1, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
+
 using System;
+
 namespace Hprose.IO.Serializers {
     class DBNullSerializer : Serializer<DBNull> {
         public override void Write(Writer writer, DBNull obj) => writer.Stream.WriteByte(HproseTags.TagNull);

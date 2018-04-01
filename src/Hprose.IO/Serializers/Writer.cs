@@ -12,13 +12,14 @@
  *                                                        *
  * hprose Writer class for C#.                            *
  *                                                        *
- * LastModified: Mar 30, 2018                             *
+ * LastModified: Apr 1, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
+
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Hprose.IO.Serializers {
     public class Writer {

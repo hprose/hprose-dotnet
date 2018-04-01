@@ -16,7 +16,9 @@
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
+
 using System.Collections;
+
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {

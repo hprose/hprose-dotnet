@@ -12,10 +12,11 @@
  *                                                        *
  * EnumSerializer class for C#.                           *
  *                                                        *
- * LastModified: Mar 31, 2018                             *
+ * LastModified: Apr 1, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
+
 using System;
 
 namespace Hprose.IO.Serializers {

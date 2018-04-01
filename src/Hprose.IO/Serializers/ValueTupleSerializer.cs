@@ -18,6 +18,7 @@
 \**********************************************************/
 
 using System;
+
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {

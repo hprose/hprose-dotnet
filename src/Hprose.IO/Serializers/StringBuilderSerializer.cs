@@ -12,11 +12,13 @@
  *                                                        *
  * StringBuilderSerializer class for C#.                  *
  *                                                        *
- * LastModified: Mar 30, 2018                             *
+ * LastModified: Apr 1, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
+
 using System.Text;
+
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {

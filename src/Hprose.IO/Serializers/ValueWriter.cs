@@ -12,14 +12,16 @@
  *                                                        *
  * ValueWriter class for C#.                              *
  *                                                        *
- * LastModified: Mar30, 2018                             *
+ * LastModified: Apr 1, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
+
 using System;
 using System.IO;
-using System.Text;
 using System.Numerics;
+using System.Text;
+
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
