@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Serializer class for C#.                        *
  *                                                        *
- * LastModified: Mar 30, 2018                             *
+ * LastModified: Apr 1, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -96,6 +96,16 @@ namespace Hprose.IO.Serializers {
                     genericType == typeof(ValueTuple<,,,,,,>) ||
                     genericType == typeof(ValueTuple<,,,,,,,>)) {
                     return typeof(ValueTupleSerializer<>).MakeGenericType(type);
+                }
+                if (genericType == typeof(Tuple<>) ||
+                    genericType == typeof(Tuple<,>) ||
+                    genericType == typeof(Tuple<,,>) ||
+                    genericType == typeof(Tuple<,,,>) ||
+                    genericType == typeof(Tuple<,,,,>) ||
+                    genericType == typeof(Tuple<,,,,,>) ||
+                    genericType == typeof(Tuple<,,,,,,>) ||
+                    genericType == typeof(Tuple<,,,,,,,>)) {
+                    return typeof(TupleSerializer<>).MakeGenericType(type);
                 }
                 Type[] genericArgs = type.GetGenericArguments();
                 if (genericType == typeof(Nullable<>)) {
