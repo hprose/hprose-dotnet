@@ -78,86 +78,59 @@ namespace Hprose.IO.Serializers {
             _serializers[typeof(T)] = new Lazy<ISerializer>(ctor);
         }
 
-        private static ISerializer NewInstance(Type type) {
-            Type serializerType = null;
+        private static Type GetSerializerType(Type type) {
             if (type.IsEnum) {
-                serializerType = typeof(EnumSerializer<>).MakeGenericType(type);
+                return typeof(EnumSerializer<>).MakeGenericType(type);
             }
-            else if (type.IsArray) {
-                serializerType = typeof(ArraySerializer<>).MakeGenericType(type.GetElementType());
+            if (type.IsArray) {
+                return typeof(ArraySerializer<>).MakeGenericType(type.GetElementType());
             }
-            else if (type.IsConstructedGenericType) {
+            if (type.IsConstructedGenericType) {
                 Type genericType = type.GetGenericTypeDefinition();
+                if (genericType == typeof(ValueTuple<>) ||
+                    genericType == typeof(ValueTuple<,>) ||
+                    genericType == typeof(ValueTuple<,,>) ||
+                    genericType == typeof(ValueTuple<,,,>) ||
+                    genericType == typeof(ValueTuple<,,,,>) ||
+                    genericType == typeof(ValueTuple<,,,,,>) ||
+                    genericType == typeof(ValueTuple<,,,,,,>) ||
+                    genericType == typeof(ValueTuple<,,,,,,,>)) {
+                    return typeof(ValueTupleSerializer<>).MakeGenericType(type);
+                }
                 Type[] genericArgs = type.GetGenericArguments();
+                if (genericType == typeof(Nullable<>)) {
+                    return typeof(NullableSerializer<>).MakeGenericType(genericArgs);
+                }
+                if (genericType == typeof(NullableKey<>)) {
+                    return typeof(NullableKeySerializer<>).MakeGenericType(genericArgs);
+                }
                 switch (genericArgs.Length) {
                     case 1:
-                        if (genericType == typeof(Nullable<>)) {
-                            serializerType = typeof(NullableSerializer<>).MakeGenericType(genericArgs);
-                        }
-                        else if (genericType == typeof(NullableKey<>)) {
-                            serializerType = typeof(NullableKeySerializer<>).MakeGenericType(genericArgs);
-                        }
-                        else if (genericType == typeof(ValueTuple<>)) {
-                            serializerType = typeof(ValueTupleSerializer<>).MakeGenericType(genericArgs);
-                        }
-                        else if (typeof(ICollection<>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
+                        if (typeof(ICollection<>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
                             if (genericArgs[0].IsConstructedGenericType) {
                                 Type genType = genericArgs[0].GetGenericTypeDefinition();
                                 if (genType == typeof(KeyValuePair<,>)) {
                                     Type[] genArgs = genericArgs[0].GetGenericArguments();
-                                    serializerType = typeof(DictionarySerializer<,,>).MakeGenericType(type, genArgs[0], genArgs[1]);
+                                    return typeof(DictionarySerializer<,,>).MakeGenericType(type, genArgs[0], genArgs[1]);
                                 }
                             }
-                            if (serializerType == null) {
-                                serializerType = typeof(CollectionSerializer<,>).MakeGenericType(type, genericArgs[0]);
-                            }
+                            return typeof(CollectionSerializer<,>).MakeGenericType(type, genericArgs[0]);
                         }
                         break;
                     case 2:
-                        if (genericType == typeof(ValueTuple<,>)) {
-                            serializerType = typeof(ValueTupleSerializer<,>).MakeGenericType(genericArgs);
-                        }
-                        else if (typeof(IDictionary<,>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
-                            serializerType = typeof(DictionarySerializer<,,>).MakeGenericType(type, genericArgs[0], genericArgs[1]);
-                        }
-                        break;
-                    case 3:
-                        if (genericType == typeof(ValueTuple<,,>)) {
-                            serializerType = typeof(ValueTupleSerializer<,,>).MakeGenericType(genericArgs);
-                        }
-                        break;
-                    case 4:
-                        if (genericType == typeof(ValueTuple<,,,>)) {
-                            serializerType = typeof(ValueTupleSerializer<,,,>).MakeGenericType(genericArgs);
-                        }
-                        break;
-                    case 5:
-                        if (genericType == typeof(ValueTuple<,,,,>)) {
-                            serializerType = typeof(ValueTupleSerializer<,,,,>).MakeGenericType(genericArgs);
-                        }
-                        break;
-                    case 6:
-                        if (genericType == typeof(ValueTuple<,,,,,>)) {
-                            serializerType = typeof(ValueTupleSerializer<,,,,,>).MakeGenericType(genericArgs);
-                        }
-                        break;
-                    case 7:
-                        if (genericType == typeof(ValueTuple<,,,,,,>)) {
-                            serializerType = typeof(ValueTupleSerializer<,,,,,,>).MakeGenericType(genericArgs);
-                        }
-                        break;
-                    case 8:
-                        if (genericType == typeof(ValueTuple<,,,,,,,>)) {
-                            serializerType = typeof(ValueTupleSerializer<,,,,,,,>).MakeGenericType(genericArgs);
+                        if (typeof(IDictionary<,>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
+                            return typeof(DictionarySerializer<,,>).MakeGenericType(type, genericArgs[0], genericArgs[1]);
                         }
                         break;
                 }
             }
-            return Activator.CreateInstance(serializerType) as ISerializer;
+            return null;
         }
 
         internal static ISerializer GetInstance(Type type) {
-            return _serializers.GetOrAdd(type, t => new Lazy<ISerializer>(() => NewInstance(t))).Value;
+            return _serializers.GetOrAdd(type, t => new Lazy<ISerializer>(
+                () => Activator.CreateInstance(GetSerializerType(t)) as ISerializer
+            )).Value;
         }
 
         public override void Write(Writer writer, object obj) {

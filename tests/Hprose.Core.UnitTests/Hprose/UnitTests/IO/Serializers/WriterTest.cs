@@ -161,6 +161,18 @@ namespace Hprose.UnitTests.IO.Serializers {
                 writer.Serialize(c);
                 Assert.AreEqual("a{}a2{1s5\"hello\"}a3{12r2;}a4{123r2;}a5{1234r2;}a6{12345r2;}a7{123456r2;}a8{1234567r2;}r8;a9{12345678r2;}r9;a30{123456789012345678901234567890}", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(ValueTuple.Create(ValueTuple.Create(), ValueTuple.Create()));
+                Assert.AreEqual("a2{a{}r1;}", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var e = ValueTuple.Create();
+                var a = (1, 2, 3, 4, 5, 6, 7, e);
+                writer.Serialize(a);
+                Assert.AreEqual("a8{1234567a{}}", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
         }
     }
 }
