@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\BitArraySerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\ByteSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\EnumerableSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\StreamSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\TupleSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\ValueTupleSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DictionarySerializer.cs" />
@@ -52,7 +53,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\Serializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\BooleanSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DBNullSerializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Serializers\SerializerFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\ValueWriter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\Writer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\WriterRefer.cs" />

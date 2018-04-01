@@ -298,5 +298,16 @@ namespace Hprose.UnitTests.IO.Serializers {
                 Assert.AreEqual("a6{tftftf}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
         }
+        [TestMethod]
+        public void TestSerializeStream() {
+            using (MemoryStream stream = new MemoryStream()) {
+                using (MemoryStream s = new MemoryStream(new byte[] { (byte)'0', (byte)'1', (byte)'2' })) {
+                    Writer writer = new Writer(stream);
+                    writer.Serialize(s);
+                    writer.Serialize(s);
+                    Assert.AreEqual("b3\"012\"r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+                }
+            }
+        }
     }
 }

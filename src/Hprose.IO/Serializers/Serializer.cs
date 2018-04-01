@@ -16,10 +16,13 @@
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
+
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
+
 using Hprose.Collections.Generic;
 
 namespace Hprose.IO.Serializers {
@@ -150,6 +153,9 @@ namespace Hprose.IO.Serializers {
             }
             if (typeof(ICollection).IsAssignableFrom(type) && typeof(IEnumerable).IsAssignableFrom(type)) {
                 return typeof(EnumerableSerializer<>).MakeGenericType(type);
+            }
+            if (typeof(Stream).IsAssignableFrom(type)) {
+                return typeof(StreamSerializer<>).MakeGenericType(type);
             }
             return null;
         }
