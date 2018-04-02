@@ -9,11 +9,14 @@
     <Import_RootNamespace>Hprose.IO</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Accessors\" />
     <Folder Include="$(MSBuildThisFileDirectory)Converters\" />
     <Folder Include="$(MSBuildThisFileDirectory)Deserializers\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Accessors\Accessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Accessors\FieldsAccessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Accessors\PropertiesAccessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Accessors\MembersAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HproseMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HproseTags.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\AnonymousTypeSerializer.cs" />
