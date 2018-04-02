@@ -17,29 +17,56 @@
  *                                                        *
 \**********************************************************/
 
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reflection;
 
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class AnonymousTypeSerializer<T> : ReferenceSerializer<T> {
-        static readonly PropertyInfo[] Properties;
+        static readonly Action<Writer, T> WriteProperties;
         static readonly int Length;
         static AnonymousTypeSerializer() {
-            Properties = typeof(T).GetProperties();
-            Length = Properties.Length;
+            var properties = typeof(T).GetProperties();
+            Length = properties.Length;
+            var writer = Expression.Variable(typeof(Writer), "writer");
+            var obj = Expression.Variable(typeof(T), "obj");
+            Type strSerializerType = typeof(Serializer<string>);
+            var strSerializer = Expression.Property(null, strSerializerType, "Instance");
+            List<Expression> expressions = new List<Expression>();
+            foreach (PropertyInfo property in properties) {
+                expressions.Add(
+                    Expression.Call(
+                        strSerializer,
+                        strSerializerType.GetMethod("Write"),
+                        writer,
+                        Expression.Constant(property.Name)
+                    )
+                );
+                var elemSerializerType = typeof(Serializer<>).MakeGenericType(property.PropertyType);
+                expressions.Add(
+                    Expression.Call(
+                        Expression.Property(null, elemSerializerType, "Instance"),
+                        elemSerializerType.GetMethod("Write"),
+                        writer,
+                        Expression.Property(obj, property.Name)
+                    )
+                );
+            }
+            WriteProperties = (Action<Writer, T>)Expression.Lambda(Expression.Block(expressions), writer, obj).Compile();
         }
         public override void Serialize(Writer writer, T obj) {
             base.Serialize(writer, obj);
             var stream = writer.Stream;
             stream.WriteByte(TagMap);
-            if (Length > 0) ValueWriter.WriteInt(stream, Length);
+            if (Length > 0) {
+                ValueWriter.WriteInt(stream, Length);
+            }
             stream.WriteByte(TagOpenbrace);
-            var strSerializer = Serializer<string>.Instance;
-            var objSerializer = Serializer.Instance;
-            foreach (PropertyInfo property in Properties) {
-                strSerializer.Write(writer, property.Name);
-                objSerializer.Write(writer, property.GetValue(obj, null));
+            if (Length > 0) {
+                WriteProperties(writer, obj);
             }
             stream.WriteByte(TagClosebrace);
         }

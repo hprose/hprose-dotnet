@@ -59,11 +59,13 @@
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
     <Reference Include="Mono.Android" />
+    <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin')) ">
     <Reference Include="$(TargetFrameworkIdentifier)" />
+    <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
   </ItemGroup>
 
