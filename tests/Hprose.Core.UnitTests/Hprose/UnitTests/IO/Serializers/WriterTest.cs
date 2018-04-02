@@ -309,5 +309,24 @@ namespace Hprose.UnitTests.IO.Serializers {
                 }
             }
         }
+        [TestMethod]
+        public void TestSerializeMDArray() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var a = new int[2,2,2] {
+                    { { 1, 2 }, { 3, 4 } },
+                    { { 5, 6 }, { 7, 8 } }
+                };
+                writer.Serialize(a);
+                writer.Serialize(a);
+                var b = new int[2, 2] {
+                    { 1, 2 }, { 3, 4 }
+                };
+                writer.Serialize(b);
+                writer.Serialize(b);
+
+                Assert.AreEqual("a2{a2{a2{12}a2{34}}a2{a2{56}a2{78}}}r0;a2{a2{12}a2{34}}r7;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+        }
     }
 }

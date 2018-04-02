@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Serializer class for C#.                        *
  *                                                        *
- * LastModified: Apr 1, 2018                              *
+ * LastModified: Apr 2, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -88,7 +88,14 @@ namespace Hprose.IO.Serializers {
                 return typeof(EnumSerializer<>).MakeGenericType(type);
             }
             if (type.IsArray) {
-                return typeof(ArraySerializer<>).MakeGenericType(type.GetElementType());
+                switch (type.GetArrayRank()) {
+                    case 1:
+                        return typeof(ArraySerializer<>).MakeGenericType(type.GetElementType());
+                    case 2:
+                        return typeof(Array2Serializer<>).MakeGenericType(type.GetElementType());
+                    default:
+                        return typeof(MultiDimArraySerializer<>).MakeGenericType(type);
+                }
             }
             if (type.IsConstructedGenericType) {
                 Type genericType = type.GetGenericTypeDefinition();

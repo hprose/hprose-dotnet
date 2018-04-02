@@ -16,6 +16,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)HproseMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HproseTags.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\MultiDimArraySerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\BitArraySerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\ByteSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\EnumerableSerializer.cs" />
