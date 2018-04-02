@@ -115,10 +115,8 @@ namespace Hprose.IO.Serializers {
                 switch (genericArgs.Length) {
                     case 1:
                         bool isGenericCollection = typeof(ICollection<>).MakeGenericType(genericArgs).IsAssignableFrom(type);
-                        bool isGenericIEnumerable = typeof(ICollection).IsAssignableFrom(type) &&
-                            typeof(IEnumerable<>).MakeGenericType(genericArgs).IsAssignableFrom(type);
-
-                        if (isGenericCollection || isGenericIEnumerable) {
+                        bool isGenericIEnumerable = typeof(IEnumerable<>).MakeGenericType(genericArgs).IsAssignableFrom(type);
+                        if (isGenericCollection) {
                             if (genericArgs[0].IsConstructedGenericType) {
                                 Type genType = genericArgs[0].GetGenericTypeDefinition();
                                 if (genType == typeof(KeyValuePair<,>)) {
@@ -126,11 +124,23 @@ namespace Hprose.IO.Serializers {
                                     return typeof(DictionarySerializer<,,>).MakeGenericType(type, genArgs[0], genArgs[1]);
                                 }
                             }
-                        }
-                        if (isGenericCollection) {
                             return typeof(CollectionSerializer<,>).MakeGenericType(type, genericArgs[0]);
                         }
                         if (isGenericIEnumerable) {
+                            bool isCollection = typeof(ICollection).IsAssignableFrom(type);
+                            if (genericArgs[0].IsConstructedGenericType) {
+                                Type genType = genericArgs[0].GetGenericTypeDefinition();
+                                if (genType == typeof(KeyValuePair<,>)) {
+                                    Type[] genArgs = genericArgs[0].GetGenericArguments();
+                                    if (isCollection) {
+                                        return typeof(FastEnumerableSerializer<,,>).MakeGenericType(type, genArgs[0], genArgs[1]);
+                                    }
+                                    return typeof(EnumerableSerializer<,,>).MakeGenericType(type, genArgs[0], genArgs[1]);
+                                }
+                            }
+                            if (isCollection) {
+                                return typeof(FastEnumerableSerializer<,>).MakeGenericType(type, genericArgs[0]);
+                            }
                             return typeof(EnumerableSerializer<,>).MakeGenericType(type, genericArgs[0]);
                         }
                         break;
@@ -144,7 +154,7 @@ namespace Hprose.IO.Serializers {
             if (typeof(IDictionary).IsAssignableFrom(type)) {
                 return typeof(DictionarySerializer<>).MakeGenericType(type);
             }
-            if (typeof(ICollection).IsAssignableFrom(type) && typeof(IEnumerable).IsAssignableFrom(type)) {
+            if (typeof(IEnumerable).IsAssignableFrom(type)) {
                 return typeof(EnumerableSerializer<>).MakeGenericType(type);
             }
             if (type.IsGenericType && type.Name.StartsWith("<>f__AnonymousType")) {
