@@ -1,11 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.IO;
+﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+
 using Hprose.Collections.Generic;
 using Hprose.IO.Serializers;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Hprose.UnitTests.IO.Serializers {
     [TestClass]

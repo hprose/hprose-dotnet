@@ -1,7 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.IO;
+﻿using System.IO;
 using System.Text;
+
 using Hprose.IO.Serializers;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Hprose.UnitTests.IO.Serializers {
     [TestClass]

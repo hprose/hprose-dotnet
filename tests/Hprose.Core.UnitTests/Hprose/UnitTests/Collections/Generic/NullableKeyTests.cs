@@ -1,7 +1,9 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using Hprose.Collections.Generic;
 using System.Collections.Generic;
+
+using Hprose.Collections.Generic;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Hprose.UnitTests.Collections.Generic {
     [TestClass]
