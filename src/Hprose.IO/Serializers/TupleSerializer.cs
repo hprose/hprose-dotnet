@@ -12,7 +12,7 @@
  *                                                        *
  * TupleSerializer class for C#.                          *
  *                                                        *
- * LastModified: Apr 1, 2018                              *
+ * LastModified: Apr 2, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -29,14 +29,7 @@ namespace Hprose.IO.Serializers {
             Type type = typeof(T);
             if (type.IsGenericType) {
                 var t = type.GetGenericTypeDefinition();
-                if (t == typeof(Tuple<>) ||
-                    t == typeof(Tuple<,>) ||
-                    t == typeof(Tuple<,,>) ||
-                    t == typeof(Tuple<,,,>) ||
-                    t == typeof(Tuple<,,,,>) ||
-                    t == typeof(Tuple<,,,,,>) ||
-                    t == typeof(Tuple<,,,,,,>) ||
-                    t == typeof(Tuple<,,,,,,,>)) {
+                if (t.Name.StartsWith("Tuple`")) {
                     Type[] args = type.GetGenericArguments();
                     typeof(TupleHelper).GetMethod($"Initialize{args.Length}").MakeGenericMethod(args).Invoke(null, null);
                     return;

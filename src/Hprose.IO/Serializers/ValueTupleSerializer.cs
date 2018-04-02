@@ -12,7 +12,7 @@
  *                                                        *
  * ValueTupleSerializer class for C#.                     *
  *                                                        *
- * LastModified: Apr 1, 2018                              *
+ * LastModified: Apr 2, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -29,14 +29,7 @@ namespace Hprose.IO.Serializers {
             Type type = typeof(T);
             if (type.IsGenericType) {
                 var t = type.GetGenericTypeDefinition();
-                if (t == typeof(ValueTuple<>) ||
-                    t == typeof(ValueTuple<,>) ||
-                    t == typeof(ValueTuple<,,>) ||
-                    t == typeof(ValueTuple<,,,>) ||
-                    t == typeof(ValueTuple<,,,,>) ||
-                    t == typeof(ValueTuple<,,,,,>) ||
-                    t == typeof(ValueTuple<,,,,,,>) ||
-                    t == typeof(ValueTuple<,,,,,,,>)) {
+                if (t.Name.StartsWith("ValueTuple`")) {
                     Type[] args = type.GetGenericArguments();
                     typeof(ValueTupleHelper).GetMethod($"Initialize{args.Length}").MakeGenericMethod(args).Invoke(null, null);
                     return;

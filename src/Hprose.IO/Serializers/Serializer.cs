@@ -99,24 +99,10 @@ namespace Hprose.IO.Serializers {
             }
             if (type.IsConstructedGenericType) {
                 Type genericType = type.GetGenericTypeDefinition();
-                if (genericType == typeof(ValueTuple<>) ||
-                    genericType == typeof(ValueTuple<,>) ||
-                    genericType == typeof(ValueTuple<,,>) ||
-                    genericType == typeof(ValueTuple<,,,>) ||
-                    genericType == typeof(ValueTuple<,,,,>) ||
-                    genericType == typeof(ValueTuple<,,,,,>) ||
-                    genericType == typeof(ValueTuple<,,,,,,>) ||
-                    genericType == typeof(ValueTuple<,,,,,,,>)) {
+                if (genericType.Name.StartsWith("ValueTuple`")) {
                     return typeof(ValueTupleSerializer<>).MakeGenericType(type);
                 }
-                if (genericType == typeof(Tuple<>) ||
-                    genericType == typeof(Tuple<,>) ||
-                    genericType == typeof(Tuple<,,>) ||
-                    genericType == typeof(Tuple<,,,>) ||
-                    genericType == typeof(Tuple<,,,,>) ||
-                    genericType == typeof(Tuple<,,,,,>) ||
-                    genericType == typeof(Tuple<,,,,,,>) ||
-                    genericType == typeof(Tuple<,,,,,,,>)) {
+                if (genericType.Name.StartsWith("Tuple`")) {
                     return typeof(TupleSerializer<>).MakeGenericType(type);
                 }
                 Type[] genericArgs = type.GetGenericArguments();
