@@ -147,6 +147,9 @@ namespace Hprose.IO.Serializers {
             if (typeof(ICollection).IsAssignableFrom(type) && typeof(IEnumerable).IsAssignableFrom(type)) {
                 return typeof(EnumerableSerializer<>).MakeGenericType(type);
             }
+            if (type.IsGenericType && type.Name.StartsWith("<>f__AnonymousType")) {
+                return typeof(AnonymousTypeSerializer<>).MakeGenericType(type);
+            }
             if (typeof(Stream).IsAssignableFrom(type)) {
                 return typeof(StreamSerializer<>).MakeGenericType(type);
             }

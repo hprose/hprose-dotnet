@@ -328,5 +328,15 @@ namespace Hprose.UnitTests.IO.Serializers {
                 Assert.AreEqual("a2{a2{a2{12}a2{34}}a2{a2{56}a2{78}}}r0;a2{a2{12}a2{34}}r7;", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
         }
+        [TestMethod]
+        public void TestSerializeAnonymouseType() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var v = new { Amount = 108, Message = "Hello" };
+                writer.Serialize(v);
+                writer.Serialize(v);
+                Assert.AreEqual("m2{s6\"Amount\"i108;s7\"Message\"s5\"Hello\"}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+        }
     }
 }
