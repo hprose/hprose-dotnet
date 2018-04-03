@@ -12,7 +12,7 @@
  *                                                        *
  * ValueTupleSerializer class for C#.                     *
  *                                                        *
- * LastModified: Apr 2, 2018                              *
+ * LastModified: Apr 3, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -22,7 +22,7 @@ using System;
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
-    class ValueTupleHelper<T> {
+    static class ValueTupleHelper<T> {
         public static volatile int Length;
         public static volatile Action<Writer, T> WriteElements;
         static ValueTupleHelper() {
@@ -40,7 +40,7 @@ namespace Hprose.IO.Serializers {
         }
     }
 
-    class ValueTupleHelper {
+    static class ValueTupleHelper {
         public static void Initialize1<T1>() {
             ValueTupleHelper<ValueTuple<T1>>.Length = 1;
             ValueTupleHelper<ValueTuple<T1>>.WriteElements = (writer, obj) => {
