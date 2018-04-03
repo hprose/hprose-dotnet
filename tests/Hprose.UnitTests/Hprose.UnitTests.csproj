@@ -4,16 +4,7 @@
     <TargetFrameworks>netcoreapp2.0;net45;net451;net452;net46;net461;net462;net47;net471</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" $(TargetFramework.Contains('netstandard1.')) ">
-		<_IsNetStandard1Defined>$([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants.Trim())', '(^|;)NETSTANDARD1($|;)'))</_IsNetStandard1Defined>
-		<DefineConstants Condition="!$(_IsNetStandard1Defined)">NETSTANDARD1;$(DefineConstants)</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" $(TargetFramework.Contains('netcoreapp1.')) ">
-		<_IsNetCoreApp1Defined>$([System.Text.RegularExpressions.Regex]::IsMatch('$(DefineConstants.Trim())', '(^|;)NETCOREAPP1($|;)'))</_IsNetCoreApp1Defined>
-		<DefineConstants Condition="!$(_IsNetCoreApp1Defined)">NETCOREAPP1;$(DefineConstants)</DefineConstants>
+    <RootNamespace>Hprose.UnitTests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
