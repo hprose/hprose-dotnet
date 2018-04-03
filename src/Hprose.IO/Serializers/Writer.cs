@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Writer class for C#.                            *
  *                                                        *
- * LastModified: Apr 1, 2018                              *
+ * LastModified: Apr 3, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -30,11 +30,12 @@ namespace Hprose.IO.Serializers {
         private int _last = 0;
 
         public Stream Stream => _stream;
+        public HproseMode Mode => _mode;
 
-        public Writer(Stream stream, HproseMode mode = HproseMode.MemberMode, bool simple = false) {
+        public Writer(Stream stream, bool simple = false, HproseMode mode = HproseMode.MemberMode) {
             _stream = stream;
-            _mode = mode;
             _refer = simple ? null : new WriterRefer();
+            _mode = mode;
         }
 
         public void Serialize(object obj) => Serializer.Instance.Write(this, obj);
@@ -44,6 +45,17 @@ namespace Hprose.IO.Serializers {
         internal bool WriteRef(object obj) => _refer?.Write(_stream, obj) ?? false;
 
         internal void SetRef(object obj) => _refer?.Set(obj);
+
+        internal void AddCount(int count) => _refer?.AddCount(count);
+
+        public int WriteMetaData(Type type, Action action) {
+            if (!_ref.TryGetValue(type, out int r)) {
+                action();
+                r = _last++;
+                _ref[type] = r;
+            }
+            return r;
+        }
 
         public void Reset() {
             _refer?.Reset();
