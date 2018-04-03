@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Serializer class for C#.                        *
  *                                                        *
- * LastModified: Apr 2, 2018                              *
+ * LastModified: Apr 3, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -163,7 +163,7 @@ namespace Hprose.IO.Serializers {
             if (typeof(Stream).IsAssignableFrom(type)) {
                 return typeof(StreamSerializer<>).MakeGenericType(type);
             }
-            return null;
+            return typeof(ObjectSerializer<>).MakeGenericType(type);
         }
 
         internal static ISerializer GetInstance(Type type) {

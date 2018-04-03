@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 
 using Hprose.Collections.Generic;
 using Hprose.IO.Serializers;
@@ -338,6 +339,35 @@ namespace Hprose.UnitTests.IO.Serializers {
                 writer.Serialize(v);
                 writer.Serialize(v);
                 Assert.AreEqual("m2{s6\"Amount\"i108;s7\"Message\"s5\"Hello\"}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+        }
+        [DataContract(Name = "Person")]
+        public class Person {
+            [DataMember(Order = 0)]
+            public int Id;
+            [DataMember(Order = 1)]
+            public string Name;
+            [DataMember(Order = 2)]
+            public int Age;
+        }
+        [TestMethod]
+        public void TestSerializeObject() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var o = new Person {
+                    Id = 0,
+                    Name = "Tom",
+                    Age = 48
+                };
+                var o2 = new Person {
+                    Id = 1,
+                    Name = "Jerry",
+                    Age = 36
+                };
+                writer.Serialize(o);
+                writer.Serialize(o2);
+                writer.Serialize(o);
+                Assert.AreEqual("c6\"Person\"3{s2\"id\"s4\"name\"s3\"age\"}o0{0s3\"Tom\"i48;}o0{1s5\"Jerry\"i36;}r3;", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
         }
     }

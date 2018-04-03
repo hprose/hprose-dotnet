@@ -18,7 +18,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\PropertiesAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\MembersAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HproseMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ClassManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HproseTags.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\ObjectSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\AnonymousTypeSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\MultiDimArraySerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\BitArraySerializer.cs" />
