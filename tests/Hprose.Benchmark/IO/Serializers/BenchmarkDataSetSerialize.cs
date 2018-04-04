@@ -1,0 +1,149 @@
+﻿using System;
+using System.Data;
+using System.IO;
+using System.Runtime.Serialization.Json;
+
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes.Columns;
+using BenchmarkDotNet.Attributes.Exporters;
+using BenchmarkDotNet.Attributes.Jobs;
+
+using Hprose.IO.Serializers;
+
+using Newtonsoft.Json;
+
+namespace Hprose.Benchmark.IO.Serializers {
+    [ClrJob(isBaseline: true), CoreJob, MonoJob]
+    [RPlotExporter, RankColumn]
+    public class BenchmarkDataSetSerialize {
+        private static DataSet MakeDataSet() {
+            var dataSet = new DataSet();
+            MakeParentTable(dataSet);
+            MakeChildTable(dataSet);
+            MakeDataRelation(dataSet);
+            return dataSet;
+        }
+
+        private static void MakeParentTable(DataSet dataSet) {
+            DataTable table = new DataTable("ParentTable");
+            DataColumn column;
+            DataRow row;
+
+            column = new DataColumn();
+            column.DataType = Type.GetType("System.Int32");
+            column.ColumnName = "id";
+            column.ReadOnly = true;
+            column.Unique = true;
+            table.Columns.Add(column);
+
+            column = new DataColumn();
+            column.DataType = Type.GetType("System.String");
+            column.ColumnName = "ParentItem";
+            column.AutoIncrement = false;
+            column.Caption = "ParentItem";
+            column.ReadOnly = false;
+            column.Unique = false;
+            table.Columns.Add(column);
+
+            DataColumn[] PrimaryKeyColumns = new DataColumn[1];
+            PrimaryKeyColumns[0] = table.Columns["id"];
+            table.PrimaryKey = PrimaryKeyColumns;
+
+            dataSet.Tables.Add(table);
+
+            for (int i = 0; i <= 2; i++) {
+                row = table.NewRow();
+                row["id"] = i;
+                row["ParentItem"] = "ParentItem " + i;
+                table.Rows.Add(row);
+            }
+        }
+
+        private static void MakeChildTable(DataSet dataSet) {
+            DataTable table = new DataTable("childTable");
+            DataColumn column;
+            DataRow row;
+
+            column = new DataColumn();
+            column.DataType = Type.GetType("System.Int32");
+            column.ColumnName = "ChildID";
+            column.AutoIncrement = true;
+            column.Caption = "ID";
+            column.ReadOnly = true;
+            column.Unique = true;
+
+            table.Columns.Add(column);
+
+            column = new DataColumn();
+            column.DataType = Type.GetType("System.String");
+            column.ColumnName = "ChildItem";
+            column.AutoIncrement = false;
+            column.Caption = "ChildItem";
+            column.ReadOnly = false;
+            column.Unique = false;
+            table.Columns.Add(column);
+
+            column = new DataColumn();
+            column.DataType = Type.GetType("System.Int32");
+            column.ColumnName = "ParentID";
+            column.AutoIncrement = false;
+            column.Caption = "ParentID";
+            column.ReadOnly = false;
+            column.Unique = false;
+            table.Columns.Add(column);
+
+            dataSet.Tables.Add(table);
+
+            for (int i = 0; i <= 4; i++) {
+                row = table.NewRow();
+                row["childID"] = i;
+                row["ChildItem"] = "Item " + i;
+                row["ParentID"] = 0;
+                table.Rows.Add(row);
+            }
+            for (int i = 0; i <= 4; i++) {
+                row = table.NewRow();
+                row["childID"] = i + 5;
+                row["ChildItem"] = "Item " + i;
+                row["ParentID"] = 1;
+                table.Rows.Add(row);
+            }
+            for (int i = 0; i <= 4; i++) {
+                row = table.NewRow();
+                row["childID"] = i + 10;
+                row["ChildItem"] = "Item " + i;
+                row["ParentID"] = 2;
+                table.Rows.Add(row);
+            }
+        }
+
+        private static void MakeDataRelation(DataSet dataSet) {
+            DataColumn parentColumn =
+                dataSet.Tables["ParentTable"].Columns["id"];
+            DataColumn childColumn =
+                dataSet.Tables["ChildTable"].Columns["ParentID"];
+            DataRelation relation = new
+                DataRelation("parent2Child", parentColumn, childColumn);
+            dataSet.Tables["ChildTable"].ParentRelations.Add(relation);
+        }
+
+        private static DataSet dataSet = MakeDataSet();
+
+        [Benchmark]
+        public void HproseSerializeDataSet() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(dataSet);
+            }
+        }
+        [Benchmark]
+        public void DataContractSerializeDataSet() {
+            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(DataSet));
+            using (MemoryStream stream = new MemoryStream()) {
+                js.WriteObject(stream, dataSet);
+            }
+        }
+        [Benchmark]
+        public void NewtonJsonSerializeDataSet() => JsonConvert.SerializeObject(dataSet);
+    }
+}
