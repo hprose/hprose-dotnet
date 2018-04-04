@@ -20,6 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)HproseMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClassManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HproseTags.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\DataSetSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DataTableSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\ObjectSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\AnonymousTypeSerializer.cs" />

@@ -167,6 +167,9 @@ namespace Hprose.IO.Serializers {
             if (typeof(DataTable).IsAssignableFrom(type)) {
                 return typeof(DataTableSerializer<>).MakeGenericType(type);
             }
+            if (typeof(DataSet).IsAssignableFrom(type)) {
+                return typeof(DataSetSerializer<>).MakeGenericType(type);
+            }
             return typeof(ObjectSerializer<>).MakeGenericType(type);
         }
 
