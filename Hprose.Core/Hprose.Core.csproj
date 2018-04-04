@@ -61,6 +61,7 @@
     <Reference Include="Mono.Android" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
@@ -69,6 +70,7 @@
     <Reference Include="$(TargetFrameworkIdentifier)" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>

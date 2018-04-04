@@ -12,7 +12,7 @@
  *                                                        *
  * MembersAccessor class for C#.                          *
  *                                                        *
- * LastModified: Apr 2, 2018                              *
+ * LastModified: Apr 4, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -28,7 +28,7 @@ using static System.Reflection.BindingFlags;
 namespace Hprose.IO.Accessors {
     internal static class MembersAccessor {
         public static IReadOnlyDictionary<string, MemberInfo> GetMembers(Type type) {
-            var members = new Dictionary<string, MemberInfo>(StringComparer.OrdinalIgnoreCase);
+            var members = new Dictionary<string, MemberInfo>();
             var flags = Public | Instance;
             var isDataContract = type.IsDefined(typeof(DataContractAttribute), false);
             if (isDataContract) {
@@ -43,8 +43,7 @@ namespace Hprose.IO.Accessors {
                     (!isDataContract || dataMember != null) &&
                     !property.IsDefined(ignoreDataMember, false) &&
                     property.GetIndexParameters().Length == 0 &&
-                    !members.ContainsKey(name = dataMember?.Name ?? property.Name)) {
-                    name = char.ToLower(name[0]) + name.Substring(1);
+                    !members.ContainsKey(name = Accessor.UnifiedName(dataMember?.Name ?? property.Name))) {
                     members[name] = property;
                 }
             }
@@ -54,8 +53,7 @@ namespace Hprose.IO.Accessors {
                 if ((!isDataContract || dataMember != null) &&
                     !field.IsDefined(ignoreDataMember, false) &&
                     !field.IsNotSerialized &&
-                    !members.ContainsKey(name = dataMember?.Name ?? field.Name)) {
-                    name = char.ToLower(name[0]) + name.Substring(1);
+                    !members.ContainsKey(name = Accessor.UnifiedName(dataMember?.Name ?? field.Name))) {
                     members[name] = field;
                 }
             }

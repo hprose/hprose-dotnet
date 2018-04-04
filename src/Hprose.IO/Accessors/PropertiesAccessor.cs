@@ -28,7 +28,7 @@ using static System.Reflection.BindingFlags;
 namespace Hprose.IO.Accessors {
     internal static class PropertiesAccessor {
         public static IReadOnlyDictionary<string, PropertyInfo> GetProperties(Type type) {
-            var members = new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
+            var members = new Dictionary<string, PropertyInfo>();
             if (!type.IsSerializable) {
                 return members;
             }
@@ -41,8 +41,7 @@ namespace Hprose.IO.Accessors {
                 if (property.CanRead && property.CanWrite &&
                     !property.IsDefined(ignoreDataMember, false) &&
                     property.GetIndexParameters().Length == 0 &&
-                    !members.ContainsKey(name = dataMember?.Name ?? property.Name)) {
-                    name = char.ToLower(name[0]) + name.Substring(1);
+                    !members.ContainsKey(name = Accessor.UnifiedName(dataMember?.Name ?? property.Name))) {
                     members[name] = property;
                 }
             }

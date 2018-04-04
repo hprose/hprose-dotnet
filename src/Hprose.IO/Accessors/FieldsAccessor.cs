@@ -12,7 +12,7 @@
  *                                                        *
  * FieldsAccessor class for C#.                           *
  *                                                        *
- * LastModified: Apr 2, 2018                              *
+ * LastModified: Apr 4, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -28,7 +28,7 @@ using static System.Reflection.BindingFlags;
 namespace Hprose.IO.Accessors {
     internal static class FieldsAccessor {
         public static IReadOnlyDictionary<string, FieldInfo> GetFields(Type type) {
-            var members = new Dictionary<string, FieldInfo>(StringComparer.OrdinalIgnoreCase);
+            var members = new Dictionary<string, FieldInfo>();
             if (!type.IsSerializable) {
                 return members;
             }
@@ -41,8 +41,7 @@ namespace Hprose.IO.Accessors {
                     string name;
                     if (!field.IsDefined(ignoreDataMember, false) &&
                         !field.IsNotSerialized &&
-                        !members.ContainsKey(name = dataMember?.Name ?? field.Name)) {
-                        name = char.ToLower(name[0]) + name.Substring(1);
+                        !members.ContainsKey(name = Accessor.UnifiedName(dataMember?.Name ?? field.Name))) {
                         members[name] = field;
                     }
                 }

@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Hprose.UnitTests.IO.Serializers {
     [TestClass]
-    public class WriterTest {
+    public class WriterTests {
         [TestMethod]
         public void TestSerializeBasic() {
             using (MemoryStream stream = new MemoryStream()) {

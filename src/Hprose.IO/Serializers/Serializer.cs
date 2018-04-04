@@ -21,6 +21,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 
 using Hprose.Collections.Generic;
@@ -162,6 +163,9 @@ namespace Hprose.IO.Serializers {
             }
             if (typeof(Stream).IsAssignableFrom(type)) {
                 return typeof(StreamSerializer<>).MakeGenericType(type);
+            }
+            if (typeof(DataTable).IsAssignableFrom(type)) {
+                return typeof(DataTableSerializer<>).MakeGenericType(type);
             }
             return typeof(ObjectSerializer<>).MakeGenericType(type);
         }
