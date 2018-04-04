@@ -29,20 +29,22 @@ namespace Hprose.Benchmark.IO.Serializers {
             DataColumn column;
             DataRow row;
 
-            column = new DataColumn();
-            column.DataType = Type.GetType("System.Int32");
-            column.ColumnName = "id";
-            column.ReadOnly = true;
-            column.Unique = true;
+            column = new DataColumn {
+                DataType = Type.GetType("System.Int32"),
+                ColumnName = "id",
+                ReadOnly = true,
+                Unique = true
+            };
             table.Columns.Add(column);
 
-            column = new DataColumn();
-            column.DataType = Type.GetType("System.String");
-            column.ColumnName = "ParentItem";
-            column.AutoIncrement = false;
-            column.Caption = "ParentItem";
-            column.ReadOnly = false;
-            column.Unique = false;
+            column = new DataColumn {
+                DataType = Type.GetType("System.String"),
+                ColumnName = "ParentItem",
+                AutoIncrement = false,
+                Caption = "ParentItem",
+                ReadOnly = false,
+                Unique = false
+            };
             table.Columns.Add(column);
 
             DataColumn[] PrimaryKeyColumns = new DataColumn[1];
@@ -64,32 +66,35 @@ namespace Hprose.Benchmark.IO.Serializers {
             DataColumn column;
             DataRow row;
 
-            column = new DataColumn();
-            column.DataType = Type.GetType("System.Int32");
-            column.ColumnName = "ChildID";
-            column.AutoIncrement = true;
-            column.Caption = "ID";
-            column.ReadOnly = true;
-            column.Unique = true;
+            column = new DataColumn {
+                DataType = Type.GetType("System.Int32"),
+                ColumnName = "ChildID",
+                AutoIncrement = true,
+                Caption = "ID",
+                ReadOnly = true,
+                Unique = true
+            };
 
             table.Columns.Add(column);
 
-            column = new DataColumn();
-            column.DataType = Type.GetType("System.String");
-            column.ColumnName = "ChildItem";
-            column.AutoIncrement = false;
-            column.Caption = "ChildItem";
-            column.ReadOnly = false;
-            column.Unique = false;
+            column = new DataColumn {
+                DataType = Type.GetType("System.String"),
+                ColumnName = "ChildItem",
+                AutoIncrement = false,
+                Caption = "ChildItem",
+                ReadOnly = false,
+                Unique = false
+            };
             table.Columns.Add(column);
 
-            column = new DataColumn();
-            column.DataType = Type.GetType("System.Int32");
-            column.ColumnName = "ParentID";
-            column.AutoIncrement = false;
-            column.Caption = "ParentID";
-            column.ReadOnly = false;
-            column.Unique = false;
+            column = new DataColumn {
+                DataType = Type.GetType("System.Int32"),
+                ColumnName = "ParentID",
+                AutoIncrement = false,
+                Caption = "ParentID",
+                ReadOnly = false,
+                Unique = false
+            };
             table.Columns.Add(column);
 
             dataSet.Tables.Add(table);
