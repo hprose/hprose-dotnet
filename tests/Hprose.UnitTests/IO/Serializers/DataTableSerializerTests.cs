@@ -26,28 +26,11 @@ namespace Hprose.UnitTests.IO.Serializers {
             table.Columns.Add(new DataColumn("Name", typeof(string)));
             table.Columns.Add(new DataColumn("Age", typeof(int)));
 
-            DataRow row;
-
-            row = table.NewRow();
-            row["Id"] = 0;
-            row["Name"] = "Mario";
-            row["Age"] = 45;
-            table.Rows.Add(row);
-
-            row = table.NewRow();
-            row["Id"] = 1;
-            row["Name"] = "Luigi";
-            row["Age"] = 42;
-            table.Rows.Add(row);
-
-            row = table.NewRow();
-            row["Id"] = 2;
-            row["Name"] = "Peach";
-            row["Age"] = 28;
-            table.Rows.Add(row);
+            table.Rows.Add(0, "Mario", 45);
+            table.Rows.Add(1, "Luigi", 42);
+            table.Rows.Add(2, "Peach", 28);
 
             return table;
         }
-
     }
 }
