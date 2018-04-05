@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Serializer class for C#.                        *
  *                                                        *
- * LastModified: Apr 3, 2018                              *
+ * LastModified: Apr 5, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -22,6 +22,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.IO;
 
 using Hprose.Collections.Generic;
@@ -76,6 +77,7 @@ namespace Hprose.IO.Serializers {
             Register(() => new BytesSerializer());
             Register(() => new ValueTupleSerializer());
             Register(() => new BitArraySerializer());
+            Register(() => new DictionarySerializer<ExpandoObject, string, object>());
         }
 
         public static void Initialize() { }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Runtime.Serialization;
 
@@ -316,7 +317,7 @@ namespace Hprose.UnitTests.IO.Serializers {
         public void TestSerializeMDArray() {
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
-                var a = new int[2,2,2] {
+                var a = new int[2, 2, 2] {
                     { { 1, 2 }, { 3, 4 } },
                     { { 5, 6 }, { 7, 8 } }
                 };
@@ -368,6 +369,18 @@ namespace Hprose.UnitTests.IO.Serializers {
                 writer.Serialize(o2);
                 writer.Serialize(o);
                 Assert.AreEqual("c6\"Person\"3{s2\"id\"s4\"name\"s3\"age\"}o0{0s3\"Tom\"i48;}o0{1s5\"Jerry\"i36;}r3;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+        }
+        [TestMethod]
+        public void TestSerializeExpandoObject() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                dynamic o = new ExpandoObject();
+                o.Id = 1;
+                o.Name = "Test";
+                writer.Serialize(o);
+                writer.Serialize(o);
+                Assert.AreEqual("m2{s2\"Id\"1s4\"Name\"s4\"Test\"}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
         }
     }
