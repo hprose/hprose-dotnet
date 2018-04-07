@@ -12,7 +12,7 @@
  *                                                        *
  * StringBuilderSerializer class for C#.                  *
  *                                                        *
- * LastModified: Apr 1, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -23,13 +23,13 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class StringBuilderSerializer : ReferenceSerializer<StringBuilder> {
-        public override void Serialize(Writer writer, StringBuilder obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, StringBuilder obj) {
+            base.Write(writer, obj);
             var stream = writer.Stream;
             stream.WriteByte(TagString);
             ValueWriter.Write(stream, obj.ToString());
         }
-        public override void Write(Writer writer, StringBuilder obj) {
+        public override void Serialize(Writer writer, StringBuilder obj) {
             var stream = writer.Stream;
             switch (obj?.Length) {
                 case 0:
@@ -39,7 +39,7 @@ namespace Hprose.IO.Serializers {
                     ValueWriter.Write(stream, obj[0]);
                     break;
                 default:
-                    base.Write(writer, obj);
+                    base.Serialize(writer, obj);
                     break;
             }
         }

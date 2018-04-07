@@ -12,7 +12,7 @@
  *                                                        *
  * DictionarySerializer class for C#.                     *
  *                                                        *
- * LastModified: Apr 1, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -24,8 +24,8 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class DictionarySerializer<T, K, V> : ReferenceSerializer<T> where T : ICollection<KeyValuePair<K, V>> {
-        public override void Serialize(Writer writer, T obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, T obj) {
+            base.Write(writer, obj);
             var stream = writer.Stream;
             int length = obj.Count;
             stream.WriteByte(TagMap);
@@ -36,15 +36,15 @@ namespace Hprose.IO.Serializers {
             var serializerK = Serializer<K>.Instance;
             var serializerV = Serializer<V>.Instance;
             foreach (var pair in obj) {
-                serializerK.Write(writer, pair.Key);
-                serializerV.Write(writer, pair.Value);
+                serializerK.Serialize(writer, pair.Key);
+                serializerV.Serialize(writer, pair.Value);
             }
             stream.WriteByte(TagClosebrace);
         }
     }
     class DictionarySerializer<T> : ReferenceSerializer<T> where T : IDictionary {
-        public override void Serialize(Writer writer, T obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, T obj) {
+            base.Write(writer, obj);
             var stream = writer.Stream;
             int length = obj.Count;
             stream.WriteByte(TagMap);
@@ -54,8 +54,8 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagOpenbrace);
             var serializer = Serializer.Instance;
             foreach (DictionaryEntry pair in obj) {
-                serializer.Write(writer, pair.Key);
-                serializer.Write(writer, pair.Value);
+                serializer.Serialize(writer, pair.Key);
+                serializer.Serialize(writer, pair.Value);
             }
             stream.WriteByte(TagClosebrace);
         }

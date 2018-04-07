@@ -12,7 +12,7 @@
  *                                                        *
  * TimeSpanSerializer class for C#.                       *
  *                                                        *
- * LastModified: Mar 30, 2018                             *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -21,6 +21,6 @@ using System;
 
 namespace Hprose.IO.Serializers {
     class TimeSpanSerializer : Serializer<TimeSpan> {
-        public override void Write(Writer writer, TimeSpan obj) => ValueWriter.Write(writer.Stream, obj.Ticks);
+        public override void Serialize(Writer writer, TimeSpan obj) => ValueWriter.Write(writer.Stream, obj.Ticks);
     }
 }

@@ -12,7 +12,7 @@
  *                                                        *
  * NullableKeySerializer class for C#.                    *
  *                                                        *
- * LastModified: Mar 30, 2018                             *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -21,6 +21,6 @@ using Hprose.Collections.Generic;
 
 namespace Hprose.IO.Serializers {
     class NullableKeySerializer<T> : Serializer<NullableKey<T>> {
-        public override void Write(Writer writer, NullableKey<T> obj) => Serializer<T>.Instance.Write(writer, obj.Value);
+        public override void Serialize(Writer writer, NullableKey<T> obj) => Serializer<T>.Instance.Serialize(writer, obj.Value);
     }
 }

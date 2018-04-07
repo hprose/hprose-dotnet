@@ -12,13 +12,13 @@
  *                                                        *
  * SingleSerializer class for C#.                         *
  *                                                        *
- * LastModified: Mar 30, 2018                             *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 namespace Hprose.IO.Serializers {
     class SingleSerializer : Serializer<float> {
-        public override void Write(Writer writer, float obj) => ValueWriter.Write(writer.Stream, obj);
+        public override void Serialize(Writer writer, float obj) => ValueWriter.Write(writer.Stream, obj);
     }
 }

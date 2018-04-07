@@ -12,7 +12,7 @@
  *                                                        *
  * CollectionSerializer class for C#.                     *
  *                                                        *
- * LastModified: Apr 1, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -23,8 +23,8 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class CollectionSerializer<T, V> : ReferenceSerializer<T> where T : ICollection<V> {
-        public override void Serialize(Writer writer, T obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, T obj) {
+            base.Write(writer, obj);
             var stream = writer.Stream;
             int length = obj.Count;
             stream.WriteByte(TagList);
@@ -34,7 +34,7 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagOpenbrace);
             var serializer = Serializer<V>.Instance;
             foreach (V value in obj) {
-                serializer.Write(writer, value);
+                serializer.Serialize(writer, value);
             }
             stream.WriteByte(TagClosebrace);
         }

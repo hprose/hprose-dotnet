@@ -29,7 +29,7 @@ using Hprose.Collections.Generic;
 
 namespace Hprose.IO.Serializers {
     internal interface ISerializer {
-        void Write(Writer writer, object obj);
+        void Serialize(Writer writer, object obj);
     }
 
     public abstract class Serializer<T> : ISerializer {
@@ -43,8 +43,8 @@ namespace Hprose.IO.Serializers {
                 return _instance;
             }
         }
-        public abstract void Write(Writer writer, T obj);
-        void ISerializer.Write(Writer writer, object obj) => Write(writer, (T)obj);
+        public abstract void Serialize(Writer writer, T obj);
+        void ISerializer.Serialize(Writer writer, object obj) => Serialize(writer, (T)obj);
     }
 
     public class Serializer : Serializer<object> {
@@ -187,12 +187,12 @@ namespace Hprose.IO.Serializers {
             )).Value;
         }
 
-        public override void Write(Writer writer, object obj) {
+        public override void Serialize(Writer writer, object obj) {
             if (obj == null) {
                 writer.Stream.WriteByte(HproseTags.TagNull);
             }
             else {
-                GetInstance(obj.GetType()).Write(writer, obj);
+                GetInstance(obj.GetType()).Serialize(writer, obj);
             }
         }
     }

@@ -12,7 +12,7 @@
  *                                                        *
  * ObjectSerializer class for C#.                         *
  *                                                        *
- * LastModified: Apr 3, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -59,7 +59,7 @@ namespace Hprose.IO.Serializers {
                 expressions.Add(
                     Expression.Call(
                         Expression.Property(null, elemSerializerType, "Instance"),
-                        elemSerializerType.GetMethod("Write"),
+                        elemSerializerType.GetMethod("Serialize"),
                         writer,
                         Expression.PropertyOrField(obj, member.Name)
                     )
@@ -109,7 +109,7 @@ namespace Hprose.IO.Serializers {
     }
 
     class ObjectSerializer<T> : ReferenceSerializer<T> {
-        public override void Serialize(Writer writer, T obj) {
+        public override void Write(Writer writer, T obj) {
             MembersWriter membersWriter = MembersWriter.GetMembersWriter<T>(writer.Mode);
             int count = membersWriter.Count;
             var stream = writer.Stream;
@@ -119,7 +119,7 @@ namespace Hprose.IO.Serializers {
                 stream.Write(data, 0, data.Length);
                 writer.AddCount(count);
             });
-            base.Serialize(writer, obj);
+            base.Write(writer, obj);
             stream.WriteByte(TagObject);
             ValueWriter.WriteInt(stream, r);
             stream.WriteByte(TagOpenbrace);

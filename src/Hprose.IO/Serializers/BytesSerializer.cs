@@ -12,7 +12,7 @@
  *                                                        *
  * BytesSerializer class for C#.                          *
  *                                                        *
- * LastModified: Mar 30, 2018                             *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -21,8 +21,8 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class BytesSerializer : ReferenceSerializer<byte[]> {
-        public override void Serialize(Writer writer, byte[] obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, byte[] obj) {
+            base.Write(writer, obj);
             var stream = writer.Stream;
             stream.WriteByte(TagBytes);
             int length = obj.Length;

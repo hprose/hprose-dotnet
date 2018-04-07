@@ -24,8 +24,8 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class FastEnumerableSerializer<T, V> : ReferenceSerializer<T> where T : IEnumerable<V>, ICollection {
-        public override void Serialize(Writer writer, T obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, T obj) {
+            base.Write(writer, obj);
             var stream = writer.Stream;
             int length = obj.Count;
             stream.WriteByte(TagList);
@@ -35,14 +35,14 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagOpenbrace);
             var serializer = Serializer<V>.Instance;
             foreach (V value in obj) {
-                serializer.Write(writer, value);
+                serializer.Serialize(writer, value);
             }
             stream.WriteByte(TagClosebrace);
         }
     }
     class EnumerableSerializer<T, V> : ReferenceSerializer<T> where T : IEnumerable<V> {
-        public override void Serialize(Writer writer, T obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, T obj) {
+            base.Write(writer, obj);
             var stream = writer.Stream;
             int length = 0;
             foreach (V value in obj) { ++length; }
@@ -53,14 +53,14 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagOpenbrace);
             var serializer = Serializer<V>.Instance;
             foreach (V value in obj) {
-                serializer.Write(writer, value);
+                serializer.Serialize(writer, value);
             }
             stream.WriteByte(TagClosebrace);
         }
     }
     class FastEnumerableSerializer<T, K, V> : ReferenceSerializer<T> where T : IEnumerable<KeyValuePair<K, V>>, ICollection {
-        public override void Serialize(Writer writer, T obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, T obj) {
+            base.Write(writer, obj);
             var stream = writer.Stream;
             int length = obj.Count;
             stream.WriteByte(TagMap);
@@ -71,15 +71,15 @@ namespace Hprose.IO.Serializers {
             var serializerK = Serializer<K>.Instance;
             var serializerV = Serializer<V>.Instance;
             foreach (var pair in obj) {
-                serializerK.Write(writer, pair.Key);
-                serializerV.Write(writer, pair.Value);
+                serializerK.Serialize(writer, pair.Key);
+                serializerV.Serialize(writer, pair.Value);
             }
             stream.WriteByte(TagClosebrace);
         }
     }
     class EnumerableSerializer<T, K, V> : ReferenceSerializer<T> where T : IEnumerable<KeyValuePair<K, V>> {
-        public override void Serialize(Writer writer, T obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, T obj) {
+            base.Write(writer, obj);
             var stream = writer.Stream;
             int length = 0;
             foreach (var pair in obj) { ++length; }
@@ -91,15 +91,15 @@ namespace Hprose.IO.Serializers {
             var serializerK = Serializer<K>.Instance;
             var serializerV = Serializer<V>.Instance;
             foreach (var pair in obj) {
-                serializerK.Write(writer, pair.Key);
-                serializerV.Write(writer, pair.Value);
+                serializerK.Serialize(writer, pair.Key);
+                serializerV.Serialize(writer, pair.Value);
             }
             stream.WriteByte(TagClosebrace);
         }
     }
     class EnumerableSerializer<T> : ReferenceSerializer<T> where T : IEnumerable {
-        public override void Serialize(Writer writer, T obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, T obj) {
+            base.Write(writer, obj);
             var stream = writer.Stream;
             int length = 0;
             bool isMap = true;
@@ -121,11 +121,11 @@ namespace Hprose.IO.Serializers {
             foreach (object value in obj) {
                 if (isMap) {
                     var pair = (DictionaryEntry)value;
-                    serializer.Write(writer, pair.Key);
-                    serializer.Write(writer, pair.Value);
+                    serializer.Serialize(writer, pair.Key);
+                    serializer.Serialize(writer, pair.Value);
                 }
                 else {
-                    serializer.Write(writer, value);
+                    serializer.Serialize(writer, value);
                 }
             }
             stream.WriteByte(TagClosebrace);

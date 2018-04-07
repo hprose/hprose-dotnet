@@ -12,13 +12,13 @@
  *                                                        *
  * Int16Serializer class for C#.                          *
  *                                                        *
- * LastModified: Mar 30, 2018                             *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 namespace Hprose.IO.Serializers {
     class Int16Serializer : Serializer<short> {
-        public override void Write(Writer writer, short obj) => ValueWriter.Write(writer.Stream, obj);
+        public override void Serialize(Writer writer, short obj) => ValueWriter.Write(writer.Stream, obj);
     }
 }

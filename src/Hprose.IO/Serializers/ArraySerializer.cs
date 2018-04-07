@@ -12,7 +12,7 @@
  *                                                        *
  * ArraySerializer class for C#.                          *
  *                                                        *
- * LastModified: Apr 2, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -21,8 +21,8 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class ArraySerializer<T> : ReferenceSerializer<T[]> {
-        public override void Serialize(Writer writer, T[] obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, T[] obj) {
+            base.Write(writer, obj);
             var stream = writer.Stream;
             int length = obj.Length;
             stream.WriteByte(TagList);
@@ -32,14 +32,14 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagOpenbrace);
             var serializer = Serializer<T>.Instance;
             for (int i = 0; i < length; ++i) {
-                serializer.Write(writer, obj[i]);
+                serializer.Serialize(writer, obj[i]);
             }
             stream.WriteByte(TagClosebrace);
         }
     }
     class Array2Serializer<T> : ReferenceSerializer<T[,]> {
-        public override void Serialize(Writer writer, T[,] obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, T[,] obj) {
+            base.Write(writer, obj);
             var stream = writer.Stream;
             int length = obj.GetLength(0);
             int length2 = obj.GetLength(1);
@@ -57,7 +57,7 @@ namespace Hprose.IO.Serializers {
                 }
                 stream.WriteByte(TagOpenbrace);
                 for (int j = 0; j < length2; ++j) {
-                    serializer.Write(writer, obj[i, j]);
+                    serializer.Serialize(writer, obj[i, j]);
                 }
                 stream.WriteByte(TagClosebrace);
             }

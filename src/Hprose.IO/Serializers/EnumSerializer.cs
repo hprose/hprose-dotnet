@@ -12,7 +12,7 @@
  *                                                        *
  * EnumSerializer class for C#.                           *
  *                                                        *
- * LastModified: Apr 1, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -21,7 +21,7 @@ using System;
 
 namespace Hprose.IO.Serializers {
     class EnumSerializer<T> : Serializer<T> where T : struct, IComparable, IConvertible, IFormattable {
-        public override void Write(Writer writer, T obj) {
+        public override void Serialize(Writer writer, T obj) {
             switch (obj.GetTypeCode()) {
                 case TypeCode.Int32:
                     ValueWriter.Write(writer.Stream, obj.ToInt32(null));

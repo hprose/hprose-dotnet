@@ -12,7 +12,7 @@
  *                                                        *
  * DataTableSerializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 4, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -23,8 +23,8 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class DataSetSerializer<T> : ReferenceSerializer<T> where T : DataSet {
-        public override void Serialize(Writer writer, T obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, T obj) {
+            base.Write(writer, obj);
             var tables = obj.Tables;
             var length = tables.Count;
             var stream = writer.Stream;
@@ -34,7 +34,7 @@ namespace Hprose.IO.Serializers {
             }
             stream.WriteByte(TagOpenbrace);
             for (int i = 0; i < length; ++i) {
-                Serializer<DataTable>.Instance.Write(writer, tables[i]);
+                Serializer<DataTable>.Instance.Serialize(writer, tables[i]);
             }
             stream.WriteByte(TagClosebrace);
         }

@@ -12,7 +12,7 @@
  *                                                        *
  * StreamSerializer class for C#.                         *
  *                                                        *
- * LastModified: Apr 1, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -23,8 +23,8 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class StreamSerializer<T> : ReferenceSerializer<T> where T : Stream {
-        public override void Serialize(Writer writer, T obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, T obj) {
+            base.Write(writer, obj);
             var stream = writer.Stream;
             long oldPos = 0;
             if (obj.CanSeek) {
@@ -46,11 +46,11 @@ namespace Hprose.IO.Serializers {
                 obj.Position = oldPos;
             }
         }
-        public override void Write(Writer writer, T obj) {
+        public override void Serialize(Writer writer, T obj) {
             if (!obj.CanRead) {
                 throw new IOException("This stream can't support serialize.");
             }
-            base.Write(writer, obj);
+            base.Serialize(writer, obj);
         }
     }
 }

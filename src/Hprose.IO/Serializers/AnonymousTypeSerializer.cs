@@ -12,7 +12,7 @@
  *                                                        *
  * AnonymousTypeSerializer class for C#.                  *
  *                                                        *
- * LastModified: Apr 2, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -40,7 +40,7 @@ namespace Hprose.IO.Serializers {
                 expressions.Add(
                     Expression.Call(
                         strSerializer,
-                        strSerializerType.GetMethod("Write"),
+                        strSerializerType.GetMethod("Serialize"),
                         writer,
                         Expression.Constant(property.Name)
                     )
@@ -49,7 +49,7 @@ namespace Hprose.IO.Serializers {
                 expressions.Add(
                     Expression.Call(
                         Expression.Property(null, elemSerializerType, "Instance"),
-                        elemSerializerType.GetMethod("Write"),
+                        elemSerializerType.GetMethod("Serialize"),
                         writer,
                         Expression.Property(obj, property.Name)
                     )
@@ -57,8 +57,8 @@ namespace Hprose.IO.Serializers {
             }
             WriteProperties = (Action<Writer, T>)Expression.Lambda(Expression.Block(expressions), writer, obj).Compile();
         }
-        public override void Serialize(Writer writer, T obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, T obj) {
+            base.Write(writer, obj);
             var stream = writer.Stream;
             stream.WriteByte(TagMap);
             if (Length > 0) {

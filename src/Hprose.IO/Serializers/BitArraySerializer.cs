@@ -12,7 +12,7 @@
  *                                                        *
  * BitArraySerializer class for C#.                       *
  *                                                        *
- * LastModified: Apr 1, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -23,8 +23,8 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class BitArraySerializer : ReferenceSerializer<BitArray> {
-        public override void Serialize(Writer writer, BitArray obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, BitArray obj) {
+            base.Write(writer, obj);
             var stream = writer.Stream;
             int length = obj.Length;
             stream.WriteByte(TagList);
@@ -34,7 +34,7 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagOpenbrace);
             var serializer = Serializer<bool>.Instance;
             for (int i = 0; i < length; ++i) {
-                serializer.Write(writer, obj[i]);
+                serializer.Serialize(writer, obj[i]);
             }
             stream.WriteByte(TagClosebrace);
         }

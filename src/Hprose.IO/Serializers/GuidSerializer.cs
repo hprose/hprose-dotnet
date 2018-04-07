@@ -12,7 +12,7 @@
  *                                                        *
  * GuidSerializer class for C#.                           *
  *                                                        *
- * LastModified: Apr 1, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -24,8 +24,8 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class GuidSerializer : ReferenceSerializer<Guid> {
-        public override void Serialize(Writer writer, Guid obj) {
-            base.Serialize(writer, obj);
+        public override void Write(Writer writer, Guid obj) {
+            base.Write(writer, obj);
             Stream stream = writer.Stream;
             stream.WriteByte(TagGuid);
             stream.WriteByte(TagOpenbrace);
