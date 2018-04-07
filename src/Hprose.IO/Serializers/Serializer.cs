@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Serializer class for C#.                        *
  *                                                        *
- * LastModified: Apr 5, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -100,7 +100,7 @@ namespace Hprose.IO.Serializers {
                         return typeof(MultiDimArraySerializer<>).MakeGenericType(type);
                 }
             }
-            if (type.IsConstructedGenericType) {
+            if (type.IsGenericType) {
                 Type genericType = type.GetGenericTypeDefinition();
                 if (genericType.Name.StartsWith("ValueTuple`")) {
                     return typeof(ValueTupleSerializer<>).MakeGenericType(type);
@@ -120,7 +120,7 @@ namespace Hprose.IO.Serializers {
                         bool isGenericCollection = typeof(ICollection<>).MakeGenericType(genericArgs).IsAssignableFrom(type);
                         bool isGenericIEnumerable = typeof(IEnumerable<>).MakeGenericType(genericArgs).IsAssignableFrom(type);
                         if (isGenericCollection) {
-                            if (genericArgs[0].IsConstructedGenericType) {
+                            if (genericArgs[0].IsGenericType) {
                                 Type genType = genericArgs[0].GetGenericTypeDefinition();
                                 if (genType == typeof(KeyValuePair<,>)) {
                                     Type[] genArgs = genericArgs[0].GetGenericArguments();
@@ -131,7 +131,7 @@ namespace Hprose.IO.Serializers {
                         }
                         if (isGenericIEnumerable) {
                             bool isCollection = typeof(ICollection).IsAssignableFrom(type);
-                            if (genericArgs[0].IsConstructedGenericType) {
+                            if (genericArgs[0].IsGenericType) {
                                 Type genType = genericArgs[0].GetGenericTypeDefinition();
                                 if (genType == typeof(KeyValuePair<,>)) {
                                     Type[] genArgs = genericArgs[0].GetGenericArguments();
@@ -150,6 +150,12 @@ namespace Hprose.IO.Serializers {
                     case 2:
                         if (typeof(IDictionary<,>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
                             return typeof(DictionarySerializer<,,>).MakeGenericType(type, genericArgs[0], genericArgs[1]);
+                        }
+                        if (typeof(ICollection<>).MakeGenericType(genericArgs[0]).IsAssignableFrom(type)) {
+                            return typeof(CollectionSerializer<,>).MakeGenericType(type, genericArgs[0]);
+                        }
+                        if (typeof(ICollection<>).MakeGenericType(genericArgs[1]).IsAssignableFrom(type)) {
+                            return typeof(CollectionSerializer<,>).MakeGenericType(type, genericArgs[1]);
                         }
                         break;
                 }

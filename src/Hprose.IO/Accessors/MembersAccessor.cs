@@ -12,7 +12,7 @@
  *                                                        *
  * MembersAccessor class for C#.                          *
  *                                                        *
- * LastModified: Apr 4, 2018                              *
+ * LastModified: Apr 6, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -27,7 +27,7 @@ using static System.Reflection.BindingFlags;
 
 namespace Hprose.IO.Accessors {
     internal static class MembersAccessor {
-        public static IReadOnlyDictionary<string, MemberInfo> GetMembers(Type type) {
+        public static Dictionary<string, MemberInfo> GetMembers(Type type) {
             var members = new Dictionary<string, MemberInfo>();
             var flags = Public | Instance;
             var isDataContract = type.IsDefined(typeof(DataContractAttribute), false);
@@ -67,7 +67,7 @@ namespace Hprose.IO.Accessors {
         }
     }
     public static class MembersAccessor<T> {
-        public static readonly IReadOnlyDictionary<string, MemberInfo> Members;
+        public static readonly Dictionary<string, MemberInfo> Members;
         static MembersAccessor() {
             Members = MembersAccessor.GetMembers(typeof(T));
         }

@@ -27,8 +27,10 @@ namespace Hprose.Collections.Generic {
     public class NullableKeyDictionary<TKey, TValue> : Dictionary<NullableKey<TKey>, TValue>,
         ICollection<KeyValuePair<TKey, TValue>>,
         IDictionary<TKey, TValue>,
+#if !NET40
         IReadOnlyCollection<KeyValuePair<TKey, TValue>>,
         IReadOnlyDictionary<TKey, TValue>,
+#endif
         IEnumerable<KeyValuePair<TKey, TValue>> {
 
         public NullableKeyDictionary() : this(0, null) { }
@@ -61,9 +63,11 @@ namespace Hprose.Collections.Generic {
 
         ICollection<TKey> IDictionary<TKey, TValue>.Keys => Keys;
 
+#if !NET40
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
 
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
+#endif
 
         ICollection<TValue> IDictionary<TKey, TValue>.Values => Values;
 
@@ -152,7 +156,9 @@ namespace Hprose.Collections.Generic {
 
         [Serializable]
         public sealed new class KeyCollection : ICollection<TKey>,
+#if !NET40
             IReadOnlyCollection<TKey>,
+#endif
             IEnumerable<TKey>, IEnumerable, ICollection {
 
             private Dictionary<NullableKey<TKey>, TValue> _dictionary;

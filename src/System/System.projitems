@@ -8,4 +8,10 @@
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>System</Import_RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Reflection\CustomAttributeExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Reflection\" />
+  </ItemGroup>
 </Project>

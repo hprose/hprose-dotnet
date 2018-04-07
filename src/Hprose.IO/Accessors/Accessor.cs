@@ -12,19 +12,20 @@
  *                                                        *
  * Accessor class for C#.                                 *
  *                                                        *
- * LastModified: Apr 4, 2018                              *
+ * LastModified: Apr 6, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace Hprose.IO.Accessors {
-    public class Accessor {
-        public static IReadOnlyDictionary<string, MemberInfo> GetMembers<T>() => MembersAccessor<T>.Members;
-        public static IReadOnlyDictionary<string, FieldInfo> GetFields<T>() => FieldsAccessor<T>.Fields;
-        public static IReadOnlyDictionary<string, PropertyInfo> GetProperties<T>() => PropertiesAccessor<T>.Properties;
+    public static class Accessor {
+        public static Dictionary<string, MemberInfo> GetMembers<T>() => MembersAccessor<T>.Members;
+        public static Dictionary<string, FieldInfo> GetFields<T>() => FieldsAccessor<T>.Fields;
+        public static Dictionary<string, PropertyInfo> GetProperties<T>() => PropertiesAccessor<T>.Properties;
         public static string UnifiedName(string name) => char.ToLowerInvariant(name[0]) + name.Substring(1);
     }
 }
