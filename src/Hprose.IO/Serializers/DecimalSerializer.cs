@@ -19,6 +19,6 @@
 
 namespace Hprose.IO.Serializers {
     class DecimalSerializer : Serializer<decimal> {
-        public override void Serialize(Writer writer, decimal obj) => ValueWriter.Write(writer.Stream, obj);
+        public override void Write(Writer writer, decimal obj) => ValueWriter.Write(writer.Stream, obj);
     }
 }

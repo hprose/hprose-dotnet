@@ -19,6 +19,6 @@
 
 namespace Hprose.IO.Serializers {
     class UInt32Serializer : Serializer<uint> {
-        public override void Serialize(Writer writer, uint obj) => ValueWriter.Write(writer.Stream, obj);
+        public override void Write(Writer writer, uint obj) => ValueWriter.Write(writer.Stream, obj);
     }
 }

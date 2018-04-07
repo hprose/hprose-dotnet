@@ -19,6 +19,6 @@
 
 namespace Hprose.IO.Serializers {
     class UInt16Serializer : Serializer<ushort> {
-        public override void Serialize(Writer writer, ushort obj) => ValueWriter.Write(writer.Stream, obj);
+        public override void Write(Writer writer, ushort obj) => ValueWriter.Write(writer.Stream, obj);
     }
 }

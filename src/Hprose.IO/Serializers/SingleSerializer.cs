@@ -19,6 +19,6 @@
 
 namespace Hprose.IO.Serializers {
     class SingleSerializer : Serializer<float> {
-        public override void Serialize(Writer writer, float obj) => ValueWriter.Write(writer.Stream, obj);
+        public override void Write(Writer writer, float obj) => ValueWriter.Write(writer.Stream, obj);
     }
 }

@@ -21,6 +21,6 @@ using System;
 
 namespace Hprose.IO.Serializers {
     class UIntPtrSerializer : Serializer<UIntPtr> {
-        public override void Serialize(Writer writer, UIntPtr obj) => ValueWriter.Write(writer.Stream, obj);
+        public override void Write(Writer writer, UIntPtr obj) => ValueWriter.Write(writer.Stream, obj);
     }
 }

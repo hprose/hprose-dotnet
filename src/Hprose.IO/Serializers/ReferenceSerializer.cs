@@ -21,7 +21,7 @@ namespace Hprose.IO.Serializers {
     public abstract class ReferenceSerializer<T> : Serializer<T> {
 
         // write your actual serialization code in sub class
-        public virtual void Write(Writer writer, T obj) => writer.SetRef(obj);
+        public override void Write(Writer writer, T obj) => writer.SetRef(obj);
 
         public override void Serialize(Writer writer, T obj) {
             if (obj != null) {

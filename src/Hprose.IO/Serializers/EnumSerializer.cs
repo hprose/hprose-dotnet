@@ -21,7 +21,7 @@ using System;
 
 namespace Hprose.IO.Serializers {
     class EnumSerializer<T> : Serializer<T> where T : struct, IComparable, IConvertible, IFormattable {
-        public override void Serialize(Writer writer, T obj) {
+        public override void Write(Writer writer, T obj) {
             switch (obj.GetTypeCode()) {
                 case TypeCode.Int32:
                     ValueWriter.Write(writer.Stream, obj.ToInt32(null));

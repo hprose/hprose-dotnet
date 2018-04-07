@@ -29,6 +29,7 @@ using Hprose.Collections.Generic;
 
 namespace Hprose.IO.Serializers {
     internal interface ISerializer {
+        void Write(Writer writer, object obj);
         void Serialize(Writer writer, object obj);
     }
 
@@ -43,7 +44,9 @@ namespace Hprose.IO.Serializers {
                 return _instance;
             }
         }
-        public abstract void Serialize(Writer writer, T obj);
+        public abstract void Write(Writer writer, T obj);
+        public virtual void Serialize(Writer writer, T obj) => Write(writer, obj);
+        void ISerializer.Write(Writer writer, object obj) => Write(writer, (T)obj);
         void ISerializer.Serialize(Writer writer, object obj) => Serialize(writer, (T)obj);
     }
 
@@ -193,6 +196,15 @@ namespace Hprose.IO.Serializers {
             }
             else {
                 GetInstance(obj.GetType()).Serialize(writer, obj);
+            }
+        }
+
+        public override void Write(Writer writer, object obj) {
+            if (obj == null) {
+                writer.Stream.WriteByte(HproseTags.TagNull);
+            }
+            else {
+                GetInstance(obj.GetType()).Write(writer, obj);
             }
         }
     }

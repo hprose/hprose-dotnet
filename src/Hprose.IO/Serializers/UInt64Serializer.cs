@@ -19,6 +19,6 @@
 
 namespace Hprose.IO.Serializers {
     class UInt64Serializer : Serializer<ulong> {
-        public override void Serialize(Writer writer, ulong obj) => ValueWriter.Write(writer.Stream, obj);
+        public override void Write(Writer writer, ulong obj) => ValueWriter.Write(writer.Stream, obj);
     }
 }

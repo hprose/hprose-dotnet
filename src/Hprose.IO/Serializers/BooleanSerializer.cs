@@ -19,6 +19,6 @@
 
 namespace Hprose.IO.Serializers {
     class BooleanSerializer : Serializer<bool> {
-        public override void Serialize(Writer writer, bool obj) => ValueWriter.Write(writer.Stream, obj);
+        public override void Write(Writer writer, bool obj) => ValueWriter.Write(writer.Stream, obj);
     }
 }

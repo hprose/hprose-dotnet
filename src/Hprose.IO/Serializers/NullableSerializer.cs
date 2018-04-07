@@ -19,7 +19,7 @@
 
 namespace Hprose.IO.Serializers {
     class NullableSerializer<T> : Serializer<T?> where T : struct {
-        public override void Serialize(Writer writer, T? obj) {
+        public override void Write(Writer writer, T? obj) {
             if (obj.HasValue) {
                 Serializer<T>.Instance.Serialize(writer, obj.Value);
             }

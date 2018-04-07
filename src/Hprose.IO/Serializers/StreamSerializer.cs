@@ -24,6 +24,9 @@ using static Hprose.IO.HproseTags;
 namespace Hprose.IO.Serializers {
     class StreamSerializer<T> : ReferenceSerializer<T> where T : Stream {
         public override void Write(Writer writer, T obj) {
+            if (!obj.CanRead) {
+                throw new IOException("This stream can't support serialize.");
+            }
             base.Write(writer, obj);
             var stream = writer.Stream;
             long oldPos = 0;
@@ -45,12 +48,6 @@ namespace Hprose.IO.Serializers {
             if (obj.CanSeek) {
                 obj.Position = oldPos;
             }
-        }
-        public override void Serialize(Writer writer, T obj) {
-            if (!obj.CanRead) {
-                throw new IOException("This stream can't support serialize.");
-            }
-            base.Serialize(writer, obj);
         }
     }
 }
