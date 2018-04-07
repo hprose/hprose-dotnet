@@ -12,7 +12,7 @@
  *                                                        *
  * hprose ClassManager class for C#.                      *
  *                                                        *
- * LastModified: Apr 3, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -36,7 +36,7 @@ namespace Hprose.IO {
         public static void Register<T>(string name = null) {
             Type type = typeof(T);
             if (name == null || name.Length == 0) {
-                name = type.GetCustomAttribute<DataContractAttribute>()?.Name ?? type.FullName;
+                name = type.GetCustomAttribute<DataContractAttribute>()?.Name ?? type.ToString();
             }
             name = name.Replace('.', '_').Replace('+', '_');
             int index = name.IndexOf('`');
