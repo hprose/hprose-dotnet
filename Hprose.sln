@@ -25,8 +25,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hprose.UnitTests", "tests\H
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hprose.Benchmark", "tests\Hprose.Benchmark\Hprose.Benchmark.csproj", "{3CF692BC-DF52-4FBA-BE0F-7644909A08CD}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "System", "src\System\System.shproj", "{9C694A86-7F06-41CF-A3D5-9113A7591EC0}"
-EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		src\Hprose.Common\Hprose.Common.projitems*{12dbe6fd-77f9-47a5-b255-056a9b23496a}*SharedItemsImports = 13
@@ -34,7 +32,6 @@ Global
 		src\Hprose.IO\Hprose.IO.projitems*{3bbafd96-bce6-4d52-a2b4-8abd2250465f}*SharedItemsImports = 13
 		src\Hprose.Server\Hprose.Server.projitems*{4221bd53-5c13-4aa8-98f7-15fe52d91aaf}*SharedItemsImports = 13
 		src\Hprose.Collections\Hprose.Collections.projitems*{645ef886-f73b-46a5-a484-7ebe81209303}*SharedItemsImports = 13
-		src\System\System.projitems*{9c694a86-7f06-41cf-a3d5-9113a7591ec0}*SharedItemsImports = 13
 		src\Hprose.Reflection\Hprose.Reflection.projitems*{e6d9923e-bab1-42c5-8f14-54e5df7cdbc0}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -109,7 +106,6 @@ Global
 		{4221BD53-5C13-4AA8-98F7-15FE52D91AAF} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
 		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E} = {30A67E52-BF38-4C95-8A80-B0A4F98658B2}
 		{3CF692BC-DF52-4FBA-BE0F-7644909A08CD} = {30A67E52-BF38-4C95-8A80-B0A4F98658B2}
-		{9C694A86-7F06-41CF-A3D5-9113A7591EC0} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2EEAB779-9719-4703-8BDF-9C5F995D8A68}

@@ -12,7 +12,7 @@
  *                                                        *
  * FieldsAccessor class for C#.                           *
  *                                                        *
- * LastModified: Apr 6, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -37,7 +37,7 @@ namespace Hprose.IO.Accessors {
             while (type != typeof(object) && type.IsSerializable) {
                 var fields = type.GetFields(flags);
                 foreach (var field in fields) {
-                    var dataMember = field.GetCustomAttribute<DataMemberAttribute>(false);
+                    var dataMember = Attribute.GetCustomAttribute(field, typeof(DataMemberAttribute), false) as DataMemberAttribute;
                     string name;
                     if (!field.IsDefined(ignoreDataMember, false) &&
                         !field.IsNotSerialized &&
@@ -48,7 +48,7 @@ namespace Hprose.IO.Accessors {
                 type = type.BaseType;
             }
             return (from entry in members
-                    orderby entry.Value.GetCustomAttribute<DataMemberAttribute>(false)?.Order ?? 0
+                    orderby (Attribute.GetCustomAttribute(entry.Value, typeof(DataMemberAttribute), false) as DataMemberAttribute)?.Order ?? 0
                     select entry).ToDictionary(
                         pair => pair.Key,
                         pair => pair.Value,

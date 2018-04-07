@@ -24,6 +24,4 @@
 
   <Import Project="..\..\src\Hprose.Reflection\Hprose.Reflection.projitems" Label="Shared" />
 
-  <Import Project="..\..\src\System\System.projitems" Label="Shared" />
-
 </Project>

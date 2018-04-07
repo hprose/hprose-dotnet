@@ -12,7 +12,7 @@
  *                                                        *
  * PropertiesAccessor class for C#.                       *
  *                                                        *
- * LastModified: Apr 6, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -36,7 +36,7 @@ namespace Hprose.IO.Accessors {
             var ignoreDataMember = typeof(IgnoreDataMemberAttribute);
             var properties = type.GetProperties(flags);
             foreach (var property in properties) {
-                var dataMember = property.GetCustomAttribute<DataMemberAttribute>(false);
+                var dataMember = Attribute.GetCustomAttribute(property, typeof(DataMemberAttribute), false) as DataMemberAttribute;
                 string name;
                 if (property.CanRead && property.CanWrite &&
                     !property.IsDefined(ignoreDataMember, false) &&
@@ -46,7 +46,7 @@ namespace Hprose.IO.Accessors {
                 }
             }
             return (from entry in members
-                    orderby entry.Value.GetCustomAttribute<DataMemberAttribute>(false)?.Order ?? 0
+                    orderby (Attribute.GetCustomAttribute(entry.Value, typeof(DataMemberAttribute), false) as DataMemberAttribute)?.Order ?? 0
                     select entry).ToDictionary(
                         pair => pair.Key,
                         pair => pair.Value,
