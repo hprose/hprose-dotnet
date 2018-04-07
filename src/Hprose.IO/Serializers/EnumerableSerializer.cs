@@ -12,7 +12,7 @@
  *                                                        *
  * EnumerableSerializer class for C#.                     *
  *                                                        *
- * LastModified: Apr 1, 2018                              *
+ * LastModified: Apr 7, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -108,6 +108,9 @@ namespace Hprose.IO.Serializers {
                 if (!(value is DictionaryEntry)) {
                     isMap = false;
                 }
+            }
+            if (length == 0) {
+                isMap = false;
             }
             stream.WriteByte(isMap ? TagMap : TagList);
             if (length > 0) {
