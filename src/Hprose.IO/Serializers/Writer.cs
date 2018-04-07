@@ -46,7 +46,7 @@ namespace Hprose.IO.Serializers {
 
         internal void SetRef(object obj) => _refer?.Set(obj);
 
-        internal void AddCount(int count) => _refer?.AddCount(count);
+        public void AddCount(int count) => _refer?.AddCount(count);
 
         public int WriteMetaData(object type, Action action) {
             if (!_ref.TryGetValue(type, out int r)) {
