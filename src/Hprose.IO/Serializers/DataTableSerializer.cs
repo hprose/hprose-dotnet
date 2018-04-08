@@ -40,7 +40,7 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagOpenbrace);
             var columns = obj.Columns;
             int count = columns.Count;
-            int r = writer.WriteMetaData(columns, () => {
+            int r = writer.WriteClass(columns, () => {
                 stream.WriteByte(TagClass);
                 ValueWriter.Write(stream, obj.TableName);
                 ValueWriter.Write(stream, count);

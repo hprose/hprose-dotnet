@@ -52,7 +52,7 @@ namespace Hprose.IO.Serializers {
 
         public void AddCount(int count) => _refer?.AddCount(count);
 
-        public int WriteMetaData(object type, Action action) {
+        public int WriteClass(object type, Action action) {
             if (!_ref.TryGetValue(type, out int r)) {
                 action();
                 r = _last++;

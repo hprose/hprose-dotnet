@@ -114,7 +114,7 @@ namespace Hprose.IO.Serializers {
             int count = membersWriter.Count;
             var stream = writer.Stream;
             var type = typeof(T);
-            int r = writer.WriteMetaData(type, () => {
+            int r = writer.WriteClass(type, () => {
                 byte[] data = membersWriter.MetaData;
                 stream.Write(data, 0, data.Length);
                 writer.AddCount(count);
