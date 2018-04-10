@@ -36,7 +36,7 @@ namespace Hprose.IO.Deserializers {
                 case TagInteger:
                     return ValueReader.ReadInt(stream) != 0;
                 case TagLong:
-                    return ValueReader.ReadLong(stream) != 0;
+                    return !ValueReader.ReadBigInteger(stream).IsZero;
                 case TagDouble:
                     return ValueReader.ReadDouble(stream) != 0;
                 case TagUTF8Char:
