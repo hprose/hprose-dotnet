@@ -48,21 +48,21 @@ namespace Hprose.IO.Converters {
         static readonly ConcurrentDictionary<Type, Lazy<IConverter>> _converters = new ConcurrentDictionary<Type, Lazy<IConverter>>();
         static Converter() {
             Register(() => new Converter());
-            Register(() => new NumberConverter<bool>());
-            Register(() => new NumberConverter<byte>());
-            Register(() => new NumberConverter<sbyte>());
-            Register(() => new NumberConverter<short>());
-            Register(() => new NumberConverter<ushort>());
-            Register(() => new NumberConverter<int>());
-            Register(() => new NumberConverter<uint>());
             Register(() => new Int64Converter());
-            Register(() => new NumberConverter<ulong>());
-            Register(() => new NumberConverter<float>());
-            Register(() => new NumberConverter<double>());
-            Register(() => new NumberConverter<decimal>());
-            Register(() => new NumberConverter<IntPtr>());
-            Register(() => new NumberConverter<UIntPtr>());
-            Register(() => new NumberConverter<BigInteger>());
+            Register(() => new BaseConverter<bool>());
+            Register(() => new BaseConverter<byte>());
+            Register(() => new BaseConverter<sbyte>());
+            Register(() => new BaseConverter<short>());
+            Register(() => new BaseConverter<ushort>());
+            Register(() => new BaseConverter<int>());
+            Register(() => new BaseConverter<uint>());
+            Register(() => new BaseConverter<ulong>());
+            Register(() => new BaseConverter<float>());
+            Register(() => new BaseConverter<double>());
+            Register(() => new BaseConverter<decimal>());
+            //Register(() => new BaseConverter<IntPtr>());
+            //Register(() => new BaseConverter<UIntPtr>());
+            //Register(() => new BaseConverter<BigInteger>());
         }
 
         public static void Initialize() { }
