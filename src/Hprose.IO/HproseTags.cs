@@ -12,7 +12,7 @@
  *                                                        *
  * hprose tags class for C#.                              *
  *                                                        *
- * LastModified: Mar 28, 2018                             *
+ * LastModified: Apr 10, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -56,5 +56,42 @@ namespace Hprose.IO {
         public const byte TagArgument = (byte)'A';
         public const byte TagError = (byte)'E';
         public const byte TagEnd = (byte)'z';
+
+        public static string ToString(int tag) {
+            switch (tag) {
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                case TagInteger: return "Int32";
+                case TagLong: return "BigInteger";
+                case TagDouble: return "Double";
+                case TagNull: return "Null";
+                case TagEmpty: return "Empty String";
+                case TagTrue: return "Boolean True";
+                case TagFalse: return "Boolean False";
+                case TagNaN: return "NaN";
+                case TagInfinity: return "Infinity";
+                case TagDate: return "DateTime";
+                case TagTime: return "DateTime";
+                case TagBytes: return "Byte[]";
+                case TagUTF8Char: return "Char";
+                case TagString: return "String";
+                case TagGuid: return "Guid";
+                case TagList: return "IList";
+                case TagMap: return "IDictionary";
+                case TagClass: return "Class";
+                case TagObject: return "Object";
+                case TagRef: return "Object Reference";
+                case TagError: return "Error";
+                default: return "Unexpected Tag: 0x" + (tag & 0xff).ToString("x2");
+            }
+        }
     }
 }
