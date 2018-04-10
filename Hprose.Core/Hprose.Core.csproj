@@ -85,8 +85,6 @@
 
   <Import Project="..\src\Hprose.Reflection\Hprose.Reflection.projitems" Label="Shared" />
 
-  <Import Condition=" $(TargetFramework.StartsWith('net40')) " Project="..\src\System\System.projitems" Label="Shared" />
-
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <PropertyGroup Condition=" '$(TargetFrameworkIdentifier)' != '' ">
       <Product>Hprose.Core for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion)</Product>
