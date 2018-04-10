@@ -79,8 +79,8 @@ namespace Hprose.IO.Deserializers {
             Register(() => new UInt32Deserializer());
             Register(() => new Int64Deserializer());
             Register(() => new UInt64Deserializer());
-            //Register(() => new SingleSerializer());
-            //Register(() => new DoubleSerializer());
+            Register(() => new SingleDeserializer());
+            Register(() => new DoubleDeserializer());
             //Register(() => new DecimalSerializer());
             //Register(() => new IntPtrSerializer());
             //Register(() => new UIntPtrSerializer());

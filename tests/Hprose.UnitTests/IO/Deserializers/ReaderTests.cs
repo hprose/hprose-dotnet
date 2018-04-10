@@ -32,17 +32,17 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(3.14);
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
-                Assert.AreEqual(reader.Deserialize<byte>(), 0);
-                Assert.AreEqual(reader.Deserialize<byte>(), 1);
-                Assert.AreEqual(reader.Deserialize<byte>(), 0);
-                Assert.AreEqual(reader.Deserialize<byte>(), 0);
-                Assert.AreEqual(reader.Deserialize<byte>(), 0);
-                Assert.AreEqual(reader.Deserialize<byte>(), 1);
-                Assert.AreEqual(reader.Deserialize<byte>(), 0x23);
-                Assert.AreEqual(reader.Deserialize<byte>(), 0x23);
-                Assert.AreEqual(reader.Deserialize<byte>(), 123);
-                Assert.AreEqual(reader.Deserialize<byte>(), byte.MaxValue - 123 + 1);
-                Assert.AreEqual(reader.Deserialize<byte>(), 3);
+                Assert.AreEqual(0, reader.Deserialize<byte>());
+                Assert.AreEqual(1, reader.Deserialize<byte>());
+                Assert.AreEqual(0, reader.Deserialize<byte>());
+                Assert.AreEqual(0, reader.Deserialize<byte>());
+                Assert.AreEqual(0, reader.Deserialize<byte>());
+                Assert.AreEqual(1, reader.Deserialize<byte>());
+                Assert.AreEqual(0x23, reader.Deserialize<byte>());
+                Assert.AreEqual(0x23, reader.Deserialize<byte>());
+                Assert.AreEqual(123, reader.Deserialize<byte>());
+                Assert.AreEqual(byte.MaxValue - 123 + 1, reader.Deserialize<byte>());
+                Assert.AreEqual(3, reader.Deserialize<byte>());
             }
         }
         [TestMethod]
@@ -62,17 +62,17 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(3.14);
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
-                Assert.AreEqual(reader.Deserialize<sbyte>(), 0);
-                Assert.AreEqual(reader.Deserialize<sbyte>(), 1);
-                Assert.AreEqual(reader.Deserialize<sbyte>(), 0);
-                Assert.AreEqual(reader.Deserialize<sbyte>(), 0);
-                Assert.AreEqual(reader.Deserialize<sbyte>(), 0);
-                Assert.AreEqual(reader.Deserialize<sbyte>(), 1);
-                Assert.AreEqual(reader.Deserialize<sbyte>(), 0x23);
-                Assert.AreEqual(reader.Deserialize<sbyte>(), 0x23);
-                Assert.AreEqual(reader.Deserialize<sbyte>(), 123);
-                Assert.AreEqual(reader.Deserialize<sbyte>(), -123);
-                Assert.AreEqual(reader.Deserialize<sbyte>(), 3);
+                Assert.AreEqual(0, reader.Deserialize<sbyte>());
+                Assert.AreEqual(1, reader.Deserialize<sbyte>());
+                Assert.AreEqual(0, reader.Deserialize<sbyte>());
+                Assert.AreEqual(0, reader.Deserialize<sbyte>());
+                Assert.AreEqual(0, reader.Deserialize<sbyte>());
+                Assert.AreEqual(1, reader.Deserialize<sbyte>());
+                Assert.AreEqual(0x23, reader.Deserialize<sbyte>());
+                Assert.AreEqual(0x23, reader.Deserialize<sbyte>());
+                Assert.AreEqual(123, reader.Deserialize<sbyte>());
+                Assert.AreEqual(-123, reader.Deserialize<sbyte>());
+                Assert.AreEqual(3, reader.Deserialize<sbyte>());
             }
         }
         [TestMethod]
@@ -92,17 +92,17 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(3.14);
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
-                Assert.AreEqual(reader.Deserialize<short>(), 0);
-                Assert.AreEqual(reader.Deserialize<short>(), 1);
-                Assert.AreEqual(reader.Deserialize<short>(), 0);
-                Assert.AreEqual(reader.Deserialize<short>(), 0);
-                Assert.AreEqual(reader.Deserialize<short>(), 0);
-                Assert.AreEqual(reader.Deserialize<short>(), 1);
-                Assert.AreEqual(reader.Deserialize<short>(), 0x23);
-                Assert.AreEqual(reader.Deserialize<short>(), 0x23);
-                Assert.AreEqual(reader.Deserialize<short>(), 123);
-                Assert.AreEqual(reader.Deserialize<short>(), -123);
-                Assert.AreEqual(reader.Deserialize<short>(), 3);
+                Assert.AreEqual(0, reader.Deserialize<short>());
+                Assert.AreEqual(1, reader.Deserialize<short>());
+                Assert.AreEqual(0, reader.Deserialize<short>());
+                Assert.AreEqual(0, reader.Deserialize<short>());
+                Assert.AreEqual(0, reader.Deserialize<short>());
+                Assert.AreEqual(1, reader.Deserialize<short>());
+                Assert.AreEqual(0x23, reader.Deserialize<short>());
+                Assert.AreEqual(0x23, reader.Deserialize<short>());
+                Assert.AreEqual(123, reader.Deserialize<short>());
+                Assert.AreEqual(-123, reader.Deserialize<short>());
+                Assert.AreEqual(3, reader.Deserialize<short>());
             }
         }
         [TestMethod]
@@ -122,17 +122,17 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(3.14);
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
-                Assert.AreEqual(reader.Deserialize<ushort>(), 0);
-                Assert.AreEqual(reader.Deserialize<ushort>(), 1);
-                Assert.AreEqual(reader.Deserialize<ushort>(), 0);
-                Assert.AreEqual(reader.Deserialize<ushort>(), 0);
-                Assert.AreEqual(reader.Deserialize<ushort>(), 0);
-                Assert.AreEqual(reader.Deserialize<ushort>(), 1);
-                Assert.AreEqual(reader.Deserialize<ushort>(), 0x23);
-                Assert.AreEqual(reader.Deserialize<ushort>(), 0x23);
-                Assert.AreEqual(reader.Deserialize<ushort>(), 123);
-                Assert.AreEqual(reader.Deserialize<ushort>(), ushort.MaxValue - 123 + 1);
-                Assert.AreEqual(reader.Deserialize<ushort>(), 3);
+                Assert.AreEqual(0, reader.Deserialize<ushort>());
+                Assert.AreEqual(1, reader.Deserialize<ushort>());
+                Assert.AreEqual(0, reader.Deserialize<ushort>());
+                Assert.AreEqual(0, reader.Deserialize<ushort>());
+                Assert.AreEqual(0, reader.Deserialize<ushort>());
+                Assert.AreEqual(1, reader.Deserialize<ushort>());
+                Assert.AreEqual(0x23, reader.Deserialize<ushort>());
+                Assert.AreEqual(0x23, reader.Deserialize<ushort>());
+                Assert.AreEqual(123, reader.Deserialize<ushort>());
+                Assert.AreEqual(ushort.MaxValue - 123 + 1, reader.Deserialize<ushort>());
+                Assert.AreEqual(3, reader.Deserialize<ushort>());
             }
         }
         [TestMethod]
@@ -152,17 +152,17 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(3.14);
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
-                Assert.AreEqual(reader.Deserialize<int>(), 0);
-                Assert.AreEqual(reader.Deserialize<int>(), 1);
-                Assert.AreEqual(reader.Deserialize<int>(), 0);
-                Assert.AreEqual(reader.Deserialize<int>(), 0);
-                Assert.AreEqual(reader.Deserialize<int>(), 0);
-                Assert.AreEqual(reader.Deserialize<int>(), 1);
-                Assert.AreEqual(reader.Deserialize<int>(), 0x23);
-                Assert.AreEqual(reader.Deserialize<int>(), 0x23);
-                Assert.AreEqual(reader.Deserialize<int>(), 123);
-                Assert.AreEqual(reader.Deserialize<int>(), -123);
-                Assert.AreEqual(reader.Deserialize<int>(), 3);
+                Assert.AreEqual(0, reader.Deserialize<int>());
+                Assert.AreEqual(1, reader.Deserialize<int>());
+                Assert.AreEqual(0, reader.Deserialize<int>());
+                Assert.AreEqual(0, reader.Deserialize<int>());
+                Assert.AreEqual(0, reader.Deserialize<int>());
+                Assert.AreEqual(1, reader.Deserialize<int>());
+                Assert.AreEqual(0x23, reader.Deserialize<int>());
+                Assert.AreEqual(0x23, reader.Deserialize<int>());
+                Assert.AreEqual(123, reader.Deserialize<int>());
+                Assert.AreEqual(-123, reader.Deserialize<int>());
+                Assert.AreEqual(3, reader.Deserialize<int>());
             }
         }
         [TestMethod]
@@ -182,17 +182,17 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(3.14);
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
-                Assert.AreEqual(reader.Deserialize<uint>(), 0u);
-                Assert.AreEqual(reader.Deserialize<uint>(), 1u);
-                Assert.AreEqual(reader.Deserialize<uint>(), 0u);
-                Assert.AreEqual(reader.Deserialize<uint>(), 0u);
-                Assert.AreEqual(reader.Deserialize<uint>(), 0u);
-                Assert.AreEqual(reader.Deserialize<uint>(), 1u);
-                Assert.AreEqual(reader.Deserialize<uint>(), 0x23u);
-                Assert.AreEqual(reader.Deserialize<uint>(), 0x23u);
-                Assert.AreEqual(reader.Deserialize<uint>(), 123u);
-                Assert.AreEqual(reader.Deserialize<uint>(), uint.MaxValue - 123 + 1);
-                Assert.AreEqual(reader.Deserialize<uint>(), 3u);
+                Assert.AreEqual(0u, reader.Deserialize<uint>());
+                Assert.AreEqual(1u, reader.Deserialize<uint>());
+                Assert.AreEqual(0u, reader.Deserialize<uint>());
+                Assert.AreEqual(0u, reader.Deserialize<uint>());
+                Assert.AreEqual(0u, reader.Deserialize<uint>());
+                Assert.AreEqual(1u, reader.Deserialize<uint>());
+                Assert.AreEqual(0x23u, reader.Deserialize<uint>());
+                Assert.AreEqual(0x23u, reader.Deserialize<uint>());
+                Assert.AreEqual(123u, reader.Deserialize<uint>());
+                Assert.AreEqual(uint.MaxValue - 123 + 1, reader.Deserialize<uint>());
+                Assert.AreEqual(3u, reader.Deserialize<uint>());
             }
         }
         [TestMethod]
@@ -214,19 +214,19 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(new DateTime(1234567890123456789));
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
-                Assert.AreEqual(reader.Deserialize<long>(), 0L);
-                Assert.AreEqual(reader.Deserialize<long>(), 1L);
-                Assert.AreEqual(reader.Deserialize<long>(), 0L);
-                Assert.AreEqual(reader.Deserialize<long>(), 0L);
-                Assert.AreEqual(reader.Deserialize<long>(), 0L);
-                Assert.AreEqual(reader.Deserialize<long>(), 1L);
-                Assert.AreEqual(reader.Deserialize<long>(), 0x23L);
-                Assert.AreEqual(reader.Deserialize<long>(), 0x23L);
-                Assert.AreEqual(reader.Deserialize<long>(), 123L);
-                Assert.AreEqual(reader.Deserialize<long>(), -123L);
-                Assert.AreEqual(reader.Deserialize<long>(), 3L);
-                Assert.AreEqual(reader.Deserialize<long>(), 1234567890123456789);
-                Assert.AreEqual(reader.Deserialize<long>(), 1234567890123456789);
+                Assert.AreEqual(0L, reader.Deserialize<long>());
+                Assert.AreEqual(1L, reader.Deserialize<long>());
+                Assert.AreEqual(0L, reader.Deserialize<long>());
+                Assert.AreEqual(0L, reader.Deserialize<long>());
+                Assert.AreEqual(0L, reader.Deserialize<long>());
+                Assert.AreEqual(1L, reader.Deserialize<long>());
+                Assert.AreEqual(0x23L, reader.Deserialize<long>());
+                Assert.AreEqual(0x23L, reader.Deserialize<long>());
+                Assert.AreEqual(123L, reader.Deserialize<long>());
+                Assert.AreEqual(-123L, reader.Deserialize<long>());
+                Assert.AreEqual(3L, reader.Deserialize<long>());
+                Assert.AreEqual(1234567890123456789, reader.Deserialize<long>());
+                Assert.AreEqual(1234567890123456789, reader.Deserialize<long>());
             }
         }
         [TestMethod]
@@ -246,17 +246,17 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(3.14);
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
-                Assert.AreEqual(reader.Deserialize<ulong>(), 0uL);
-                Assert.AreEqual(reader.Deserialize<ulong>(), 1uL);
-                Assert.AreEqual(reader.Deserialize<ulong>(), 0uL);
-                Assert.AreEqual(reader.Deserialize<ulong>(), 0uL);
-                Assert.AreEqual(reader.Deserialize<ulong>(), 0uL);
-                Assert.AreEqual(reader.Deserialize<ulong>(), 1uL);
-                Assert.AreEqual(reader.Deserialize<ulong>(), 0x23uL);
-                Assert.AreEqual(reader.Deserialize<ulong>(), 0x23uL);
-                Assert.AreEqual(reader.Deserialize<ulong>(), 123uL);
-                Assert.AreEqual(reader.Deserialize<ulong>(), ulong.MaxValue - 123 + 1);
-                Assert.AreEqual(reader.Deserialize<ulong>(), 3uL);
+                Assert.AreEqual(0uL, reader.Deserialize<ulong>());
+                Assert.AreEqual(1uL, reader.Deserialize<ulong>());
+                Assert.AreEqual(0uL, reader.Deserialize<ulong>());
+                Assert.AreEqual(0uL, reader.Deserialize<ulong>());
+                Assert.AreEqual(0uL, reader.Deserialize<ulong>());
+                Assert.AreEqual(1uL, reader.Deserialize<ulong>());
+                Assert.AreEqual(0x23uL, reader.Deserialize<ulong>());
+                Assert.AreEqual(0x23uL, reader.Deserialize<ulong>());
+                Assert.AreEqual(123uL, reader.Deserialize<ulong>());
+                Assert.AreEqual(ulong.MaxValue - 123 + 1, reader.Deserialize<ulong>());
+                Assert.AreEqual(3uL, reader.Deserialize<ulong>());
             }
         }
         [TestMethod]
@@ -280,21 +280,93 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(double.PositiveInfinity);
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
-                Assert.AreEqual(reader.Deserialize<bool>(), false);
-                Assert.AreEqual(reader.Deserialize<bool>(), true);
-                Assert.AreEqual(reader.Deserialize<bool>(), false);
-                Assert.AreEqual(reader.Deserialize<bool>(), false);
-                Assert.AreEqual(reader.Deserialize<bool>(), false);
-                Assert.AreEqual(reader.Deserialize<bool>(), false);
-                Assert.AreEqual(reader.Deserialize<bool>(), true);
-                Assert.AreEqual(reader.Deserialize<bool>(), true);
-                Assert.AreEqual(reader.Deserialize<bool>(), false);
-                Assert.AreEqual(reader.Deserialize<bool>(), true);
-                Assert.AreEqual(reader.Deserialize<bool>(), true);
-                Assert.AreEqual(reader.Deserialize<bool>(), true);
-                Assert.AreEqual(reader.Deserialize<bool>(), true);
-                Assert.AreEqual(reader.Deserialize<bool>(), true);
-                Assert.AreEqual(reader.Deserialize<bool>(), true);
+                Assert.IsFalse(reader.Deserialize<bool>());
+                Assert.IsTrue(reader.Deserialize<bool>());
+                Assert.IsFalse(reader.Deserialize<bool>());
+                Assert.IsFalse(reader.Deserialize<bool>());
+                Assert.IsFalse(reader.Deserialize<bool>());
+                Assert.IsFalse(reader.Deserialize<bool>());
+                Assert.IsTrue(reader.Deserialize<bool>());
+                Assert.IsTrue(reader.Deserialize<bool>());
+                Assert.IsFalse(reader.Deserialize<bool>());
+                Assert.IsTrue(reader.Deserialize<bool>());
+                Assert.IsTrue(reader.Deserialize<bool>());
+                Assert.IsTrue(reader.Deserialize<bool>());
+                Assert.IsTrue(reader.Deserialize<bool>());
+                Assert.IsTrue(reader.Deserialize<bool>());
+                Assert.IsTrue(reader.Deserialize<bool>());
+            }
+        }
+        [TestMethod]
+        public void TestDeserializeSingle() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(null);
+                writer.Serialize(true);
+                writer.Serialize(false);
+                writer.Serialize("");
+                writer.Serialize('0');
+                writer.Serialize('1');
+                writer.Serialize("5e2");
+                writer.Serialize("5e2");
+                writer.Serialize((byte)123);
+                writer.Serialize((sbyte)-123);
+                writer.Serialize(3.14);
+                writer.Serialize(double.NaN);
+                writer.Serialize(double.NegativeInfinity);
+                writer.Serialize(double.PositiveInfinity);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(0f, reader.Deserialize<float>());
+                Assert.AreEqual(1f, reader.Deserialize<float>());
+                Assert.AreEqual(0f, reader.Deserialize<float>());
+                Assert.AreEqual(0f, reader.Deserialize<float>());
+                Assert.AreEqual(0f, reader.Deserialize<float>());
+                Assert.AreEqual(1f, reader.Deserialize<float>());
+                Assert.AreEqual(5e2f, reader.Deserialize<float>());
+                Assert.AreEqual(5e2f, reader.Deserialize<float>());
+                Assert.AreEqual(123f, reader.Deserialize<float>());
+                Assert.AreEqual(-123f, reader.Deserialize<float>());
+                Assert.AreEqual(3.14f, reader.Deserialize<float>());
+                Assert.IsTrue(float.IsNaN(reader.Deserialize<float>()));
+                Assert.IsTrue(float.IsNegativeInfinity(reader.Deserialize<float>()));
+                Assert.IsTrue(float.IsPositiveInfinity(reader.Deserialize<float>()));
+            }
+        }
+        [TestMethod]
+        public void TestDeserializeDouble() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(null);
+                writer.Serialize(true);
+                writer.Serialize(false);
+                writer.Serialize("");
+                writer.Serialize('0');
+                writer.Serialize('1');
+                writer.Serialize("5e2");
+                writer.Serialize("5e2");
+                writer.Serialize((byte)123);
+                writer.Serialize((sbyte)-123);
+                writer.Serialize(3.14);
+                writer.Serialize(double.NaN);
+                writer.Serialize(double.NegativeInfinity);
+                writer.Serialize(double.PositiveInfinity);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(0, reader.Deserialize<double>());
+                Assert.AreEqual(1, reader.Deserialize<double>());
+                Assert.AreEqual(0, reader.Deserialize<double>());
+                Assert.AreEqual(0, reader.Deserialize<double>());
+                Assert.AreEqual(0, reader.Deserialize<double>());
+                Assert.AreEqual(1, reader.Deserialize<double>());
+                Assert.AreEqual(5e2, reader.Deserialize<double>());
+                Assert.AreEqual(5e2, reader.Deserialize<double>());
+                Assert.AreEqual(123, reader.Deserialize<double>());
+                Assert.AreEqual(-123, reader.Deserialize<double>());
+                Assert.AreEqual(3.14, reader.Deserialize<double>());
+                Assert.IsTrue(double.IsNaN(reader.Deserialize<double>()));
+                Assert.IsTrue(double.IsNegativeInfinity(reader.Deserialize<double>()));
+                Assert.IsTrue(double.IsPositiveInfinity(reader.Deserialize<double>()));
             }
         }
     }

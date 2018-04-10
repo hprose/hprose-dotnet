@@ -16,6 +16,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Int64Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Converter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\SingleDeserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DoubleDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\BooleanDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\Int64Deserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\UInt64Deserializer.cs" />

@@ -87,7 +87,7 @@ namespace Hprose.IO.Deserializers {
             return result;
         }
 
-        public static float ReadLongAsFloat(Stream stream) {
+        public static float ReadLongAsSingle(Stream stream) {
             float result = 0;
             int i = stream.ReadByte();
             if (i == TagSemicolon) {
@@ -265,7 +265,7 @@ namespace Hprose.IO.Deserializers {
             return BigInteger.Parse(ReadUntil(stream, TagSemicolon).ToString());
         }
 
-        public static float ReadFloat(Stream stream) {
+        public static float ReadSingle(Stream stream) {
             return float.Parse(ReadUntil(stream, TagSemicolon).ToString());
         }
 
@@ -273,7 +273,7 @@ namespace Hprose.IO.Deserializers {
             return double.Parse(ReadUntil(stream, TagSemicolon).ToString());
         }
 
-        public static float ReadFloatInfinity(Stream stream) {
+        public static float ReadSingleInfinity(Stream stream) {
             return (stream.ReadByte() == TagNeg) ? float.NegativeInfinity : float.PositiveInfinity;
         }
 
