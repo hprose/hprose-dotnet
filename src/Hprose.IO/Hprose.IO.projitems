@@ -9,14 +9,28 @@
     <Import_RootNamespace>Hprose.IO</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Converters\" />
-    <Folder Include="$(MSBuildThisFileDirectory)Deserializers\" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\Accessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\FieldsAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\PropertiesAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\MembersAccessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\Int64Converter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\BaseConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\Converter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\BooleanDeserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\Int64Deserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\UInt64Deserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\UInt32Deserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\Int32Deserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\UInt16Deserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\Int16Deserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\SByteDeserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ByteDeserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\Deserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ClassInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ReferenceReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ValueReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ReaderRefer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\Reader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HproseMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClassManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HproseTags.cs" />
