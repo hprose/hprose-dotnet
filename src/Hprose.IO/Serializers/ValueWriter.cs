@@ -12,7 +12,7 @@
  *                                                        *
  * ValueWriter class for C#.                              *
  *                                                        *
- * LastModified: Apr 1, 2018                              *
+ * LastModified: Apr 10, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -209,6 +209,7 @@ namespace Hprose.IO.Serializers {
                 stream.WriteByte(TagDouble);
                 byte[] buf = GetASCII(n.ToString("R"));
                 stream.Write(buf, 0, buf.Length);
+                stream.WriteByte(TagSemicolon);
             }
         }
 
@@ -224,6 +225,7 @@ namespace Hprose.IO.Serializers {
                 stream.WriteByte(TagDouble);
                 byte[] buf = GetASCII(n.ToString("R"));
                 stream.Write(buf, 0, buf.Length);
+                stream.WriteByte(TagSemicolon);
             }
         }
 
@@ -231,6 +233,7 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagDouble);
             byte[] buf = GetASCII(n.ToString());
             stream.Write(buf, 0, buf.Length);
+            stream.WriteByte(TagSemicolon);
         }
 
         public static void Write(Stream stream, BigInteger n) {
@@ -304,18 +307,19 @@ namespace Hprose.IO.Serializers {
             int minute = datetime.Minute;
             int second = datetime.Second;
             int millisecond = datetime.Millisecond;
+            int ticks = (int)(datetime.Ticks % 10000);
             byte tag = (datetime.Kind == DateTimeKind.Utc) ? TagUTC : TagSemicolon;
-            if ((hour == 0) && (minute == 0) && (second == 0) && (millisecond == 0)) {
+            if ((hour == 0) && (minute == 0) && (second == 0) && (millisecond == 0) && (ticks == 0)) {
                 WriteDate(stream, year, month, day);
                 stream.WriteByte(tag);
             }
             else if ((year == 1970) && (month == 1) && (day == 1)) {
-                WriteTime(stream, hour, minute, second, millisecond);
+                WriteTime(stream, hour, minute, second, millisecond, ticks);
                 stream.WriteByte(tag);
             }
             else {
                 WriteDate(stream, year, month, day);
-                WriteTime(stream, hour, minute, second, millisecond);
+                WriteTime(stream, hour, minute, second, millisecond, ticks);
                 stream.WriteByte(tag);
             }
         }
@@ -332,7 +336,7 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte((byte)('0' + (day % 10)));
         }
 
-        public static void WriteTime(Stream stream, int hour, int minute, int second, int millisecond) {
+        public static void WriteTime(Stream stream, int hour, int minute, int second, int millisecond, int ticks) {
             stream.WriteByte(TagTime);
             stream.WriteByte((byte)('0' + (hour / 10 % 10)));
             stream.WriteByte((byte)('0' + (hour % 10)));
@@ -340,11 +344,21 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte((byte)('0' + (minute % 10)));
             stream.WriteByte((byte)('0' + (second / 10 % 10)));
             stream.WriteByte((byte)('0' + (second % 10)));
-            if (millisecond > 0) {
+            if (millisecond > 0 || ticks > 0) {
                 stream.WriteByte(TagPoint);
                 stream.WriteByte((byte)('0' + (millisecond / 100 % 10)));
                 stream.WriteByte((byte)('0' + (millisecond / 10 % 10)));
                 stream.WriteByte((byte)('0' + (millisecond % 10)));
+                if (ticks > 0) {
+                    stream.WriteByte((byte)('0' + (ticks / 1000 % 10)));
+                    stream.WriteByte((byte)('0' + (ticks / 100 % 10)));
+                    stream.WriteByte((byte)('0' + (ticks / 10 % 10)));
+                    if (ticks % 10 > 0) {
+                        stream.WriteByte((byte)('0' + (ticks % 10)));
+                        stream.WriteByte((byte)'0');
+                        stream.WriteByte((byte)'0');
+                    }
+                }
             }
         }
 

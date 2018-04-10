@@ -30,6 +30,37 @@ namespace Hprose.UnitTests.IO.Serializers {
             }
         }
         [TestMethod]
+        public void TestSerializeDateTime() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                DateTime date = new DateTime(2018, 4, 10);
+                writer.Serialize(date);
+                writer.Serialize(date);
+                Assert.AreEqual("D20180410;r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                DateTime date = new DateTime(2018, 4, 10, 13, 31, 34, 567);
+                writer.Serialize(date);
+                writer.Serialize(date);
+                Assert.AreEqual("D20180410T133134.567;r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                DateTime date = new DateTime(1970, 1, 1, 13, 31, 34, 567);
+                writer.Serialize(date);
+                writer.Serialize(date);
+                Assert.AreEqual("T133134.567;r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                DateTime date = new DateTime(123456789);
+                writer.Serialize(date);
+                writer.Serialize(date);
+                Assert.AreEqual("D00010101T000012.345678900;r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+        }
+        [TestMethod]
         public void TestSerializeGuid() {
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
