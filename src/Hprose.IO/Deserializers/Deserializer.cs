@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Deserializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 8, 2018                              *
+ * LastModified: Apr 12, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -81,7 +81,7 @@ namespace Hprose.IO.Deserializers {
             Register(() => new UInt64Deserializer());
             Register(() => new SingleDeserializer());
             Register(() => new DoubleDeserializer());
-            //Register(() => new DecimalSerializer());
+            Register(() => new DecimalDeserializer());
             //Register(() => new IntPtrSerializer());
             //Register(() => new UIntPtrSerializer());
             //Register(() => new BigIntegerSerializer());

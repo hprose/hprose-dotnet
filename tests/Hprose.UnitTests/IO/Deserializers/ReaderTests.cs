@@ -369,5 +369,35 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.IsTrue(double.IsPositiveInfinity(reader.Deserialize<double>()));
             }
         }
+        [TestMethod]
+        public void TestDeserializeDecimal() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(null);
+                writer.Serialize(true);
+                writer.Serialize(false);
+                writer.Serialize("");
+                writer.Serialize('0');
+                writer.Serialize('1');
+                writer.Serialize("-7.9e28");
+                writer.Serialize("-7.9e28");
+                writer.Serialize((byte)123);
+                writer.Serialize((sbyte)-123);
+                writer.Serialize(3.14);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(0m, reader.Deserialize<decimal>());
+                Assert.AreEqual(1m, reader.Deserialize<decimal>());
+                Assert.AreEqual(0m, reader.Deserialize<decimal>());
+                Assert.AreEqual(0m, reader.Deserialize<decimal>());
+                Assert.AreEqual(0m, reader.Deserialize<decimal>());
+                Assert.AreEqual(1m, reader.Deserialize<decimal>());
+                Assert.AreEqual(-7.9e28m, reader.Deserialize<decimal>());
+                Assert.AreEqual(-7.9e28m, reader.Deserialize<decimal>());
+                Assert.AreEqual(123m, reader.Deserialize<decimal>());
+                Assert.AreEqual(-123m, reader.Deserialize<decimal>());
+                Assert.AreEqual(3.14m, reader.Deserialize<decimal>());
+            }
+        }
     }
 }
