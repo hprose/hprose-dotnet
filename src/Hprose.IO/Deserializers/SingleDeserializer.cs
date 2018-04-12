@@ -31,7 +31,7 @@ namespace Hprose.IO.Deserializers {
             switch (tag) {
                 case TagInteger:
                 case TagLong:
-                    return ValueReader.ReadLongAsSingle(stream);
+                    return ValueReader.ReadIntAsSingle(stream);
                 case TagDouble:
                     return ValueReader.ReadSingle(stream);
                 case TagNaN:
