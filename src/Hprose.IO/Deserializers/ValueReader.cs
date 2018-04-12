@@ -87,7 +87,7 @@ namespace Hprose.IO.Deserializers {
             return result;
         }
 
-        public static float ReadLongAsSingle(Stream stream) {
+        public static float ReadIntAsSingle(Stream stream) {
             float result = 0;
             int i = stream.ReadByte();
             if (i == TagSemicolon) {
@@ -117,8 +117,38 @@ namespace Hprose.IO.Deserializers {
             return result;
         }
 
-        public static double ReadLongAsDouble(Stream stream) {
+        public static double ReadIntAsDouble(Stream stream) {
             double result = 0;
+            int i = stream.ReadByte();
+            if (i == TagSemicolon) {
+                return result;
+            }
+            bool neg = false;
+            switch (i) {
+                case '-':
+                    neg = true;
+                    goto case '+';
+                case '+':
+                    i = stream.ReadByte();
+                    break;
+            }
+            if (neg) {
+                while ((i != TagSemicolon) && (i != -1)) {
+                    result = result * 10 - (i - '0');
+                    i = stream.ReadByte();
+                }
+            }
+            else {
+                while ((i != TagSemicolon) && (i != -1)) {
+                    result = result * 10 + (i - '0');
+                    i = stream.ReadByte();
+                }
+            }
+            return result;
+        }
+
+        public static decimal ReadIntAsDecimal(Stream stream) {
+            decimal result = 0;
             int i = stream.ReadByte();
             if (i == TagSemicolon) {
                 return result;
