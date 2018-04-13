@@ -482,18 +482,32 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(3.14);
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
-                Assert.AreEqual((BigInteger)0, reader.Deserialize<BigInteger>());
-                Assert.AreEqual((BigInteger)1, reader.Deserialize<BigInteger>());
-                Assert.AreEqual((BigInteger)0, reader.Deserialize<BigInteger>());
-                Assert.AreEqual((BigInteger)0, reader.Deserialize<BigInteger>());
-                Assert.AreEqual((BigInteger)0, reader.Deserialize<BigInteger>());
-                Assert.AreEqual((BigInteger)1, reader.Deserialize<BigInteger>());
-                Assert.AreEqual((BigInteger)123456789, reader.Deserialize<BigInteger>());
-                Assert.AreEqual((BigInteger)123456789, reader.Deserialize<BigInteger>());
+                Assert.AreEqual(0, reader.Deserialize<BigInteger>());
+                Assert.AreEqual(1, reader.Deserialize<BigInteger>());
+                Assert.AreEqual(0, reader.Deserialize<BigInteger>());
+                Assert.AreEqual(0, reader.Deserialize<BigInteger>());
+                Assert.AreEqual(0, reader.Deserialize<BigInteger>());
+                Assert.AreEqual(1, reader.Deserialize<BigInteger>());
+                Assert.AreEqual(123456789, reader.Deserialize<BigInteger>());
+                Assert.AreEqual(123456789, reader.Deserialize<BigInteger>());
                 Assert.AreEqual(BigInteger.Parse("123456789123456789123456789123456789"), reader.Deserialize<BigInteger>());
-                Assert.AreEqual((BigInteger)123, reader.Deserialize<BigInteger>());
-                Assert.AreEqual((BigInteger)(-123), reader.Deserialize<BigInteger>());
-                Assert.AreEqual((BigInteger)3, reader.Deserialize<BigInteger>());
+                Assert.AreEqual(123, reader.Deserialize<BigInteger>());
+                Assert.AreEqual(-123, reader.Deserialize<BigInteger>());
+                Assert.AreEqual(3, reader.Deserialize<BigInteger>());
+            }
+        }
+        [TestMethod]
+        public void TestDeserializeDBNull() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(null);
+                writer.Serialize(DBNull.Value);
+                writer.Serialize("");
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(DBNull.Value, reader.Deserialize<DBNull>());
+                Assert.AreEqual(DBNull.Value, reader.Deserialize<DBNull>());
+                Assert.AreEqual(DBNull.Value, reader.Deserialize<DBNull>());
             }
         }
     }

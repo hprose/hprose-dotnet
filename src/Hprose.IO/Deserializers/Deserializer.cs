@@ -68,7 +68,7 @@ namespace Hprose.IO.Deserializers {
         static readonly ConcurrentDictionary<Type, Lazy<IDeserializer>> _deserializers = new ConcurrentDictionary<Type, Lazy<IDeserializer>>();
         static Deserializer() {
             Register(() => new Deserializer());
-            //Register(() => new DBNullSerializer());
+            Register(() => new DBNullDeserializer());
             Register(() => new BooleanDeserializer());
             //Register(() => new CharSerializer());
             Register(() => new ByteDeserializer());
