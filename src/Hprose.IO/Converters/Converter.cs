@@ -60,8 +60,6 @@ namespace Hprose.IO.Converters {
             Register(() => new BaseConverter<float>());
             Register(() => new BaseConverter<double>());
             Register(() => new BaseConverter<decimal>());
-            //Register(() => new BaseConverter<IntPtr>());
-            //Register(() => new BaseConverter<UIntPtr>());
             //Register(() => new BaseConverter<BigInteger>());
         }
 

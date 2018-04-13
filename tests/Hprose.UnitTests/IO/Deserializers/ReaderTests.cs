@@ -399,5 +399,69 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual(3.14m, reader.Deserialize<decimal>());
             }
         }
+        [TestMethod]
+        public void TestDeserializeIntPtr() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(null);
+                writer.Serialize(true);
+                writer.Serialize(false);
+                writer.Serialize("");
+                writer.Serialize('0');
+                writer.Serialize('1');
+                writer.Serialize("123456789");
+                writer.Serialize("123456789");
+                writer.Serialize((IntPtr)(123456789));
+                writer.Serialize((byte)123);
+                writer.Serialize((sbyte)-123);
+                writer.Serialize(3.14);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual((IntPtr)0, reader.Deserialize<IntPtr>());
+                Assert.AreEqual((IntPtr)1, reader.Deserialize<IntPtr>());
+                Assert.AreEqual((IntPtr)0, reader.Deserialize<IntPtr>());
+                Assert.AreEqual((IntPtr)0, reader.Deserialize<IntPtr>());
+                Assert.AreEqual((IntPtr)0, reader.Deserialize<IntPtr>());
+                Assert.AreEqual((IntPtr)1, reader.Deserialize<IntPtr>());
+                Assert.AreEqual((IntPtr)123456789, reader.Deserialize<IntPtr>());
+                Assert.AreEqual((IntPtr)123456789, reader.Deserialize<IntPtr>());
+                Assert.AreEqual((IntPtr)123456789, reader.Deserialize<IntPtr>());
+                Assert.AreEqual((IntPtr)123, reader.Deserialize<IntPtr>());
+                Assert.AreEqual((IntPtr)(-123), reader.Deserialize<IntPtr>());
+                Assert.AreEqual((IntPtr)3, reader.Deserialize<IntPtr>());
+            }
+        }
+        [TestMethod]
+        public void TestDeserializeUIntPtr() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(null);
+                writer.Serialize(true);
+                writer.Serialize(false);
+                writer.Serialize("");
+                writer.Serialize('0');
+                writer.Serialize('1');
+                writer.Serialize("123456789");
+                writer.Serialize("123456789");
+                writer.Serialize((UIntPtr)(123456789));
+                writer.Serialize((byte)123);
+                writer.Serialize((sbyte)-123);
+                writer.Serialize(3.14);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual((UIntPtr)0, reader.Deserialize<UIntPtr>());
+                Assert.AreEqual((UIntPtr)1, reader.Deserialize<UIntPtr>());
+                Assert.AreEqual((UIntPtr)0, reader.Deserialize<UIntPtr>());
+                Assert.AreEqual((UIntPtr)0, reader.Deserialize<UIntPtr>());
+                Assert.AreEqual((UIntPtr)0, reader.Deserialize<UIntPtr>());
+                Assert.AreEqual((UIntPtr)1, reader.Deserialize<UIntPtr>());
+                Assert.AreEqual((UIntPtr)123456789, reader.Deserialize<UIntPtr>());
+                Assert.AreEqual((UIntPtr)123456789, reader.Deserialize<UIntPtr>());
+                Assert.AreEqual((UIntPtr)123456789, reader.Deserialize<UIntPtr>());
+                Assert.AreEqual((UIntPtr)123, reader.Deserialize<UIntPtr>());
+                Assert.AreEqual((UIntPtr)(-123), reader.Deserialize<UIntPtr>());
+                Assert.AreEqual((UIntPtr)3, reader.Deserialize<UIntPtr>());
+            }
+        }
     }
 }
