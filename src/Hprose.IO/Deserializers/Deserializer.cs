@@ -84,7 +84,7 @@ namespace Hprose.IO.Deserializers {
             Register(() => new DecimalDeserializer());
             Register(() => new IntPtrDeserializer());
             Register(() => new UIntPtrDeserializer());
-            //Register(() => new BigIntegerSerializer());
+            Register(() => new BigIntegerDeserializer());
             //Register(() => new TimeSpanSerializer());
             //Register(() => new DateTimeSerializer());
             //Register(() => new GuidSerializer());

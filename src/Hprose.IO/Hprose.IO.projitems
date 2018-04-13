@@ -13,10 +13,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\FieldsAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\PropertiesAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\MembersAccessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\BigIntegerConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Int64Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DecimalDeserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\BigIntegerDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\UIntPtrDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\IntPtrDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\SingleDeserializer.cs" />

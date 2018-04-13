@@ -11,6 +11,7 @@ using Hprose.IO.Serializers;
 using Hprose.IO.Deserializers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Numerics;
 
 namespace Hprose.UnitTests.IO.Deserializers {
     [TestClass]
@@ -461,6 +462,38 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual((UIntPtr)123, reader.Deserialize<UIntPtr>());
                 Assert.AreEqual((UIntPtr)(-123), reader.Deserialize<UIntPtr>());
                 Assert.AreEqual((UIntPtr)3, reader.Deserialize<UIntPtr>());
+            }
+        }
+        [TestMethod]
+        public void TestDeserializeBigInteger() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(null);
+                writer.Serialize(true);
+                writer.Serialize(false);
+                writer.Serialize("");
+                writer.Serialize('0');
+                writer.Serialize('1');
+                writer.Serialize("123456789");
+                writer.Serialize("123456789");
+                writer.Serialize(BigInteger.Parse("123456789123456789123456789123456789"));
+                writer.Serialize((byte)123);
+                writer.Serialize((sbyte)-123);
+                writer.Serialize(3.14);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual((BigInteger)0, reader.Deserialize<BigInteger>());
+                Assert.AreEqual((BigInteger)1, reader.Deserialize<BigInteger>());
+                Assert.AreEqual((BigInteger)0, reader.Deserialize<BigInteger>());
+                Assert.AreEqual((BigInteger)0, reader.Deserialize<BigInteger>());
+                Assert.AreEqual((BigInteger)0, reader.Deserialize<BigInteger>());
+                Assert.AreEqual((BigInteger)1, reader.Deserialize<BigInteger>());
+                Assert.AreEqual((BigInteger)123456789, reader.Deserialize<BigInteger>());
+                Assert.AreEqual((BigInteger)123456789, reader.Deserialize<BigInteger>());
+                Assert.AreEqual(BigInteger.Parse("123456789123456789123456789123456789"), reader.Deserialize<BigInteger>());
+                Assert.AreEqual((BigInteger)123, reader.Deserialize<BigInteger>());
+                Assert.AreEqual((BigInteger)(-123), reader.Deserialize<BigInteger>());
+                Assert.AreEqual((BigInteger)3, reader.Deserialize<BigInteger>());
             }
         }
     }
