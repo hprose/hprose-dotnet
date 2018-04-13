@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Converter class for C#.                         *
  *                                                        *
- * LastModified: Apr 10, 2018                             *
+ * LastModified: Apr 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
-using System.Numerics;
 
 namespace Hprose.IO.Converters {
     public interface IConverter { }
@@ -48,7 +47,6 @@ namespace Hprose.IO.Converters {
         static readonly ConcurrentDictionary<Type, Lazy<IConverter>> _converters = new ConcurrentDictionary<Type, Lazy<IConverter>>();
         static Converter() {
             Register(() => new Converter());
-            Register(() => new Int64Converter());
             Register(() => new BaseConverter<bool>());
             Register(() => new BaseConverter<byte>());
             Register(() => new BaseConverter<sbyte>());
@@ -60,7 +58,8 @@ namespace Hprose.IO.Converters {
             Register(() => new BaseConverter<float>());
             Register(() => new BaseConverter<double>());
             Register(() => new BaseConverter<decimal>());
-            //Register(() => new BaseConverter<BigInteger>());
+            Register(() => new Int64Converter());
+            Register(() => new BigIntegerConverter());
         }
 
         public static void Initialize() { }
