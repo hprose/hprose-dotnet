@@ -560,5 +560,29 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual(new TimeSpan(1, 30, 40), reader.Deserialize<TimeSpan>());
             }
         }
+        [TestMethod]
+        public void TestDeserializeDateTime() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(null);
+                writer.Serialize("");
+                writer.Serialize((byte)123);
+                writer.Serialize(3.14);
+                writer.Serialize(new DateTime(123456789));
+                writer.Serialize(new TimeSpan(123456789));
+                writer.Serialize("2018-04-14 12:39:40");
+                writer.Serialize("2018-04-14 12:39:40");
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(new DateTime(0), reader.Deserialize<DateTime>());
+                Assert.AreEqual(new DateTime(0), reader.Deserialize<DateTime>());
+                Assert.AreEqual(new DateTime(123), reader.Deserialize<DateTime>());
+                Assert.AreEqual(new DateTime(3), reader.Deserialize<DateTime>());
+                Assert.AreEqual(new DateTime(123456789), reader.Deserialize<DateTime>());
+                Assert.AreEqual(new DateTime(123456789), reader.Deserialize<DateTime>());
+                Assert.AreEqual(new DateTime(2018, 04, 14, 12, 39, 40), reader.Deserialize<DateTime>());
+                Assert.AreEqual(new DateTime(2018, 04, 14, 12, 39, 40), reader.Deserialize<DateTime>());
+            }
+        }
     }
 }
