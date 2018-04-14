@@ -510,5 +510,27 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual(DBNull.Value, reader.Deserialize<DBNull>());
             }
         }
+        [TestMethod]
+        public void TestDeserializeChar() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(null);
+                writer.Serialize("");
+                writer.Serialize('0');
+                writer.Serialize('1');
+                writer.Serialize((byte)123);
+                writer.Serialize((sbyte)-123);
+                writer.Serialize(3.14);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual((char)0, reader.Deserialize<char>());
+                Assert.AreEqual((char)0, reader.Deserialize<char>());
+                Assert.AreEqual('0', reader.Deserialize<char>());
+                Assert.AreEqual('1', reader.Deserialize<char>());
+                Assert.AreEqual((char)123, reader.Deserialize<char>());
+                Assert.AreEqual(char.MaxValue - 123 + 1, reader.Deserialize<char>());
+                Assert.AreEqual((char)3, reader.Deserialize<char>());
+            }
+        }
     }
 }
