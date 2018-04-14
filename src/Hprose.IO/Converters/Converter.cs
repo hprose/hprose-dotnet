@@ -64,6 +64,7 @@ namespace Hprose.IO.Converters {
             Register(() => new DateTimeConverter());
             Register(() => new GuidConverter());
             Register(() => new StringConverter());
+            Register(() => new StringBuilderConverter());
             Register(() => new CharsConverter());
         }
 
