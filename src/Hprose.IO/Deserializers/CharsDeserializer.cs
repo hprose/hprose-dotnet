@@ -35,20 +35,20 @@ namespace Hprose.IO.Deserializers {
                     return new char[] { ValueReader.ReadChar(stream) };
                 case TagList:
                     return ReferenceReader.ReadArray<char>(reader);
+                case TagEmpty:
+                    return EmptyChars;
+                case TagTrue:
+                    return bool.TrueString.ToCharArray();
+                case TagFalse:
+                    return bool.FalseString.ToCharArray();
+                case TagNaN:
+                    return double.NaN.ToString().ToCharArray();
+                case TagInfinity:
+                    return ValueReader.ReadInfinity(stream).ToString().ToCharArray();
                 case TagInteger:
                 case TagLong:
                 case TagDouble:
                     return Converter<char[]>.Instance.Convert(ValueReader.ReadUntil(stream, TagSemicolon));
-                case TagEmpty:
-                    return EmptyChars;
-                case TagTrue:
-                    return Converter<char[]>.Instance.Convert(bool.TrueString);
-                case TagFalse:
-                    return Converter<char[]>.Instance.Convert(bool.FalseString);
-                case TagNaN:
-                    return Converter<char[]>.Instance.Convert(double.NaN.ToString());
-                case TagInfinity:
-                    return Converter<char[]>.Instance.Convert(ValueReader.ReadInfinity(stream).ToString());
                 case TagDate:
                     return Converter<char[]>.Instance.Convert(ReferenceReader.ReadDateTime(reader));
                 case TagTime:
