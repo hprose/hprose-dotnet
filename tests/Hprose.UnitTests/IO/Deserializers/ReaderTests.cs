@@ -628,5 +628,22 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual("012", reader.Deserialize<string>());
             }
         }
+        [TestMethod]
+        public void TestDeserializeGuid() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(null);
+                writer.Serialize(Guid.Empty);
+                writer.Serialize(Guid.Empty);
+                writer.Serialize(Guid.Empty.ToByteArray());
+                writer.Serialize(Guid.Empty.ToString());
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(Guid.Empty, reader.Deserialize<Guid>());
+                Assert.AreEqual(Guid.Empty, reader.Deserialize<Guid>());
+                Assert.AreEqual(Guid.Empty, reader.Deserialize<Guid>());
+                Assert.AreEqual(Guid.Empty, reader.Deserialize<Guid>());
+            }
+        }
     }
 }
