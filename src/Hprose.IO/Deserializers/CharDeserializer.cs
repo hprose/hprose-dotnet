@@ -29,7 +29,6 @@ namespace Hprose.IO.Deserializers {
                 case TagUTF8Char:
                     return ValueReader.ReadChar(stream);
                 case TagEmpty:
-                case TagNull:
                     return '\0';
                 case TagInteger:
                     return (char)ValueReader.ReadInt(stream);
