@@ -585,6 +585,23 @@ namespace Hprose.UnitTests.IO.Deserializers {
             }
         }
         [TestMethod]
+        public void TestDeserializeGuid() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(null);
+                writer.Serialize(Guid.Empty);
+                writer.Serialize(Guid.Empty);
+                writer.Serialize(Guid.Empty.ToByteArray());
+                writer.Serialize(Guid.Empty.ToString());
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(Guid.Empty, reader.Deserialize<Guid>());
+                Assert.AreEqual(Guid.Empty, reader.Deserialize<Guid>());
+                Assert.AreEqual(Guid.Empty, reader.Deserialize<Guid>());
+                Assert.AreEqual(Guid.Empty, reader.Deserialize<Guid>());
+            }
+        }
+        [TestMethod]
         public void TestDeserializeString() {
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
@@ -606,6 +623,8 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(Guid.Empty);
                 writer.Serialize(new byte[] { (byte)'0', (byte)'1', (byte)'2' });
                 writer.Serialize(new byte[] { (byte)'0', (byte)'1', (byte)'2' });
+                writer.Serialize(new List<char> { '0', '1', '2' });
+                writer.Serialize(new List<char> { '0', '1', '2' });
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
                 Assert.AreEqual(null, reader.Deserialize<string>());
@@ -626,23 +645,56 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual(Guid.Empty.ToString(), reader.Deserialize<string>());
                 Assert.AreEqual("012", reader.Deserialize<string>());
                 Assert.AreEqual("012", reader.Deserialize<string>());
+                Assert.AreEqual("012", reader.Deserialize<string>());
+                Assert.AreEqual("012", reader.Deserialize<string>());
             }
         }
         [TestMethod]
-        public void TestDeserializeGuid() {
+        public void TestDeserializeChars() {
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
                 writer.Serialize(null);
+                writer.Serialize(true);
+                writer.Serialize(false);
+                writer.Serialize("");
+                writer.Serialize('0');
+                writer.Serialize('1');
+                writer.Serialize("5e2");
+                writer.Serialize("5e2");
+                writer.Serialize((byte)123);
+                writer.Serialize((sbyte)-123);
+                writer.Serialize(3.14);
+                writer.Serialize(double.NaN);
+                writer.Serialize(double.NegativeInfinity);
+                writer.Serialize(double.PositiveInfinity);
+                writer.Serialize(new DateTime(2018, 4, 14));
                 writer.Serialize(Guid.Empty);
-                writer.Serialize(Guid.Empty);
-                writer.Serialize(Guid.Empty.ToByteArray());
-                writer.Serialize(Guid.Empty.ToString());
+                writer.Serialize(new byte[] { (byte)'0', (byte)'1', (byte)'2' });
+                writer.Serialize(new byte[] { (byte)'0', (byte)'1', (byte)'2' });
+                writer.Serialize(new List<char> { '0', '1', '2' });
+                writer.Serialize(new List<char> { '0', '1', '2' });
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
-                Assert.AreEqual(Guid.Empty, reader.Deserialize<Guid>());
-                Assert.AreEqual(Guid.Empty, reader.Deserialize<Guid>());
-                Assert.AreEqual(Guid.Empty, reader.Deserialize<Guid>());
-                Assert.AreEqual(Guid.Empty, reader.Deserialize<Guid>());
+                Assert.AreEqual(null, reader.Deserialize<char[]>());
+                Assert.AreEqual(bool.TrueString, new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual(bool.FalseString, new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual("", new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual("0", new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual("1", new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual("5e2", new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual("5e2", new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual("123", new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual("-123", new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual("3.14", new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual(double.NaN.ToString(), new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual(double.NegativeInfinity.ToString(), new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual(double.PositiveInfinity.ToString(), new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual(new DateTime(2018, 4, 14).ToString(), new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual(Guid.Empty.ToString(), new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual("012", new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual("012", new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual("012", new String(reader.Deserialize<char[]>()));
+                Assert.AreEqual("012", new String(reader.Deserialize<char[]>()));
             }
         }
     }

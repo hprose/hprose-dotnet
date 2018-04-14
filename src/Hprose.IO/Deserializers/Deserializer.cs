@@ -90,7 +90,7 @@ namespace Hprose.IO.Deserializers {
             Register(() => new GuidDeserializer());
             Register(() => new StringDeserializer());
             //Register(() => new StringBuilderSerializer());
-            //Register(() => new CharsSerializer());
+            Register(() => new CharsDeserializer());
             //Register(() => new BytesSerializer());
             //Register(() => new ValueTupleSerializer());
             //Register(() => new BitArraySerializer());
