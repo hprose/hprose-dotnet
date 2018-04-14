@@ -57,11 +57,11 @@ namespace Hprose.IO.Deserializers {
                 case TagInfinity:
                     return ValueReader.ReadInfinity(stream).ToString();
                 case TagDate:
-                    return Converter<string>.Instance.Convert(ReferenceReader.ReadDateTime(reader));
+                    return ReferenceReader.ReadDateTime(reader).ToString();
                 case TagTime:
-                    return Converter<string>.Instance.Convert(ReferenceReader.ReadTime(reader));
+                    return ReferenceReader.ReadTime(reader).ToString();
                 case TagGuid:
-                    return Converter<string>.Instance.Convert(ReferenceReader.ReadGuid(reader));
+                    return ReferenceReader.ReadGuid(reader).ToString();
                 case TagBytes:
                     return Converter<string>.Instance.Convert(ReferenceReader.ReadBytes(reader));
                 case TagList:
