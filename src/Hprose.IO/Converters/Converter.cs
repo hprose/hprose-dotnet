@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Converter class for C#.                         *
  *                                                        *
- * LastModified: Apr 13, 2018                             *
+ * LastModified: Apr 14, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -60,6 +60,7 @@ namespace Hprose.IO.Converters {
             Register(() => new BaseConverter<decimal>());
             Register(() => new Int64Converter());
             Register(() => new BigIntegerConverter());
+            Register(() => new TimeSpanConverter());
         }
 
         public static void Initialize() { }
