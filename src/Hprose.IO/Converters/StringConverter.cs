@@ -18,6 +18,7 @@
 \**********************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Hprose.IO.Converters {
@@ -28,6 +29,8 @@ namespace Hprose.IO.Converters {
                     return s;
                 case char[] chars:
                     return new String(chars);
+                case List<char> charList:
+                    return new String(charList.ToArray());
                 case byte[] bytes:
                     try {
                         return Encoding.UTF8.GetString(bytes);

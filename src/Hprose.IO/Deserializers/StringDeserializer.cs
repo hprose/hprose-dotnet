@@ -64,12 +64,8 @@ namespace Hprose.IO.Deserializers {
                     return Converter<string>.Instance.Convert(ReferenceReader.ReadGuid(reader));
                 case TagBytes:
                     return Converter<string>.Instance.Convert(ReferenceReader.ReadBytes(reader));
-                //case TagList:
-                //    return Converter<string>.Instance.Convert(ReferenceReader.ReadList(reader));
-                //case TagMap:
-                //    return Converter<string>.Instance.Convert(ReferenceReader.ReadMap(reader));
-                //case TagObject:
-                //    return Converter<string>.Instance.Convert(ReferenceReader.ReadObject(reader));
+                case TagList:
+                    return Converter<string>.Instance.Convert(ReferenceReader.ReadArray<char>(reader));
                 default:
                     return base.Read(reader, tag);
             }
