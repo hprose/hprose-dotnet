@@ -532,5 +532,33 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual((char)3, reader.Deserialize<char>());
             }
         }
+        [TestMethod]
+        public void TestDeserializeTimeSpan() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(null);
+                writer.Serialize("");
+                writer.Serialize('0');
+                writer.Serialize('1');
+                writer.Serialize((byte)123);
+                writer.Serialize((sbyte)-123);
+                writer.Serialize(3.14);
+                writer.Serialize(new DateTime(123456789));
+                writer.Serialize(new TimeSpan(123456789));
+                writer.Serialize("1:30:40");
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(TimeSpan.Zero, reader.Deserialize<TimeSpan>());
+                Assert.AreEqual(TimeSpan.Zero, reader.Deserialize<TimeSpan>());
+                Assert.AreEqual(TimeSpan.Zero, reader.Deserialize<TimeSpan>());
+                Assert.AreEqual(new TimeSpan(1, 0, 0, 0), reader.Deserialize<TimeSpan>());
+                Assert.AreEqual(new TimeSpan(123), reader.Deserialize<TimeSpan>());
+                Assert.AreEqual(new TimeSpan(-123), reader.Deserialize<TimeSpan>());
+                Assert.AreEqual(new TimeSpan(3), reader.Deserialize<TimeSpan>());
+                Assert.AreEqual(new TimeSpan(123456789), reader.Deserialize<TimeSpan>());
+                Assert.AreEqual(new TimeSpan(123456789), reader.Deserialize<TimeSpan>());
+                Assert.AreEqual(new TimeSpan(1, 30, 40), reader.Deserialize<TimeSpan>());
+            }
+        }
     }
 }
