@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\MembersAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\GuidConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\CharsConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\StringBuilderConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\StringConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\DateTimeConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\TimeSpanConverter.cs" />
@@ -23,6 +24,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\CharDeserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\StringBuilderDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\GuidDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\CharsDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\StringDeserializer.cs" />
