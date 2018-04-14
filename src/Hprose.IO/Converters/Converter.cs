@@ -61,6 +61,7 @@ namespace Hprose.IO.Converters {
             Register(() => new Int64Converter());
             Register(() => new BigIntegerConverter());
             Register(() => new TimeSpanConverter());
+            Register(() => new DateTimeConverter());
         }
 
         public static void Initialize() { }
