@@ -584,5 +584,49 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual(new DateTime(2018, 04, 14, 12, 39, 40), reader.Deserialize<DateTime>());
             }
         }
+        [TestMethod]
+        public void TestDeserializeString() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(null);
+                writer.Serialize(true);
+                writer.Serialize(false);
+                writer.Serialize("");
+                writer.Serialize('0');
+                writer.Serialize('1');
+                writer.Serialize("5e2");
+                writer.Serialize("5e2");
+                writer.Serialize((byte)123);
+                writer.Serialize((sbyte)-123);
+                writer.Serialize(3.14);
+                writer.Serialize(double.NaN);
+                writer.Serialize(double.NegativeInfinity);
+                writer.Serialize(double.PositiveInfinity);
+                writer.Serialize(new DateTime(2018, 4, 14));
+                writer.Serialize(Guid.Empty);
+                writer.Serialize(new byte[] { (byte)'0', (byte)'1', (byte)'2' });
+                writer.Serialize(new byte[] { (byte)'0', (byte)'1', (byte)'2' });
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<string>());
+                Assert.AreEqual(bool.TrueString, reader.Deserialize<string>());
+                Assert.AreEqual(bool.FalseString, reader.Deserialize<string>());
+                Assert.AreEqual("", reader.Deserialize<string>());
+                Assert.AreEqual("0", reader.Deserialize<string>());
+                Assert.AreEqual("1", reader.Deserialize<string>());
+                Assert.AreEqual("5e2", reader.Deserialize<string>());
+                Assert.AreEqual("5e2", reader.Deserialize<string>());
+                Assert.AreEqual("123", reader.Deserialize<string>());
+                Assert.AreEqual("-123", reader.Deserialize<string>());
+                Assert.AreEqual("3.14", reader.Deserialize<string>());
+                Assert.AreEqual(double.NaN.ToString(), reader.Deserialize<string>());
+                Assert.AreEqual(double.NegativeInfinity.ToString(), reader.Deserialize<string>());
+                Assert.AreEqual(double.PositiveInfinity.ToString(), reader.Deserialize<string>());
+                Assert.AreEqual(new DateTime(2018, 4, 14).ToString(), reader.Deserialize<string>());
+                Assert.AreEqual(Guid.Empty.ToString(), reader.Deserialize<string>());
+                Assert.AreEqual("012", reader.Deserialize<string>());
+                Assert.AreEqual("012", reader.Deserialize<string>());
+            }
+        }
     }
 }

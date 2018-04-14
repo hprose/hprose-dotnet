@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\FieldsAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\PropertiesAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\MembersAccessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\StringConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\DateTimeConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\TimeSpanConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BigIntegerConverter.cs" />
@@ -20,6 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\CharDeserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\StringDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DateTimeDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\TimeSpanDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DBNullDeserializer.cs" />
