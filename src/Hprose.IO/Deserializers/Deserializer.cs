@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Deserializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 12, 2018                             *
+ * LastModified: Apr 15, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -91,7 +91,7 @@ namespace Hprose.IO.Deserializers {
             Register(() => new StringDeserializer());
             Register(() => new StringBuilderDeserializer());
             Register(() => new CharsDeserializer());
-            //Register(() => new BytesSerializer());
+            Register(() => new BytesDeserializer());
             //Register(() => new ValueTupleSerializer());
             //Register(() => new BitArraySerializer());
             //Register(() => new DictionarySerializer<ExpandoObject, string, object>());

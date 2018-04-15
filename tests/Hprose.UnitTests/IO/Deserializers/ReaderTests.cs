@@ -746,5 +746,27 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual("012", reader.Deserialize<StringBuilder>().ToString());
             }
         }
+        [TestMethod]
+        public void TestDeserializeBytes() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(null);
+                writer.Serialize("1234567890");
+                writer.Serialize(Guid.Empty);
+                writer.Serialize(new byte[] { (byte)'0', (byte)'1', (byte)'2' });
+                writer.Serialize(new byte[] { (byte)'0', (byte)'1', (byte)'2' });
+                writer.Serialize(new List<int> { '0', '1', '2' });
+                writer.Serialize(new List<int> { '0', '1', '2' });
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<byte[]>());
+                Assert.AreEqual("1234567890", Encoding.UTF8.GetString(reader.Deserialize<byte[]>()));
+                Assert.AreEqual(Encoding.UTF8.GetString(Guid.Empty.ToByteArray()), Encoding.UTF8.GetString(reader.Deserialize<byte[]>()));
+                Assert.AreEqual("012", Encoding.UTF8.GetString(reader.Deserialize<byte[]>()));
+                Assert.AreEqual("012", Encoding.UTF8.GetString(reader.Deserialize<byte[]>()));
+                Assert.AreEqual("012", Encoding.UTF8.GetString(reader.Deserialize<byte[]>()));
+                Assert.AreEqual("012", Encoding.UTF8.GetString(reader.Deserialize<byte[]>()));
+            }
+        }
     }
 }

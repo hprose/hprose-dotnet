@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\FieldsAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\PropertiesAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\MembersAccessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\BytesConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\GuidConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\CharsConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\StringBuilderConverter.cs" />
@@ -24,6 +25,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\CharDeserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\BytesDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\StringBuilderDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\GuidDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\CharsDeserializer.cs" />
