@@ -36,7 +36,12 @@ namespace Hprose.IO.Converters {
         }
         private static TypeConverter typeConverter = TypeDescriptor.GetConverter(typeof(T));
         public virtual T Convert(object obj) {
-            return (T)typeConverter.ConvertFrom(obj);
+            switch (obj) {
+                case T value:
+                    return value;
+                default:
+                    return (T)typeConverter.ConvertFrom(obj);
+            }
         }
     }
 
