@@ -104,6 +104,16 @@ namespace Hprose.IO.Deserializers {
         }
 
         private static Type GetDeserializerType(Type type) {
+            if (type.IsArray) {
+                switch (type.GetArrayRank()) {
+                    case 1:
+                        return typeof(ArrayDeserializer<>).MakeGenericType(type.GetElementType());
+                    case 2:
+                        return typeof(Array2Deserializer<>).MakeGenericType(type.GetElementType());
+                    //default:
+                        //return typeof(MultiDimArrayDeserializer<>).MakeGenericType(type);
+                }
+            }
             //if (type.IsEnum) {
             //    return typeof(EnumSerializer<>).MakeGenericType(type);
             //}

@@ -768,5 +768,42 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual("012", Encoding.UTF8.GetString(reader.Deserialize<byte[]>()));
             }
         }
+        private void AreEqual<T>(T[] array1, T[] array2) {
+            Assert.AreEqual(array1.Length, array2.Length);
+            for (int i = 0; i < array1.Length; i++) {
+                Assert.AreEqual(array1[i], array2[i]);
+            }
+        }
+        private void AreEqual<T>(T[,] array1, T[,] array2) {
+            Assert.AreEqual(array1.GetLength(0), array2.GetLength(0));
+            Assert.AreEqual(array1.GetLength(1), array2.GetLength(1));
+            for (int i = 0; i < array1.GetLength(0); i++) {
+                for (int j = 0; j < array1.GetLength(1); j++) {
+                    Assert.AreEqual(array1[i, j], array2[i, j]);
+                }
+            }
+        }
+        [TestMethod]
+        public void TestDeserializeArray() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var array = new int[] { '0', '1', '2', '3', '4', '5' };
+                var array2 = new int[,] { { '0', '1', '2' }, { '3', '4', '5' } };
+                writer.Serialize(null);
+                writer.Serialize(array2);
+                writer.Serialize(array);
+                writer.Serialize(null);
+                writer.Serialize(array2);
+                writer.Serialize(array);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<int[]>());
+                AreEqual(array2, reader.Deserialize<int[,]>());
+                AreEqual(array, reader.Deserialize<int[]>());
+                Assert.AreEqual(null, reader.Deserialize<int[,]>());
+                AreEqual(array2, reader.Deserialize<int[,]>());
+                AreEqual(array, reader.Deserialize<int[]>());
+            }
+        }
     }
 }

@@ -12,7 +12,7 @@
  *                                                        *
  * ValueReader class for C#.                              *
  *                                                        *
- * LastModified: Apr 8, 2018                              *
+ * LastModified: Apr 15, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -193,6 +193,12 @@ namespace Hprose.IO.Deserializers {
                 i = stream.ReadByte();
             }
             return sb;
+        }
+        public static void SkipUntil(Stream stream, int tag) {
+            int i = stream.ReadByte();
+            while ((i != tag) && (i != -1)) {
+                i = stream.ReadByte();
+            }
         }
         public static char[] ReadChars(Stream stream) {
             int len = ReadLength(stream);
