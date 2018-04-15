@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Converter class for C#.                         *
  *                                                        *
- * LastModified: Apr 14, 2018                             *
+ * LastModified: Apr 15, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -66,6 +66,7 @@ namespace Hprose.IO.Converters {
             Register(() => new StringConverter());
             Register(() => new StringBuilderConverter());
             Register(() => new CharsConverter());
+            Register(() => new BytesConverter());
         }
 
         public static void Initialize() { }
