@@ -842,6 +842,7 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(list);
                 var set = new HashSet<int> { '0', '1', '2' };
                 writer.Serialize(set);
+                writer.Serialize(set);
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
                 Assert.AreEqual(null, reader.Deserialize<List<int>>());
@@ -849,7 +850,8 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 AreEqual(list, reader.Deserialize<IList<int>>());
                 AreEqual(list, reader.Deserialize<ICollection<int>>());
                 AreEqual(list, (ICollection<int>)reader.Deserialize<IEnumerable<int>>());
-                AreEqual(set, reader.Deserialize<HashSet<int>>());
+                AreEqual(set, reader.Deserialize<ISet<int>>());
+                AreEqual(set, reader.Deserialize<ISet<int>>());
             }
         }
         [TestMethod]
