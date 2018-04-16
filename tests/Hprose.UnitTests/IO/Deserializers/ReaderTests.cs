@@ -852,12 +852,6 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 AreEqual(set, reader.Deserialize<HashSet<int>>());
             }
         }
-        private void AreEqual<T>(Queue<T> q1, Queue<T> q2) {
-            Assert.AreEqual(q1.Count, q2.Count);
-            foreach (var e in q1) {
-                Assert.IsTrue(q2.Contains(e));
-            }
-        }
         [TestMethod]
         public void TestDeserializeQueue() {
             using (MemoryStream stream = new MemoryStream()) {
@@ -869,8 +863,23 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
                 Assert.AreEqual(null, reader.Deserialize<Queue<int>>());
-                AreEqual(queue, reader.Deserialize<Queue<int>>());
-                AreEqual(queue, reader.Deserialize<Queue<int>>());
+                AreEqual(queue.ToArray(), reader.Deserialize<Queue<int>>().ToArray());
+                AreEqual(queue.ToArray(), reader.Deserialize<Queue<int>>().ToArray());
+            }
+        }
+        [TestMethod]
+        public void TestDeserializeStack() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var stack = new Stack<int>(new List<int> { '0', '1', '2', '3', '4', '5' });
+                writer.Serialize(null);
+                writer.Serialize(stack);
+                writer.Serialize(stack);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<Stack<int>>());
+                AreEqual(stack.ToArray(), reader.Deserialize<Stack<int>>().ToArray());
+                AreEqual(stack.ToArray(), reader.Deserialize<Stack<int>>().ToArray());
             }
         }
     }
