@@ -884,5 +884,20 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 AreEqual(stack.ToArray(), reader.Deserialize<Stack<int>>().ToArray());
             }
         }
+        [TestMethod]
+        public void TestDeserializeBlockingCollection() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var c = new BlockingCollection<int> { '0', '1', '2', '3', '4', '5' };
+                writer.Serialize(null);
+                writer.Serialize(c);
+                writer.Serialize(c);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<BlockingCollection<int>>());
+                AreEqual(c.ToArray(), reader.Deserialize<BlockingCollection<int>>().ToArray());
+                AreEqual(c.ToArray(), reader.Deserialize<BlockingCollection<int>>().ToArray());
+            }
+        }
     }
 }

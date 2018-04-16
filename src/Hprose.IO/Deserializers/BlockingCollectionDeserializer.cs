@@ -1,0 +1,51 @@
+﻿/**********************************************************\
+|                                                          |
+|                          hprose                          |
+|                                                          |
+| Official WebSite: http://www.hprose.com/                 |
+|                   http://www.hprose.org/                 |
+|                                                          |
+\**********************************************************/
+/**********************************************************\
+ *                                                        *
+ * BlockingCollectionDeserializer.cs                      *
+ *                                                        *
+ * BlockingCollectionDeserializer class for C#.           *
+ *                                                        *
+ * LastModified: Apr 16, 2018                             *
+ * Author: Ma Bingyao <andot@hprose.com>                  *
+ *                                                        *
+\**********************************************************/
+
+using System.IO;
+using System.Collections.Concurrent;
+
+using static Hprose.IO.HproseTags;
+
+namespace Hprose.IO.Deserializers {
+    class BlockingCollectionDeserializer<T> : Deserializer<BlockingCollection<T>> {
+        public static BlockingCollection<T> ReadBlockingCollection(Reader reader) {
+            Stream stream = reader.Stream;
+            int count = ValueReader.ReadCount(stream);
+            BlockingCollection<T> collection = new BlockingCollection<T>();
+            reader.SetRef(collection);
+            var deserializer = Deserializer<T>.Instance;
+            for (int i = 0; i < count; ++i) {
+                collection.Add(deserializer.Deserialize(reader));
+            }
+            stream.ReadByte();
+            return collection;
+        }
+        public override BlockingCollection<T> Read(Reader reader, int tag) {
+            var stream = reader.Stream;
+            switch (tag) {
+                case TagEmpty:
+                    return new BlockingCollection<T>();
+                case TagList:
+                    return ReadBlockingCollection(reader);
+                default:
+                    return base.Read(reader, tag);
+            }
+        }
+    }
+}

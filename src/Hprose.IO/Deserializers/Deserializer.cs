@@ -133,6 +133,9 @@ namespace Hprose.IO.Deserializers {
                         if (typeof(Stack<>) == genericType) {
                             return typeof(StackDeserializer<>).MakeGenericType(genericArgs);
                         }
+                        if (typeof(BlockingCollection<>) == genericType) {
+                            return typeof(BlockingCollectionDeserializer<>).MakeGenericType(genericArgs);
+                        }
                         Type genericCollection = typeof(ICollection<>).MakeGenericType(genericArgs);
                         if (genericCollection.IsAssignableFrom(type)) {
                             if (genericArgs[0].IsGenericType) {
