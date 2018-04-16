@@ -783,25 +783,44 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 }
             }
         }
+        private void AreEqual<T>(T[,,] array1, T[,,] array2) {
+            Assert.AreEqual(array1.GetLength(0), array2.GetLength(0));
+            Assert.AreEqual(array1.GetLength(1), array2.GetLength(1));
+            Assert.AreEqual(array1.GetLength(2), array2.GetLength(2));
+            for (int i = 0; i < array1.GetLength(0); i++) {
+                for (int j = 0; j < array1.GetLength(1); j++) {
+                    for (int k = 0; k < array1.GetLength(2); k++) {
+                        Assert.AreEqual(array1[i, j, k], array2[i, j, k]);
+                    }
+                }
+            }
+        }
         [TestMethod]
         public void TestDeserializeArray() {
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
                 var array = new int[] { '0', '1', '2', '3', '4', '5' };
                 var array2 = new int[,] { { '0', '1', '2' }, { '3', '4', '5' } };
+                var array3 = new int[,,] { { { '0', '1' }, { '2', '3' } }, { { '4', '5' }, { '6', '7' } } };
                 writer.Serialize(null);
+                writer.Serialize(array3);
                 writer.Serialize(array2);
                 writer.Serialize(array);
                 writer.Serialize(null);
+                writer.Serialize(null);
                 writer.Serialize(array2);
+                writer.Serialize(array3);
                 writer.Serialize(array);
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
                 Assert.AreEqual(null, reader.Deserialize<int[]>());
+                AreEqual(array3, reader.Deserialize<int[,,]>());
                 AreEqual(array2, reader.Deserialize<int[,]>());
                 AreEqual(array, reader.Deserialize<int[]>());
                 Assert.AreEqual(null, reader.Deserialize<int[,]>());
+                Assert.AreEqual(null, reader.Deserialize<int[,,]>());
                 AreEqual(array2, reader.Deserialize<int[,]>());
+                AreEqual(array3, reader.Deserialize<int[,,]>());
                 AreEqual(array, reader.Deserialize<int[]>());
             }
         }

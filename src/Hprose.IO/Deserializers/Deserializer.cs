@@ -110,8 +110,8 @@ namespace Hprose.IO.Deserializers {
                         return typeof(ArrayDeserializer<>).MakeGenericType(type.GetElementType());
                     case 2:
                         return typeof(Array2Deserializer<>).MakeGenericType(type.GetElementType());
-                    //default:
-                        //return typeof(MultiDimArrayDeserializer<>).MakeGenericType(type);
+                    default:
+                        return typeof(MultiDimArrayDeserializer<,>).MakeGenericType(type, type.GetElementType());
                 }
             }
             //if (type.IsEnum) {
