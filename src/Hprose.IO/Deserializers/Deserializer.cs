@@ -124,6 +124,9 @@ namespace Hprose.IO.Deserializers {
                             (typeof(IList<>) == genericType)) {
                             return typeof(CollectionDeserializer<,,>).MakeGenericType(type, typeof(List<>).MakeGenericType(genericArgs), genericArgs[0]);
                         }
+                        if (typeof(Queue<>) == genericType) {
+                            return typeof(QueueDeserializer<>).MakeGenericType(genericArgs[0]);
+                        }
                         Type genericCollection = typeof(ICollection<>).MakeGenericType(genericArgs);
                         if (genericCollection.IsAssignableFrom(type)) {
                             if (genericArgs[0].IsGenericType) {
