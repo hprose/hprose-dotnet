@@ -114,18 +114,43 @@ namespace Hprose.IO.Deserializers {
                         return typeof(MultiDimArrayDeserializer<,>).MakeGenericType(type, type.GetElementType());
                 }
             }
+            if (type.IsGenericType) {
+                Type genericType = type.GetGenericTypeDefinition();
+                Type[] genericArgs = type.GetGenericArguments();
+                switch (genericArgs.Length) {
+                    case 1:
+                        if ((typeof(ICollection<>) == genericType) ||
+                            (typeof(IEnumerable<>) == genericType) ||
+                            (typeof(IList<>) == genericType)) {
+                            return typeof(CollectionDeserializer<,,>).MakeGenericType(type, typeof(List<>).MakeGenericType(genericArgs), genericArgs[0]);
+                        }
+                        Type genericCollection = typeof(ICollection<>).MakeGenericType(genericArgs);
+                        if (genericCollection.IsAssignableFrom(type)) {
+                            if (genericArgs[0].IsGenericType) {
+                                Type genType = genericArgs[0].GetGenericTypeDefinition();
+                                //if (genType == typeof(KeyValuePair<,>)) {
+                                //    Type[] genArgs = genericArgs[0].GetGenericArguments();
+                                //    return typeof(DictionarySerializer<,,>).MakeGenericType(type, genArgs[0], genArgs[1]);
+                                //}
+                            }
+                            return typeof(CollectionDeserializer<,,>).MakeGenericType(type, type, genericArgs[0]);
+                        }
+                        break;
+                    //case 2:
+                    //    if (typeof(IDictionary<,>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
+                    //        return typeof(DictionarySerializer<,,>).MakeGenericType(type, genericArgs[0], genericArgs[1]);
+                    //    }
+                    //    if (typeof(ICollection<>).MakeGenericType(genericArgs[0]).IsAssignableFrom(type)) {
+                    //        return typeof(CollectionSerializer<,>).MakeGenericType(type, genericArgs[0]);
+                    //    }
+                    //    if (typeof(ICollection<>).MakeGenericType(genericArgs[1]).IsAssignableFrom(type)) {
+                    //        return typeof(CollectionSerializer<,>).MakeGenericType(type, genericArgs[1]);
+                    //    }
+                    //    break;
+                }
+            }
             //if (type.IsEnum) {
             //    return typeof(EnumSerializer<>).MakeGenericType(type);
-            //}
-            //if (type.IsArray) {
-            //    switch (type.GetArrayRank()) {
-            //        case 1:
-            //            return typeof(ArraySerializer<>).MakeGenericType(type.GetElementType());
-            //        case 2:
-            //            return typeof(Array2Serializer<>).MakeGenericType(type.GetElementType());
-            //        default:
-            //            return typeof(MultiDimArraySerializer<>).MakeGenericType(type);
-            //    }
             //}
             //if (type.IsGenericType) {
             //    Type genericType = type.GetGenericTypeDefinition();

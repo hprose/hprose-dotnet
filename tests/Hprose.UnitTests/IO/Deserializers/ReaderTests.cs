@@ -824,5 +824,33 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 AreEqual(array, reader.Deserialize<int[]>());
             }
         }
+        private void AreEqual<T>(ICollection<T> c1, ICollection<T> c2) {
+            Assert.AreEqual(c1.Count, c2.Count);
+            foreach (var e in c1) {
+                Assert.IsTrue(c2.Contains(e));
+            }
+        }
+        [TestMethod]
+        public void TestDeserializeCollection() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var list = new List<int> { '0', '1', '2', '3', '4', '5' };
+                writer.Serialize(null);
+                writer.Serialize(list);
+                writer.Serialize(list);
+                writer.Serialize(list);
+                writer.Serialize(list);
+                var set = new HashSet<int> { '0', '1', '2' };
+                writer.Serialize(set);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<List<int>>());
+                AreEqual(list, reader.Deserialize<IList<int>>());
+                AreEqual(list, reader.Deserialize<IList<int>>());
+                AreEqual(list, reader.Deserialize<ICollection<int>>());
+                AreEqual(list, (ICollection<int>)reader.Deserialize<IEnumerable<int>>());
+                AreEqual(set, reader.Deserialize<HashSet<int>>());
+            }
+        }
     }
 }
