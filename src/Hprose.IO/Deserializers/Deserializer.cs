@@ -142,6 +142,9 @@ namespace Hprose.IO.Deserializers {
                         if (typeof(Stack<>) == genericType) {
                             return typeof(StackDeserializer<>).MakeGenericType(genericArgs);
                         }
+                        if (typeof(ConcurrentStack<>) == genericType) {
+                            return typeof(ConcurrentStackDeserializer<>).MakeGenericType(genericArgs);
+                        }
                         if (typeof(BlockingCollection<>) == genericType) {
                             return typeof(BlockingCollectionDeserializer<>).MakeGenericType(genericArgs);
                         }
@@ -155,6 +158,9 @@ namespace Hprose.IO.Deserializers {
                                 //}
                             }
                             return typeof(CollectionDeserializer<,,>).MakeGenericType(type, type, genericArgs[0]);
+                        }
+                        if (typeof(IProducerConsumerCollection<>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
+                            return typeof(ProducerConsumerCollectionDeserializer<,>).MakeGenericType(type, genericArgs[0]);
                         }
                         break;
                     //case 2:

@@ -952,5 +952,27 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual(TypeCode.String, reader.Deserialize<TypeCode>());
             }
         }
+        [TestMethod]
+        public void TestDeserializeProduceConsumerCollection() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var s = new ConcurrentStack<int>(new List<int> { '0', '1', '2', '3', '4', '5' });
+                var q = new ConcurrentQueue<int>(new List<int> { '0', '1', '2', '3', '4', '5' });
+                writer.Serialize(null);
+                writer.Serialize(s);
+                writer.Serialize(q);
+                writer.Serialize(null);
+                writer.Serialize(s);
+                writer.Serialize(q);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<ConcurrentStack<int>>());
+                AreEqual(s.ToArray(), reader.Deserialize<ConcurrentStack<int>>().ToArray());
+                AreEqual(q.ToArray(), reader.Deserialize<ConcurrentQueue<int>>().ToArray());
+                Assert.AreEqual(null, reader.Deserialize<ConcurrentQueue<int>>());
+                AreEqual(s.ToArray(), reader.Deserialize<ConcurrentStack<int>>().ToArray());
+                AreEqual(q.ToArray(), reader.Deserialize<ConcurrentQueue<int>>().ToArray());
+            }
+        }
     }
 }
