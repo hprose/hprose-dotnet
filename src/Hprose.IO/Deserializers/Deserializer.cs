@@ -104,6 +104,9 @@ namespace Hprose.IO.Deserializers {
         }
 
         private static Type GetDeserializerType(Type type) {
+            if (type.IsEnum) {
+                return typeof(EnumDeserializer<>).MakeGenericType(type);
+            }
             if (type.IsArray) {
                 switch (type.GetArrayRank()) {
                     case 1:
@@ -167,9 +170,6 @@ namespace Hprose.IO.Deserializers {
                     //    break;
                 }
             }
-            //if (type.IsEnum) {
-            //    return typeof(EnumSerializer<>).MakeGenericType(type);
-            //}
             //if (type.IsGenericType) {
             //    Type genericType = type.GetGenericTypeDefinition();
             //    if (genericType.Name.StartsWith("ValueTuple`")) {

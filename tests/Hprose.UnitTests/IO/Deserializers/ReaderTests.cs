@@ -932,5 +932,25 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual("string", reader.Deserialize<NullableKey<string>>());
             }
         }
+        [TestMethod]
+        public void TestDeserializeEnum() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(TypeCode.Boolean);
+                writer.Serialize(TypeCode.Empty);
+                writer.Serialize(TypeCode.Double);
+                writer.Serialize(true);
+                writer.Serialize((char)(9));
+                writer.Serialize("String");
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(TypeCode.Boolean, reader.Deserialize<TypeCode>());
+                Assert.AreEqual(TypeCode.Empty, reader.Deserialize<TypeCode>());
+                Assert.AreEqual(TypeCode.Double, reader.Deserialize<TypeCode>());
+                Assert.AreEqual(TypeCode.Object, reader.Deserialize<TypeCode>());
+                Assert.AreEqual(TypeCode.Int32, reader.Deserialize<TypeCode>());
+                Assert.AreEqual(TypeCode.String, reader.Deserialize<TypeCode>());
+            }
+        }
     }
 }
