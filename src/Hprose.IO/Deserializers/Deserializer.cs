@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Deserializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 15, 2018                             *
+ * LastModified: Apr 17, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -119,6 +119,12 @@ namespace Hprose.IO.Deserializers {
                 Type[] genericArgs = type.GetGenericArguments();
                 switch (genericArgs.Length) {
                     case 1:
+                        if (genericType == typeof(Nullable<>)) {
+                            return typeof(NullableDeserializer<>).MakeGenericType(genericArgs);
+                        }
+                        //if (genericType == typeof(NullableKey<>)) {
+                        //    return typeof(NullableKeyDeserializer<>).MakeGenericType(genericArgs);
+                        //}
                         if ((typeof(ICollection<>) == genericType) ||
                             (typeof(IEnumerable<>) == genericType) ||
                             (typeof(IList<>) == genericType)) {

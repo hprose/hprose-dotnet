@@ -24,6 +24,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Int64Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Converter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\NullableDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\BlockingCollectionDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\StackDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\QueueDeserializer.cs" />
