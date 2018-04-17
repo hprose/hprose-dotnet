@@ -13,6 +13,7 @@ using Hprose.IO.Deserializers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Numerics;
 using System.Text;
+using System.Collections.Specialized;
 
 namespace Hprose.UnitTests.IO.Deserializers {
     [TestClass]
@@ -972,6 +973,27 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual(null, reader.Deserialize<ConcurrentQueue<int>>());
                 AreEqual(s.ToArray(), reader.Deserialize<ConcurrentStack<int>>().ToArray());
                 AreEqual(q.ToArray(), reader.Deserialize<ConcurrentQueue<int>>().ToArray());
+            }
+        }
+        private void AreEqual(StringCollection c1, StringCollection c2) {
+            Assert.AreEqual(c1.Count, c2.Count);
+            for (var i = 0; i < c1.Count; ++i) {
+                Assert.AreEqual(c1[i], c2[i]);
+            }
+        }
+        [TestMethod]
+        public void TestDeserializeStringCollection() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var s = new StringCollection { "Hello", "World" };
+                writer.Serialize(null);
+                writer.Serialize(s);
+                writer.Serialize(s);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<StringCollection>());
+                AreEqual(s, reader.Deserialize<StringCollection>());
+                AreEqual(s, reader.Deserialize<StringCollection>());
             }
         }
     }
