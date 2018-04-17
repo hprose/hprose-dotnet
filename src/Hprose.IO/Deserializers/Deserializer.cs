@@ -122,9 +122,9 @@ namespace Hprose.IO.Deserializers {
                         if (genericType == typeof(Nullable<>)) {
                             return typeof(NullableDeserializer<>).MakeGenericType(genericArgs);
                         }
-                        //if (genericType == typeof(NullableKey<>)) {
-                        //    return typeof(NullableKeyDeserializer<>).MakeGenericType(genericArgs);
-                        //}
+                        if (genericType == typeof(NullableKey<>)) {
+                            return typeof(NullableKeyDeserializer<>).MakeGenericType(genericArgs);
+                        }
                         if ((typeof(ICollection<>) == genericType) ||
                             (typeof(IEnumerable<>) == genericType) ||
                             (typeof(IList<>) == genericType)) {

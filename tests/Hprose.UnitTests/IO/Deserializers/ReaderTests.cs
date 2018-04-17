@@ -916,5 +916,21 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 AreEqual(c.ToArray(), reader.Deserialize<BlockingCollection<int?>>().ToArray());
             }
         }
+        [TestMethod]
+        public void TestDeserializeNullableKey() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(null);
+                writer.Serialize(null);
+                writer.Serialize(1);
+                writer.Serialize("string");
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<NullableKey<int?>>());
+                Assert.AreEqual(null, reader.Deserialize<NullableKey<string>>());
+                Assert.AreEqual(1, reader.Deserialize<NullableKey<int?>>());
+                Assert.AreEqual("string", reader.Deserialize<NullableKey<string>>());
+            }
+        }
     }
 }
