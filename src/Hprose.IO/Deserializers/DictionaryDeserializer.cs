@@ -51,4 +51,5 @@ namespace Hprose.IO.Deserializers {
             }
         }
     }
+    class DictionaryDeserializer<T, K, V> : DictionaryDeserializer<T, T, K, V> where T : ICollection<KeyValuePair<K, V>>, new() { }
 }
