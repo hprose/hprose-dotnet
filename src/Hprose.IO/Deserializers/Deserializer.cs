@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Deserializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 17, 2018                             *
+ * LastModified: Apr 18, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -129,13 +129,36 @@ namespace Hprose.IO.Deserializers {
                         if (genericType == typeof(NullableKey<>)) {
                             return typeof(NullableKeyDeserializer<>).MakeGenericType(genericArgs);
                         }
-                        if ((typeof(ICollection<>) == genericType) ||
-                            (typeof(IEnumerable<>) == genericType) ||
-                            (typeof(IList<>) == genericType)) {
-                            return typeof(CollectionDeserializer<,,>).MakeGenericType(type, typeof(List<>).MakeGenericType(genericArgs), genericArgs[0]);
-                        }
-                        if (typeof(ISet<>) == genericType) {
-                            return typeof(CollectionDeserializer<,,>).MakeGenericType(type, typeof(HashSet<>).MakeGenericType(genericArgs), genericArgs[0]);
+                        if (type.IsInterface) {
+                            var pairType = typeof(KeyValuePair<,>);
+                            if (typeof(ISet<>) == genericType) {
+                                var arg = genericArgs[0];
+                                if (arg.IsGenericType && arg.GetGenericTypeDefinition() == pairType) {
+                                    Type[] genArgs = arg.GetGenericArguments();
+                                    return typeof(DictionaryDeserializer<,,,>).MakeGenericType(type, typeof(HashSet<>).MakeGenericType(genericArgs), genArgs[0], genArgs[1]);
+                                }
+                                return typeof(CollectionDeserializer<,,>).MakeGenericType(type, typeof(HashSet<>).MakeGenericType(genericArgs), genericArgs[0]);
+                            }
+                            if (typeof(IList<>).MakeGenericType(genericArgs).IsAssignableFrom(type)
+#if !NET40
+                                || typeof(IReadOnlyList<>).MakeGenericType(genericArgs).IsAssignableFrom(type)
+#endif
+                                ) {
+                                var arg = genericArgs[0];
+                                if (arg.IsGenericType && arg.GetGenericTypeDefinition() == pairType) {
+                                    Type[] genArgs = arg.GetGenericArguments();
+                                    return typeof(DictionaryDeserializer<,,,>).MakeGenericType(type, typeof(List<>).MakeGenericType(genericArgs), genArgs[0], genArgs[1]);
+                                }
+                                return typeof(CollectionDeserializer<,,>).MakeGenericType(type, typeof(List<>).MakeGenericType(genericArgs), genericArgs[0]);
+                            }
+                            if (typeof(IEnumerable<>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
+                                var arg = genericArgs[0];
+                                if (arg.IsGenericType && arg.GetGenericTypeDefinition() == pairType) {
+                                    Type[] genArgs = arg.GetGenericArguments();
+                                    return typeof(DictionaryDeserializer<,,,>).MakeGenericType(type, typeof(Dictionary<,>).MakeGenericType(genArgs), genArgs[0], genArgs[1]);
+                                }
+                                return typeof(CollectionDeserializer<,,>).MakeGenericType(type, typeof(List<>).MakeGenericType(genericArgs), genericArgs[0]);
+                            }
                         }
                         if (typeof(Queue<>) == genericType) {
                             return typeof(QueueDeserializer<>).MakeGenericType(genericArgs);
@@ -149,32 +172,25 @@ namespace Hprose.IO.Deserializers {
                         if (typeof(BlockingCollection<>) == genericType) {
                             return typeof(BlockingCollectionDeserializer<>).MakeGenericType(genericArgs);
                         }
-                        Type genericCollection = typeof(ICollection<>).MakeGenericType(genericArgs);
-                        if (genericCollection.IsAssignableFrom(type)) {
-                            if (genericArgs[0].IsGenericType) {
-                                Type genType = genericArgs[0].GetGenericTypeDefinition();
-                                //if (genType == typeof(KeyValuePair<,>)) {
-                                //    Type[] genArgs = genericArgs[0].GetGenericArguments();
-                                //    return typeof(DictionarySerializer<,,>).MakeGenericType(type, genArgs[0], genArgs[1]);
-                                //}
-                            }
+                        if (typeof(ICollection<>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
                             return typeof(CollectionDeserializer<,,>).MakeGenericType(type, type, genericArgs[0]);
                         }
                         if (typeof(IProducerConsumerCollection<>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
                             return typeof(ProducerConsumerCollectionDeserializer<,>).MakeGenericType(type, genericArgs[0]);
                         }
                         break;
-                    //case 2:
-                    //    if (typeof(IDictionary<,>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
-                    //        return typeof(DictionarySerializer<,,>).MakeGenericType(type, genericArgs[0], genericArgs[1]);
-                    //    }
-                    //    if (typeof(ICollection<>).MakeGenericType(genericArgs[0]).IsAssignableFrom(type)) {
-                    //        return typeof(CollectionSerializer<,>).MakeGenericType(type, genericArgs[0]);
-                    //    }
-                    //    if (typeof(ICollection<>).MakeGenericType(genericArgs[1]).IsAssignableFrom(type)) {
-                    //        return typeof(CollectionSerializer<,>).MakeGenericType(type, genericArgs[1]);
-                    //    }
-                    //    break;
+                    case 2:
+                        if (typeof(IDictionary<,>) == genericType
+#if !NET40
+                            || typeof(IReadOnlyDictionary<,>) == genericType
+#endif
+                            ) {
+                            return typeof(DictionaryDeserializer<,,,>).MakeGenericType(type, typeof(Dictionary<,>).MakeGenericType(genericArgs), genericArgs[0], genericArgs[1]);
+                        }
+                        if (typeof(IDictionary<,>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
+                            return typeof(DictionaryDeserializer<,,,>).MakeGenericType(type, type, genericArgs[0], genericArgs[1]);
+                        }
+                        break;
                 }
             }
             //if (type.IsGenericType) {
@@ -184,57 +200,6 @@ namespace Hprose.IO.Deserializers {
             //    }
             //    if (genericType.Name.StartsWith("Tuple`")) {
             //        return typeof(TupleSerializer<>).MakeGenericType(type);
-            //    }
-            //    Type[] genericArgs = type.GetGenericArguments();
-            //    if (genericType == typeof(Nullable<>)) {
-            //        return typeof(NullableSerializer<>).MakeGenericType(genericArgs);
-            //    }
-            //    if (genericType == typeof(NullableKey<>)) {
-            //        return typeof(NullableKeySerializer<>).MakeGenericType(genericArgs);
-            //    }
-            //    switch (genericArgs.Length) {
-            //        case 1:
-            //            bool isGenericCollection = typeof(ICollection<>).MakeGenericType(genericArgs).IsAssignableFrom(type);
-            //            bool isGenericIEnumerable = typeof(IEnumerable<>).MakeGenericType(genericArgs).IsAssignableFrom(type);
-            //            if (isGenericCollection) {
-            //                if (genericArgs[0].IsGenericType) {
-            //                    Type genType = genericArgs[0].GetGenericTypeDefinition();
-            //                    if (genType == typeof(KeyValuePair<,>)) {
-            //                        Type[] genArgs = genericArgs[0].GetGenericArguments();
-            //                        return typeof(DictionarySerializer<,,>).MakeGenericType(type, genArgs[0], genArgs[1]);
-            //                    }
-            //                }
-            //                return typeof(CollectionSerializer<,>).MakeGenericType(type, genericArgs[0]);
-            //            }
-            //            if (isGenericIEnumerable) {
-            //                bool isCollection = typeof(ICollection).IsAssignableFrom(type);
-            //                if (genericArgs[0].IsGenericType) {
-            //                    Type genType = genericArgs[0].GetGenericTypeDefinition();
-            //                    if (genType == typeof(KeyValuePair<,>)) {
-            //                        Type[] genArgs = genericArgs[0].GetGenericArguments();
-            //                        if (isCollection) {
-            //                            return typeof(FastEnumerableSerializer<,,>).MakeGenericType(type, genArgs[0], genArgs[1]);
-            //                        }
-            //                        return typeof(EnumerableSerializer<,,>).MakeGenericType(type, genArgs[0], genArgs[1]);
-            //                    }
-            //                }
-            //                if (isCollection) {
-            //                    return typeof(FastEnumerableSerializer<,>).MakeGenericType(type, genericArgs[0]);
-            //                }
-            //                return typeof(EnumerableSerializer<,>).MakeGenericType(type, genericArgs[0]);
-            //            }
-            //            break;
-            //        case 2:
-            //            if (typeof(IDictionary<,>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
-            //                return typeof(DictionarySerializer<,,>).MakeGenericType(type, genericArgs[0], genericArgs[1]);
-            //            }
-            //            if (typeof(ICollection<>).MakeGenericType(genericArgs[0]).IsAssignableFrom(type)) {
-            //                return typeof(CollectionSerializer<,>).MakeGenericType(type, genericArgs[0]);
-            //            }
-            //            if (typeof(ICollection<>).MakeGenericType(genericArgs[1]).IsAssignableFrom(type)) {
-            //                return typeof(CollectionSerializer<,>).MakeGenericType(type, genericArgs[1]);
-            //            }
-            //            break;
             //    }
             //}
             //if (typeof(IDictionary).IsAssignableFrom(type)) {

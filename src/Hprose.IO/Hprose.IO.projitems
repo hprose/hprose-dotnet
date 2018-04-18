@@ -24,6 +24,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Int64Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Converter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DictionaryDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\StringCollectionDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ProducerConsumerCollectionDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\EnumDeserializer.cs" />

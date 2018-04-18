@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Numerics;
 using System.Text;
 using System.Collections.Specialized;
+using System.Linq;
 
 namespace Hprose.UnitTests.IO.Deserializers {
     [TestClass]
@@ -831,6 +832,12 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.IsTrue(c2.Contains(e));
             }
         }
+        private void AreEqual<T>(IReadOnlyCollection<T> c1, IReadOnlyCollection<T> c2) {
+            Assert.AreEqual(c1.Count, c2.Count);
+            foreach (var e in c1) {
+                Assert.IsTrue(c2.Contains(e));
+            }
+        }
         [TestMethod]
         public void TestDeserializeCollection() {
             using (MemoryStream stream = new MemoryStream()) {
@@ -929,8 +936,8 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Reader reader = new Reader(stream);
                 Assert.AreEqual(null, reader.Deserialize<NullableKey<int?>>());
                 Assert.AreEqual(null, reader.Deserialize<NullableKey<string>>());
-                Assert.AreEqual(1, reader.Deserialize<NullableKey<int?>>());
-                Assert.AreEqual("string", reader.Deserialize<NullableKey<string>>());
+                Assert.AreEqual<int?>(1, reader.Deserialize<NullableKey<int?>>());
+                Assert.AreEqual<string>("string", reader.Deserialize<NullableKey<string>>());
             }
         }
         [TestMethod]
@@ -994,6 +1001,121 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual(null, reader.Deserialize<StringCollection>());
                 AreEqual(s, reader.Deserialize<StringCollection>());
                 AreEqual(s, reader.Deserialize<StringCollection>());
+            }
+        }
+        [TestMethod]
+        public void TestDeserializeStringDictionary() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var dict = new Dictionary<string, string> {
+                    { "Item1", "XXXXX" },
+                    { "Item2", "YYYYY" },
+                    { "Item3", "ZZZZZ" },
+                };
+                writer.Serialize(null);
+                writer.Serialize(dict);
+                writer.Serialize(dict);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<IDictionary<string, string>>());
+                AreEqual(dict, reader.Deserialize<IDictionary<string, string>>());
+                AreEqual(dict, reader.Deserialize<IDictionary<string, string>>());
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var dict = new Dictionary<string, string> {
+                    { "Item1", "XXXXX" },
+                    { "Item2", "YYYYY" },
+                    { "Item3", "ZZZZZ" },
+                };
+                writer.Serialize(null);
+                writer.Serialize(dict);
+                writer.Serialize(dict);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<ISet<KeyValuePair<string, string>>>());
+                AreEqual(dict, reader.Deserialize<ISet<KeyValuePair<string, string>>>());
+                AreEqual(dict, reader.Deserialize<ISet<KeyValuePair<string, string>>>());
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var dict = new Dictionary<string, string> {
+                    { "Item1", "XXXXX" },
+                    { "Item2", "YYYYY" },
+                    { "Item3", "ZZZZZ" },
+                };
+                writer.Serialize(null);
+                writer.Serialize(dict);
+                writer.Serialize(dict);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<IList<KeyValuePair<string, string>>>());
+                AreEqual(dict, reader.Deserialize<IList<KeyValuePair<string, string>>>());
+                AreEqual(dict, reader.Deserialize<IList<KeyValuePair<string, string>>>());
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var dict = new Dictionary<string, string> {
+                    { "Item1", "XXXXX" },
+                    { "Item2", "YYYYY" },
+                    { "Item3", "ZZZZZ" },
+                };
+                writer.Serialize(null);
+                writer.Serialize(dict);
+                writer.Serialize(dict);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<IReadOnlyList<KeyValuePair<string, string>>>());
+                AreEqual(dict, reader.Deserialize<IReadOnlyList<KeyValuePair<string, string>>>());
+                AreEqual(dict, reader.Deserialize<IReadOnlyList<KeyValuePair<string, string>>>());
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var dict = new Dictionary<string, string> {
+                    { "Item1", "XXXXX" },
+                    { "Item2", "YYYYY" },
+                    { "Item3", "ZZZZZ" },
+                };
+                writer.Serialize(null);
+                writer.Serialize(dict);
+                writer.Serialize(dict);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<ICollection<KeyValuePair<string, string>>>());
+                AreEqual(dict, reader.Deserialize<ICollection<KeyValuePair<string, string>>>());
+                AreEqual(dict, reader.Deserialize<ICollection<KeyValuePair<string, string>>>());
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var dict = new Dictionary<string, string> {
+                    { "Item1", "XXXXX" },
+                    { "Item2", "YYYYY" },
+                    { "Item3", "ZZZZZ" },
+                };
+                writer.Serialize(null);
+                writer.Serialize(dict);
+                writer.Serialize(dict);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<IReadOnlyCollection<KeyValuePair<string, string>>>());
+                AreEqual(dict, reader.Deserialize<IReadOnlyCollection<KeyValuePair<string, string>>>());
+                AreEqual(dict, reader.Deserialize<IReadOnlyCollection<KeyValuePair<string, string>>>());
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var dict = new Dictionary<string, string> {
+                    { "Item1", "XXXXX" },
+                    { "Item2", "YYYYY" },
+                    { "Item3", "ZZZZZ" },
+                };
+                writer.Serialize(null);
+                writer.Serialize(dict);
+                writer.Serialize(dict);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<ConcurrentDictionary<string, string>>());
+                AreEqual((ICollection<KeyValuePair<string, string>>)dict, reader.Deserialize<ConcurrentDictionary<string, string>>());
+                AreEqual((ICollection<KeyValuePair<string, string>>)dict, reader.Deserialize<ConcurrentDictionary<string, string>>());
             }
         }
     }
