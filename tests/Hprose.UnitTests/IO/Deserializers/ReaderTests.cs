@@ -1004,7 +1004,7 @@ namespace Hprose.UnitTests.IO.Deserializers {
             }
         }
         [TestMethod]
-        public void TestDeserializeStringDictionary() {
+        public void TestDeserializeDictionary() {
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
                 var dict = new Dictionary<string, string> {
@@ -1133,6 +1133,20 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual(null, reader.Deserialize());
                 AreEqual(dict, (ICollection<KeyValuePair<object, object>>)reader.Deserialize());
                 AreEqual(dict, (ICollection<KeyValuePair<object, object>>)reader.Deserialize());
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                dynamic o = new ExpandoObject();
+                o.Id = 1;
+                o.Name = "Test";
+                writer.Serialize(null);
+                writer.Serialize(o);
+                writer.Serialize(o);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize());
+                AreEqual(o, reader.Deserialize<ExpandoObject>());
+                AreEqual(o, reader.Deserialize<ExpandoObject>());
             }
         }
     }

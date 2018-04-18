@@ -63,9 +63,35 @@ namespace Hprose.IO.Deserializers {
         object IDeserializer.Read(Reader reader, int tag) => Read(reader, tag);
         object IDeserializer.Deserialize(Reader reader) => Deserialize(reader);
     }
-
+    public enum LongType {
+        BigInteger, Int64, UInt64
+    }
+    public enum RealType {
+        Double, Single, Decimal
+    }
+    public enum CharType {
+        String, Char
+    }
+    public enum ListType {
+        List, Array, ArrayList
+    }
+    public enum DictType {
+        NullableKeyDictionary, Dictionary, ExpandoObject, Hashtable
+    }
     public class Deserializer : Deserializer<object> {
         static readonly ConcurrentDictionary<Type, Lazy<IDeserializer>> _deserializers = new ConcurrentDictionary<Type, Lazy<IDeserializer>>();
+        private static volatile LongType _defaultLongType = LongType.BigInteger;
+        private static volatile RealType _defaultRealType = RealType.Double;
+        private static volatile CharType _defaultCharType = CharType.String;
+        private static volatile ListType _defaultListType = ListType.List;
+        private static volatile DictType _defaultDictType = DictType.NullableKeyDictionary;
+
+        public static LongType DefaultLongType { get => _defaultLongType; set => _defaultLongType = value; }
+        public static RealType DefaultRealType { get => _defaultRealType; set => _defaultRealType = value; }
+        public static CharType DefaultCharType { get => _defaultCharType; set => _defaultCharType = value; }
+        public static ListType DefaultListType { get => _defaultListType; set => _defaultListType = value; }
+        public static DictType DefaultDictType { get => _defaultDictType; set => _defaultDictType = value; }
+
         static Deserializer() {
             Register(() => new Deserializer());
             Register(() => new DBNullDeserializer());
@@ -95,7 +121,7 @@ namespace Hprose.IO.Deserializers {
             Register(() => new StringCollectionDeserializer());
             //Register(() => new ValueTupleSerializer());
             //Register(() => new BitArraySerializer());
-            //Register(() => new DictionarySerializer<ExpandoObject, string, object>());
+            Register(() => new DictionaryDeserializer<ExpandoObject, string, object>());
         }
 
         public static void Initialize() { }
@@ -173,7 +199,7 @@ namespace Hprose.IO.Deserializers {
                             return typeof(BlockingCollectionDeserializer<>).MakeGenericType(genericArgs);
                         }
                         if (typeof(ICollection<>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
-                            return typeof(CollectionDeserializer<,,>).MakeGenericType(type, type, genericArgs[0]);
+                            return typeof(CollectionDeserializer<,>).MakeGenericType(type, genericArgs[0]);
                         }
                         if (typeof(IProducerConsumerCollection<>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
                             return typeof(ProducerConsumerCollectionDeserializer<,>).MakeGenericType(type, genericArgs[0]);
@@ -188,7 +214,7 @@ namespace Hprose.IO.Deserializers {
                             return typeof(DictionaryDeserializer<,,,>).MakeGenericType(type, typeof(Dictionary<,>).MakeGenericType(genericArgs), genericArgs[0], genericArgs[1]);
                         }
                         if (typeof(IDictionary<,>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
-                            return typeof(DictionaryDeserializer<,,,>).MakeGenericType(type, type, genericArgs[0], genericArgs[1]);
+                            return typeof(DictionaryDeserializer<,,>).MakeGenericType(type, genericArgs[0], genericArgs[1]);
                         }
                         break;
                 }
@@ -239,9 +265,23 @@ namespace Hprose.IO.Deserializers {
                 case TagInteger:
                     return ValueReader.ReadInt(stream);
                 case TagLong:
-                    return ValueReader.ReadBigInteger(stream);
+                    switch (_defaultLongType) {
+                        case LongType.Int64:
+                            return ValueReader.ReadLong(stream);
+                        case LongType.UInt64:
+                            return (ulong)ValueReader.ReadLong(stream);
+                        default:
+                            return ValueReader.ReadBigInteger(stream);
+                    }
                 case TagDouble:
-                    return ValueReader.ReadDouble(stream);
+                    switch (_defaultRealType) {
+                        case RealType.Single:
+                            return ValueReader.ReadSingle(stream);
+                        case RealType.Decimal:
+                            return ValueReader.ReadDecimal(stream);
+                        default:
+                            return ValueReader.ReadDouble(stream);
+                    }
                 case TagEmpty:
                     return "";
                 case TagTrue:
@@ -253,7 +293,12 @@ namespace Hprose.IO.Deserializers {
                 case TagInfinity:
                     return ValueReader.ReadInfinity(stream);
                 case TagUTF8Char:
-                    return ValueReader.ReadUTF8Char(stream);
+                    switch (_defaultCharType) {
+                        case CharType.Char:
+                            return ValueReader.ReadChar(stream);
+                        default:
+                            return ValueReader.ReadUTF8Char(stream);
+                    }
                 case TagString:
                     return ReferenceReader.ReadString(reader);
                 case TagBytes:
@@ -265,9 +310,23 @@ namespace Hprose.IO.Deserializers {
                 case TagGuid:
                     return ReferenceReader.ReadGuid(reader);
                 case TagList:
-                    return CollectionDeserializer<IList<object>, List<object>, object>.Read(reader);
+                    switch (_defaultListType) {
+                        case ListType.Array:
+                            return ReferenceReader.ReadArray<object>(reader);
+                        case ListType.ArrayList:
+                        default:
+                            return CollectionDeserializer<List<object>, object>.Read(reader);
+                    }
                 case TagMap:
-                    return DictionaryDeserializer<IDictionary<object, object>, NullableKeyDictionary<object, object>, object, object>.Read(reader);
+                    switch (_defaultDictType) {
+                        case DictType.Dictionary:
+                            return DictionaryDeserializer<Dictionary<object, object>, object, object>.Read(reader);
+                        case DictType.ExpandoObject:
+                            return DictionaryDeserializer<ExpandoObject, string, object>.Read(reader);
+                        case DictType.Hashtable:
+                        default:
+                            return DictionaryDeserializer<NullableKeyDictionary<object, object>, object, object>.Read(reader);
+                    }
                 //case TagObject:
                 //    return ReadObjectWithoutTag(null);
                 default:
