@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Reader class for C#.                            *
  *                                                        *
- * LastModified: Apr 9, 2018                              *
+ * LastModified: Apr 18, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -27,6 +27,17 @@ namespace Hprose.IO.Deserializers {
         private readonly ReaderRefer _refer;
         private readonly HproseMode _mode;
         private readonly List<ClassInfo> _ref = new List<ClassInfo>();
+        private volatile LongType _defaultLongType = LongType.BigInteger;
+        private volatile RealType _defaultRealType = RealType.Double;
+        private volatile CharType _defaultCharType = CharType.String;
+        private volatile ListType _defaultListType = ListType.List;
+        private volatile DictType _defaultDictType = DictType.NullableKeyDictionary;
+
+        public LongType DefaultLongType { get => _defaultLongType; set => _defaultLongType = value; }
+        public RealType DefaultRealType { get => _defaultRealType; set => _defaultRealType = value; }
+        public CharType DefaultCharType { get => _defaultCharType; set => _defaultCharType = value; }
+        public ListType DefaultListType { get => _defaultListType; set => _defaultListType = value; }
+        public DictType DefaultDictType { get => _defaultDictType; set => _defaultDictType = value; }
 
         public Stream Stream => _stream;
         public HproseMode Mode => _mode;
