@@ -25,7 +25,7 @@ using static Hprose.IO.HproseTags;
 namespace Hprose.IO.Deserializers {
     class MultiDimArrayDeserializer<T, E> : Deserializer<T> {
         private static readonly T EmptyArray = (T)(object)(Array.CreateInstance(typeof(E), new int[typeof(T).GetArrayRank()]));
-        private static T ReadMultiDimArray(Reader reader) {
+        private static T Read(Reader reader) {
             Stream stream = reader.Stream;
             Type type = typeof(T);
             int rank = type.GetArrayRank();
@@ -83,7 +83,7 @@ namespace Hprose.IO.Deserializers {
                 case TagEmpty:
                     return EmptyArray;
                 case TagList:
-                    return ReadMultiDimArray(reader);
+                    return Read(reader);
                 default:
                     return base.Read(reader, tag);
             }

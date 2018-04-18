@@ -24,7 +24,7 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
     class ConcurrentStackDeserializer<T> : Deserializer<ConcurrentStack<T>> {
-        public static ConcurrentStack<T> ReadStack(Reader reader) {
+        public static ConcurrentStack<T> Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             ConcurrentStack<T> stack = new ConcurrentStack<T>();
@@ -46,7 +46,7 @@ namespace Hprose.IO.Deserializers {
                 case TagEmpty:
                     return new ConcurrentStack<T>();
                 case TagList:
-                    return ReadStack(reader);
+                    return Read(reader);
                 default:
                     return base.Read(reader, tag);
             }

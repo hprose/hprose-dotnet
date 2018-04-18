@@ -24,7 +24,7 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
     class DictionaryDeserializer<I, T, K, V> : Deserializer<I> where T : I, ICollection<KeyValuePair<K, V>>, new() {
-        public static I ReadCollection(Reader reader) {
+        public static I Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             T dict = new T();
@@ -45,7 +45,7 @@ namespace Hprose.IO.Deserializers {
                 case TagEmpty:
                     return new T();
                 case TagMap:
-                    return ReadCollection(reader);
+                    return Read(reader);
                 default:
                     return base.Read(reader, tag);
             }

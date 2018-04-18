@@ -24,7 +24,7 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
     class StackDeserializer<T> : Deserializer<Stack<T>> {
-        public static Stack<T> ReadStack(Reader reader) {
+        public static Stack<T> Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             Stack<T> stack = new Stack<T>();
@@ -46,7 +46,7 @@ namespace Hprose.IO.Deserializers {
                 case TagEmpty:
                     return new Stack<T>();
                 case TagList:
-                    return ReadStack(reader);
+                    return Read(reader);
                 default:
                     return base.Read(reader, tag);
             }

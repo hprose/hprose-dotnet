@@ -24,7 +24,7 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
     class StringCollectionDeserializer : Deserializer<StringCollection> {
-        public static StringCollection ReadCollection(Reader reader) {
+        public static StringCollection Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             StringCollection collection = new StringCollection();
@@ -42,7 +42,7 @@ namespace Hprose.IO.Deserializers {
                 case TagEmpty:
                     return new StringCollection();
                 case TagList:
-                    return ReadCollection(reader);
+                    return Read(reader);
                 default:
                     return base.Read(reader, tag);
             }

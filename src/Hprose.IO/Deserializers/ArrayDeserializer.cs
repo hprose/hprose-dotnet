@@ -40,7 +40,7 @@ namespace Hprose.IO.Deserializers {
 
     class Array2Deserializer<T> : Deserializer<T[,]> {
         private static readonly T[,] EmptyArray = new T[0, 0] { };
-        private static T[,] ReadArray(Reader reader) {
+        private static T[,] Read(Reader reader) {
             Stream stream = reader.Stream;
             int count1 = ValueReader.ReadCount(stream);
             if (stream.ReadByte() != TagList) {
@@ -73,7 +73,7 @@ namespace Hprose.IO.Deserializers {
                 case TagEmpty:
                     return EmptyArray;
                 case TagList:
-                    return ReadArray(reader);
+                    return Read(reader);
                 default:
                     return base.Read(reader, tag);
             }

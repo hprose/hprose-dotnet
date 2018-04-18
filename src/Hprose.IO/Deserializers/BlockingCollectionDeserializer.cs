@@ -24,7 +24,7 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
     class BlockingCollectionDeserializer<T> : Deserializer<BlockingCollection<T>> {
-        public static BlockingCollection<T> ReadBlockingCollection(Reader reader) {
+        public static BlockingCollection<T> Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             BlockingCollection<T> collection = new BlockingCollection<T>();
@@ -42,7 +42,7 @@ namespace Hprose.IO.Deserializers {
                 case TagEmpty:
                     return new BlockingCollection<T>();
                 case TagList:
-                    return ReadBlockingCollection(reader);
+                    return Read(reader);
                 default:
                     return base.Read(reader, tag);
             }

@@ -24,7 +24,7 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
     class QueueDeserializer<T> : Deserializer<Queue<T>> {
-        public static Queue<T> ReadQueue(Reader reader) {
+        public static Queue<T> Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             Queue<T> queue = new Queue<T>();
@@ -42,7 +42,7 @@ namespace Hprose.IO.Deserializers {
                 case TagEmpty:
                     return new Queue<T>();
                 case TagList:
-                    return ReadQueue(reader);
+                    return Read(reader);
                 default:
                     return base.Read(reader, tag);
             }
