@@ -12,7 +12,7 @@
  *                                                        *
  * ValueReader class for C#.                              *
  *                                                        *
- * LastModified: Apr 15, 2018                             *
+ * LastModified: Apr 18, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -307,6 +307,10 @@ namespace Hprose.IO.Deserializers {
 
         public static double ReadDouble(Stream stream) {
             return double.Parse(ReadUntil(stream, TagSemicolon).ToString());
+        }
+
+        public static decimal ReadDecimal(Stream stream) {
+            return decimal.Parse(ReadUntil(stream, TagSemicolon).ToString());
         }
 
         public static float ReadSingleInfinity(Stream stream) {

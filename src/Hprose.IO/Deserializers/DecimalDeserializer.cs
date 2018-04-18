@@ -12,7 +12,7 @@
  *                                                        *
  * DecimalDeserializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 12, 2018                             *
+ * LastModified: Apr 18, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -33,7 +33,7 @@ namespace Hprose.IO.Deserializers {
                 case TagLong:
                     return ValueReader.ReadIntAsDecimal(stream);
                 case TagDouble:
-                    return (decimal)ValueReader.ReadDouble(stream);
+                    return ValueReader.ReadDecimal(stream);
                 case TagTrue:
                     return 1;
                 case TagFalse:
