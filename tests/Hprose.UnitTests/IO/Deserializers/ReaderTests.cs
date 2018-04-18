@@ -1149,5 +1149,47 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 AreEqual(o, reader.Deserialize<ExpandoObject>());
             }
         }
+        [TestMethod]
+        public void TestDeserializeArrayList() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var c = new ArrayList { '0', '1', '2', '3', '4', '5' };
+                writer.Serialize(null);
+                writer.Serialize(c);
+                writer.Serialize(c);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                reader.DefaultCharType = CharType.Char;
+                Assert.AreEqual(null, reader.Deserialize<ArrayList>());
+                AreEqual(c.ToArray(), reader.Deserialize<ArrayList>().ToArray());
+                AreEqual(c.ToArray(), reader.Deserialize<ArrayList>().ToArray());
+            }
+        }
+        private void AreEqual(IDictionary d1, IDictionary d2) {
+            Assert.AreEqual(d1.Count, d2.Count);
+            foreach (DictionaryEntry e in d1) {
+                Assert.AreEqual(d2[e.Key], e.Value);
+            }
+        }
+        [TestMethod]
+        public void TestDeserializeHashtable() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var h = new Hashtable {
+                    { "Item1", "XXXXX" },
+                    { "Item2", "YYYYY" },
+                    { "Item3", "ZZZZZ" },
+                };
+                writer.Serialize(null);
+                writer.Serialize(h);
+                writer.Serialize(h);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                reader.DefaultCharType = CharType.Char;
+                Assert.AreEqual(null, reader.Deserialize<Hashtable>());
+                AreEqual(h, reader.Deserialize<Hashtable>());
+                AreEqual(h, reader.Deserialize<Hashtable>());
+            }
+        }
     }
 }
