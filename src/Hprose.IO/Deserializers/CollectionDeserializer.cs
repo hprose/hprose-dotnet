@@ -48,4 +48,5 @@ namespace Hprose.IO.Deserializers {
             }
         }
     }
+    class CollectionDeserializer<T, E> : CollectionDeserializer<T, T, E> where T : ICollection<E>, new() { }
 }
