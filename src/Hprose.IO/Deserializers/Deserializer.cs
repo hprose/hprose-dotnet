@@ -229,5 +229,50 @@ namespace Hprose.IO.Deserializers {
                 () => Activator.CreateInstance(GetDeserializerType(t)) as IDeserializer
             )).Value;
         }
+
+        public override object Read(Reader reader, int tag) {
+            if (tag >= '0' && tag <= '9') {
+                return (tag - '0');
+            }
+            var stream = reader.Stream;
+            switch (tag) {
+                case TagInteger:
+                    return ValueReader.ReadInt(stream);
+                case TagLong:
+                    return ValueReader.ReadBigInteger(stream);
+                case TagDouble:
+                    return ValueReader.ReadDouble(stream);
+                case TagEmpty:
+                    return "";
+                case TagTrue:
+                    return true;
+                case TagFalse:
+                    return false;
+                case TagNaN:
+                    return double.NaN;
+                case TagInfinity:
+                    return ValueReader.ReadInfinity(stream);
+                case TagUTF8Char:
+                    return ValueReader.ReadUTF8Char(stream);
+                case TagString:
+                    return ReferenceReader.ReadString(reader);
+                case TagBytes:
+                    return ReferenceReader.ReadBytes(reader);
+                case TagDate:
+                    return ReferenceReader.ReadDateTime(reader);
+                case TagTime:
+                    return ReferenceReader.ReadTime(reader);
+                case TagGuid:
+                    return ReferenceReader.ReadGuid(reader);
+                case TagList:
+                    return CollectionDeserializer<IList<object>, List<object>, object>.Read(reader);
+                case TagMap:
+                    return DictionaryDeserializer<IDictionary<object, object>, NullableKeyDictionary<object, object>, object, object>.Read(reader);
+                //case TagObject:
+                //    return ReadObjectWithoutTag(null);
+                default:
+                    return base.Read(reader, tag);
+            }
+        }
     }
 }

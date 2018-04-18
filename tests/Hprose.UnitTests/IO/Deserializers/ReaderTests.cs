@@ -1117,6 +1117,23 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 AreEqual((ICollection<KeyValuePair<string, string>>)dict, reader.Deserialize<ConcurrentDictionary<string, string>>());
                 AreEqual((ICollection<KeyValuePair<string, string>>)dict, reader.Deserialize<ConcurrentDictionary<string, string>>());
             }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var dict = new NullableKeyDictionary<object, object> {
+                    { null, null },
+                    { "Item1", "XXXXX" },
+                    { "Item2", "YYYYY" },
+                    { "Item3", "ZZZZZ" },
+                };
+                writer.Serialize(null);
+                writer.Serialize(dict);
+                writer.Serialize(dict);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize());
+                AreEqual(dict, (ICollection<KeyValuePair<object, object>>)reader.Deserialize());
+                AreEqual(dict, (ICollection<KeyValuePair<object, object>>)reader.Deserialize());
+            }
         }
     }
 }
