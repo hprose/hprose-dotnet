@@ -19,7 +19,7 @@
 using System;
 
 namespace Hprose.IO.Deserializers {
-    struct ClassInfo {
+    public struct ClassInfo {
         public string Name;
         public Type Type;
         public string[] Members;

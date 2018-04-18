@@ -1191,5 +1191,29 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 AreEqual(h, reader.Deserialize<Hashtable>());
             }
         }
+        public class Test {
+            public int Id;
+            public string Name;
+        }
+        [TestMethod]
+        public void TestDeserializeObjectAsExpandoObject() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var o = new Test();
+                o.Id = 1;
+                o.Name = "Test";
+                writer.Serialize(null);
+                writer.Serialize(o);
+                writer.Serialize(o);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize());
+                dynamic o2 = reader.Deserialize<ExpandoObject>();
+                Assert.AreEqual(o.Id, o2.id);
+                Assert.AreEqual(o.Name, o2.name);
+                dynamic o3 = reader.Deserialize<ExpandoObject>();
+                Assert.AreEqual(o2, o3);
+            }
+        }
     }
 }

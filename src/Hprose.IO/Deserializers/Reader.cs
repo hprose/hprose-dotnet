@@ -42,6 +42,8 @@ namespace Hprose.IO.Deserializers {
         public Stream Stream => _stream;
         public HproseMode Mode => _mode;
 
+        public ClassInfo this[int index] => _ref[index];
+
         public Reader(Stream stream, bool simple = false, HproseMode mode = HproseMode.MemberMode) {
             _stream = stream;
             _refer = simple ? null : new ReaderRefer();

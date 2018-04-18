@@ -21,6 +21,8 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
+using Hprose.IO.Converters;
+
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
@@ -40,6 +42,21 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return dict;
         }
+        public static I ReadObjectAsMap(Reader reader) {
+            Stream stream = reader.Stream;
+            int index = ValueReader.ReadInt(stream, TagOpenbrace);
+            string[] members = reader[index].Members;
+            int count = members.Length;
+            T dict = new T();
+            reader.SetRef(dict);
+            var deserializer = Deserializer<V>.Instance;
+            for (int i = 0; i < count; ++i) {
+                var v = deserializer.Deserialize(reader);
+                dict.Add(new KeyValuePair<K, V>((K)(object)members[i], v));
+            }
+            stream.ReadByte();
+            return dict;
+        }
         public override I Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {
@@ -47,6 +64,8 @@ namespace Hprose.IO.Deserializers {
                     return new T();
                 case TagMap:
                     return Read(reader);
+                case TagObject:
+                    return ReadObjectAsMap(reader);
                 default:
                     return base.Read(reader, tag);
             }
@@ -69,6 +88,21 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return dict;
         }
+        public static I ReadObjectAsMap(Reader reader) {
+            Stream stream = reader.Stream;
+            int index = ValueReader.ReadInt(stream, TagOpenbrace);
+            string[] members = reader[index].Members;
+            int count = members.Length;
+            T dict = new T();
+            reader.SetRef(dict);
+            var deserializer = Deserializer.Instance;
+            for (int i = 0; i < count; ++i) {
+                var v = deserializer.Deserialize(reader);
+                dict.Add(members[i], v);
+            }
+            stream.ReadByte();
+            return dict;
+        }
         public override I Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {
@@ -76,6 +110,8 @@ namespace Hprose.IO.Deserializers {
                     return new T();
                 case TagMap:
                     return Read(reader);
+                case TagObject:
+                    return ReadObjectAsMap(reader);
                 default:
                     return base.Read(reader, tag);
             }
