@@ -1158,8 +1158,9 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(c);
                 writer.Serialize(c);
                 stream.Position = 0;
-                Reader reader = new Reader(stream);
-                reader.DefaultCharType = CharType.Char;
+                Reader reader = new Reader(stream) {
+                    DefaultCharType = CharType.Char
+                };
                 Assert.AreEqual(null, reader.Deserialize<ArrayList>());
                 AreEqual(c.ToArray(), reader.Deserialize<ArrayList>().ToArray());
                 AreEqual(c.ToArray(), reader.Deserialize<ArrayList>().ToArray());
@@ -1185,7 +1186,6 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(h);
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
-                reader.DefaultCharType = CharType.Char;
                 Assert.AreEqual(null, reader.Deserialize<Hashtable>());
                 AreEqual(h, reader.Deserialize<Hashtable>());
                 AreEqual(h, reader.Deserialize<Hashtable>());
@@ -1199,9 +1199,10 @@ namespace Hprose.UnitTests.IO.Deserializers {
         public void TestDeserializeObjectAsExpandoObject() {
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
-                var o = new Test();
-                o.Id = 1;
-                o.Name = "Test";
+                var o = new Test {
+                    Id = 1,
+                    Name = "Test",
+                };
                 writer.Serialize(null);
                 writer.Serialize(o);
                 writer.Serialize(o);
@@ -1209,8 +1210,8 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Reader reader = new Reader(stream);
                 Assert.AreEqual(null, reader.Deserialize());
                 dynamic o2 = reader.Deserialize<ExpandoObject>();
-                Assert.AreEqual(o.Id, o2.id);
-                Assert.AreEqual(o.Name, o2.name);
+                Assert.AreEqual(o.Id, o2.Id);
+                Assert.AreEqual(o.Name, o2.Name);
                 dynamic o3 = reader.Deserialize<ExpandoObject>();
                 Assert.AreEqual(o2, o3);
             }

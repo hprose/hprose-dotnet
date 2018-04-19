@@ -25,6 +25,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DictType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ObjectDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ListType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\RealType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ListDeserializer.cs" />

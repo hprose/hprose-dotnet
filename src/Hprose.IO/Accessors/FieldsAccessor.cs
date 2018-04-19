@@ -12,7 +12,7 @@
  *                                                        *
  * FieldsAccessor class for C#.                           *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: Apr 19, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -27,8 +27,8 @@ using static System.Reflection.BindingFlags;
 
 namespace Hprose.IO.Accessors {
     internal static class FieldsAccessor {
-        public static Dictionary<string, FieldInfo> GetFields(Type type) {
-            var members = new Dictionary<string, FieldInfo>();
+        public static Dictionary<string, MemberInfo> GetFields(Type type) {
+            var members = new Dictionary<string, MemberInfo>();
             if (!type.IsSerializable) {
                 return members;
             }
@@ -57,9 +57,6 @@ namespace Hprose.IO.Accessors {
         }
     }
     public static class FieldsAccessor<T> {
-        public static readonly Dictionary<string, FieldInfo> Fields;
-        static FieldsAccessor() {
-            Fields = FieldsAccessor.GetFields(typeof(T));
-        }
+        public static readonly Dictionary<string, MemberInfo> Fields = FieldsAccessor.GetFields(typeof(T));
     }
 }

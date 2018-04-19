@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Deserializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 18, 2018                             *
+ * LastModified: Apr 19, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -237,6 +237,8 @@ namespace Hprose.IO.Deserializers {
                 () => Activator.CreateInstance(GetDeserializerType(t)) as IDeserializer
             )).Value;
         }
+
+        public static object Deserialize(Reader reader, Type type) => GetInstance(type).Deserialize(reader);
 
         public override object Read(Reader reader, int tag) {
             if (tag >= '0' && tag <= '9') {

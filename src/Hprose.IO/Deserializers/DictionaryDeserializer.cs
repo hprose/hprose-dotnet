@@ -12,16 +12,17 @@
  *                                                        *
  * DictionaryDeserializer class for C#.                   *
  *                                                        *
- * LastModified: Apr 18, 2018                             *
+ * LastModified: Apr 19, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
-using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
-using Hprose.IO.Converters;
+using Hprose.IO.Accessors;
 
 using static Hprose.IO.HproseTags;
 
@@ -45,14 +46,32 @@ namespace Hprose.IO.Deserializers {
         public static I ReadObjectAsMap(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            string[] members = reader[index].Members;
-            int count = members.Length;
+            ClassInfo classInfo = reader[index];
             T dict = new T();
             reader.SetRef(dict);
             var deserializer = Deserializer<V>.Instance;
-            for (int i = 0; i < count; ++i) {
-                var v = deserializer.Deserialize(reader);
-                dict.Add(new KeyValuePair<K, V>((K)(object)members[i], v));
+            if (classInfo.Type != null) {
+                var members = Accessor.GetMembers(classInfo.Type, reader.Mode);
+                int count = classInfo.Members.Length;
+                for (int i = 0; i < count; ++i) {
+                    var member = members[classInfo.Members[i]];
+                    if (member != null) {
+                        var v = reader.Deserialize(member is FieldInfo ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType);
+                        dict.Add(new KeyValuePair<K, V>((K)(object)member.Name, (V)v));
+                    }
+                    else {
+                        var v = deserializer.Deserialize(reader);
+                        dict.Add(new KeyValuePair<K, V>((K)(object)classInfo.Members[i], v));
+                    }
+                }
+            }
+            else {
+                string[] members = classInfo.Members;
+                int count = members.Length;
+                for (int i = 0; i < count; ++i) {
+                    var v = deserializer.Deserialize(reader);
+                    dict.Add(new KeyValuePair<K, V>((K)(object)members[i], v));
+                }
             }
             stream.ReadByte();
             return dict;
@@ -91,14 +110,32 @@ namespace Hprose.IO.Deserializers {
         public static I ReadObjectAsMap(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            string[] members = reader[index].Members;
-            int count = members.Length;
+            ClassInfo classInfo = reader[index];
             T dict = new T();
             reader.SetRef(dict);
             var deserializer = Deserializer.Instance;
-            for (int i = 0; i < count; ++i) {
-                var v = deserializer.Deserialize(reader);
-                dict.Add(members[i], v);
+            if (classInfo.Type != null) {
+                var members = Accessor.GetMembers(classInfo.Type, reader.Mode);
+                int count = classInfo.Members.Length;
+                for (int i = 0; i < count; ++i) {
+                    var member = members[classInfo.Members[i]];
+                    if (member != null) {
+                        var v = reader.Deserialize(member is FieldInfo ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType);
+                        dict.Add(member.Name, v);
+                    }
+                    else {
+                        var v = deserializer.Deserialize(reader);
+                        dict.Add(classInfo.Members[i], v);
+                    }
+                }
+            }
+            else {
+                string[] members = classInfo.Members;
+                int count = members.Length;
+                for (int i = 0; i < count; ++i) {
+                    var v = deserializer.Deserialize(reader);
+                    dict.Add(members[i], v);
+                }
             }
             stream.ReadByte();
             return dict;

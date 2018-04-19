@@ -12,7 +12,7 @@
  *                                                        *
  * PropertiesAccessor class for C#.                       *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: Apr 19, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -27,8 +27,8 @@ using static System.Reflection.BindingFlags;
 
 namespace Hprose.IO.Accessors {
     internal static class PropertiesAccessor {
-        public static Dictionary<string, PropertyInfo> GetProperties(Type type) {
-            var members = new Dictionary<string, PropertyInfo>();
+        public static Dictionary<string, MemberInfo> GetProperties(Type type) {
+            var members = new Dictionary<string, MemberInfo>();
             if (!type.IsSerializable) {
                 return members;
             }
@@ -55,9 +55,6 @@ namespace Hprose.IO.Accessors {
         }
     }
     public static class PropertiesAccessor<T> {
-        public static readonly Dictionary<string, PropertyInfo> Properties;
-        static PropertiesAccessor() {
-            Properties = PropertiesAccessor.GetProperties(typeof(T));
-        }
+        public static readonly Dictionary<string, MemberInfo> Properties = PropertiesAccessor.GetProperties(typeof(T));
     }
 }
