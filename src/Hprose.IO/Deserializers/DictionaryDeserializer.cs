@@ -43,13 +43,28 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return dict;
         }
+        public override I Read(Reader reader, int tag) {
+            var stream = reader.Stream;
+            switch (tag) {
+                case TagEmpty:
+                    return new T();
+                case TagMap:
+                    return Read(reader);
+                default:
+                    return base.Read(reader, tag);
+            }
+        }
+    }
+    class DictionaryDeserializer<T, K, V> : DictionaryDeserializer<T, T, K, V> where T : ICollection<KeyValuePair<K, V>>, new() { }
+
+    class StringObjectDictionaryDeserializer<I, T> : DictionaryDeserializer<I, T, string, object> where T : I, ICollection<KeyValuePair<string, object>>, new() {
         public static I ReadObjectAsMap(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
             ClassInfo classInfo = reader[index];
             T dict = new T();
             reader.SetRef(dict);
-            var deserializer = Deserializer<V>.Instance;
+            var deserializer = Deserializer.Instance;
             if (classInfo.Type != null) {
                 var members = Accessor.GetMembers(classInfo.Type, reader.Mode);
                 int count = classInfo.Members.Length;
@@ -57,11 +72,11 @@ namespace Hprose.IO.Deserializers {
                     var member = members[classInfo.Members[i]];
                     if (member != null) {
                         var v = reader.Deserialize(member is FieldInfo ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType);
-                        dict.Add(new KeyValuePair<K, V>((K)(object)member.Name, (V)v));
+                        dict.Add(new KeyValuePair<string, object>(member.Name, v));
                     }
                     else {
                         var v = deserializer.Deserialize(reader);
-                        dict.Add(new KeyValuePair<K, V>((K)(object)classInfo.Members[i], v));
+                        dict.Add(new KeyValuePair<string, object>(classInfo.Members[i], v));
                     }
                 }
             }
@@ -70,7 +85,7 @@ namespace Hprose.IO.Deserializers {
                 int count = members.Length;
                 for (int i = 0; i < count; ++i) {
                     var v = deserializer.Deserialize(reader);
-                    dict.Add(new KeyValuePair<K, V>((K)(object)members[i], v));
+                    dict.Add(new KeyValuePair<string, object>(members[i], v));
                 }
             }
             stream.ReadByte();
@@ -79,10 +94,6 @@ namespace Hprose.IO.Deserializers {
         public override I Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {
-                case TagEmpty:
-                    return new T();
-                case TagMap:
-                    return Read(reader);
                 case TagObject:
                     return ReadObjectAsMap(reader);
                 default:
@@ -90,7 +101,7 @@ namespace Hprose.IO.Deserializers {
             }
         }
     }
-    class DictionaryDeserializer<T, K, V> : DictionaryDeserializer<T, T, K, V> where T : ICollection<KeyValuePair<K, V>>, new() { }
+    class StringObjectDictionaryDeserializer<T> : StringObjectDictionaryDeserializer<T, T> where T : ICollection<KeyValuePair<string, object>>, new() { }
 
     class DictionaryDeserializer<I, T> : Deserializer<I> where T : I, IDictionary, new() {
         public static I Read(Reader reader) {

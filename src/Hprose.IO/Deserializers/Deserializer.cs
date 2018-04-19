@@ -95,7 +95,7 @@ namespace Hprose.IO.Deserializers {
             Register(() => new StringCollectionDeserializer());
             //Register(() => new ValueTupleSerializer());
             //Register(() => new BitArraySerializer());
-            Register(() => new DictionaryDeserializer<ExpandoObject, string, object>());
+            Register(() => new StringObjectDictionaryDeserializer<ExpandoObject>());
         }
 
         public static void Initialize() { }
@@ -135,6 +135,9 @@ namespace Hprose.IO.Deserializers {
                                 var arg = genericArgs[0];
                                 if (arg.IsGenericType && arg.GetGenericTypeDefinition() == pairType) {
                                     Type[] genArgs = arg.GetGenericArguments();
+                                    if (genArgs[0] == typeof(string) && genArgs[1] == typeof(object)) {
+                                        return typeof(StringObjectDictionaryDeserializer<,>).MakeGenericType(type, typeof(HashSet<>).MakeGenericType(genericArgs));
+                                    }
                                     return typeof(DictionaryDeserializer<,,,>).MakeGenericType(type, typeof(HashSet<>).MakeGenericType(genericArgs), genArgs[0], genArgs[1]);
                                 }
                                 return typeof(CollectionDeserializer<,,>).MakeGenericType(type, typeof(HashSet<>).MakeGenericType(genericArgs), genericArgs[0]);
@@ -147,6 +150,9 @@ namespace Hprose.IO.Deserializers {
                                 var arg = genericArgs[0];
                                 if (arg.IsGenericType && arg.GetGenericTypeDefinition() == pairType) {
                                     Type[] genArgs = arg.GetGenericArguments();
+                                    if (genArgs[0] == typeof(string) && genArgs[1] == typeof(object)) {
+                                        return typeof(StringObjectDictionaryDeserializer<,>).MakeGenericType(type, typeof(List<>).MakeGenericType(genericArgs));
+                                    }
                                     return typeof(DictionaryDeserializer<,,,>).MakeGenericType(type, typeof(List<>).MakeGenericType(genericArgs), genArgs[0], genArgs[1]);
                                 }
                                 return typeof(CollectionDeserializer<,,>).MakeGenericType(type, typeof(List<>).MakeGenericType(genericArgs), genericArgs[0]);
@@ -155,6 +161,9 @@ namespace Hprose.IO.Deserializers {
                                 var arg = genericArgs[0];
                                 if (arg.IsGenericType && arg.GetGenericTypeDefinition() == pairType) {
                                     Type[] genArgs = arg.GetGenericArguments();
+                                    if (genArgs[0] == typeof(string) && genArgs[1] == typeof(object)) {
+                                        return typeof(StringObjectDictionaryDeserializer<,>).MakeGenericType(type, typeof(Dictionary<,>).MakeGenericType(genArgs));
+                                    }
                                     return typeof(DictionaryDeserializer<,,,>).MakeGenericType(type, typeof(Dictionary<,>).MakeGenericType(genArgs), genArgs[0], genArgs[1]);
                                 }
                                 return typeof(CollectionDeserializer<,,>).MakeGenericType(type, typeof(List<>).MakeGenericType(genericArgs), genericArgs[0]);
@@ -185,9 +194,15 @@ namespace Hprose.IO.Deserializers {
                             || typeof(IReadOnlyDictionary<,>) == genericType
 #endif
                             ) {
+                            if (genericArgs[0] == typeof(string) && genericArgs[1] == typeof(object)) {
+                                return typeof(StringObjectDictionaryDeserializer<,>).MakeGenericType(type, typeof(Dictionary<,>).MakeGenericType(genericArgs));
+                            }
                             return typeof(DictionaryDeserializer<,,,>).MakeGenericType(type, typeof(Dictionary<,>).MakeGenericType(genericArgs), genericArgs[0], genericArgs[1]);
                         }
                         if (typeof(IDictionary<,>).MakeGenericType(genericArgs).IsAssignableFrom(type)) {
+                            if (genericArgs[0] == typeof(string) && genericArgs[1] == typeof(object)) {
+                                return typeof(StringObjectDictionaryDeserializer<>).MakeGenericType(type);
+                            }
                             return typeof(DictionaryDeserializer<,,>).MakeGenericType(type, genericArgs[0], genericArgs[1]);
                         }
                         break;
