@@ -12,7 +12,7 @@
  *                                                        *
  * MultiDimArraySerializer class for C#.                  *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: Apr 20, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -42,6 +42,7 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagList);
             if (len[0] > 0) ValueWriter.WriteInt(stream, len[0]);
             stream.WriteByte(TagOpenbrace);
+            var serializer = Serializer.Instance;
             while (loc[0] <= des[0, 1]) {
                 int n = 0;
                 for (i = maxrank; i > 0; i--) {
@@ -61,7 +62,7 @@ namespace Hprose.IO.Serializers {
                 for (loc[maxrank] = des[maxrank, 0];
                      loc[maxrank] <= des[maxrank, 1];
                      loc[maxrank]++) {
-                    Serializer.Instance.Serialize(writer, array.GetValue(loc));
+                    serializer.Serialize(writer, array.GetValue(loc));
                 }
                 for (i = maxrank; i > 0; i--) {
                     if (loc[i] > des[i, 1]) {
