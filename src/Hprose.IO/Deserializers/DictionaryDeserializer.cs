@@ -12,7 +12,7 @@
  *                                                        *
  * DictionaryDeserializer class for C#.                   *
  *                                                        *
- * LastModified: Apr 19, 2018                             *
+ * LastModified: Apr 21, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -23,6 +23,7 @@ using System.IO;
 using System.Reflection;
 
 using Hprose.IO.Accessors;
+using Hprose.IO.Converters;
 
 using static Hprose.IO.HproseTags;
 
@@ -43,6 +44,19 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return dict;
         }
+        public static I ReadListAsMap(Reader reader) {
+            Stream stream = reader.Stream;
+            int count = ValueReader.ReadCount(stream);
+            T dict = new T();
+            reader.SetRef(dict);
+            var deserializer = Deserializer<V>.Instance;
+            for (int i = 0; i < count; ++i) {
+                var v = deserializer.Deserialize(reader);
+                dict.Add(new KeyValuePair<K, V>(Converter<K>.Convert(i), v));
+            }
+            stream.ReadByte();
+            return dict;
+        }
         public override I Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {
@@ -50,6 +64,8 @@ namespace Hprose.IO.Deserializers {
                     return new T();
                 case TagMap:
                     return Read(reader);
+                case TagList:
+                    return ReadListAsMap(reader);
                 default:
                     return base.Read(reader, tag);
             }
@@ -118,6 +134,19 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return dict;
         }
+        public static I ReadListAsMap(Reader reader) {
+            Stream stream = reader.Stream;
+            int count = ValueReader.ReadCount(stream);
+            T dict = new T();
+            reader.SetRef(dict);
+            var deserializer = Deserializer.Instance;
+            for (int i = 0; i < count; ++i) {
+                var v = deserializer.Deserialize(reader);
+                dict.Add(i, v);
+            }
+            stream.ReadByte();
+            return dict;
+        }
         public static I ReadObjectAsMap(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
@@ -158,6 +187,8 @@ namespace Hprose.IO.Deserializers {
                     return new T();
                 case TagMap:
                     return Read(reader);
+                case TagList:
+                    return ReadListAsMap(reader);
                 case TagObject:
                     return ReadObjectAsMap(reader);
                 default:

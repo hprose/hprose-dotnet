@@ -1216,5 +1216,22 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual(o2, o3);
             }
         }
+        [TestMethod]
+        public void TestDeserializeListAsDict() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var list = new List<int> { '0', '1', '2', '3', '4', '5' };
+                writer.Serialize(null);
+                writer.Serialize(list);
+                writer.Serialize(list);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize());
+                var dict = reader.Deserialize<Dictionary<short, int>>();
+                AreEqual(dict.Values.ToArray(), list.ToArray());
+                var dict2 = reader.Deserialize<Dictionary<short, int>>();
+                Assert.AreEqual(dict, dict2);
+            }
+        }
     }
 }
