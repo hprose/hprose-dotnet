@@ -42,7 +42,7 @@ namespace Hprose.IO.Deserializers {
                 case TagUTF8Char:
                     return "0\0".IndexOf(ValueReader.ReadChar(stream)) == -1;
                 case TagString:
-                    return Converter<bool>.Instance.Convert(ReferenceReader.ReadString(reader));
+                    return Converter<bool>.Convert(ReferenceReader.ReadString(reader));
                 case TagInfinity:
                     stream.ReadByte();
                     return true;

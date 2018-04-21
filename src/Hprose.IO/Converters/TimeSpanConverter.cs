@@ -12,7 +12,7 @@
  *                                                        *
  * hprose TimeSpanConverter class for C#.                 *
  *                                                        *
- * LastModified: Apr 14, 2018                             *
+ * LastModified: Apr 21, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -21,20 +21,32 @@ using System;
 using System.Text;
 
 namespace Hprose.IO.Converters {
-    class TimeSpanConverter : Converter<TimeSpan> {
-        public override TimeSpan Convert(object obj) {
-            switch (obj) {
-                case DateTime dt:
-                    return new TimeSpan(dt.Ticks);
-                case char[] chars:
-                    return TimeSpan.Parse(new String(chars));
-                case StringBuilder sb:
-                    return TimeSpan.Parse(sb.ToString());
-                case String s:
-                    return TimeSpan.Parse(s);
-                default:
-                    return base.Convert(obj);
-            }
+    static class TimeSpanConverter {
+        static TimeSpanConverter() {
+            Converter<long, TimeSpan>.convert = (value) => new TimeSpan(value);
+            Converter<DateTime, TimeSpan>.convert = (value) => new TimeSpan(value.Ticks);
+            Converter<string, TimeSpan>.convert = (value) => TimeSpan.Parse(value);
+            Converter<StringBuilder, TimeSpan>.convert = (value) => TimeSpan.Parse(value.ToString());
+            Converter<char[], TimeSpan>.convert = (value) => TimeSpan.Parse(new string(value));
+            Converter<object, TimeSpan>.convert = (value) => {
+                switch (value) {
+                    case TimeSpan ts:
+                        return ts;
+                    case DateTime dt:
+                        return new TimeSpan(dt.Ticks);
+                    case string s:
+                        return TimeSpan.Parse(s);
+                    case char[] chars:
+                        return TimeSpan.Parse(new string(chars));
+                    case StringBuilder sb:
+                        return TimeSpan.Parse(sb.ToString());
+                    case long l:
+                        return new TimeSpan(l);
+                    default:
+                        return Converter<TimeSpan>.ConvertFromObject(value);
+                }
+            };
         }
+        internal static void Initialize() { }
     }
 }

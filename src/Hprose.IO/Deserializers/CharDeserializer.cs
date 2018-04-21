@@ -37,7 +37,7 @@ namespace Hprose.IO.Deserializers {
                 case TagDouble:
                     return (char)ValueReader.ReadDouble(stream);
                 case TagString:
-                    return Converter<char>.Instance.Convert(ReferenceReader.ReadString(reader));
+                    return Converter<char>.Convert(ReferenceReader.ReadString(reader));
                 default:
                     if (tag >= '0' && tag <= '9') {
                         return (char)(tag - '0');

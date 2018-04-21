@@ -24,11 +24,11 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
     class ObjectDeserializer<T> : Deserializer<T> where T : new() {
-        public static T ReadMapAsObject(Reader reader) {
+        public static T Read(Reader reader) {
             Stream stream = reader.Stream;
             return default;
         }
-        public static T Read(Reader reader) {
+        public static T ReadMapAsObject(Reader reader) {
             Stream stream = reader.Stream;
             return default;
         }

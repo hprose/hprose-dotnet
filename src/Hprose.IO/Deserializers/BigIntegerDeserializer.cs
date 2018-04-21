@@ -42,13 +42,13 @@ namespace Hprose.IO.Deserializers {
                 case TagEmpty:
                     return 0;
                 case TagUTF8Char:
-                    return Converter<BigInteger>.Instance.Convert(ValueReader.ReadUTF8Char(stream));
+                    return Converter<BigInteger>.Convert(ValueReader.ReadUTF8Char(stream));
                 case TagString:
-                    return Converter<BigInteger>.Instance.Convert(ReferenceReader.ReadString(reader));
+                    return Converter<BigInteger>.Convert(ReferenceReader.ReadString(reader));
                 case TagDate:
-                    return Converter<BigInteger>.Instance.Convert(ReferenceReader.ReadDateTime(reader));
+                    return Converter<BigInteger>.Convert(ReferenceReader.ReadDateTime(reader));
                 case TagTime:
-                    return Converter<BigInteger>.Instance.Convert(ReferenceReader.ReadTime(reader));
+                    return Converter<BigInteger>.Convert(ReferenceReader.ReadTime(reader));
                 default:
                     return base.Read(reader, tag);
             }

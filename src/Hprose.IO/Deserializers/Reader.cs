@@ -21,6 +21,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+using Hprose.IO.Converters;
+
 namespace Hprose.IO.Deserializers {
     public class Reader {
         private readonly Stream _stream;
@@ -79,7 +81,7 @@ namespace Hprose.IO.Deserializers {
         internal T ReadRef<T>() {
             object obj = _refer?.Read(ValueReader.ReadInt(_stream));
             if (obj != null) {
-                return Converters.Converter<T>.Instance.Convert(obj);
+                return Converter<T>.Convert(obj);
             }
             throw new InvalidCastException("Cannot convert " + obj.GetType().ToString() + " to " + typeof(T).ToString() + ".");
         }

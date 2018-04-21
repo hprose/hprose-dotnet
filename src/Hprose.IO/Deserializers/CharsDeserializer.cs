@@ -46,15 +46,15 @@ namespace Hprose.IO.Deserializers {
                 case TagInteger:
                 case TagLong:
                 case TagDouble:
-                    return Converter<char[]>.Instance.Convert(ValueReader.ReadUntil(stream, TagSemicolon));
+                    return Converter<char[]>.Convert(ValueReader.ReadUntil(stream, TagSemicolon));
                 case TagDate:
-                    return Converter<char[]>.Instance.Convert(ReferenceReader.ReadDateTime(reader));
+                    return Converter<char[]>.Convert(ReferenceReader.ReadDateTime(reader));
                 case TagTime:
-                    return Converter<char[]>.Instance.Convert(ReferenceReader.ReadTime(reader));
+                    return Converter<char[]>.Convert(ReferenceReader.ReadTime(reader));
                 case TagGuid:
-                    return Converter<char[]>.Instance.Convert(ReferenceReader.ReadGuid(reader));
+                    return Converter<char[]>.Convert(ReferenceReader.ReadGuid(reader));
                 case TagBytes:
-                    return Converter<char[]>.Instance.Convert(ReferenceReader.ReadBytes(reader));
+                    return Converter<char[]>.Convert(ReferenceReader.ReadBytes(reader));
                 default:
                     if (tag >= '0' && tag <= '9') {
                         return new char[] { (char)tag };

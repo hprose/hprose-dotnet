@@ -41,9 +41,9 @@ namespace Hprose.IO.Deserializers {
                 case TagEmpty:
                     return 0;
                 case TagUTF8Char:
-                    return Converter<int>.Instance.Convert(ValueReader.ReadUTF8Char(stream));
+                    return Converter<int>.Convert(ValueReader.ReadUTF8Char(stream));
                 case TagString:
-                    return Converter<int>.Instance.Convert(ReferenceReader.ReadString(reader));
+                    return Converter<int>.Convert(ReferenceReader.ReadString(reader));
                 default:
                     return base.Read(reader, tag);
             }

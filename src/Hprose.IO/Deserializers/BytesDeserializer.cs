@@ -34,11 +34,11 @@ namespace Hprose.IO.Deserializers {
                 case TagList:
                     return ReferenceReader.ReadArray<byte>(reader);
                 case TagUTF8Char:
-                    return Converter<byte[]>.Instance.Convert(ValueReader.ReadUTF8Char(stream));
+                    return Converter<byte[]>.Convert(ValueReader.ReadUTF8Char(stream));
                 case TagString:
-                    return Converter<byte[]>.Instance.Convert(ReferenceReader.ReadChars(reader));
+                    return Converter<byte[]>.Convert(ReferenceReader.ReadChars(reader));
                 case TagGuid:
-                    return Converter<byte[]>.Instance.Convert(ReferenceReader.ReadGuid(reader));
+                    return Converter<byte[]>.Convert(ReferenceReader.ReadGuid(reader));
                 default:
                     return base.Read(reader, tag);
             }

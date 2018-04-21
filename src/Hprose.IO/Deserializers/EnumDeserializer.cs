@@ -46,7 +46,7 @@ namespace Hprose.IO.Deserializers {
                 case TagUTF8Char:
                     return (T)Enum.ToObject(type, ValueReader.ReadChar(stream));
                 case TagString:
-                    return Converter<T>.Instance.Convert(ReferenceReader.ReadString(reader));
+                    return Converter<T>.Convert(ReferenceReader.ReadString(reader));
                 default:
                     return base.Read(reader, tag);
             }

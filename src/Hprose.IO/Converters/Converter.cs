@@ -12,82 +12,102 @@
  *                                                        *
  * hprose Converter class for C#.                         *
  *                                                        *
- * LastModified: Apr 15, 2018                             *
+ * LastModified: Apr 21, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using System;
-using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Text;
 
 namespace Hprose.IO.Converters {
-    public interface IConverter { }
-    public class Converter<T> : IConverter {
-        static Converter() => Converter.Initialize();
-        private static volatile Converter<T> _instance;
-        public static Converter<T> Instance {
-            get {
-                if (_instance == null) {
-                    _instance = Converter.GetInstance(typeof(T)) as Converter<T>;
-                }
-                return _instance;
+    class Converter<TInput, TOutput> {
+        public static volatile Func<TInput, TOutput> convert;
+    }
+
+    public class Converter<TOutput> {
+        internal static TypeConverter converter = TypeDescriptor.GetConverter(typeof(TOutput));
+
+        static Converter() {
+            Converter<TOutput, TOutput>.convert = Convert;
+            if (Converter<object, TOutput>.convert == null) {
+                Converter<object, TOutput>.convert = ConvertFrom;
             }
+            if (Converter<char[], TOutput>.convert == null) {
+                Converter<char[], TOutput>.convert = ConvertFromChars;
+            }
+            if (Converter<StringBuilder, TOutput>.convert == null) {
+                Converter<StringBuilder, TOutput>.convert = ConvertFromStringBuilder;
+            }
+            Converter.Initialize();
         }
-        private static TypeConverter typeConverter = TypeDescriptor.GetConverter(typeof(T));
-        public virtual T Convert(object obj) {
-            switch (obj) {
-                case T value:
-                    return value;
+
+        public static TOutput Convert<TInput>(TInput value) {
+            var convert = Converter<TInput, TOutput>.convert;
+            if (convert != null) {
+                return convert(value);
+            }
+            Type type = typeof(TOutput);
+            if (type == typeof(string)) {
+                return (TOutput)(object)StringConverter.Convert(value);
+            }
+            if (type == typeof(char[])) {
+                return (TOutput)(object)CharsConverter.Convert(value);
+            }
+            if (type == typeof(StringBuilder)) {
+                return (TOutput)(object)StringBuilderConverter.Convert(value);
+            }
+            return ConvertFromObject(value);
+        }
+
+        public static TOutput Convert(TOutput value) => value;
+
+        internal static TOutput ConvertFromChars(char[] value) => (TOutput)converter.ConvertFrom(new string(value));
+
+        internal static TOutput ConvertFromStringBuilder(StringBuilder value) => (TOutput)converter.ConvertFrom(value.ToString());
+
+        internal static TOutput ConvertFromObject(object value) => (TOutput)converter.ConvertFrom(value);
+
+        internal static TOutput ConvertFrom(object value) {
+            switch (value) {
+                case TOutput obj:
+                    return obj;
+                case char[] chars:
+                    return (TOutput)converter.ConvertFrom(new string(chars));
+                case StringBuilder sb:
+                    return (TOutput)converter.ConvertFrom(sb.ToString());
                 default:
-                    return (T)typeConverter.ConvertFrom(obj);
+                    return (TOutput)converter.ConvertFrom(value);
             }
         }
     }
 
-    public class Converter : Converter<object> {
-        public override object Convert(object obj) {
-            return obj;
-        }
-        static readonly ConcurrentDictionary<Type, Lazy<IConverter>> _converters = new ConcurrentDictionary<Type, Lazy<IConverter>>();
+    public static class Converter {
         static Converter() {
-            Register(() => new Converter());
-            Register(() => new BaseConverter<bool>());
-            Register(() => new BaseConverter<byte>());
-            Register(() => new BaseConverter<sbyte>());
-            Register(() => new BaseConverter<short>());
-            Register(() => new BaseConverter<ushort>());
-            Register(() => new BaseConverter<int>());
-            Register(() => new BaseConverter<uint>());
-            Register(() => new BaseConverter<ulong>());
-            Register(() => new BaseConverter<float>());
-            Register(() => new BaseConverter<double>());
-            Register(() => new BaseConverter<decimal>());
-            Register(() => new Int64Converter());
-            Register(() => new BigIntegerConverter());
-            Register(() => new TimeSpanConverter());
-            Register(() => new DateTimeConverter());
-            Register(() => new GuidConverter());
-            Register(() => new StringConverter());
-            Register(() => new StringBuilderConverter());
-            Register(() => new CharsConverter());
-            Register(() => new BytesConverter());
+            BoolConverter.Initialize();
+            CharConverter.Initialize();
+            ByteConverter.Initialize();
+            SByteConverter.Initialize();
+            Int16Converter.Initialize();
+            UInt16Converter.Initialize();
+            Int32Converter.Initialize();
+            UInt32Converter.Initialize();
+            Int64Converter.Initialize();
+            UInt64Converter.Initialize();
+            SingleConverter.Initialize();
+            DoubleConverter.Initialize();
+            DecimalConverter.Initialize();
+            BigIntegerConverter.Initialize();
+            BytesConverter.Initialize();
+            CharsConverter.Initialize();
+            StringConverter.Initialize();
+            StringBuilderConverter.Initialize();
+            DateTimeConverter.Initialize();
+            TimeSpanConverter.Initialize();
+            GuidConverter.Initialize();
         }
-
-        public static void Initialize() { }
-
-        public static void Register<T>(Func<Converter<T>> ctor) {
-            _converters[typeof(T)] = new Lazy<IConverter>(ctor);
-        }
-
-        private static Type GetConverterType(Type type) {
-            return typeof(Converter<>).MakeGenericType(type);
-        }
-
-        internal static IConverter GetInstance(Type type) {
-            return _converters.GetOrAdd(type, t => new Lazy<IConverter>(
-                () => Activator.CreateInstance(GetConverterType(t)) as IConverter
-            )).Value;
-        }
+        internal static void Initialize() { }
+        public static void Register<TInput, TOutput>(Func<TInput, TOutput> convert) => Converter<TInput, TOutput>.convert = convert;
     }
 }

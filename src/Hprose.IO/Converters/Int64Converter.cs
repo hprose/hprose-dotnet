@@ -12,27 +12,45 @@
  *                                                        *
  * hprose Int64Converter class for C#.                    *
  *                                                        *
- * LastModified: Apr 10, 2018                             *
+ * LastModified: Apr 21, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using System;
-using System.Text;
+using System.Numerics;
 
 namespace Hprose.IO.Converters {
-    class Int64Converter : Converter<long> {
-        public override long Convert(object obj) {
-            switch (obj) {
-                case DateTime dt:
-                    return dt.Ticks;
-                case char[] chars:
-                    return base.Convert(new String(chars));
-                case StringBuilder sb:
-                    return base.Convert(sb.ToString());
-                default:
-                    return base.Convert(obj);
-            }
+    static class Int64Converter {
+        static Int64Converter() {
+            Converter<bool, long>.convert = Convert.ToInt64;
+            Converter<char, long>.convert = Convert.ToInt64;
+            Converter<byte, long>.convert = Convert.ToInt64;
+            Converter<sbyte, long>.convert = Convert.ToInt64;
+            Converter<short, long>.convert = Convert.ToInt64;
+            Converter<ushort, long>.convert = Convert.ToInt64;
+            Converter<int, long>.convert = Convert.ToInt64;
+            Converter<uint, long>.convert = Convert.ToInt64;
+            Converter<ulong, long>.convert = Convert.ToInt64;
+            Converter<float, long>.convert = Convert.ToInt64;
+            Converter<double, long>.convert = Convert.ToInt64;
+            Converter<decimal, long>.convert = Convert.ToInt64;
+            Converter<DateTime, long>.convert = (value) => value.Ticks;
+            Converter<TimeSpan, long>.convert = (value) => value.Ticks;
+            Converter<BigInteger, long>.convert = (value) => (long)value;
+            Converter<object, long>.convert = (value) => {
+                switch (value) {
+                    case long l:
+                        return l;
+                    case DateTime dt:
+                        return dt.Ticks;
+                    case TimeSpan ts:
+                        return ts.Ticks;
+                    default:
+                        return Converter<long>.ConvertFrom(value);
+                }
+            };
         }
+        internal static void Initialize() { }
     }
 }

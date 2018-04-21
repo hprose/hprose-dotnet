@@ -46,7 +46,7 @@ namespace Hprose.IO.Deserializers {
                 case TagTrue:
                     return new DateTime(1);
                 case TagString:
-                    return Converter<DateTime>.Instance.Convert(ReferenceReader.ReadString(reader));
+                    return Converter<DateTime>.Convert(ReferenceReader.ReadString(reader));
                 default:
                     if (tag >= '2' && tag <= '9') {
                         return new DateTime(tag - '0');

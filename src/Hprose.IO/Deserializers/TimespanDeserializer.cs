@@ -42,13 +42,13 @@ namespace Hprose.IO.Deserializers {
                 case TagTrue:
                     return new TimeSpan(1);
                 case TagUTF8Char:
-                    return Converter<TimeSpan>.Instance.Convert(ValueReader.ReadUTF8Char(stream));
+                    return Converter<TimeSpan>.Convert(ValueReader.ReadUTF8Char(stream));
                 case TagString:
-                    return Converter<TimeSpan>.Instance.Convert(ReferenceReader.ReadString(reader));
+                    return Converter<TimeSpan>.Convert(ReferenceReader.ReadString(reader));
                 case TagDate:
-                    return Converter<TimeSpan>.Instance.Convert(ReferenceReader.ReadDateTime(reader));
+                    return Converter<TimeSpan>.Convert(ReferenceReader.ReadDateTime(reader));
                 case TagTime:
-                    return Converter<TimeSpan>.Instance.Convert(ReferenceReader.ReadTime(reader));
+                    return Converter<TimeSpan>.Convert(ReferenceReader.ReadTime(reader));
                 default:
                     if (tag >= '2' && tag <= '9') {
                         return new TimeSpan(tag - '0');

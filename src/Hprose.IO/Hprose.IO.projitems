@@ -13,6 +13,18 @@
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\FieldsAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\PropertiesAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Accessors\MembersAccessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\DecimalConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\DoubleConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\SingleConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\UInt64Converter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\UInt32Converter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\Int32Converter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\UInt16Converter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\Int16Converter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\SByteConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\CharConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\ByteConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\BoolConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BytesConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\GuidConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\CharsConverter.cs" />
@@ -22,7 +34,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\TimeSpanConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BigIntegerConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Int64Converter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Converters\BaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DictType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ObjectDeserializer.cs" />
