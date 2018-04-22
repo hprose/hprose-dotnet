@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Deserializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 19, 2018                             *
+ * LastModified: Apr 22, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -100,9 +100,7 @@ namespace Hprose.IO.Deserializers {
 
         public static void Initialize() { }
 
-        public static void Register<T>(Func<Deserializer<T>> ctor) {
-            _deserializers[typeof(T)] = new Lazy<IDeserializer>(ctor);
-        }
+        public static void Register<T>(Func<Deserializer<T>> ctor) => _deserializers[typeof(T)] = new Lazy<IDeserializer>(ctor);
 
         private static Type GetDeserializerType(Type type) {
             if (type.IsEnum) {
@@ -247,11 +245,11 @@ namespace Hprose.IO.Deserializers {
             return null;
         }
 
-        internal static IDeserializer GetInstance(Type type) {
-            return _deserializers.GetOrAdd(type, t => new Lazy<IDeserializer>(
-                () => Activator.CreateInstance(GetDeserializerType(t)) as IDeserializer
-            )).Value;
-        }
+        private static Func<Type, Lazy<IDeserializer>> deserializerFactory = (type) => new Lazy<IDeserializer>(
+                () => Activator.CreateInstance(GetDeserializerType(type)) as IDeserializer
+            );
+
+        internal static IDeserializer GetInstance(Type type) => _deserializers.GetOrAdd(type, deserializerFactory).Value;
 
         public static object Deserialize(Reader reader, Type type) => GetInstance(type).Deserialize(reader);
 
