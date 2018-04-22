@@ -12,7 +12,7 @@
  *                                                        *
  * hprose ClassManager class for C#.                      *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: Apr 22, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -48,18 +48,15 @@ namespace Hprose.IO {
                 (alias, _) => { ClassName<T>.Name = alias; return new Lazy<Type>(() => type); }
             );
         }
-        public static bool IsRegistered(string name) {
-            return classCache.ContainsKey(name);
-        }
+        public static bool IsRegistered(string name) => classCache.ContainsKey(name);
         public static string GetName<T>() {
             if (ClassName<T>.Name == null) {
                 Register<T>();
             }
             return ClassName<T>.Name;
         }
-        public static Type GetType(string name) {
-            return classCache.GetOrAdd(name, (alias) => new Lazy<Type>(() => LoadType(alias))).Value;
-        }
+        private static Func<string, Lazy<Type>> typeFactory = (name) => new Lazy<Type>(() => LoadType(name));
+        public static Type GetType(string name) => classCache.GetOrAdd(name, typeFactory).Value;
         private static Type LoadType(string alias) {
             Type type;
             int length = alias.Length - alias.Replace("_", "").Length;
