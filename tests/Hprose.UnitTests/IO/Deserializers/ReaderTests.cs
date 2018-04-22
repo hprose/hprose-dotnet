@@ -1166,6 +1166,29 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 AreEqual(c.ToArray(), reader.Deserialize<ArrayList>().ToArray());
             }
         }
+        private void AreEqual(BitArray a1, BitArray a2) {
+            Assert.AreEqual(a1.Count, a2.Count);
+            for(var i = 0; i < a1.Count; ++i) {
+                Assert.AreEqual(a1[i], a2[i]);
+            }
+        }
+        [TestMethod]
+        public void TestDeserializeBitArray() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var c = new BitArray(new bool[] { true, false, true, false });
+                writer.Serialize(null);
+                writer.Serialize(c);
+                writer.Serialize(c);
+                stream.Position = 0;
+                Reader reader = new Reader(stream) {
+                    DefaultCharType = CharType.Char
+                };
+                Assert.AreEqual(null, reader.Deserialize<BitArray>());
+                AreEqual(c, reader.Deserialize<BitArray>());
+                AreEqual(c, reader.Deserialize<BitArray>());
+            }
+        }
         private void AreEqual(IDictionary d1, IDictionary d2) {
             Assert.AreEqual(d1.Count, d2.Count);
             foreach (DictionaryEntry e in d1) {

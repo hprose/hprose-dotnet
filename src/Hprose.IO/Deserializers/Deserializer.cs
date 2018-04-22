@@ -94,7 +94,7 @@ namespace Hprose.IO.Deserializers {
             Register(() => new BytesDeserializer());
             Register(() => new StringCollectionDeserializer());
             //Register(() => new ValueTupleSerializer());
-            //Register(() => new BitArraySerializer());
+            Register(() => new BitArrayDeserializer());
             Register(() => new StringObjectDictionaryDeserializer<ExpandoObject>());
         }
 

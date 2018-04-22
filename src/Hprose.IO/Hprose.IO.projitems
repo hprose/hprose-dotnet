@@ -36,6 +36,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Int64Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DictType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\BitArrayDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ObjectDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ListType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\RealType.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DBNullDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DecimalDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\BigIntegerDeserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\TupleDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\UIntPtrDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\IntPtrDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\SingleDeserializer.cs" />
