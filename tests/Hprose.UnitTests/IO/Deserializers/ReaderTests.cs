@@ -1256,5 +1256,24 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual(dict, dict2);
             }
         }
+        [TestMethod]
+        public void TestDeserializeTuple() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var list = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+                writer.Serialize(null);
+                writer.Serialize("");
+                writer.Serialize(list);
+                writer.Serialize(list);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(null, reader.Deserialize<Tuple<int>>());
+                Assert.AreEqual(new Tuple<int>(0), reader.Deserialize<Tuple<int>>());
+                var tuple = reader.Deserialize<Tuple<int, int, int, int, int, int, int, Tuple<int, int, int>>>();
+                Assert.AreEqual(tuple, new Tuple<int, int, int, int, int, int, int, Tuple<int, int, int>>(0, 1, 2, 3, 4, 5, 6, new Tuple<int, int, int>(7, 8, 9)));
+                var tuple2 = reader.Deserialize<Tuple<int, int, int, int, int, int, int, Tuple<int, int, int>>>();
+                Assert.AreEqual(tuple, tuple2);
+            }
+        }
     }
 }

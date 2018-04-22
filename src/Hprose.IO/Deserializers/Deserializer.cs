@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Deserializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 22, 2018                             *
+ * LastModified: Apr 23, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -206,15 +206,15 @@ namespace Hprose.IO.Deserializers {
                         break;
                 }
             }
-            //if (type.IsGenericType) {
-            //    Type genericType = type.GetGenericTypeDefinition();
-            //    if (genericType.Name.StartsWith("ValueTuple`")) {
-            //        return typeof(ValueTupleSerializer<>).MakeGenericType(type);
-            //    }
-            //    if (genericType.Name.StartsWith("Tuple`")) {
-            //        return typeof(TupleSerializer<>).MakeGenericType(type);
-            //    }
-            //}
+            if (type.IsGenericType) {
+                Type genericType = type.GetGenericTypeDefinition();
+                //if (genericType.Name.StartsWith("ValueTuple`")) {
+                //    return typeof(ValueTupleSerializer<>).MakeGenericType(type);
+                //}
+                if (genericType.Name.StartsWith("Tuple`")) {
+                    return typeof(TupleDeserializer<>).MakeGenericType(type);
+                }
+            }
             if (typeof(IDictionary).IsAssignableFrom(type)) {
                 if (type.IsInterface) {
                     return typeof(DictionaryDeserializer<,>).MakeGenericType(type, typeof(Hashtable));

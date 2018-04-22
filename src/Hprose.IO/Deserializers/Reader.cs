@@ -88,6 +88,10 @@ namespace Hprose.IO.Deserializers {
 
         internal void SetRef(object obj) => _refer?.Set(obj);
 
+        internal void SetRef(int index, object obj) => _refer?.Set(index, obj);
+
+        internal int LastRefIndex => _refer?.LastIndex?? -1;
+
         public void Reset() {
             _refer?.Reset();
             _ref.Clear();

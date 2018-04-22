@@ -22,7 +22,9 @@ using System.Collections.Generic;
 namespace Hprose.IO.Deserializers {
     sealed class ReaderRefer {
         private readonly List<object> _ref = new List<object>();
+        public int LastIndex => _ref.Count - 1;
         public void Set(object obj) => _ref.Add(obj);
+        public void Set(int index, object obj) => _ref[index] = obj;
         public object Read(int index) => _ref[index];
         public void Reset() => _ref.Clear();
     }
