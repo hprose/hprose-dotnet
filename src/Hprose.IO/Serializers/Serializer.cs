@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Serializer class for C#.                        *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: Apr 22, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -85,9 +85,7 @@ namespace Hprose.IO.Serializers {
 
         public static void Initialize() { }
 
-        public static void Register<T>(Func<Serializer<T>> ctor) {
-            _serializers[typeof(T)] = new Lazy<ISerializer>(ctor);
-        }
+        public static void Register<T>(Func<Serializer<T>> ctor) => _serializers[typeof(T)] = new Lazy<ISerializer>(ctor);
 
         private static Type GetSerializerType(Type type) {
             if (type.IsEnum) {
@@ -184,11 +182,11 @@ namespace Hprose.IO.Serializers {
             return typeof(ObjectSerializer<>).MakeGenericType(type);
         }
 
-        internal static ISerializer GetInstance(Type type) {
-            return _serializers.GetOrAdd(type, t => new Lazy<ISerializer>(
-                () => Activator.CreateInstance(GetSerializerType(t)) as ISerializer
-            )).Value;
-        }
+        private static Func<Type, Lazy<ISerializer>> serializerFactory = (type) => new Lazy<ISerializer>(
+                () => Activator.CreateInstance(GetSerializerType(type)) as ISerializer
+            );
+
+        internal static ISerializer GetInstance(Type type) => _serializers.GetOrAdd(type, serializerFactory).Value;
 
         public override void Serialize(Writer writer, object obj) {
             if (obj == null) {
