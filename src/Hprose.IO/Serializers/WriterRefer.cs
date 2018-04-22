@@ -12,7 +12,7 @@
  *                                                        *
  * WriterRefer class for C#.                              *
  *                                                        *
- * LastModified: Apr 1, 2018                              *
+ * LastModified: Apr 22, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -26,12 +26,8 @@ namespace Hprose.IO.Serializers {
     sealed class WriterRefer {
         private readonly Dictionary<object, int> _ref = new Dictionary<object, int>();
         private int _last = 0;
-        public void AddCount(int count) {
-            _last += count;
-        }
-        public void Set(object obj) {
-            _ref[obj] = _last++;
-        }
+        public void AddCount(int count) => _last += count;
+        public void Set(object obj) => _ref[obj] = _last++;
         public bool Write(Stream stream, object obj) {
             if (_ref.TryGetValue(obj, out int r)) {
                 stream.WriteByte(TagRef);
