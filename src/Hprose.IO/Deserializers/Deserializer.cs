@@ -93,7 +93,7 @@ namespace Hprose.IO.Deserializers {
             Register(() => new CharsDeserializer());
             Register(() => new BytesDeserializer());
             Register(() => new StringCollectionDeserializer());
-            //Register(() => new ValueTupleSerializer());
+            Register(() => new ValueTupleDeserializer());
             Register(() => new BitArrayDeserializer());
             Register(() => new StringObjectDictionaryDeserializer<ExpandoObject>());
         }
@@ -208,9 +208,9 @@ namespace Hprose.IO.Deserializers {
             }
             if (type.IsGenericType) {
                 Type genericType = type.GetGenericTypeDefinition();
-                //if (genericType.Name.StartsWith("ValueTuple`")) {
-                //    return typeof(ValueTupleSerializer<>).MakeGenericType(type);
-                //}
+                if (genericType.Name.StartsWith("ValueTuple`")) {
+                    return typeof(ValueTupleDeserializer<>).MakeGenericType(type);
+                }
                 if (genericType.Name.StartsWith("Tuple`")) {
                     return typeof(TupleDeserializer<>).MakeGenericType(type);
                 }

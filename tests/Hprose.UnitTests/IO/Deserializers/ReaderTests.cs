@@ -1323,5 +1323,88 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual(tuple, tuple2);
             }
         }
+        [TestMethod]
+        public void TestDeserializeValueTuple() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var list = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+                writer.Serialize(null);
+                writer.Serialize("");
+                writer.Serialize(list);
+                writer.Serialize(list);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(default, reader.Deserialize<ValueTuple<int>>());
+                Assert.AreEqual(new ValueTuple<int>(0), reader.Deserialize<ValueTuple<int>>());
+                var tuple = reader.Deserialize<ValueTuple<int, int, int, int, int, int, int, ValueTuple<int, int, int>>>();
+                Assert.AreEqual(tuple, new ValueTuple<int, int, int, int, int, int, int, ValueTuple<int, int, int>>(0, 1, 2, 3, 4, 5, 6, new ValueTuple<int, int, int>(7, 8, 9)));
+                var tuple2 = reader.Deserialize<ValueTuple<int, int, int, int, int, int, int, ValueTuple<int, int, int>>>();
+                Assert.AreEqual(tuple, tuple2);
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var list = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+                writer.Serialize(null);
+                writer.Serialize("");
+                writer.Serialize(list);
+                writer.Serialize(list);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(default, reader.Deserialize<ValueTuple<int>>());
+                Assert.AreEqual(new ValueTuple<int>(0), reader.Deserialize<ValueTuple<int>>());
+                var tuple = reader.Deserialize<ValueTuple<int, int, int, int, int, int, int, ValueTuple<int, int>>>();
+                Assert.AreEqual(tuple, new ValueTuple<int, int, int, int, int, int, int, ValueTuple<int, int>>(0, 1, 2, 3, 4, 5, 6, new ValueTuple<int, int>(7, 8)));
+                var tuple2 = reader.Deserialize<ValueTuple<int, int, int, int, int, int, int, ValueTuple<int, int>>>();
+                Assert.AreEqual(tuple, tuple2);
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var list = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+                writer.Serialize(null);
+                writer.Serialize("");
+                writer.Serialize(list);
+                writer.Serialize(list);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(default, reader.Deserialize<ValueTuple<int>>());
+                Assert.AreEqual(new ValueTuple<int>(0), reader.Deserialize<ValueTuple<int>>());
+                var tuple = reader.Deserialize<ValueTuple<int, int, int, int, int, int, int>>();
+                Assert.AreEqual(tuple, new ValueTuple<int, int, int, int, int, int, int>(0, 1, 2, 3, 4, 5, 6));
+                var tuple2 = reader.Deserialize<ValueTuple<int, int, int, int, int, int, int>>();
+                Assert.AreEqual(tuple, tuple2);
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var list = new List<int> { 0, 1, 2, 3, 4, 5 };
+                writer.Serialize(null);
+                writer.Serialize("");
+                writer.Serialize(list);
+                writer.Serialize(list);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(default, reader.Deserialize<ValueTuple<int>>());
+                Assert.AreEqual(new ValueTuple<int>(0), reader.Deserialize<ValueTuple<int>>());
+                var tuple = reader.Deserialize<ValueTuple<int, int, int, int, int, int, int>>();
+                Assert.AreEqual(tuple, new ValueTuple<int, int, int, int, int, int, int>(0, 1, 2, 3, 4, 5, 0));
+                var tuple2 = reader.Deserialize<ValueTuple<int, int, int, int, int, int, int>>();
+                Assert.AreEqual(tuple, tuple2);
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var list = new List<int> { 0, 1, 2, 3, 4, 5 };
+                writer.Serialize(null);
+                writer.Serialize("");
+                writer.Serialize(list);
+                writer.Serialize(list);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(default, reader.Deserialize<ValueTuple>());
+                Assert.AreEqual(new ValueTuple(), reader.Deserialize<ValueTuple>());
+                var tuple = reader.Deserialize<ValueTuple>();
+                Assert.AreEqual(tuple, new ValueTuple());
+                var tuple2 = reader.Deserialize<ValueTuple>();
+                Assert.AreEqual(tuple, tuple2);
+            }
+        }
     }
 }

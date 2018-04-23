@@ -67,6 +67,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DBNullDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DecimalDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\BigIntegerDeserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ValueTupleDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\TupleDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\UIntPtrDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\IntPtrDeserializer.cs" />
