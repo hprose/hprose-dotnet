@@ -1410,5 +1410,45 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual(tuple, tuple3);
             }
         }
+        [DataContract(Name = "Person")]
+        public class Person {
+            [DataMember(Order = 0)]
+            public int Id;
+            [DataMember(Order = 1)]
+            public string Name { get; set; }
+            [DataMember(Order = 2)]
+            public int Age { get; set; }
+        }
+        [TestMethod]
+        public void TestDeserializeObject() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var o = new Person {
+                    Id = 0,
+                    Name = "Tom",
+                    Age = 48
+                };
+                var o2 = new Person {
+                    Id = 1,
+                    Name = "Jerry",
+                    Age = 36
+                };
+                writer.Serialize(o);
+                writer.Serialize(o2);
+                writer.Serialize(o);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                var o3 = reader.Deserialize<Person>();
+                var o4 = reader.Deserialize<Person>();
+                var o5 = reader.Deserialize<Person>();
+                Assert.AreEqual(0, o3.Id);
+                Assert.AreEqual("Tom", o3.Name);
+                Assert.AreEqual(48, o3.Age);
+                Assert.AreEqual(1, o4.Id);
+                Assert.AreEqual("Jerry", o4.Name);
+                Assert.AreEqual(36, o4.Age);
+                Assert.AreEqual(o3, o5);
+            }
+        }
     }
 }

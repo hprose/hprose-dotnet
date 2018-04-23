@@ -241,8 +241,7 @@ namespace Hprose.IO.Deserializers {
             //if (typeof(DataSet).IsAssignableFrom(type)) {
             //    return typeof(DataSetSerializer<>).MakeGenericType(type);
             //}
-            //return typeof(ObjectSerializer<>).MakeGenericType(type);
-            return null;
+            return typeof(ObjectDeserializer<>).MakeGenericType(type);
         }
 
         private static readonly Func<Type, Lazy<IDeserializer>> deserializerFactory = (type) => new Lazy<IDeserializer>(
