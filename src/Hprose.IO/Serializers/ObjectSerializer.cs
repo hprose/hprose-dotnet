@@ -12,20 +12,21 @@
  *                                                        *
  * ObjectSerializer class for C#.                         *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: Apr 23, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.IO;
+
 using Hprose.IO.Accessors;
 
-using static Hprose.IO.HproseTags;
 using static Hprose.IO.HproseMode;
+using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
 
