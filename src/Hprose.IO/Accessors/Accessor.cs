@@ -12,7 +12,7 @@
  *                                                        *
  * Accessor class for C#.                                 *
  *                                                        *
- * LastModified: Apr 19, 2018                             *
+ * LastModified: Apr 23, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -32,16 +32,21 @@ namespace Hprose.IO.Accessors {
         private static readonly ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>> _members = new ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>>();
         private static readonly ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>> _fields = new ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>>();
         private static readonly ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>> _properties = new ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>>();
+
+        private static readonly Func<Type, Lazy<Dictionary<string, MemberInfo>>> _fieldsFactory = (type) => new Lazy<Dictionary<string, MemberInfo>>(() => FieldsAccessor.GetFields(type));
+        private static readonly Func<Type, Lazy<Dictionary<string, MemberInfo>>> _propertiesFactory = (type) => new Lazy<Dictionary<string, MemberInfo>>(() => PropertiesAccessor.GetProperties(type));
+        private static readonly Func<Type, Lazy<Dictionary<string, MemberInfo>>> _membersFactory = (type) => new Lazy<Dictionary<string, MemberInfo>>(() => MembersAccessor.GetMembers(type));
+
         public static Dictionary<string, MemberInfo> GetMembers(Type type, HproseMode mode) {
             if (type.IsSerializable) {
                 switch (mode) {
                     case HproseMode.FieldMode:
-                        return _fields.GetOrAdd(type, (t) => new Lazy<Dictionary<string, MemberInfo>>(() => FieldsAccessor.GetFields(t))).Value;
+                        return _fields.GetOrAdd(type, _fieldsFactory).Value;
                     case HproseMode.PropertyMode:
-                        return _properties.GetOrAdd(type, (t) => new Lazy<Dictionary<string, MemberInfo>>(() => PropertiesAccessor.GetProperties(t))).Value;
+                        return _properties.GetOrAdd(type, _propertiesFactory).Value;
                 }
             }
-            return _members.GetOrAdd(type, (t) => new Lazy<Dictionary<string, MemberInfo>>(() => MembersAccessor.GetMembers(t))).Value;
+            return _members.GetOrAdd(type, _membersFactory).Value;
         }
     }
 }

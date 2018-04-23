@@ -12,7 +12,7 @@
  *                                                        *
  * hprose ClassManager class for C#.                      *
  *                                                        *
- * LastModified: Apr 22, 2018                             *
+ * LastModified: Apr 23, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -55,7 +55,7 @@ namespace Hprose.IO {
             }
             return ClassName<T>.Name;
         }
-        private static Func<string, Lazy<Type>> typeFactory = (name) => new Lazy<Type>(() => LoadType(name));
+        private static readonly Func<string, Lazy<Type>> typeFactory = (name) => new Lazy<Type>(() => LoadType(name));
         public static Type GetType(string name) => classCache.GetOrAdd(name, typeFactory).Value;
         private static Type LoadType(string alias) {
             Type type;

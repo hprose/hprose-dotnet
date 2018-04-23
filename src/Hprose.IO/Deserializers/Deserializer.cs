@@ -245,7 +245,7 @@ namespace Hprose.IO.Deserializers {
             return null;
         }
 
-        private static Func<Type, Lazy<IDeserializer>> deserializerFactory = (type) => new Lazy<IDeserializer>(
+        private static readonly Func<Type, Lazy<IDeserializer>> deserializerFactory = (type) => new Lazy<IDeserializer>(
                 () => Activator.CreateInstance(GetDeserializerType(type)) as IDeserializer
             );
 

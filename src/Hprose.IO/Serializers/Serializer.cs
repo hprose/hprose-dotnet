@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Serializer class for C#.                        *
  *                                                        *
- * LastModified: Apr 22, 2018                             *
+ * LastModified: Apr 23, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -182,7 +182,7 @@ namespace Hprose.IO.Serializers {
             return typeof(ObjectSerializer<>).MakeGenericType(type);
         }
 
-        private static Func<Type, Lazy<ISerializer>> serializerFactory = (type) => new Lazy<ISerializer>(
+        private static readonly Func<Type, Lazy<ISerializer>> serializerFactory = (type) => new Lazy<ISerializer>(
                 () => Activator.CreateInstance(GetSerializerType(type)) as ISerializer
             );
 
