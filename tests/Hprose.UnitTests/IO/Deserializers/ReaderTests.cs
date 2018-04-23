@@ -1396,14 +1396,18 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize("");
                 writer.Serialize(list);
                 writer.Serialize(list);
+                var tuple = (a: 1, b: 2);
+                writer.Serialize(tuple);
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
                 Assert.AreEqual(default, reader.Deserialize<ValueTuple>());
                 Assert.AreEqual(new ValueTuple(), reader.Deserialize<ValueTuple>());
-                var tuple = reader.Deserialize<ValueTuple>();
-                Assert.AreEqual(tuple, new ValueTuple());
+                var tuple1 = reader.Deserialize<ValueTuple>();
+                Assert.AreEqual(tuple1, new ValueTuple());
                 var tuple2 = reader.Deserialize<ValueTuple>();
-                Assert.AreEqual(tuple, tuple2);
+                Assert.AreEqual(tuple1, tuple2);
+                var tuple3 = reader.Deserialize<ValueTuple<int, int>>();
+                Assert.AreEqual(tuple, tuple3);
             }
         }
     }
