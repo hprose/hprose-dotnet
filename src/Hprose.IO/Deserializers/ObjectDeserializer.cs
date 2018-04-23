@@ -30,7 +30,7 @@ using static Hprose.IO.HproseMode;
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
-    class MembersReader {
+    static class MembersReader {
         public static Delegate GetDelegate(Type type, Dictionary<string, MemberInfo> members, string[] names) {
             var reader = Expression.Variable(typeof(Reader), "reader");
             var obj = Expression.Variable(type, "obj");
@@ -76,25 +76,25 @@ namespace Hprose.IO.Deserializers {
         }
     }
 
-    class MembersReader<T> {
+    static class MembersReader<T> {
         private static readonly ConcurrentDictionary<string, Lazy<Delegate>> _readActions = new ConcurrentDictionary<string, Lazy<Delegate>>();
         public static Delegate GetReadAction(string[] names) => _readActions.GetOrAdd(string.Join(" ", names), (_) => new Lazy<Delegate>(() => MembersReader.GetDelegate(typeof(T), MembersAccessor<T>.Members, names))).Value;
     }
 
-    class FieldsReader<T> {
+    static class FieldsReader<T> {
         private static readonly ConcurrentDictionary<string, Lazy<Delegate>> _readActions = new ConcurrentDictionary<string, Lazy<Delegate>>();
         public static Delegate GetReadAction(string[] names) => _readActions.GetOrAdd(string.Join(" ", names), (_) => new Lazy<Delegate>(() => MembersReader.GetDelegate(typeof(T), FieldsAccessor<T>.Fields, names))).Value;
     }
 
-    class PropertiesReader<T> {
+    static class PropertiesReader<T> {
         private static readonly ConcurrentDictionary<string, Lazy<Delegate>> _readActions = new ConcurrentDictionary<string, Lazy<Delegate>>();
         public static Delegate GetReadAction(string[] names) => _readActions.GetOrAdd(string.Join(" ", names), (_) => new Lazy<Delegate>(() => MembersReader.GetDelegate(typeof(T), PropertiesAccessor<T>.Properties, names))).Value;
     }
 
-    class ObjectDeserializer<T> : Deserializer<T> where T : new() {
+    class ObjectDeserializer<T> : Deserializer<T> {
         public static T Read(Reader reader) {
             Stream stream = reader.Stream;
-            T obj = new T();
+            T obj = (T)Activator.CreateInstance(typeof(T), true);
             reader.SetRef(obj);
             var deserializer = Deserializer.Instance;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
@@ -110,7 +110,7 @@ namespace Hprose.IO.Deserializers {
             var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
-                    return new T();
+                    return (T)Activator.CreateInstance(typeof(T), true);
                 case TagObject:
                     return Read(reader);
                 case TagMap:

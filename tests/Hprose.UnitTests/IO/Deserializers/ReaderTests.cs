@@ -1418,18 +1418,20 @@ namespace Hprose.UnitTests.IO.Deserializers {
             public string Name { get; set; }
             [DataMember(Order = 2)]
             public int Age { get; set; }
+            public Person(int id) {
+                Id = id;
+            }
+            private Person() { }
         }
         [TestMethod]
         public void TestDeserializeObject() {
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
-                var o = new Person {
-                    Id = 0,
+                var o = new Person(0) {
                     Name = "Tom",
                     Age = 48
                 };
-                var o2 = new Person {
-                    Id = 1,
+                var o2 = new Person(1) {
                     Name = "Jerry",
                     Age = 36
                 };
