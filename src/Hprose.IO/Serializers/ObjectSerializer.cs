@@ -12,7 +12,7 @@
  *                                                        *
  * ObjectSerializer class for C#.                         *
  *                                                        *
- * LastModified: Apr 23, 2018                             *
+ * LastModified: Apr 24, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -50,9 +50,9 @@ namespace Hprose.IO.Serializers {
                 return stream.ToArray();
             }
         }
-        public static Delegate GetDelegate(Type type, IEnumerable<MemberInfo> members) {
+        public static Action<Writer, T> GetDelegate<T>(IEnumerable<MemberInfo> members) {
             var writer = Expression.Variable(typeof(Writer), "writer");
-            var obj = Expression.Variable(type, "obj");
+            var obj = Expression.Variable(typeof(T), "obj");
             List<Expression> expressions = new List<Expression>();
             foreach (MemberInfo member in members) {
                 Type memberType = member is FieldInfo ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType;
@@ -66,7 +66,7 @@ namespace Hprose.IO.Serializers {
                     )
                 );
             }
-            return Expression.Lambda(Expression.Block(expressions), writer, obj).Compile();
+            return Expression.Lambda<Action<Writer, T>>(Expression.Block(expressions), writer, obj).Compile();
         }
         public static MembersWriter GetMembersWriter<T>(HproseMode mode) {
             if (typeof(T).IsSerializable) {
@@ -85,7 +85,7 @@ namespace Hprose.IO.Serializers {
             var members = Accessor.GetMembers<T>();
             Count = members.Count;
             MetaData = GetMetaData(ClassManager.GetName<T>(), members.Keys, Count);
-            WriteMembers = GetDelegate(typeof(T), members.Values);
+            WriteMembers = GetDelegate<T>(members.Values);
         }
     }
 
@@ -95,7 +95,7 @@ namespace Hprose.IO.Serializers {
             var fields = Accessor.GetFields<T>();
             Count = fields.Count;
             MetaData = GetMetaData(ClassManager.GetName<T>(), fields.Keys, Count);
-            WriteMembers = GetDelegate(typeof(T), fields.Values);
+            WriteMembers = GetDelegate<T>(fields.Values);
         }
     }
 
@@ -105,7 +105,7 @@ namespace Hprose.IO.Serializers {
             var properties = Accessor.GetProperties<T>();
             Count = properties.Count;
             MetaData = GetMetaData(ClassManager.GetName<T>(), properties.Keys, Count);
-            WriteMembers = GetDelegate(typeof(T), properties.Values);
+            WriteMembers = GetDelegate<T>(properties.Values);
         }
     }
 
@@ -125,7 +125,7 @@ namespace Hprose.IO.Serializers {
             ValueWriter.WriteInt(stream, r);
             stream.WriteByte(TagOpenbrace);
             if (count > 0) {
-                ((Action<Writer, T>)membersWriter.WriteMembers)(writer, obj);
+                ((Action<Writer, T>)(membersWriter.WriteMembers))(writer, obj);
             }
             stream.WriteByte(TagClosebrace);
         }
