@@ -30,10 +30,12 @@ using static Hprose.IO.HproseMode;
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
+    delegate void ReadAction<T>(Reader reader, ref T obj);
+
     static class MembersReader {
-        public static Delegate GetDelegate(Type type, Dictionary<string, MemberInfo> members, string[] names) {
-            var reader = Expression.Variable(typeof(Reader), "reader");
-            var obj = Expression.Variable(type, "obj");
+        public static ReadAction<T> GetDelegate<T>(Dictionary<string, MemberInfo> members, string[] names) {
+            var reader = Expression.Parameter(typeof(Reader), "reader");
+            var obj = Expression.Parameter(typeof(T).MakeByRefType(), "obj");
             var deserializer = Expression.Constant(Deserializer.Instance);
             List<Expression> expressions = new List<Expression>();
             foreach (string name in names) {
@@ -63,47 +65,49 @@ namespace Hprose.IO.Deserializers {
                 }
             }
             expressions.Add(Expression.Empty());
-            return Expression.Lambda(Expression.Block(expressions), reader, obj).Compile();
+            return Expression.Lambda<ReadAction<T>>(Expression.Block(expressions), new ParameterExpression[] { reader, obj }).Compile();
         }
-        public static Action<Reader, T> GetReadAction<T>(HproseMode mode, string[] names) {
+        public static ReadAction<T> GetReadAction<T>(HproseMode mode, string[] names) {
             if (typeof(T).IsSerializable) {
                 switch (mode) {
-                    case FieldMode: return FieldsReader<T>.GetReadAction(names) as Action<Reader, T>;
-                    case PropertyMode: return PropertiesReader<T>.GetReadAction(names) as Action<Reader, T>;
+                    case FieldMode: return FieldsReader<T>.GetReadAction(names);
+                    case PropertyMode: return PropertiesReader<T>.GetReadAction(names);
                 }
             }
-            return MembersReader<T>.GetReadAction(names) as Action<Reader, T>;
+            return MembersReader<T>.GetReadAction(names);
         }
     }
 
     static class MembersReader<T> {
-        private static readonly ConcurrentDictionary<string, Lazy<Delegate>> _readActions = new ConcurrentDictionary<string, Lazy<Delegate>>();
-        public static Delegate GetReadAction(string[] names) => _readActions.GetOrAdd(string.Join(" ", names), (_) => new Lazy<Delegate>(() => MembersReader.GetDelegate(typeof(T), MembersAccessor<T>.Members, names))).Value;
+        private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> _readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
+        public static ReadAction<T> GetReadAction(string[] names) => _readActions.GetOrAdd(string.Join(" ", names), (_) => new Lazy<ReadAction<T>>(() => MembersReader.GetDelegate<T>(MembersAccessor<T>.Members, names))).Value;
     }
 
     static class FieldsReader<T> {
-        private static readonly ConcurrentDictionary<string, Lazy<Delegate>> _readActions = new ConcurrentDictionary<string, Lazy<Delegate>>();
-        public static Delegate GetReadAction(string[] names) => _readActions.GetOrAdd(string.Join(" ", names), (_) => new Lazy<Delegate>(() => MembersReader.GetDelegate(typeof(T), FieldsAccessor<T>.Fields, names))).Value;
+        private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> _readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
+        public static ReadAction<T> GetReadAction(string[] names) => _readActions.GetOrAdd(string.Join(" ", names), (_) => new Lazy<ReadAction<T>>(() => MembersReader.GetDelegate<T>(FieldsAccessor<T>.Fields, names))).Value;
     }
 
     static class PropertiesReader<T> {
-        private static readonly ConcurrentDictionary<string, Lazy<Delegate>> _readActions = new ConcurrentDictionary<string, Lazy<Delegate>>();
-        public static Delegate GetReadAction(string[] names) => _readActions.GetOrAdd(string.Join(" ", names), (_) => new Lazy<Delegate>(() => MembersReader.GetDelegate(typeof(T), PropertiesAccessor<T>.Properties, names))).Value;
+        private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> _readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
+        public static ReadAction<T> GetReadAction(string[] names) => _readActions.GetOrAdd(string.Join(" ", names), (_) => new Lazy<ReadAction<T>>(() => MembersReader.GetDelegate<T>(PropertiesAccessor<T>.Properties, names))).Value;
     }
 
-    class ObjectDeserializer<T> : Deserializer<T> {
+    class ObjectDeserializer<T> : Deserializer<T> where T : class {
         public static T Read(Reader reader) {
             Stream stream = reader.Stream;
             T obj = (T)Activator.CreateInstance(typeof(T), true);
             reader.SetRef(obj);
-            var deserializer = Deserializer.Instance;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            MembersReader.GetReadAction<T>(reader.Mode, reader[index].Members)(reader, obj);
+            MembersReader.GetReadAction<T>(reader.Mode, reader[index].Members)(reader, ref obj);
             stream.ReadByte();
             return obj;
         }
         public static T ReadMapAsObject(Reader reader) {
             Stream stream = reader.Stream;
+            T obj = (T)Activator.CreateInstance(typeof(T), true);
+            reader.SetRef(obj);
+
             return default;
         }
         public override T Read(Reader reader, int tag) {
@@ -111,6 +115,40 @@ namespace Hprose.IO.Deserializers {
             switch (tag) {
                 case TagEmpty:
                     return (T)Activator.CreateInstance(typeof(T), true);
+                case TagObject:
+                    return Read(reader);
+                case TagMap:
+                    return ReadMapAsObject(reader);
+                default:
+                    return base.Read(reader, tag);
+            }
+        }
+    }
+
+    class StructDeserializer<T> : Deserializer<T> where T : struct {
+        public static T Read(Reader reader) {
+            Stream stream = reader.Stream;
+            T obj = new T();
+            reader.SetRef(null);
+            int refIndex = reader.LastRefIndex;
+            int index = ValueReader.ReadInt(stream, TagOpenbrace);
+            MembersReader.GetReadAction<T>(reader.Mode, reader[index].Members)(reader, ref obj);
+            reader.SetRef(refIndex, obj);
+            stream.ReadByte();
+            return obj;
+        }
+        public static T ReadMapAsObject(Reader reader) {
+            Stream stream = reader.Stream;
+            T obj = new T();
+            reader.SetRef(obj);
+
+            return default;
+        }
+        public override T Read(Reader reader, int tag) {
+            var stream = reader.Stream;
+            switch (tag) {
+                case TagEmpty:
+                    return new T();
                 case TagObject:
                     return Read(reader);
                 case TagMap:

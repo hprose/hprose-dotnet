@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Deserializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 23, 2018                             *
+ * LastModified: Apr 24, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -241,6 +241,9 @@ namespace Hprose.IO.Deserializers {
             //if (typeof(DataSet).IsAssignableFrom(type)) {
             //    return typeof(DataSetSerializer<>).MakeGenericType(type);
             //}
+            if (type.IsValueType) {
+                return typeof(StructDeserializer<>).MakeGenericType(type);
+            }
             return typeof(ObjectDeserializer<>).MakeGenericType(type);
         }
 
