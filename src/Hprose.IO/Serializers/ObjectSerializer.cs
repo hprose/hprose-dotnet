@@ -31,7 +31,7 @@ using static Hprose.IO.HproseTags;
 namespace Hprose.IO.Serializers {
 
     class MembersWriter {
-        public Delegate WriteMembers;
+        public Delegate WriteAction;
         public int Count;
         public byte[] MetaData;
         public static byte[] GetMetaData(string typeName, IEnumerable<string> memberNames, int count) {
@@ -50,7 +50,7 @@ namespace Hprose.IO.Serializers {
                 return stream.ToArray();
             }
         }
-        public static Action<Writer, T> GetDelegate<T>(IEnumerable<MemberInfo> members) {
+        public static Action<Writer, T> CreateWriteAction<T>(IEnumerable<MemberInfo> members) {
             var writer = Expression.Variable(typeof(Writer), "writer");
             var obj = Expression.Variable(typeof(T), "obj");
             List<Expression> expressions = new List<Expression>();
@@ -85,7 +85,7 @@ namespace Hprose.IO.Serializers {
             var members = Accessor.GetMembers<T>();
             Count = members.Count;
             MetaData = GetMetaData(ClassManager.GetName<T>(), members.Keys, Count);
-            WriteMembers = GetDelegate<T>(members.Values);
+            WriteAction = CreateWriteAction<T>(members.Values);
         }
     }
 
@@ -95,7 +95,7 @@ namespace Hprose.IO.Serializers {
             var fields = Accessor.GetFields<T>();
             Count = fields.Count;
             MetaData = GetMetaData(ClassManager.GetName<T>(), fields.Keys, Count);
-            WriteMembers = GetDelegate<T>(fields.Values);
+            WriteAction = CreateWriteAction<T>(fields.Values);
         }
     }
 
@@ -105,7 +105,7 @@ namespace Hprose.IO.Serializers {
             var properties = Accessor.GetProperties<T>();
             Count = properties.Count;
             MetaData = GetMetaData(ClassManager.GetName<T>(), properties.Keys, Count);
-            WriteMembers = GetDelegate<T>(properties.Values);
+            WriteAction = CreateWriteAction<T>(properties.Values);
         }
     }
 
@@ -125,7 +125,7 @@ namespace Hprose.IO.Serializers {
             ValueWriter.WriteInt(stream, r);
             stream.WriteByte(TagOpenbrace);
             if (count > 0) {
-                ((Action<Writer, T>)(membersWriter.WriteMembers))(writer, obj);
+                ((Action<Writer, T>)(membersWriter.WriteAction))(writer, obj);
             }
             stream.WriteByte(TagClosebrace);
         }
