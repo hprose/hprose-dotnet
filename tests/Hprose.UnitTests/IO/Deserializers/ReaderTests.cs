@@ -1436,11 +1436,16 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(o);
                 writer.Serialize(o2);
                 writer.Serialize(o);
+                writer.Serialize(new {
+                    Id = 2,
+                    Name = "Anonymous"
+                });
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
                 var o3 = reader.Deserialize<Person>();
                 var o4 = reader.Deserialize<Person>();
                 var o5 = reader.Deserialize<Person>();
+                var o6 = reader.Deserialize<Person>();
                 Assert.AreEqual(0, o3.Id);
                 Assert.AreEqual("Tom", o3.Name);
                 Assert.AreEqual(48, o3.Age);
@@ -1448,6 +1453,9 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual("Jerry", o4.Name);
                 Assert.AreEqual(36, o4.Age);
                 Assert.AreEqual(o3, o5);
+                Assert.AreEqual(o6.Id, 2);
+                Assert.AreEqual(o6.Name, "Anonymous");
+                Assert.AreEqual(o6.Age, 0);
             }
         }
         [DataContract(Name = "Person2")]
@@ -1476,11 +1484,16 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 writer.Serialize(o);
                 writer.Serialize(o2);
                 writer.Serialize(o);
+                writer.Serialize(new {
+                    Id = 2,
+                    Name = "Anonymous"
+                });
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
                 var o3 = reader.Deserialize<Person2>();
                 var o4 = reader.Deserialize<Person2>();
                 var o5 = reader.Deserialize<Person2>();
+                var o6 = reader.Deserialize<Person2>();
                 Assert.AreEqual(0, o3.Id);
                 Assert.AreEqual("Tom", o3.Name);
                 Assert.AreEqual(48, o3.Age);
@@ -1488,6 +1501,9 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual("Jerry", o4.Name);
                 Assert.AreEqual(36, o4.Age);
                 Assert.AreEqual(o3, o5);
+                Assert.AreEqual(o6.Id, 2);
+                Assert.AreEqual(o6.Name, "Anonymous");
+                Assert.AreEqual(o6.Age, 0);
             }
         }
     }

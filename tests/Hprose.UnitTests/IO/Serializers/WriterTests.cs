@@ -364,7 +364,7 @@ namespace Hprose.UnitTests.IO.Serializers {
             }
         }
         [TestMethod]
-        public void TestSerializeAnonymouseType() {
+        public void TestSerializeAnonymousType() {
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
                 var v = new { Amount = 108, Message = "Hello" };
