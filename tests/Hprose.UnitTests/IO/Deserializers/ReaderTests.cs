@@ -1506,5 +1506,44 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual(o6.Age, 0);
             }
         }
+        [TestMethod]
+        public void TestDeserializeObject2() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var o = new Person {
+                    Id = 0,
+                    Name = "Tom",
+                    Age = 48
+                };
+                var o2 = new Person2 {
+                    Id = 1,
+                    Name = "Jerry",
+                    Age = 36
+                };
+                writer.Serialize(o);
+                writer.Serialize(o2);
+                writer.Serialize(o);
+                writer.Serialize(new {
+                    Id = 2,
+                    Name = "Anonymous"
+                });
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                reader.DefaultDictType = DictType.ExpandoObject;
+                dynamic o3 = reader.Deserialize();
+                dynamic o4 = reader.Deserialize();
+                dynamic o5 = reader.Deserialize();
+                dynamic o6 = reader.Deserialize();
+                Assert.AreEqual(0, o3.Id);
+                Assert.AreEqual("Tom", o3.Name);
+                Assert.AreEqual(48, o3.Age);
+                Assert.AreEqual(1, o4.Id);
+                Assert.AreEqual("Jerry", o4.Name);
+                Assert.AreEqual(36, o4.Age);
+                Assert.AreEqual(o3, o5);
+                Assert.AreEqual(o6.Id, 2);
+                Assert.AreEqual(o6.Name, "Anonymous");
+            }
+        }
     }
 }

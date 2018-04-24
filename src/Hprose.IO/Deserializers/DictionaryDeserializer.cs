@@ -12,7 +12,7 @@
  *                                                        *
  * DictionaryDeserializer class for C#.                   *
  *                                                        *
- * LastModified: Apr 21, 2018                             *
+ * LastModified: Apr 25, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -87,7 +87,7 @@ namespace Hprose.IO.Deserializers {
                 for (int i = 0; i < count; ++i) {
                     var member = members[classInfo.Members[i]];
                     if (member != null) {
-                        var v = reader.Deserialize(member is FieldInfo ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType);
+                        var v = reader.Deserialize(Accessor.GetMemberType(member));
                         dict.Add(new KeyValuePair<string, object>(member.Name, v));
                     }
                     else {
@@ -160,7 +160,7 @@ namespace Hprose.IO.Deserializers {
                 for (int i = 0; i < count; ++i) {
                     var member = members[classInfo.Members[i]];
                     if (member != null) {
-                        var v = reader.Deserialize(member is FieldInfo ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType);
+                        var v = reader.Deserialize(Accessor.GetMemberType(member));
                         dict.Add(member.Name, v);
                     }
                     else {

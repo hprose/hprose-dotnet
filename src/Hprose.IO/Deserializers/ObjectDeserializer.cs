@@ -34,31 +34,34 @@ namespace Hprose.IO.Deserializers {
 
     static class MembersReader {
         private const BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.Public;
+        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, Lazy<Delegate>>> _readMembersActions = new ConcurrentDictionary<Type, ConcurrentDictionary<string, Lazy<Delegate>>>();
+        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, Lazy<Delegate>>> _readFieldsActions = new ConcurrentDictionary<Type, ConcurrentDictionary<string, Lazy<Delegate>>>();
+        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, Lazy<Delegate>>> _readPropertiesActions = new ConcurrentDictionary<Type, ConcurrentDictionary<string, Lazy<Delegate>>>();
 
-        public static ReadAction<T> CreateReadAction<T>(Dictionary<string, MemberInfo> members, string[] names) {
+        public static Delegate CreateReadAction(Type type, Dictionary<string, MemberInfo> members, string[] names) {
             var reader = Expression.Parameter(typeof(Reader), "reader");
-            var obj = Expression.Parameter(typeof(T).MakeByRefType(), "obj");
+            var obj = Expression.Parameter(type.MakeByRefType(), "obj");
             List<Expression> expressions = new List<Expression>();
             foreach (string name in names) {
                 expressions.Add(CreateReadMemberExpression(members[name], reader, obj));
             }
             expressions.Add(Expression.Empty());
-            return Expression.Lambda<ReadAction<T>>(Expression.Block(expressions), reader, obj).Compile();
+            return Expression.Lambda(Expression.Block(expressions), reader, obj).Compile();
         }
 
-        public static ReadAction<T> CreateReadMemberAction<T>(MemberInfo member) {
+        public static Delegate CreateReadMemberAction(Type type, MemberInfo member) {
             var reader = Expression.Parameter(typeof(Reader), "reader");
-            var obj = Expression.Parameter(typeof(T).MakeByRefType(), "obj");
+            var obj = Expression.Parameter(type.MakeByRefType(), "obj");
             BlockExpression body = Expression.Block(new List<Expression> {
                 CreateReadMemberExpression(member, reader, obj),
                 Expression.Empty()
             });
-            return Expression.Lambda<ReadAction<T>>(body, reader, obj).Compile();
+            return Expression.Lambda(body, reader, obj).Compile();
         }
 
         private static Expression CreateReadMemberExpression(MemberInfo member, ParameterExpression reader, ParameterExpression obj) {
             if (member != null) {
-                Type memberType = member is FieldInfo ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType;
+                Type memberType = Accessor.GetMemberType(member);
                 var deserializer = typeof(Deserializer<>).MakeGenericType(memberType);
                 return Expression.Assign(
                     Expression.PropertyOrField(obj, member.Name),
@@ -74,6 +77,27 @@ namespace Hprose.IO.Deserializers {
                 typeof(Deserializer).GetMethod("Deserialize", BindingAttr),
                 reader
             );
+        }
+
+        public static Delegate GetReadAction(Type type, HproseMode mode, string[] names) {
+            var key = string.Join(" ", names);
+            Func<Type, ConcurrentDictionary<string, Lazy<Delegate>>> valueFactory = (_) => new ConcurrentDictionary<string, Lazy<Delegate>>();
+            Func<string, Lazy<Delegate>> delegateFactory = (_) => new Lazy<Delegate>(() => CreateReadAction(type, Accessor.GetMembers(type, mode), names));
+            ConcurrentDictionary<string, Lazy<Delegate>> delegates = null;
+            if (type.IsSerializable) {
+                switch (mode) {
+                    case FieldMode:
+                        delegates = _readFieldsActions.GetOrAdd(type, valueFactory);
+                        break;
+                    case PropertyMode:
+                        delegates = _readPropertiesActions.GetOrAdd(type, valueFactory);
+                        break;
+                }
+            }
+            if (delegates == null) {
+                delegates = _readMembersActions.GetOrAdd(type, valueFactory);
+            }
+            return delegates.GetOrAdd(key, delegateFactory).Value;
         }
 
         public static ReadAction<T> GetReadAction<T>(HproseMode mode, string[] names) {
@@ -100,24 +124,24 @@ namespace Hprose.IO.Deserializers {
     static class MembersReader<T> {
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> _readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> _readMemberActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
-        public static ReadAction<T> GetReadAction(string[] names) => _readActions.GetOrAdd(string.Join(" ", names), (_) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(MembersAccessor<T>.Members, names))).Value;
-        private static readonly Func<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction<T>(MembersAccessor<T>.Members[name]));
+        public static ReadAction<T> GetReadAction(string[] names) => _readActions.GetOrAdd(string.Join(" ", names), (_) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction(typeof(T), MembersAccessor<T>.Members, names) as ReadAction<T>)).Value;
+        private static readonly Func<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction(typeof(T), MembersAccessor<T>.Members[name]) as ReadAction<T>);
         public static ReadAction<T> GetReadMemberAction(string name) => _readActions.GetOrAdd(name, readMemberActionFactory).Value;
     }
 
     static class FieldsReader<T> {
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> _readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> _readMemberActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
-        public static ReadAction<T> GetReadAction(string[] names) => _readActions.GetOrAdd(string.Join(" ", names), (_) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(FieldsAccessor<T>.Fields, names))).Value;
-        private static readonly Func<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction<T>(FieldsAccessor<T>.Fields[name]));
+        public static ReadAction<T> GetReadAction(string[] names) => _readActions.GetOrAdd(string.Join(" ", names), (_) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction(typeof(T), FieldsAccessor<T>.Fields, names) as ReadAction<T>)).Value;
+        private static readonly Func<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction(typeof(T), FieldsAccessor<T>.Fields[name]) as ReadAction<T>);
         public static ReadAction<T> GetReadMemberAction(string name) => _readActions.GetOrAdd(name, readMemberActionFactory).Value;
     }
 
     static class PropertiesReader<T> {
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> _readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> _readMemberActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
-        public static ReadAction<T> GetReadAction(string[] names) => _readActions.GetOrAdd(string.Join(" ", names), (_) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(PropertiesAccessor<T>.Properties, names))).Value;
-        private static readonly Func<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction<T>(PropertiesAccessor<T>.Properties[name]));
+        public static ReadAction<T> GetReadAction(string[] names) => _readActions.GetOrAdd(string.Join(" ", names), (_) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction(typeof(T), PropertiesAccessor<T>.Properties, names) as ReadAction<T>)).Value;
+        private static readonly Func<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction(typeof(T), PropertiesAccessor<T>.Properties[name]) as ReadAction<T>);
         public static ReadAction<T> GetReadMemberAction(string name) => _readActions.GetOrAdd(name, readMemberActionFactory).Value;
     }
 

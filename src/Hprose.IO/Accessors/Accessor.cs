@@ -25,6 +25,7 @@ using System.Reflection;
 namespace Hprose.IO.Accessors {
     public static class Accessor {
         public static string UnifiedName(string name) => char.ToLowerInvariant(name[0]) + name.Substring(1);
+        public static Type GetMemberType(MemberInfo member) => member is FieldInfo ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType;
 
         private static readonly ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>> _members = new ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>>();
         private static readonly ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>> _fields = new ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>>();

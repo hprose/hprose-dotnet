@@ -26,6 +26,7 @@ using System.Dynamic;
 using System.IO;
 using System.Runtime.Serialization;
 using Hprose.Collections.Generic;
+using Hprose.IO.Accessors;
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
@@ -322,17 +323,59 @@ namespace Hprose.IO.Deserializers {
                         case DictType.Dictionary:
                             return DictionaryDeserializer<Dictionary<object, object>, object, object>.Read(reader);
                         case DictType.ExpandoObject:
-                            return DictionaryDeserializer<ExpandoObject, string, object>.Read(reader);
+                            return StringObjectDictionaryDeserializer<ExpandoObject>.Read(reader);
                         case DictType.Hashtable:
                             return DictionaryDeserializer<Hashtable>.Read(reader);
                         default:
                             return DictionaryDeserializer<NullableKeyDictionary<object, object>, object, object>.Read(reader);
                     }
-                //case TagObject:
-                //    return ReadObjectWithoutTag(null);
+                case TagObject:
+                    return Read(reader);
                 default:
                     return base.Read(reader, tag);
             }
+        }
+
+        private object Read(Reader reader) {
+            Stream stream = reader.Stream;
+            int index = ValueReader.ReadInt(stream, TagOpenbrace);
+            var classInfo = reader[index];
+            var type = classInfo.Type;
+            string[] names = classInfo.Members;
+            object obj;
+            if (type != null && !type.IsValueType) {
+                obj = Activator.CreateInstance(type, true);
+                reader.SetRef(obj);
+                MembersReader.GetReadAction(type, reader.Mode, names).DynamicInvoke(reader, obj);
+            }
+            else {
+                obj = new ExpandoObject();
+                reader.SetRef(obj);
+                var dict = (IDictionary<string, object>)(obj);
+                int count = names.Length;
+                if (type != null) {
+                    if (classInfo.Type != null) {
+                        var members = Accessor.GetMembers(type, reader.Mode);
+                        for (int i = 0; i < count; ++i) {
+                            var name = names[i];
+                            var member = members[name];
+                            if (member != null) {
+                                dict.Add(member.Name, Deserialize(reader, Accessor.GetMemberType(member)));
+                            }
+                            else {
+                                dict.Add(name, Deserialize(reader));
+                            }
+                        }
+                    }
+                }
+                else {
+                    for (int i = 0; i < count; ++i) {
+                        dict.Add(names[i], Deserialize(reader));
+                    }
+                }
+            }
+            stream.ReadByte();
+            return obj;
         }
     }
 }

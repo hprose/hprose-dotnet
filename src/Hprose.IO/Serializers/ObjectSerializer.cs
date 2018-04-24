@@ -12,7 +12,7 @@
  *                                                        *
  * ObjectSerializer class for C#.                         *
  *                                                        *
- * LastModified: Apr 24, 2018                             *
+ * LastModified: Apr 25, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -55,7 +55,7 @@ namespace Hprose.IO.Serializers {
             var obj = Expression.Variable(typeof(T), "obj");
             List<Expression> expressions = new List<Expression>();
             foreach (MemberInfo member in members) {
-                Type memberType = member is FieldInfo ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType;
+                Type memberType = Accessor.GetMemberType(member);
                 var elemSerializerType = typeof(Serializer<>).MakeGenericType(memberType);
                 expressions.Add(
                     Expression.Call(
