@@ -119,30 +119,30 @@ namespace Hprose.UnitTests.IO.Serializers {
         }
         [TestMethod]
         public void TestGetMembers() {
-            Assert.AreEqual("a2{s2\"id\"s4\"name\"}", Serialize(Accessor.GetMembers<TestClass>().Keys));
-            Assert.AreEqual("a3{s3\"age\"s2\"id\"s4\"name\"}", Serialize(Accessor.GetMembers<TestClass2>().Keys));
-            Assert.AreEqual("a3{s3\"age\"s2\"id\"s4\"name\"}", Serialize(Accessor.GetMembers<TestClass3>().Keys));
-            Assert.AreEqual("a2{s2\"id\"s4\"name\"}", Serialize(Accessor.GetMembers<TestClass4>().Keys));
-            Assert.AreEqual("a{}", Serialize(Accessor.GetMembers<TestClass5>().Keys));
-            Assert.AreEqual("a{}", Serialize(Accessor.GetMembers<TestClass6>().Keys));
+            Assert.AreEqual("a2{s2\"id\"s4\"name\"}", Serialize(MembersAccessor<TestClass>.Members.Keys));
+            Assert.AreEqual("a3{s3\"age\"s2\"id\"s4\"name\"}", Serialize(MembersAccessor<TestClass2>.Members.Keys));
+            Assert.AreEqual("a3{s3\"age\"s2\"id\"s4\"name\"}", Serialize(MembersAccessor<TestClass3>.Members.Keys));
+            Assert.AreEqual("a2{s2\"id\"s4\"name\"}", Serialize(MembersAccessor<TestClass4>.Members.Keys));
+            Assert.AreEqual("a{}", Serialize(MembersAccessor<TestClass5>.Members.Keys));
+            Assert.AreEqual("a{}", Serialize(MembersAccessor<TestClass6>.Members.Keys));
         }
         [TestMethod]
         public void TestGetFields() {
-            Assert.AreEqual("a{}", Serialize(Accessor.GetFields<TestClass>().Keys));
-            Assert.AreEqual("a3{s5\"_name\"s3\"age\"s2\"id\"}", Serialize(Accessor.GetFields<TestClass2>().Keys));
-            Assert.AreEqual("a{}", Serialize(Accessor.GetFields<TestClass3>().Keys));
-            Assert.AreEqual("a{}", Serialize(Accessor.GetFields<TestClass4>().Keys));
-            Assert.AreEqual("a3{s5\"_name\"s3\"age\"s2\"id\"}", Serialize(Accessor.GetFields<TestClass5>().Keys));
-            Assert.AreEqual("a{}", Serialize(Accessor.GetFields<TestClass6>().Keys));
+            Assert.AreEqual("a{}", Serialize(FieldsAccessor<TestClass>.Fields.Keys));
+            Assert.AreEqual("a3{s5\"_name\"s3\"age\"s2\"id\"}", Serialize(FieldsAccessor<TestClass2>.Fields.Keys));
+            Assert.AreEqual("a{}", Serialize(FieldsAccessor<TestClass3>.Fields.Keys));
+            Assert.AreEqual("a{}", Serialize(FieldsAccessor<TestClass4>.Fields.Keys));
+            Assert.AreEqual("a3{s5\"_name\"s3\"age\"s2\"id\"}", Serialize(FieldsAccessor<TestClass5>.Fields.Keys));
+            Assert.AreEqual("a{}", Serialize(FieldsAccessor<TestClass6>.Fields.Keys));
         }
         [TestMethod]
         public void TestGetProperties() {
-            Assert.AreEqual("a{}", Serialize(Accessor.GetProperties<TestClass>().Keys));
-            Assert.AreEqual("a1{s4\"name\"}", Serialize(Accessor.GetProperties<TestClass2>().Keys));
-            Assert.AreEqual("a{}", Serialize(Accessor.GetProperties<TestClass3>().Keys));
-            Assert.AreEqual("a{}", Serialize(Accessor.GetProperties<TestClass4>().Keys));
-            Assert.AreEqual("a{}", Serialize(Accessor.GetProperties<TestClass5>().Keys));
-            Assert.AreEqual("a{}", Serialize(Accessor.GetProperties<TestClass6>().Keys));
+            Assert.AreEqual("a{}", Serialize(PropertiesAccessor<TestClass>.Properties.Keys));
+            Assert.AreEqual("a1{s4\"name\"}", Serialize(PropertiesAccessor<TestClass2>.Properties.Keys));
+            Assert.AreEqual("a{}", Serialize(PropertiesAccessor<TestClass3>.Properties.Keys));
+            Assert.AreEqual("a{}", Serialize(PropertiesAccessor<TestClass4>.Properties.Keys));
+            Assert.AreEqual("a{}", Serialize(PropertiesAccessor<TestClass5>.Properties.Keys));
+            Assert.AreEqual("a{}", Serialize(PropertiesAccessor<TestClass6>.Properties.Keys));
         }
     }
 }

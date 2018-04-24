@@ -12,7 +12,7 @@
  *                                                        *
  * Accessor class for C#.                                 *
  *                                                        *
- * LastModified: Apr 23, 2018                             *
+ * LastModified: Apr 24, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -24,9 +24,6 @@ using System.Reflection;
 
 namespace Hprose.IO.Accessors {
     public static class Accessor {
-        public static Dictionary<string, MemberInfo> GetMembers<T>() => MembersAccessor<T>.Members;
-        public static Dictionary<string, MemberInfo> GetFields<T>() => FieldsAccessor<T>.Fields;
-        public static Dictionary<string, MemberInfo> GetProperties<T>() => PropertiesAccessor<T>.Properties;
         public static string UnifiedName(string name) => char.ToLowerInvariant(name[0]) + name.Substring(1);
 
         private static readonly ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>> _members = new ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>>();
