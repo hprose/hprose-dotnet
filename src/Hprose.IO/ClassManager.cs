@@ -12,7 +12,7 @@
  *                                                        *
  * hprose ClassManager class for C#.                      *
  *                                                        *
- * LastModified: Apr 23, 2018                             *
+ * LastModified: Apr 25, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -25,10 +25,10 @@ using System.Runtime.Serialization;
 namespace Hprose.IO {
     public static class ClassManager {
         static class ClassName<T> {
-            private static volatile string _name;
+            private static volatile string name;
             public static string Name {
-                get => _name;
-                set => _name = value;
+                get => name;
+                set => name = value;
             }
         }
         private static readonly Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();

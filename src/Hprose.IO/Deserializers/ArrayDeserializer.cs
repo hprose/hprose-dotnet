@@ -12,7 +12,7 @@
  *                                                        *
  * ArrayDeserializer class for C#.                        *
  *                                                        *
- * LastModified: Apr 15, 2018                             *
+ * LastModified: Apr 25, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -24,12 +24,12 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
     class ArrayDeserializer<T> : Deserializer<T[]> {
-        private static readonly T[] EmptyArray = new T[0] { };
+        private static readonly T[] empty = new T[0] { };
         public override T[] Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
-                    return EmptyArray;
+                    return empty;
                 case TagList:
                     return ReferenceReader.ReadArray<T>(reader);
                 default:
@@ -39,7 +39,7 @@ namespace Hprose.IO.Deserializers {
     }
 
     class Array2Deserializer<T> : Deserializer<T[,]> {
-        private static readonly T[,] EmptyArray = new T[0, 0] { };
+        private static readonly T[,] empty = new T[0, 0] { };
         private static T[,] Read(Reader reader) {
             Stream stream = reader.Stream;
             int count1 = ValueReader.ReadCount(stream);
@@ -71,7 +71,7 @@ namespace Hprose.IO.Deserializers {
             var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
-                    return EmptyArray;
+                    return empty;
                 case TagList:
                     return Read(reader);
                 default:

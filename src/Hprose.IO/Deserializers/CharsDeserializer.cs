@@ -23,7 +23,7 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
     class CharsDeserializer : Deserializer<char[]> {
-        private static readonly char[] EmptyChars = new char[0] { };
+        private static readonly char[] empty = new char[0] { };
         public override char[] Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {
@@ -34,7 +34,7 @@ namespace Hprose.IO.Deserializers {
                 case TagList:
                     return ReferenceReader.ReadArray<char>(reader);
                 case TagEmpty:
-                    return EmptyChars;
+                    return empty;
                 case TagTrue:
                     return bool.TrueString.ToCharArray();
                 case TagFalse:

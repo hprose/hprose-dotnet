@@ -12,7 +12,7 @@
  *                                                        *
  * MultiDimArrayDeserializer class for C#.                *
  *                                                        *
- * LastModified: Apr 15, 2018                             *
+ * LastModified: Apr 25, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -24,7 +24,7 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
     class MultiDimArrayDeserializer<T, E> : Deserializer<T> {
-        private static readonly T EmptyArray = (T)(object)(Array.CreateInstance(typeof(E), new int[typeof(T).GetArrayRank()]));
+        private static readonly T empty = (T)(object)(Array.CreateInstance(typeof(E), new int[typeof(T).GetArrayRank()]));
         private static T Read(Reader reader) {
             Stream stream = reader.Stream;
             Type type = typeof(T);
@@ -81,7 +81,7 @@ namespace Hprose.IO.Deserializers {
             var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
-                    return EmptyArray;
+                    return empty;
                 case TagList:
                     return Read(reader);
                 default:

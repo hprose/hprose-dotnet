@@ -28,8 +28,8 @@ namespace Hprose.IO.Serializers {
     public static class ValueWriter {
         private const int INT_SIZE = 11;
         private const int LONG_SIZE = 20;
-        private static readonly byte[] _digits = GetASCII("0123456789");
-        private static readonly byte[] _digitTens = GetASCII(
+        private static readonly byte[] digits = GetASCII("0123456789");
+        private static readonly byte[] digitTens = GetASCII(
             "0000000000" +
             "1111111111" +
             "2222222222" +
@@ -40,7 +40,7 @@ namespace Hprose.IO.Serializers {
             "7777777777" +
             "8888888888" +
             "9999999999");
-        private static readonly byte[] _digitOnes = GetASCII(
+        private static readonly byte[] digitOnes = GetASCII(
             "0123456789" +
             "0123456789" +
             "0123456789" +
@@ -51,8 +51,8 @@ namespace Hprose.IO.Serializers {
             "0123456789" +
             "0123456789" +
             "0123456789");
-        private static readonly byte[] _minIntBuf = GetASCII("-2147483648");
-        private static readonly byte[] _minLongBuf = GetASCII("-9223372036854775808");
+        private static readonly byte[] minIntBuf = GetASCII("-2147483648");
+        private static readonly byte[] minLongBuf = GetASCII("-9223372036854775808");
         public static readonly UTF8Encoding UTF8 = new UTF8Encoding();
 
         public static byte[] GetASCII(string s) {
@@ -66,10 +66,10 @@ namespace Hprose.IO.Serializers {
 
         public static void WriteInt(Stream stream, int i) {
             if ((i >= 0) && (i <= 9)) {
-                stream.WriteByte(_digits[i]);
+                stream.WriteByte(digits[i]);
             }
             else if (i == int.MinValue) {
-                stream.Write(_minIntBuf, 0, _minIntBuf.Length);
+                stream.Write(minIntBuf, 0, minIntBuf.Length);
             }
             else {
                 byte[] buf = new byte[INT_SIZE];
@@ -83,7 +83,7 @@ namespace Hprose.IO.Serializers {
 
         public static void WriteInt(Stream stream, uint i) {
             if ((i >= 0) && (i <= 9)) {
-                stream.WriteByte(_digits[i]);
+                stream.WriteByte(digits[i]);
             }
             else {
                 byte[] buf = new byte[INT_SIZE];
@@ -94,10 +94,10 @@ namespace Hprose.IO.Serializers {
 
         public static void WriteInt(Stream stream, long i) {
             if ((i >= 0) && (i <= 9)) {
-                stream.WriteByte(_digits[i]);
+                stream.WriteByte(digits[i]);
             }
             else if (i == long.MinValue) {
-                stream.Write(_minLongBuf, 0, _minLongBuf.Length);
+                stream.Write(minLongBuf, 0, minLongBuf.Length);
             }
             else {
                 byte[] buf = new byte[LONG_SIZE];
@@ -111,7 +111,7 @@ namespace Hprose.IO.Serializers {
 
         public static void WriteInt(Stream stream, ulong i) {
             if ((i >= 0) && (i <= 9)) {
-                stream.WriteByte(_digits[i]);
+                stream.WriteByte(digits[i]);
             }
             else {
                 byte[] buf = new byte[LONG_SIZE];
@@ -126,13 +126,13 @@ namespace Hprose.IO.Serializers {
                 q = i / 100;
                 r = i - (q * 100);
                 i = q;
-                buf[--off] = _digitOnes[r];
-                buf[--off] = _digitTens[r];
+                buf[--off] = digitOnes[r];
+                buf[--off] = digitTens[r];
             }
             for (; ; ) {
                 q = (i * 52429) >> (16 + 3);
                 r = i - (q * 10);
-                buf[--off] = _digits[r];
+                buf[--off] = digits[r];
                 i = q;
                 if (i == 0) break;
             }
@@ -145,15 +145,15 @@ namespace Hprose.IO.Serializers {
                 q = i / 100;
                 r = i - (q * 100);
                 i = q;
-                buf[--off] = _digitOnes[r];
-                buf[--off] = _digitTens[r];
+                buf[--off] = digitOnes[r];
+                buf[--off] = digitTens[r];
             }
             return ToBytes((uint)i, buf, off);
         }
 
         public static void Write(Stream stream, int i) {
             if (i >= 0 && i <= 9) {
-                stream.WriteByte(_digits[i]);
+                stream.WriteByte(digits[i]);
             }
             else {
                 stream.WriteByte(TagInteger);
@@ -164,7 +164,7 @@ namespace Hprose.IO.Serializers {
 
         public static void Write(Stream stream, uint i) {
             if (i >= 0 && i <= 9) {
-                stream.WriteByte(_digits[i]);
+                stream.WriteByte(digits[i]);
             }
             else {
                 stream.WriteByte(TagLong);
@@ -175,7 +175,7 @@ namespace Hprose.IO.Serializers {
 
         public static void Write(Stream stream, long i) {
             if (i >= 0 && i <= 9) {
-                stream.WriteByte(_digits[i]);
+                stream.WriteByte(digits[i]);
             }
             else {
                 stream.WriteByte(TagLong);
@@ -186,7 +186,7 @@ namespace Hprose.IO.Serializers {
 
         public static void Write(Stream stream, ulong i) {
             if (i >= 0 && i <= 9) {
-                stream.WriteByte(_digits[i]);
+                stream.WriteByte(digits[i]);
             }
             else {
                 stream.WriteByte(TagLong);

@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Deserializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 24, 2018                             *
+ * LastModified: Apr 25, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -37,13 +37,13 @@ namespace Hprose.IO.Deserializers {
 
     public abstract class Deserializer<T> : IDeserializer {
         static Deserializer() => Deserializer.Initialize();
-        private static volatile Deserializer<T> _instance;
+        private static volatile Deserializer<T> instance;
         public static Deserializer<T> Instance {
             get {
-                if (_instance == null) {
-                    _instance = Deserializer.GetInstance(typeof(T)) as Deserializer<T>;
+                if (instance == null) {
+                    instance = Deserializer.GetInstance(typeof(T)) as Deserializer<T>;
                 }
-                return _instance;
+                return instance;
             }
         }
         public virtual T Read(Reader reader, int tag) {
@@ -65,7 +65,7 @@ namespace Hprose.IO.Deserializers {
         object IDeserializer.Deserialize(Reader reader) => Deserialize(reader);
     }
     public class Deserializer : Deserializer<object> {
-        static readonly ConcurrentDictionary<Type, Lazy<IDeserializer>> _deserializers = new ConcurrentDictionary<Type, Lazy<IDeserializer>>();
+        static readonly ConcurrentDictionary<Type, Lazy<IDeserializer>> deserializers = new ConcurrentDictionary<Type, Lazy<IDeserializer>>();
 
         static Deserializer() {
             Register(() => new Deserializer());
@@ -101,7 +101,7 @@ namespace Hprose.IO.Deserializers {
 
         public static void Initialize() { }
 
-        public static void Register<T>(Func<Deserializer<T>> ctor) => _deserializers[typeof(T)] = new Lazy<IDeserializer>(ctor);
+        public static void Register<T>(Func<Deserializer<T>> ctor) => deserializers[typeof(T)] = new Lazy<IDeserializer>(ctor);
 
         private static Type GetDeserializerType(Type type) {
             if (type.IsEnum) {
@@ -248,11 +248,11 @@ namespace Hprose.IO.Deserializers {
             return typeof(ObjectDeserializer<>).MakeGenericType(type);
         }
 
-        private static readonly Func<Type, Lazy<IDeserializer>> deserializerFactory = (type) => new Lazy<IDeserializer>(
+        private static readonly Func<Type, Lazy<IDeserializer>> deserializerFactory = type => new Lazy<IDeserializer>(
                 () => Activator.CreateInstance(GetDeserializerType(type)) as IDeserializer
             );
 
-        internal static IDeserializer GetInstance(Type type) => _deserializers.GetOrAdd(type, deserializerFactory).Value;
+        internal static IDeserializer GetInstance(Type type) => deserializers.GetOrAdd(type, deserializerFactory).Value;
 
         public static object Deserialize(Reader reader, Type type) => GetInstance(type).Deserialize(reader);
 
@@ -340,8 +340,8 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
             var classInfo = reader[index];
-            var type = classInfo.Type;
-            string[] names = classInfo.Members;
+            var type = classInfo.type;
+            string[] names = classInfo.names;
             object obj;
             if (type != null && !type.IsValueType) {
                 obj = Activator.CreateInstance(type, true);
@@ -354,7 +354,7 @@ namespace Hprose.IO.Deserializers {
                 var dict = (IDictionary<string, object>)(obj);
                 int count = names.Length;
                 if (type != null) {
-                    if (classInfo.Type != null) {
+                    if (classInfo.type != null) {
                         var members = Accessor.GetMembers(type, reader.Mode);
                         for (int i = 0; i < count; ++i) {
                             var name = names[i];

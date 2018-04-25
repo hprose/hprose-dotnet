@@ -12,7 +12,7 @@
  *                                                        *
  * hprose BytesConverter class for C#.                    *
  *                                                        *
- * LastModified: Apr 21, 2018                             *
+ * LastModified: Apr 25, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/

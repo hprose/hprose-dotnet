@@ -12,7 +12,7 @@
  *                                                        *
  * AnonymousTypeSerializer class for C#.                  *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: Apr 25, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -26,11 +26,11 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     class AnonymousTypeSerializer<T> : ReferenceSerializer<T> {
-        static readonly Action<Writer, T> WriteProperties;
-        static readonly int Length;
+        private static readonly Action<Writer, T> write;
+        private static readonly int length;
         static AnonymousTypeSerializer() {
             var properties = typeof(T).GetProperties();
-            Length = properties.Length;
+            length = properties.Length;
             var writer = Expression.Variable(typeof(Writer), "writer");
             var obj = Expression.Variable(typeof(T), "obj");
             Type strSerializerType = typeof(Serializer<string>);
@@ -55,18 +55,18 @@ namespace Hprose.IO.Serializers {
                     )
                 );
             }
-            WriteProperties = (Action<Writer, T>)Expression.Lambda(Expression.Block(expressions), writer, obj).Compile();
+            write = (Action<Writer, T>)Expression.Lambda(Expression.Block(expressions), writer, obj).Compile();
         }
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;
             stream.WriteByte(TagMap);
-            if (Length > 0) {
-                ValueWriter.WriteInt(stream, Length);
+            if (length > 0) {
+                ValueWriter.WriteInt(stream, length);
             }
             stream.WriteByte(TagOpenbrace);
-            if (Length > 0) {
-                WriteProperties(writer, obj);
+            if (length > 0) {
+                write(writer, obj);
             }
             stream.WriteByte(TagClosebrace);
         }

@@ -12,7 +12,7 @@
  *                                                        *
  * ValueTupleSerializer class for C#.                     *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: Apr 25, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -23,8 +23,8 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
     static class ValueTupleHelper<T> {
-        public static volatile int Length;
-        public static volatile Action<Writer, T> WriteElements;
+        public static volatile int length;
+        public static volatile Action<Writer, T> write;
         static ValueTupleHelper() {
             Type type = typeof(T);
             if (type.IsGenericType) {
@@ -35,36 +35,36 @@ namespace Hprose.IO.Serializers {
                     return;
                 }
             }
-            WriteElements = Serializer<T>.Instance.Serialize;
-            Length = 1;
+            write = Serializer<T>.Instance.Serialize;
+            length = 1;
         }
     }
 
     static class ValueTupleHelper {
         public static void Initialize1<T1>() {
-            ValueTupleHelper<ValueTuple<T1>>.Length = 1;
-            ValueTupleHelper<ValueTuple<T1>>.WriteElements = (writer, obj) => {
+            ValueTupleHelper<ValueTuple<T1>>.length = 1;
+            ValueTupleHelper<ValueTuple<T1>>.write = (writer, obj) => {
                 Serializer<T1>.Instance.Serialize(writer, obj.Item1);
             };
         }
         public static void Initialize2<T1, T2>() {
-            ValueTupleHelper<ValueTuple<T1, T2>>.Length = 2;
-            ValueTupleHelper<ValueTuple<T1, T2>>.WriteElements = (writer, obj) => {
+            ValueTupleHelper<ValueTuple<T1, T2>>.length = 2;
+            ValueTupleHelper<ValueTuple<T1, T2>>.write = (writer, obj) => {
                 Serializer<T1>.Instance.Serialize(writer, obj.Item1);
                 Serializer<T2>.Instance.Serialize(writer, obj.Item2);
             };
         }
         public static void Initialize3<T1, T2, T3>() {
-            ValueTupleHelper<ValueTuple<T1, T2, T3>>.Length = 3;
-            ValueTupleHelper<ValueTuple<T1, T2, T3>>.WriteElements = (writer, obj) => {
+            ValueTupleHelper<ValueTuple<T1, T2, T3>>.length = 3;
+            ValueTupleHelper<ValueTuple<T1, T2, T3>>.write = (writer, obj) => {
                 Serializer<T1>.Instance.Serialize(writer, obj.Item1);
                 Serializer<T2>.Instance.Serialize(writer, obj.Item2);
                 Serializer<T3>.Instance.Serialize(writer, obj.Item3);
             };
         }
         public static void Initialize4<T1, T2, T3, T4>() {
-            ValueTupleHelper<ValueTuple<T1, T2, T3, T4>>.Length = 4;
-            ValueTupleHelper<ValueTuple<T1, T2, T3, T4>>.WriteElements = (writer, obj) => {
+            ValueTupleHelper<ValueTuple<T1, T2, T3, T4>>.length = 4;
+            ValueTupleHelper<ValueTuple<T1, T2, T3, T4>>.write = (writer, obj) => {
                 Serializer<T1>.Instance.Serialize(writer, obj.Item1);
                 Serializer<T2>.Instance.Serialize(writer, obj.Item2);
                 Serializer<T3>.Instance.Serialize(writer, obj.Item3);
@@ -72,8 +72,8 @@ namespace Hprose.IO.Serializers {
             };
         }
         public static void Initialize5<T1, T2, T3, T4, T5>() {
-            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5>>.Length = 5;
-            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5>>.WriteElements = (writer, obj) => {
+            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5>>.length = 5;
+            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5>>.write = (writer, obj) => {
                 Serializer<T1>.Instance.Serialize(writer, obj.Item1);
                 Serializer<T2>.Instance.Serialize(writer, obj.Item2);
                 Serializer<T3>.Instance.Serialize(writer, obj.Item3);
@@ -82,8 +82,8 @@ namespace Hprose.IO.Serializers {
             };
         }
         public static void Initialize6<T1, T2, T3, T4, T5, T6>() {
-            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5, T6>>.Length = 6;
-            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5, T6>>.WriteElements = (writer, obj) => {
+            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5, T6>>.length = 6;
+            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5, T6>>.write = (writer, obj) => {
                 Serializer<T1>.Instance.Serialize(writer, obj.Item1);
                 Serializer<T2>.Instance.Serialize(writer, obj.Item2);
                 Serializer<T3>.Instance.Serialize(writer, obj.Item3);
@@ -93,8 +93,8 @@ namespace Hprose.IO.Serializers {
             };
         }
         public static void Initialize7<T1, T2, T3, T4, T5, T6, T7>() {
-            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5, T6, T7>>.Length = 7;
-            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5, T6, T7>>.WriteElements = (writer, obj) => {
+            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5, T6, T7>>.length = 7;
+            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5, T6, T7>>.write = (writer, obj) => {
                 Serializer<T1>.Instance.Serialize(writer, obj.Item1);
                 Serializer<T2>.Instance.Serialize(writer, obj.Item2);
                 Serializer<T3>.Instance.Serialize(writer, obj.Item3);
@@ -105,8 +105,8 @@ namespace Hprose.IO.Serializers {
             };
         }
         public static void Initialize8<T1, T2, T3, T4, T5, T6, T7, TRest>() where TRest : struct {
-            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5, T6, T7, TRest>>.Length = 7 + ValueTupleHelper<TRest>.Length;
-            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5, T6, T7, TRest>>.WriteElements = (writer, obj) => {
+            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5, T6, T7, TRest>>.length = 7 + ValueTupleHelper<TRest>.length;
+            ValueTupleHelper<ValueTuple<T1, T2, T3, T4, T5, T6, T7, TRest>>.write = (writer, obj) => {
                 Serializer<T1>.Instance.Serialize(writer, obj.Item1);
                 Serializer<T2>.Instance.Serialize(writer, obj.Item2);
                 Serializer<T3>.Instance.Serialize(writer, obj.Item3);
@@ -114,7 +114,7 @@ namespace Hprose.IO.Serializers {
                 Serializer<T5>.Instance.Serialize(writer, obj.Item5);
                 Serializer<T6>.Instance.Serialize(writer, obj.Item6);
                 Serializer<T7>.Instance.Serialize(writer, obj.Item7);
-                ValueTupleHelper<TRest>.WriteElements(writer, obj.Rest);
+                ValueTupleHelper<TRest>.write(writer, obj.Rest);
             };
         }
     }
@@ -134,9 +134,9 @@ namespace Hprose.IO.Serializers {
             base.Write(writer, obj);
             var stream = writer.Stream;
             stream.WriteByte(TagList);
-            ValueWriter.WriteInt(stream, ValueTupleHelper<T>.Length);
+            ValueWriter.WriteInt(stream, ValueTupleHelper<T>.length);
             stream.WriteByte(TagOpenbrace);
-            ValueTupleHelper<T>.WriteElements(writer, obj);
+            ValueTupleHelper<T>.write(writer, obj);
             stream.WriteByte(TagClosebrace);
         }
     }

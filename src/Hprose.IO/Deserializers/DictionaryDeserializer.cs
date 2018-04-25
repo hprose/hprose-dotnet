@@ -20,7 +20,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 
 using Hprose.IO.Accessors;
 using Hprose.IO.Converters;
@@ -51,8 +50,7 @@ namespace Hprose.IO.Deserializers {
             reader.SetRef(dict);
             var deserializer = Deserializer<V>.Instance;
             for (int i = 0; i < count; ++i) {
-                var v = deserializer.Deserialize(reader);
-                dict.Add(new KeyValuePair<K, V>(Converter<K>.Convert(i), v));
+                dict.Add(new KeyValuePair<K, V>(Converter<K>.Convert(i), deserializer.Deserialize(reader)));
             }
             stream.ReadByte();
             return dict;
@@ -81,27 +79,24 @@ namespace Hprose.IO.Deserializers {
             T dict = new T();
             reader.SetRef(dict);
             var deserializer = Deserializer.Instance;
-            if (classInfo.Type != null) {
-                var members = Accessor.GetMembers(classInfo.Type, reader.Mode);
-                int count = classInfo.Members.Length;
+            string[] names = classInfo.names;
+            int count = names.Length;
+            if (classInfo.type != null) {
+                var members = Accessor.GetMembers(classInfo.type, reader.Mode);
                 for (int i = 0; i < count; ++i) {
-                    var member = members[classInfo.Members[i]];
+                    var name = names[i];
+                    var member = members[name];
                     if (member != null) {
-                        var v = reader.Deserialize(Accessor.GetMemberType(member));
-                        dict.Add(new KeyValuePair<string, object>(member.Name, v));
+                        dict.Add(new KeyValuePair<string, object>(member.Name, reader.Deserialize(Accessor.GetMemberType(member))));
                     }
                     else {
-                        var v = deserializer.Deserialize(reader);
-                        dict.Add(new KeyValuePair<string, object>(classInfo.Members[i], v));
+                        dict.Add(new KeyValuePair<string, object>(name, deserializer.Deserialize(reader)));
                     }
                 }
             }
             else {
-                string[] members = classInfo.Members;
-                int count = members.Length;
                 for (int i = 0; i < count; ++i) {
-                    var v = deserializer.Deserialize(reader);
-                    dict.Add(new KeyValuePair<string, object>(members[i], v));
+                    dict.Add(new KeyValuePair<string, object>(names[i], deserializer.Deserialize(reader)));
                 }
             }
             stream.ReadByte();
@@ -154,27 +149,23 @@ namespace Hprose.IO.Deserializers {
             T dict = new T();
             reader.SetRef(dict);
             var deserializer = Deserializer.Instance;
-            if (classInfo.Type != null) {
-                var members = Accessor.GetMembers(classInfo.Type, reader.Mode);
-                int count = classInfo.Members.Length;
+            var names = classInfo.names;
+            int count = names.Length;
+            if (classInfo.type != null) {
+                var members = Accessor.GetMembers(classInfo.type, reader.Mode);
                 for (int i = 0; i < count; ++i) {
-                    var member = members[classInfo.Members[i]];
+                    var member = members[names[i]];
                     if (member != null) {
-                        var v = reader.Deserialize(Accessor.GetMemberType(member));
-                        dict.Add(member.Name, v);
+                        dict.Add(member.Name, reader.Deserialize(Accessor.GetMemberType(member)));
                     }
                     else {
-                        var v = deserializer.Deserialize(reader);
-                        dict.Add(classInfo.Members[i], v);
+                        dict.Add(names[i], deserializer.Deserialize(reader));
                     }
                 }
             }
             else {
-                string[] members = classInfo.Members;
-                int count = members.Length;
                 for (int i = 0; i < count; ++i) {
-                    var v = deserializer.Deserialize(reader);
-                    dict.Add(members[i], v);
+                    dict.Add(names[i], deserializer.Deserialize(reader));
                 }
             }
             stream.ReadByte();

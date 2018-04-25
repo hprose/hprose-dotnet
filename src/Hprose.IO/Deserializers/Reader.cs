@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Reader class for C#.                            *
  *                                                        *
- * LastModified: Apr 19, 2018                             *
+ * LastModified: Apr 25, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -72,9 +72,9 @@ namespace Hprose.IO.Deserializers {
             }
             _stream.ReadByte();
             _ref.Add(new ClassInfo {
-                Name = name,
-                Type = ClassManager.GetType(name),
-                Members = members
+                name = name,
+                type = ClassManager.GetType(name),
+                names = members
             });
         }
 

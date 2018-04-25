@@ -12,7 +12,7 @@
  *                                                        *
  * ClassInfo class for C#.                                *
  *                                                        *
- * LastModified: Apr 8, 2018                              *
+ * LastModified: Apr 25, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -20,8 +20,8 @@ using System;
 
 namespace Hprose.IO.Deserializers {
     public struct ClassInfo {
-        public string Name;
-        public Type Type;
-        public string[] Members;
+        public string name;
+        public Type type;
+        public string[] names;
     }
 }

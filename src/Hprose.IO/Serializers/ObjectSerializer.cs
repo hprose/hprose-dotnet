@@ -31,9 +31,9 @@ using static Hprose.IO.HproseTags;
 namespace Hprose.IO.Serializers {
 
     class MembersWriter {
-        public Delegate WriteAction;
-        public int Count;
-        public byte[] MetaData;
+        public Delegate write;
+        public int count;
+        public byte[] data;
         public static byte[] GetMetaData(string typeName, IEnumerable<string> memberNames, int count) {
             using (var stream = new MemoryStream()) {
                 stream.WriteByte(TagClass);
@@ -82,41 +82,41 @@ namespace Hprose.IO.Serializers {
     class MembersWriter<T> : MembersWriter {
         public static readonly MembersWriter Instance = new MembersWriter<T>();
         private MembersWriter() {
-            var members = MembersAccessor<T>.Members;
-            Count = members.Count;
-            MetaData = GetMetaData(ClassManager.GetName<T>(), members.Keys, Count);
-            WriteAction = CreateWriteAction<T>(members.Values);
+            var members = MembersAccessor<T>.members;
+            count = members.Count;
+            data = GetMetaData(ClassManager.GetName<T>(), members.Keys, count);
+            write = CreateWriteAction<T>(members.Values);
         }
     }
 
     class FieldsWriter<T> : MembersWriter {
         public static readonly MembersWriter Instance = new FieldsWriter<T>();
         private FieldsWriter() {
-            var fields = FieldsAccessor<T>.Fields;
-            Count = fields.Count;
-            MetaData = GetMetaData(ClassManager.GetName<T>(), fields.Keys, Count);
-            WriteAction = CreateWriteAction<T>(fields.Values);
+            var fields = FieldsAccessor<T>.fields;
+            count = fields.Count;
+            data = GetMetaData(ClassManager.GetName<T>(), fields.Keys, count);
+            write = CreateWriteAction<T>(fields.Values);
         }
     }
 
     class PropertiesWriter<T> : MembersWriter {
         public static readonly MembersWriter Instance = new PropertiesWriter<T>();
         private PropertiesWriter() {
-            var properties = PropertiesAccessor<T>.Properties;
-            Count = properties.Count;
-            MetaData = GetMetaData(ClassManager.GetName<T>(), properties.Keys, Count);
-            WriteAction = CreateWriteAction<T>(properties.Values);
+            var properties = PropertiesAccessor<T>.properties;
+            count = properties.Count;
+            data = GetMetaData(ClassManager.GetName<T>(), properties.Keys, count);
+            write = CreateWriteAction<T>(properties.Values);
         }
     }
 
     class ObjectSerializer<T> : ReferenceSerializer<T> {
         public override void Write(Writer writer, T obj) {
             MembersWriter membersWriter = MembersWriter.GetMembersWriter<T>(writer.Mode);
-            int count = membersWriter.Count;
+            int count = membersWriter.count;
             var stream = writer.Stream;
             var type = typeof(T);
             int r = writer.WriteClass(type, () => {
-                byte[] data = membersWriter.MetaData;
+                byte[] data = membersWriter.data;
                 stream.Write(data, 0, data.Length);
                 writer.AddCount(count);
             });
@@ -125,7 +125,7 @@ namespace Hprose.IO.Serializers {
             ValueWriter.WriteInt(stream, r);
             stream.WriteByte(TagOpenbrace);
             if (count > 0) {
-                ((Action<Writer, T>)(membersWriter.WriteAction))(writer, obj);
+                ((Action<Writer, T>)(membersWriter.write))(writer, obj);
             }
             stream.WriteByte(TagClosebrace);
         }
