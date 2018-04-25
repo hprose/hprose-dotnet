@@ -55,6 +55,7 @@ namespace Hprose.IO.Accessors {
         }
     }
     public static class PropertiesAccessor<T> {
-        public static readonly Dictionary<string, MemberInfo> properties = PropertiesAccessor.GetProperties(typeof(T));
+        private static readonly Dictionary<string, MemberInfo> properties = PropertiesAccessor.GetProperties(typeof(T));
+        public static Dictionary<string, MemberInfo> Properties => properties;
     }
 }

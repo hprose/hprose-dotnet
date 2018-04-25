@@ -82,7 +82,7 @@ namespace Hprose.IO.Serializers {
     class MembersWriter<T> : MembersWriter {
         public static readonly MembersWriter Instance = new MembersWriter<T>();
         private MembersWriter() {
-            var members = MembersAccessor<T>.members;
+            var members = MembersAccessor<T>.Members;
             count = members.Count;
             data = GetMetaData(ClassManager.GetName<T>(), members.Keys, count);
             write = CreateWriteAction<T>(members.Values);
@@ -92,7 +92,7 @@ namespace Hprose.IO.Serializers {
     class FieldsWriter<T> : MembersWriter {
         public static readonly MembersWriter Instance = new FieldsWriter<T>();
         private FieldsWriter() {
-            var fields = FieldsAccessor<T>.fields;
+            var fields = FieldsAccessor<T>.Fields;
             count = fields.Count;
             data = GetMetaData(ClassManager.GetName<T>(), fields.Keys, count);
             write = CreateWriteAction<T>(fields.Values);
@@ -102,7 +102,7 @@ namespace Hprose.IO.Serializers {
     class PropertiesWriter<T> : MembersWriter {
         public static readonly MembersWriter Instance = new PropertiesWriter<T>();
         private PropertiesWriter() {
-            var properties = PropertiesAccessor<T>.properties;
+            var properties = PropertiesAccessor<T>.Properties;
             count = properties.Count;
             data = GetMetaData(ClassManager.GetName<T>(), properties.Keys, count);
             write = CreateWriteAction<T>(properties.Values);
