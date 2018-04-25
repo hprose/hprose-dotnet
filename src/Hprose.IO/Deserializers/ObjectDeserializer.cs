@@ -12,7 +12,7 @@
  *                                                        *
  * ObjectDeserializer class for C#.                       *
  *                                                        *
- * LastModified: Apr 24, 2018                             *
+ * LastModified: Apr 25, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -34,9 +34,9 @@ namespace Hprose.IO.Deserializers {
 
     static class MembersReader {
         private const BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.Public;
-        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, Lazy<Delegate>>> _readMembersActions = new ConcurrentDictionary<Type, ConcurrentDictionary<string, Lazy<Delegate>>>();
-        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, Lazy<Delegate>>> _readFieldsActions = new ConcurrentDictionary<Type, ConcurrentDictionary<string, Lazy<Delegate>>>();
-        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, Lazy<Delegate>>> _readPropertiesActions = new ConcurrentDictionary<Type, ConcurrentDictionary<string, Lazy<Delegate>>>();
+        private static readonly ConcurrentDictionary<ValueTuple<Type, string>, Lazy<Delegate>> _readMembersActions = new ConcurrentDictionary<ValueTuple<Type, string>, Lazy<Delegate>>();
+        private static readonly ConcurrentDictionary<ValueTuple<Type, string>, Lazy<Delegate>> _readFieldsActions = new ConcurrentDictionary<ValueTuple<Type, string>, Lazy<Delegate>>();
+        private static readonly ConcurrentDictionary<ValueTuple<Type, string>, Lazy<Delegate>> _readPropertiesActions = new ConcurrentDictionary<ValueTuple<Type, string>, Lazy<Delegate>>();
 
         public static Delegate CreateReadAction(Type type, Dictionary<string, MemberInfo> members, string[] names) {
             var reader = Expression.Parameter(typeof(Reader), "reader");
@@ -80,24 +80,17 @@ namespace Hprose.IO.Deserializers {
         }
 
         public static Delegate GetReadAction(Type type, HproseMode mode, string[] names) {
-            var key = string.Join(" ", names);
-            Func<Type, ConcurrentDictionary<string, Lazy<Delegate>>> valueFactory = (_) => new ConcurrentDictionary<string, Lazy<Delegate>>();
-            Func<string, Lazy<Delegate>> delegateFactory = (_) => new Lazy<Delegate>(() => CreateReadAction(type, Accessor.GetMembers(type, mode), names));
-            ConcurrentDictionary<string, Lazy<Delegate>> delegates = null;
+            Func<ValueTuple<Type, string>, Lazy<Delegate>> delegateFactory = (_) => new Lazy<Delegate>(() => CreateReadAction(type, Accessor.GetMembers(type, mode), names));
+            var key = (type, string.Join(" ", names));
             if (type.IsSerializable) {
                 switch (mode) {
                     case FieldMode:
-                        delegates = _readFieldsActions.GetOrAdd(type, valueFactory);
-                        break;
+                        return _readFieldsActions.GetOrAdd(key, delegateFactory).Value;
                     case PropertyMode:
-                        delegates = _readPropertiesActions.GetOrAdd(type, valueFactory);
-                        break;
+                        return _readPropertiesActions.GetOrAdd(key, delegateFactory).Value;
                 }
             }
-            if (delegates == null) {
-                delegates = _readMembersActions.GetOrAdd(type, valueFactory);
-            }
-            return delegates.GetOrAdd(key, delegateFactory).Value;
+            return _readMembersActions.GetOrAdd(key, delegateFactory).Value;
         }
 
         public static ReadAction<T> GetReadAction<T>(HproseMode mode, string[] names) {
