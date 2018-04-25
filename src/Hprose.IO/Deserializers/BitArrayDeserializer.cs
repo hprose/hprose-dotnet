@@ -37,7 +37,6 @@ namespace Hprose.IO.Deserializers {
             return array;
         }
         public override BitArray Read(Reader reader, int tag) {
-            var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
                     return new BitArray(0);

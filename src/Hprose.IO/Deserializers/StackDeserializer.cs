@@ -41,7 +41,6 @@ namespace Hprose.IO.Deserializers {
             return stack;
         }
         public override Stack<T> Read(Reader reader, int tag) {
-            var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
                     return new Stack<T>();

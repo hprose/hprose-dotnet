@@ -171,7 +171,6 @@ namespace Hprose.IO.Deserializers {
             return default;
         }
         public override ValueTuple Read(Reader reader, int tag) {
-            var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
                     return default;
@@ -195,7 +194,6 @@ namespace Hprose.IO.Deserializers {
             return tuple;
         }
         public override T Read(Reader reader, int tag) {
-            var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
                     return default;

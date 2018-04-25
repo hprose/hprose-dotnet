@@ -26,7 +26,6 @@ namespace Hprose.IO.Deserializers {
     class ArrayDeserializer<T> : Deserializer<T[]> {
         private static readonly T[] empty = new T[0] { };
         public override T[] Read(Reader reader, int tag) {
-            var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
                     return empty;
@@ -68,7 +67,6 @@ namespace Hprose.IO.Deserializers {
             return a;
         }
         public override T[,] Read(Reader reader, int tag) {
-            var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
                     return empty;

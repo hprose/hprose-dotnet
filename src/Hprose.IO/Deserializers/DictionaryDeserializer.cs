@@ -56,7 +56,6 @@ namespace Hprose.IO.Deserializers {
             return dict;
         }
         public override I Read(Reader reader, int tag) {
-            var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
                     return new T();
@@ -103,7 +102,6 @@ namespace Hprose.IO.Deserializers {
             return dict;
         }
         public override I Read(Reader reader, int tag) {
-            var stream = reader.Stream;
             switch (tag) {
                 case TagObject:
                     return ReadObjectAsMap(reader);
@@ -172,7 +170,6 @@ namespace Hprose.IO.Deserializers {
             return dict;
         }
         public override I Read(Reader reader, int tag) {
-            var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
                     return new T();

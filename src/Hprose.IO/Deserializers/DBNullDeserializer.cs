@@ -24,7 +24,6 @@ using static Hprose.IO.HproseTags;
 namespace Hprose.IO.Deserializers {
     class DBNullDeserializer : Deserializer<DBNull> {
         public override DBNull Read(Reader reader, int tag) {
-            var stream = reader.Stream;
             switch (tag) {
                 case TagNull:
                 case TagEmpty:

@@ -171,7 +171,6 @@ namespace Hprose.IO.Deserializers {
             return tuple;
         }
         public override T Read(Reader reader, int tag) {
-            var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
                     return TupleHelper<T>.read(reader, 0);

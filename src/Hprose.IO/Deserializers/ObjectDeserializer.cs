@@ -174,7 +174,6 @@ namespace Hprose.IO.Deserializers {
             return obj;
         }
         public override T Read(Reader reader, int tag) {
-            var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
                     return (T)Activator.CreateInstance(typeof(T), true);
@@ -217,7 +216,6 @@ namespace Hprose.IO.Deserializers {
             return obj;
         }
         public override T Read(Reader reader, int tag) {
-            var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
                     return new T();

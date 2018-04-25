@@ -26,7 +26,6 @@ using static Hprose.IO.HproseTags;
 namespace Hprose.IO.Deserializers {
     class GuidDeserializer : Deserializer<Guid> {
         public override Guid Read(Reader reader, int tag) {
-            var stream = reader.Stream;
             switch (tag) {
                 case TagGuid:
                     return ReferenceReader.ReadGuid(reader);

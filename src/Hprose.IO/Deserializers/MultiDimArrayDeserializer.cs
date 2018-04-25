@@ -78,7 +78,6 @@ namespace Hprose.IO.Deserializers {
             return (T)(object)a;
         }
         public override T Read(Reader reader, int tag) {
-            var stream = reader.Stream;
             switch (tag) {
                 case TagEmpty:
                     return empty;
