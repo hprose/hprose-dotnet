@@ -1528,8 +1528,9 @@ namespace Hprose.UnitTests.IO.Deserializers {
                     Name = "Anonymous"
                 });
                 stream.Position = 0;
-                Reader reader = new Reader(stream);
-                reader.DefaultDictType = DictType.ExpandoObject;
+                Reader reader = new Reader(stream) {
+                    DefaultDictType = DictType.ExpandoObject
+                };
                 dynamic o3 = reader.Deserialize();
                 dynamic o4 = reader.Deserialize();
                 dynamic o5 = reader.Deserialize();

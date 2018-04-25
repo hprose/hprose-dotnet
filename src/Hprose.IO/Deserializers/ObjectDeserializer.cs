@@ -80,7 +80,7 @@ namespace Hprose.IO.Deserializers {
         }
 
         public static Delegate GetReadAction(Type type, HproseMode mode, string[] names) {
-            Func<ValueTuple<Type, string>, Lazy<Delegate>> delegateFactory = (_) => new Lazy<Delegate>(() => CreateReadAction(type, Accessor.GetMembers(type, mode), names));
+            Lazy<Delegate> delegateFactory((Type, string) _) => new Lazy<Delegate>(() => CreateReadAction(type, Accessor.GetMembers(type, mode), names));
             var key = (type, string.Join(" ", names));
             if (type.IsSerializable) {
                 switch (mode) {
