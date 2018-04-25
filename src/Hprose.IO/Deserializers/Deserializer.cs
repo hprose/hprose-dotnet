@@ -230,15 +230,12 @@ namespace Hprose.IO.Deserializers {
                     return typeof(ListDeserializer<>).MakeGenericType(type);
                 }
             }
-            //if (type.IsGenericType && type.Name.StartsWith("<>f__AnonymousType")) {
-            //    return typeof(AnonymousTypeSerializer<>).MakeGenericType(type);
-            //}
             //if (typeof(Stream).IsAssignableFrom(type)) {
             //    return typeof(StreamSerializer<>).MakeGenericType(type);
             //}
-            //if (typeof(DataTable).IsAssignableFrom(type)) {
-            //    return typeof(DataTableSerializer<>).MakeGenericType(type);
-            //}
+            if (typeof(DataTable).IsAssignableFrom(type)) {
+                return typeof(DataTableDeserializer<>).MakeGenericType(type);
+            }
             //if (typeof(DataSet).IsAssignableFrom(type)) {
             //    return typeof(DataSetSerializer<>).MakeGenericType(type);
             //}
@@ -289,9 +286,19 @@ namespace Hprose.IO.Deserializers {
                 case TagFalse:
                     return false;
                 case TagNaN:
-                    return double.NaN;
+                    switch (reader.DefaultRealType) {
+                        case RealType.Single:
+                            return float.NaN;
+                        default:
+                            return double.NaN;
+                    }
                 case TagInfinity:
-                    return ValueReader.ReadInfinity(stream);
+                    switch (reader.DefaultRealType) {
+                        case RealType.Single:
+                            return ValueReader.ReadSingleInfinity(stream);
+                        default:
+                            return ValueReader.ReadInfinity(stream);
+                    }
                 case TagUTF8Char:
                     switch (reader.DefaultCharType) {
                         case CharType.Char:
