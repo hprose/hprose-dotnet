@@ -236,9 +236,9 @@ namespace Hprose.IO.Deserializers {
             if (typeof(DataTable).IsAssignableFrom(type)) {
                 return typeof(DataTableDeserializer<>).MakeGenericType(type);
             }
-            //if (typeof(DataSet).IsAssignableFrom(type)) {
-            //    return typeof(DataSetSerializer<>).MakeGenericType(type);
-            //}
+            if (typeof(DataSet).IsAssignableFrom(type)) {
+                return typeof(DataSetDeserializer<>).MakeGenericType(type);
+            }
             if (type.IsValueType) {
                 return typeof(StructDeserializer<>).MakeGenericType(type);
             }

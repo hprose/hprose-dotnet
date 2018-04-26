@@ -88,7 +88,7 @@ namespace Hprose.IO {
                 case TagMap: return "IDictionary";
                 case TagClass: return "Class";
                 case TagObject: return "Object";
-                case TagRef: return "Object Reference";
+                case TagRef: return "Reference";
                 case TagError: return "Error";
                 default: return "Unexpected Tag: 0x" + (tag & 0xff).ToString("x2");
             }
