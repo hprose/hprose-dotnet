@@ -500,20 +500,6 @@ namespace Hprose.UnitTests.IO.Deserializers {
             }
         }
         [TestMethod]
-        public void TestDeserializeDBNull() {
-            using (MemoryStream stream = new MemoryStream()) {
-                Writer writer = new Writer(stream);
-                writer.Serialize(null);
-                writer.Serialize(DBNull.Value);
-                writer.Serialize("");
-                stream.Position = 0;
-                Reader reader = new Reader(stream);
-                Assert.AreEqual(DBNull.Value, reader.Deserialize<DBNull>());
-                Assert.AreEqual(DBNull.Value, reader.Deserialize<DBNull>());
-                Assert.AreEqual(DBNull.Value, reader.Deserialize<DBNull>());
-            }
-        }
-        [TestMethod]
         public void TestDeserializeChar() {
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
