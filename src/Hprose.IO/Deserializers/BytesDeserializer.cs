@@ -27,10 +27,10 @@ namespace Hprose.IO.Deserializers {
         public override byte[] Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {
-                case TagEmpty:
-                    return empty;
                 case TagBytes:
                     return ReferenceReader.ReadBytes(reader);
+                case TagEmpty:
+                    return empty;
                 case TagList:
                     return ReferenceReader.ReadArray<byte>(reader);
                 case TagUTF8Char:

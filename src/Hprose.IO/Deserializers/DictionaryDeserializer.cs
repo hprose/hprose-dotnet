@@ -57,12 +57,12 @@ namespace Hprose.IO.Deserializers {
         }
         public override I Read(Reader reader, int tag) {
             switch (tag) {
-                case TagEmpty:
-                    return new T();
                 case TagMap:
                     return Read(reader);
                 case TagList:
                     return ReadListAsMap(reader);
+                case TagEmpty:
+                    return new T();
                 default:
                     return base.Read(reader, tag);
             }
@@ -171,14 +171,14 @@ namespace Hprose.IO.Deserializers {
         }
         public override I Read(Reader reader, int tag) {
             switch (tag) {
-                case TagEmpty:
-                    return new T();
                 case TagMap:
                     return Read(reader);
                 case TagList:
                     return ReadListAsMap(reader);
                 case TagObject:
                     return ReadObjectAsMap(reader);
+                case TagEmpty:
+                    return new T();
                 default:
                     return base.Read(reader, tag);
             }

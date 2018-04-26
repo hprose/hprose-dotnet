@@ -42,10 +42,10 @@ namespace Hprose.IO.Deserializers {
         }
         public override Stack<T> Read(Reader reader, int tag) {
             switch (tag) {
-                case TagEmpty:
-                    return new Stack<T>();
                 case TagList:
                     return Read(reader);
+                case TagEmpty:
+                    return new Stack<T>();
                 default:
                     return base.Read(reader, tag);
             }

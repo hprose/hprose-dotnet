@@ -38,10 +38,10 @@ namespace Hprose.IO.Deserializers {
         }
         public override BitArray Read(Reader reader, int tag) {
             switch (tag) {
-                case TagEmpty:
-                    return new BitArray(0);
                 case TagList:
                     return Read(reader);
+                case TagEmpty:
+                    return new BitArray(0);
                 default:
                     return base.Read(reader, tag);
             }

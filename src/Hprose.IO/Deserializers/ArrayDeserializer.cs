@@ -27,10 +27,10 @@ namespace Hprose.IO.Deserializers {
         private static readonly T[] empty = new T[0] { };
         public override T[] Read(Reader reader, int tag) {
             switch (tag) {
-                case TagEmpty:
-                    return empty;
                 case TagList:
                     return ReferenceReader.ReadArray<T>(reader);
+                case TagEmpty:
+                    return empty;
                 default:
                     return base.Read(reader, tag);
             }
@@ -68,10 +68,10 @@ namespace Hprose.IO.Deserializers {
         }
         public override T[,] Read(Reader reader, int tag) {
             switch (tag) {
-                case TagEmpty:
-                    return empty;
                 case TagList:
                     return Read(reader);
+                case TagEmpty:
+                    return empty;
                 default:
                     return base.Read(reader, tag);
             }

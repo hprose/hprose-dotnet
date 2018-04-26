@@ -69,7 +69,6 @@ namespace Hprose.IO.Deserializers {
 
         static Deserializer() {
             Register(() => new Deserializer());
-            Register(() => new DBNullDeserializer());
             Register(() => new BooleanDeserializer());
             Register(() => new CharDeserializer());
             Register(() => new ByteDeserializer());

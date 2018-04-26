@@ -38,10 +38,10 @@ namespace Hprose.IO.Deserializers {
         }
         public override StringCollection Read(Reader reader, int tag) {
             switch (tag) {
-                case TagEmpty:
-                    return new StringCollection();
                 case TagList:
                     return Read(reader);
+                case TagEmpty:
+                    return new StringCollection();
                 default:
                     return base.Read(reader, tag);
             }

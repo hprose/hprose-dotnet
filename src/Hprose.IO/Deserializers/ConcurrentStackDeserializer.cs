@@ -42,10 +42,10 @@ namespace Hprose.IO.Deserializers {
         }
         public override ConcurrentStack<T> Read(Reader reader, int tag) {
             switch (tag) {
-                case TagEmpty:
-                    return new ConcurrentStack<T>();
                 case TagList:
                     return Read(reader);
+                case TagEmpty:
+                    return new ConcurrentStack<T>();
                 default:
                     return base.Read(reader, tag);
             }

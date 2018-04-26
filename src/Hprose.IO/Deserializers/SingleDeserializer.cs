@@ -29,11 +29,11 @@ namespace Hprose.IO.Deserializers {
                 return (tag - '0');
             }
             switch (tag) {
+                case TagDouble:
+                    return ValueReader.ReadSingle(stream);
                 case TagInteger:
                 case TagLong:
                     return ValueReader.ReadIntAsSingle(stream);
-                case TagDouble:
-                    return ValueReader.ReadSingle(stream);
                 case TagNaN:
                     return float.NaN;
                 case TagInfinity:

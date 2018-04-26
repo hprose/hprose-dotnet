@@ -35,6 +35,8 @@ namespace Hprose.IO.Deserializers {
             switch (tag) {
                 case TagInteger:
                     return ValueReader.ReadInt(stream);
+                case TagString:
+                    return ReferenceReader.ReadString(reader);
                 case TagLong:
                     switch (reader.DefaultLongType) {
                         case LongType.Int64:
@@ -82,8 +84,6 @@ namespace Hprose.IO.Deserializers {
                         default:
                             return ValueReader.ReadUTF8Char(stream);
                     }
-                case TagString:
-                    return ReferenceReader.ReadString(reader);
                 case TagBytes:
                     return ReferenceReader.ReadBytes(reader);
                 case TagDate:
@@ -268,10 +268,10 @@ namespace Hprose.IO.Deserializers {
         public override T Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {
-                case TagEmpty:
-                    return new T();
                 case TagList:
                     return Read(reader);
+                case TagEmpty:
+                    return new T();
                 default:
                     return base.Read(reader, tag);
             }

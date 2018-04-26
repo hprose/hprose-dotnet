@@ -38,10 +38,10 @@ namespace Hprose.IO.Deserializers {
         }
         public override BlockingCollection<T> Read(Reader reader, int tag) {
             switch (tag) {
-                case TagEmpty:
-                    return new BlockingCollection<T>();
                 case TagList:
                     return Read(reader);
+                case TagEmpty:
+                    return new BlockingCollection<T>();
                 default:
                     return base.Read(reader, tag);
             }

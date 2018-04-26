@@ -55,12 +55,12 @@ namespace Hprose.IO.Deserializers {
         public override T Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {
-                case TagEmpty:
-                    return new T();
                 case TagList:
                     return ReadListAsDataSet(reader);
                 case TagMap:
                     return ReadMapAsDataSet(reader);
+                case TagEmpty:
+                    return new T();
                 default:
                     return base.Read(reader, tag);
             }

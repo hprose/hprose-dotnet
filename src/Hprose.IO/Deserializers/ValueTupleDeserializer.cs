@@ -195,10 +195,10 @@ namespace Hprose.IO.Deserializers {
         }
         public override T Read(Reader reader, int tag) {
             switch (tag) {
-                case TagEmpty:
-                    return default;
                 case TagList:
                     return Read(reader);
+                case TagEmpty:
+                    return default;
                 default:
                     return base.Read(reader, tag);
             }
