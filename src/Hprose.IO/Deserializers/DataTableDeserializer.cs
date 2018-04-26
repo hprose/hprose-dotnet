@@ -20,6 +20,7 @@
 using System;
 using System.Data;
 using System.IO;
+using System.Runtime.Serialization;
 using Hprose.IO.Accessors;
 using static Hprose.IO.HproseTags;
 
@@ -93,6 +94,13 @@ namespace Hprose.IO.Deserializers {
                     return ReferenceReader.ReadGuid(reader);
                 case TagList:
                     return ReferenceReader.ReadArray<byte>(reader);
+                case TagRef:
+                    return reader.ReadRef<object>();
+                case TagClass:
+                    reader.ReadClass();
+                    return ReadValue(reader);
+                case TagError:
+                    throw new SerializationException(reader.Deserialize<string>());
                 default:
                     throw new InvalidCastException("Cannot convert " + HproseTags.ToString(tag) + " to DataTable value.");
             }
