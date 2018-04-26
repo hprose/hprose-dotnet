@@ -12,7 +12,7 @@
  *                                                        *
  * StreamSerializer class for C#.                         *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: Apr 26, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -39,12 +39,12 @@ namespace Hprose.IO.Serializers {
             if (length > 0) {
                 ValueWriter.WriteInt(stream, length);
             }
-            stream.WriteByte(HproseTags.TagQuote);
+            stream.WriteByte(TagQuote);
             byte[] buffer = new byte[4096];
             while ((length = obj.Read(buffer, 0, 4096)) != 0) {
                 stream.Write(buffer, 0, length);
             }
-            stream.WriteByte(HproseTags.TagQuote);
+            stream.WriteByte(TagQuote);
             if (obj.CanSeek) {
                 obj.Position = oldPos;
             }
