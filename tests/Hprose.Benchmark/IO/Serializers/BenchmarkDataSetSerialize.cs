@@ -186,8 +186,8 @@ namespace Hprose.Benchmark.IO.Serializers {
         [Benchmark]
         public void NewtonJsonSerializeDataSet() {
             var data = JsonConvert.SerializeObject(dataSet);
-            JsonConvert.DeserializeObject(data);
         }
+
         [Benchmark]
         public void NewtonJsonDeserializeDataSet() {
             JsonConvert.DeserializeObject(newtonData);
