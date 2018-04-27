@@ -20,11 +20,11 @@ using System;
 
 namespace Hprose.IO.Deserializers {
     public class ClassInfo {
-        public string name;
-        public string[] names;
-        public Type type;
-        public string key;
-        private int hash;
+        public readonly string name;
+        public readonly string[] names;
+        public readonly Type type;
+        public readonly string key;
+        private readonly int hash;
 
         public ClassInfo(string name, string[] names) {
             this.name = name;
