@@ -96,6 +96,8 @@ namespace Hprose.IO.Deserializers {
             Register(() => new ValueTupleDeserializer());
             Register(() => new BitArrayDeserializer());
             Register(() => new StringObjectDictionaryDeserializer<ExpandoObject>());
+            Register(() => new DataTableDeserializer());
+            Register(() => new DataSetDeserializer());
         }
 
         public static void Initialize() { }
@@ -232,12 +234,6 @@ namespace Hprose.IO.Deserializers {
             //if (typeof(Stream).IsAssignableFrom(type)) {
             //    return typeof(StreamSerializer<>).MakeGenericType(type);
             //}
-            if (typeof(DataTable).IsAssignableFrom(type)) {
-                return typeof(DataTableDeserializer<>).MakeGenericType(type);
-            }
-            if (typeof(DataSet).IsAssignableFrom(type)) {
-                return typeof(DataSetDeserializer<>).MakeGenericType(type);
-            }
             if (type.IsValueType) {
                 return typeof(StructDeserializer<>).MakeGenericType(type);
             }
@@ -252,14 +248,38 @@ namespace Hprose.IO.Deserializers {
 
         public static object Deserialize(Reader reader, Type type) => GetInstance(type).Deserialize(reader);
 
+        public static readonly object trueObject = true;
+        public static readonly object falseObject = false;
+        public static readonly object[] digitObject = new object[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
         public override object Read(Reader reader, int tag) {
             if (tag >= '0' && tag <= '9') {
-                return (tag - '0');
+                return digitObject[tag - '0'];
             }
             var stream = reader.Stream;
             switch (tag) {
                 case TagInteger:
                     return ValueReader.ReadInt(stream);
+                case TagString:
+                    return ReferenceReader.ReadString(reader);
+                case TagBytes:
+                    return ReferenceReader.ReadBytes(reader);
+                case TagTrue:
+                    return trueObject;
+                case TagFalse:
+                    return falseObject;
+                case TagEmpty:
+                    return "";
+                case TagObject:
+                    return Read(reader);
+                case TagRef:
+                    return reader.ReadRef();
+                case TagDate:
+                    return ReferenceReader.ReadDateTime(reader);
+                case TagTime:
+                    return ReferenceReader.ReadTime(reader);
+                case TagGuid:
+                    return ReferenceReader.ReadGuid(reader);
                 case TagLong:
                     switch (reader.DefaultLongType) {
                         case LongType.Int64:
@@ -278,12 +298,6 @@ namespace Hprose.IO.Deserializers {
                         default:
                             return ValueReader.ReadDouble(stream);
                     }
-                case TagEmpty:
-                    return "";
-                case TagTrue:
-                    return true;
-                case TagFalse:
-                    return false;
                 case TagNaN:
                     switch (reader.DefaultRealType) {
                         case RealType.Single:
@@ -305,16 +319,6 @@ namespace Hprose.IO.Deserializers {
                         default:
                             return ValueReader.ReadUTF8Char(stream);
                     }
-                case TagString:
-                    return ReferenceReader.ReadString(reader);
-                case TagBytes:
-                    return ReferenceReader.ReadBytes(reader);
-                case TagDate:
-                    return ReferenceReader.ReadDateTime(reader);
-                case TagTime:
-                    return ReferenceReader.ReadTime(reader);
-                case TagGuid:
-                    return ReferenceReader.ReadGuid(reader);
                 case TagList:
                     switch (reader.DefaultListType) {
                         case ListType.Array:
@@ -335,8 +339,6 @@ namespace Hprose.IO.Deserializers {
                         default:
                             return DictionaryDeserializer<NullableKeyDictionary<object, object>, object, object>.Read(reader);
                     }
-                case TagObject:
-                    return Read(reader);
                 default:
                     return base.Read(reader, tag);
             }

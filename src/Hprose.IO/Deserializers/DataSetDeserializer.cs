@@ -23,11 +23,11 @@ using System.IO;
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
-    class DataSetDeserializer<T> : Deserializer<T> where T : DataSet, new() {
-        private static T Read(Reader reader) {
+    class DataSetDeserializer : Deserializer<DataSet> {
+        private static DataSet Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
-            T dataset = new T();
+            DataSet dataset = new DataSet();
             reader.SetRef(dataset);
             var deserializer = Deserializer<DataTable>.Instance;
             for (int i = 0; i < count; ++i) {
@@ -36,13 +36,13 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return dataset;
         }
-        public override T Read(Reader reader, int tag) {
+        public override DataSet Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {
                 case TagList:
                     return Read(reader);
                 case TagEmpty:
-                    return new T();
+                    return new DataSet();
                 default:
                     return base.Read(reader, tag);
             }

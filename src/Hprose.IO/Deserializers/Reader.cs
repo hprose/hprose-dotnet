@@ -78,6 +78,10 @@ namespace Hprose.IO.Deserializers {
             });
         }
 
+        internal object ReadRef() {
+            return _refer?.Read(ValueReader.ReadInt(_stream));
+        }
+
         internal T ReadRef<T>() {
             object obj = _refer?.Read(ValueReader.ReadInt(_stream));
             if (obj != null) {

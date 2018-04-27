@@ -26,26 +26,30 @@ using Hprose.IO.Accessors;
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
-    class DataTableDeserializer<T> : Deserializer<T> where T : DataTable, new() {
-        private static void ReadMapAsFirstRow(Reader reader, DataTable table) {
+    class DataTableDeserializer : Deserializer<DataTable> {
+        private static IDeserializer[] ReadMapAsFirstRow(Reader reader, DataTable table, Deserializer<string> strDeserializer) {
             var columns = table.Columns;
             var row = table.NewRow();
             reader.SetRef(row);
             var stream = reader.Stream;
-            var strDeserializer = Deserializer<string>.Instance;
+            var deserializer = Deserializer.Instance;
             int count = ValueReader.ReadCount(stream);
+            IDeserializer[] deserializers = new IDeserializer[count];
             for (int i = 0; i < count; ++i) {
                 var name = strDeserializer.Deserialize(reader);
-                var value = reader.Deserialize();
-                var column = new DataColumn(name, value?.GetType() ?? typeof(string));
+                var value = deserializer.Deserialize(reader);
+                var type = value?.GetType() ?? typeof(string);
+                deserializers[i] = Deserializer.GetInstance(type);
+                var column = new DataColumn(name, type);
                 columns.Add(column);
                 row[column] = value ?? DBNull.Value;
             }
             table.Rows.Add(row);
             stream.ReadByte();
+            return deserializers;
         }
 
-        private static void ReadObjectAsFirstRow(Reader reader, DataTable table) {
+        private static IDeserializer[] ReadObjectAsFirstRow(Reader reader, DataTable table) {
             var columns = table.Columns;
             var row = table.NewRow();
             reader.SetRef(row);
@@ -54,7 +58,9 @@ namespace Hprose.IO.Deserializers {
             ClassInfo classInfo = reader[index];
             table.TableName = classInfo.name;
             var names = classInfo.names;
+            var deserializer = Deserializer.Instance;
             var count = names.Length;
+            IDeserializer[] deserializers = new IDeserializer[count];
             if (classInfo.type != null) {
                 var members = Accessor.GetMembers(classInfo.type, reader.Mode);
                 for (int i = 0; i < count; ++i) {
@@ -62,14 +68,17 @@ namespace Hprose.IO.Deserializers {
                     var member = members[name];
                     if (member != null) {
                         var type = Accessor.GetMemberType(member);
-                        var value = reader.Deserialize(type);
+                        deserializers[i] = Deserializer.GetInstance(type);
+                        var value = deserializers[i].Deserialize(reader);
                         var column = new DataColumn(member.Name, type);
                         columns.Add(column);
                         row[column] = value ?? DBNull.Value;
                     }
                     else {
-                        var value = reader.Deserialize();
-                        var column = new DataColumn(name, value?.GetType() ?? typeof(string));
+                        var value = deserializer.Deserialize(reader);
+                        var type = value?.GetType() ?? typeof(string);
+                        deserializers[i] = Deserializer.GetInstance(type);
+                        var column = new DataColumn(name, type);
                         columns.Add(column);
                         row[column] = value ?? DBNull.Value;
                     }
@@ -78,71 +87,53 @@ namespace Hprose.IO.Deserializers {
             else {
                 for (int i = 0; i < count; ++i) {
                     var name = names[i];
-                    var value = reader.Deserialize();
-                    var column = new DataColumn(name, value?.GetType() ?? typeof(string));
+                    var value = deserializer.Deserialize(reader);
+                    var type = value?.GetType() ?? typeof(string);
+                    deserializers[i] = Deserializer.GetInstance(type);
+                    var column = new DataColumn(name, type);
                     columns.Add(column);
                     row[column] = value ?? DBNull.Value;
                 }
             }
             table.Rows.Add(row);
             stream.ReadByte();
+            return deserializers;
         }
 
-        private static void ReadMapAsRow(Reader reader, DataTable table) {
+        private static void ReadMapAsRow(Reader reader, DataTable table, Deserializer<string> strDeserializer, IDeserializer[] deserializers) {
             var row = table.NewRow();
             reader.SetRef(row);
             var stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
-            var strDeserializer = Deserializer<string>.Instance;
             for (int i = 0; i < count; ++i) {
                 var name = strDeserializer.Deserialize(reader);
-                var value = reader.Deserialize();
+                var value = deserializers[i].Deserialize(reader);
                 row[name] = value ?? DBNull.Value;
             }
             table.Rows.Add(row);
             stream.ReadByte();
         }
 
-        private static void ReadObjectAsRow(Reader reader, DataTable table) {
+        private static void ReadObjectAsRow(Reader reader, DataTable table, IDeserializer[] deserializers) {
             var row = table.NewRow();
             reader.SetRef(row);
             var stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            ClassInfo classInfo = reader[index];
-            table.TableName = classInfo.name;
-            var names = classInfo.names;
-            var count = names.Length;
-            if (classInfo.type != null) {
-                var members = Accessor.GetMembers(classInfo.type, reader.Mode);
-                for (int i = 0; i < count; ++i) {
-                    var name = names[i];
-                    var member = members[name];
-                    if (member != null) {
-                        var type = Accessor.GetMemberType(member);
-                        var value = reader.Deserialize(type);
-                        row[member.Name] = value ?? DBNull.Value;
-                    }
-                    else {
-                        var value = reader.Deserialize();
-                        row[name] = value ?? DBNull.Value;
-                    }
-                }
-            }
-            else {
-                for (int i = 0; i < count; ++i) {
-                    var name = names[i];
-                    var value = reader.Deserialize();
-                    row[name] = value ?? DBNull.Value;
-                }
+            var columns = table.Columns;
+            var count = columns.Count;
+            for (int i = 0; i < count; ++i) {
+                var column = columns[i];
+                var value = deserializers[i].Deserialize(reader);
+                row[column] = value ?? DBNull.Value;
             }
             table.Rows.Add(row);
             stream.ReadByte();
         }
 
-        private static T Read(Reader reader) {
+        private static DataTable Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
-            T table = new T();
+            DataTable table = new DataTable();
             reader.SetRef(table);
             int tag = stream.ReadByte();
             if (count == 0) {
@@ -152,20 +143,23 @@ namespace Hprose.IO.Deserializers {
                 reader.ReadClass();
                 tag = stream.ReadByte();
             }
+            var deserializer = Deserializer.Instance;
+            IDeserializer[] deserializers;
             switch (tag) {
                 case TagObject:
-                    ReadObjectAsFirstRow(reader, table);
+                    deserializers = ReadObjectAsFirstRow(reader, table);
                     tag = stream.ReadByte();
                     for (int i = 1; i < count; ++i) {
-                        ReadObjectAsRow(reader, table);
+                        ReadObjectAsRow(reader, table, deserializers);
                         tag = stream.ReadByte();
                     }
                     break;
                 case TagMap:
-                    ReadMapAsFirstRow(reader, table);
+                    var strDeserializer = Deserializer<string>.Instance;
+                    deserializers = ReadMapAsFirstRow(reader, table, strDeserializer);
                     tag = stream.ReadByte();
                     for (int i = 1; i < count; ++i) {
-                        ReadMapAsRow(reader, table);
+                        ReadMapAsRow(reader, table, strDeserializer, deserializers);
                         tag = stream.ReadByte();
                     }
                     break;
@@ -175,13 +169,13 @@ namespace Hprose.IO.Deserializers {
             return table;
         }
 
-        public override T Read(Reader reader, int tag) {
+        public override DataTable Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {
                 case TagList:
                     return Read(reader);
                 case TagEmpty:
-                    return new T();
+                    return new DataTable();
                 default:
                     return base.Read(reader, tag);
             }
