@@ -354,7 +354,7 @@ namespace Hprose.IO.Deserializers {
             if (type != null && !type.IsValueType) {
                 obj = Activator.CreateInstance(type, true);
                 reader.SetRef(obj);
-                MembersReader.GetReadAction(type, reader.Mode, names).DynamicInvoke(reader, obj);
+                MembersReader.GetReadAction(classInfo, reader.Mode).DynamicInvoke(reader, obj);
             }
             else {
                 obj = new ExpandoObject();

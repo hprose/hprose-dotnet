@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Reader class for C#.                            *
  *                                                        *
- * LastModified: Apr 25, 2018                             *
+ * LastModified: Apr 27, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -65,17 +65,13 @@ namespace Hprose.IO.Deserializers {
         public void ReadClass() {
             string name = ValueReader.ReadString(_stream);
             int count = ValueReader.ReadCount(_stream);
-            string[] members = new string[count];
+            string[] names = new string[count];
             var strDeserialize = Deserializer<string>.Instance;
             for (int i = 0; i < count; ++i) {
-                members[i] = strDeserialize.Deserialize(this);
+                names[i] = strDeserialize.Deserialize(this);
             }
             _stream.ReadByte();
-            _ref.Add(new ClassInfo {
-                name = name,
-                type = ClassManager.GetType(name),
-                names = members
-            });
+            _ref.Add(new ClassInfo(name, names));
         }
 
         internal object ReadRef() {
@@ -94,7 +90,7 @@ namespace Hprose.IO.Deserializers {
 
         internal void SetRef(int index, object obj) => _refer?.Set(index, obj);
 
-        internal int LastRefIndex => _refer?.LastIndex?? -1;
+        internal int LastRefIndex => _refer?.LastIndex ?? -1;
 
         public void Reset() {
             _refer?.Reset();
