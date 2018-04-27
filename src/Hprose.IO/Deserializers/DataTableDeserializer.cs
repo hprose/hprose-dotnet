@@ -20,91 +20,13 @@
 using System;
 using System.Data;
 using System.IO;
-using System.Runtime.Serialization;
+
 using Hprose.IO.Accessors;
+
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
     class DataTableDeserializer<T> : Deserializer<T> where T : DataTable, new() {
-        private static object ReadValue(Reader reader) {
-            var stream = reader.Stream;
-            int tag = stream.ReadByte();
-            if (tag >= '0' && tag <= '9') {
-                return (tag - '0');
-            }
-            switch (tag) {
-                case TagInteger:
-                    return ValueReader.ReadInt(stream);
-                case TagString:
-                    return ReferenceReader.ReadString(reader);
-                case TagLong:
-                    switch (reader.DefaultLongType) {
-                        case LongType.Int64:
-                            return ValueReader.ReadLong(stream);
-                        case LongType.UInt64:
-                            return (ulong)ValueReader.ReadLong(stream);
-                        default:
-                            return new TimeSpan(ValueReader.ReadLong(stream));
-                    }
-                case TagDouble:
-                    switch (reader.DefaultRealType) {
-                        case RealType.Single:
-                            return ValueReader.ReadSingle(stream);
-                        case RealType.Decimal:
-                            return ValueReader.ReadDecimal(stream);
-                        default:
-                            return ValueReader.ReadDouble(stream);
-                    }
-                case TagNull:
-                    return DBNull.Value;
-                case TagEmpty:
-                    return "";
-                case TagTrue:
-                    return true;
-                case TagFalse:
-                    return false;
-                case TagNaN:
-                    switch (reader.DefaultRealType) {
-                        case RealType.Single:
-                            return float.NaN;
-                        default:
-                            return double.NaN;
-                    }
-                case TagInfinity:
-                    switch (reader.DefaultRealType) {
-                        case RealType.Single:
-                            return ValueReader.ReadSingleInfinity(stream);
-                        default:
-                            return ValueReader.ReadInfinity(stream);
-                    }
-                case TagUTF8Char:
-                    switch (reader.DefaultCharType) {
-                        case CharType.Char:
-                            return ValueReader.ReadChar(stream);
-                        default:
-                            return ValueReader.ReadUTF8Char(stream);
-                    }
-                case TagBytes:
-                    return ReferenceReader.ReadBytes(reader);
-                case TagDate:
-                    return ReferenceReader.ReadDateTime(reader);
-                case TagTime:
-                    return ReferenceReader.ReadTime(reader);
-                case TagGuid:
-                    return ReferenceReader.ReadGuid(reader);
-                case TagList:
-                    return ReferenceReader.ReadArray<byte>(reader);
-                case TagRef:
-                    return reader.ReadRef<object>();
-                case TagClass:
-                    reader.ReadClass();
-                    return ReadValue(reader);
-                case TagError:
-                    throw new SerializationException(reader.Deserialize<string>());
-                default:
-                    throw new InvalidCastException("Cannot convert " + HproseTags.ToString(tag) + " to DataTable value.");
-            }
-        }
         private static void ReadMapAsFirstRow(Reader reader, DataTable table) {
             var columns = table.Columns;
             var row = table.NewRow();
@@ -114,10 +36,10 @@ namespace Hprose.IO.Deserializers {
             int count = ValueReader.ReadCount(stream);
             for (int i = 0; i < count; ++i) {
                 var name = strDeserializer.Deserialize(reader);
-                var value = ReadValue(reader);
+                var value = reader.Deserialize();
                 var column = new DataColumn(name, value?.GetType() ?? typeof(string));
                 columns.Add(column);
-                row[column] = value;
+                row[column] = value ?? DBNull.Value;
             }
             table.Rows.Add(row);
             stream.ReadByte();
@@ -146,20 +68,20 @@ namespace Hprose.IO.Deserializers {
                         row[column] = value ?? DBNull.Value;
                     }
                     else {
-                        var value = ReadValue(reader);
+                        var value = reader.Deserialize();
                         var column = new DataColumn(name, value?.GetType() ?? typeof(string));
                         columns.Add(column);
-                        row[column] = value;
+                        row[column] = value ?? DBNull.Value;
                     }
                 }
             }
             else {
                 for (int i = 0; i < count; ++i) {
                     var name = names[i];
-                    var value = ReadValue(reader);
+                    var value = reader.Deserialize();
                     var column = new DataColumn(name, value?.GetType() ?? typeof(string));
                     columns.Add(column);
-                    row[column] = value;
+                    row[column] = value ?? DBNull.Value;
                 }
             }
             table.Rows.Add(row);
@@ -174,8 +96,8 @@ namespace Hprose.IO.Deserializers {
             var strDeserializer = Deserializer<string>.Instance;
             for (int i = 0; i < count; ++i) {
                 var name = strDeserializer.Deserialize(reader);
-                var value = ReadValue(reader);
-                row[name] = value;
+                var value = reader.Deserialize();
+                row[name] = value ?? DBNull.Value;
             }
             table.Rows.Add(row);
             stream.ReadByte();
@@ -201,16 +123,16 @@ namespace Hprose.IO.Deserializers {
                         row[member.Name] = value ?? DBNull.Value;
                     }
                     else {
-                        var value = ReadValue(reader);
-                        row[name] = value;
+                        var value = reader.Deserialize();
+                        row[name] = value ?? DBNull.Value;
                     }
                 }
             }
             else {
                 for (int i = 0; i < count; ++i) {
                     var name = names[i];
-                    var value = ReadValue(reader);
-                    row[name] = value;
+                    var value = reader.Deserialize();
+                    row[name] = value ?? DBNull.Value;
                 }
             }
             table.Rows.Add(row);
