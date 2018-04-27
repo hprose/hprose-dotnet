@@ -98,7 +98,7 @@ namespace Hprose.IO.Deserializers {
             (ClassInfo _) => new Lazy<Delegate>(() => CreateReadAction(_.type, Accessor.GetMembers(_.type, MemberMode), _.names))
         };
 
-        public static Delegate GetReadAction(ClassInfo classInfo, HproseMode mode) {
+        public static Delegate GetReadAction(HproseMode mode, ClassInfo classInfo) {
             if (classInfo.type.IsSerializable) {
                 switch (mode) {
                     case FieldMode:
