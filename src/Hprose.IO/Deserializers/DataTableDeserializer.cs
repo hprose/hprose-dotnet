@@ -55,7 +55,7 @@ namespace Hprose.IO.Deserializers {
             reader.SetRef(row);
             var stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            ClassInfo classInfo = reader[index];
+            ClassInfo classInfo = reader.GetClassInfo(index);
             table.TableName = classInfo.name;
             var names = classInfo.names;
             var deserializer = Deserializer.Instance;

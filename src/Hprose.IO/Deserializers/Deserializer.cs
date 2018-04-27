@@ -347,7 +347,7 @@ namespace Hprose.IO.Deserializers {
         private object Read(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            var classInfo = reader[index];
+            var classInfo = reader.GetClassInfo(index);
             var type = classInfo.type;
             string[] names = classInfo.names;
             object obj;

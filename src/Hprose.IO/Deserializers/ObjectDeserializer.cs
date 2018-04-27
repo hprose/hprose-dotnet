@@ -164,7 +164,7 @@ namespace Hprose.IO.Deserializers {
             T obj = (T)Activator.CreateInstance(typeof(T), true);
             reader.SetRef(obj);
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            MembersReader.GetReadAction<T>(reader.Mode, reader[index].key)(reader, ref obj);
+            MembersReader.GetReadAction<T>(reader.Mode, reader.GetClassInfo(index).key)(reader, ref obj);
             stream.ReadByte();
             return obj;
         }
@@ -202,7 +202,7 @@ namespace Hprose.IO.Deserializers {
             reader.SetRef(null);
             int refIndex = reader.LastRefIndex;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            MembersReader.GetReadAction<T>(reader.Mode, reader[index].key)(reader, ref obj);
+            MembersReader.GetReadAction<T>(reader.Mode, reader.GetClassInfo(index).key)(reader, ref obj);
             reader.SetRef(refIndex, obj);
             stream.ReadByte();
             return obj;

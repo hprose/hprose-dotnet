@@ -74,7 +74,7 @@ namespace Hprose.IO.Deserializers {
         public static I ReadObjectAsMap(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            ClassInfo classInfo = reader[index];
+            ClassInfo classInfo = reader.GetClassInfo(index);
             T dict = new T();
             reader.SetRef(dict);
             var deserializer = Deserializer.Instance;
@@ -143,7 +143,7 @@ namespace Hprose.IO.Deserializers {
         public static I ReadObjectAsMap(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            ClassInfo classInfo = reader[index];
+            ClassInfo classInfo = reader.GetClassInfo(index);
             T dict = new T();
             reader.SetRef(dict);
             var deserializer = Deserializer.Instance;
