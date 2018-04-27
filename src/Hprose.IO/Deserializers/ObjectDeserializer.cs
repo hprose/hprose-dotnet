@@ -12,7 +12,7 @@
  *                                                        *
  * ObjectDeserializer class for C#.                       *
  *                                                        *
- * LastModified: Apr 25, 2018                             *
+ * LastModified: Apr 27, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -194,7 +194,6 @@ namespace Hprose.IO.Deserializers {
             reader.SetRef(null);
             int refIndex = reader.LastRefIndex;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            Console.WriteLine(MembersReader.GetReadAction<T>(reader.Mode, reader[index].names));
             MembersReader.GetReadAction<T>(reader.Mode, reader[index].names)(reader, ref obj);
             reader.SetRef(refIndex, obj);
             stream.ReadByte();
