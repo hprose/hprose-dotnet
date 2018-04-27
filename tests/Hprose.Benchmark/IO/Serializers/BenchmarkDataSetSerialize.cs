@@ -9,6 +9,7 @@ using BenchmarkDotNet.Attributes.Exporters;
 using BenchmarkDotNet.Attributes.Jobs;
 
 using Hprose.IO.Serializers;
+using Hprose.IO.Deserializers;
 
 using Newtonsoft.Json;
 
@@ -134,11 +135,38 @@ namespace Hprose.Benchmark.IO.Serializers {
 
         private static DataSet dataSet = MakeDataSet();
 
+        private static byte[] hproseData;
+        private static byte[] dcData;
+        private static string newtonData;
+
+        static BenchmarkDataSetSerialize() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                writer.Serialize(dataSet);
+                stream.Position = 0;
+                hproseData = stream.ToArray();
+            }
+            using (MemoryStream stream = new MemoryStream()) {
+                DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(DataSet));
+                js.WriteObject(stream, dataSet);
+                stream.Position = 0;
+                dcData = stream.ToArray();
+            }
+            newtonData = JsonConvert.SerializeObject(dataSet);
+        }
+
         [Benchmark]
         public void HproseSerializeDataSet() {
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
                 writer.Serialize(dataSet);
+            }
+        }
+        [Benchmark]
+        public void HproseDeserializeDataSet() {
+            using (MemoryStream stream = new MemoryStream(hproseData)) {
+                Reader reader = new Reader(stream);
+                reader.Deserialize<DataSet>();
             }
         }
         [Benchmark]
@@ -149,6 +177,20 @@ namespace Hprose.Benchmark.IO.Serializers {
             }
         }
         [Benchmark]
-        public void NewtonJsonSerializeDataSet() => JsonConvert.SerializeObject(dataSet);
+        public void DataContractDeserializeDataSet() {
+            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(DataSet));
+            using (MemoryStream stream = new MemoryStream(dcData)) {
+                js.ReadObject(stream);
+            }
+        }
+        [Benchmark]
+        public void NewtonJsonSerializeDataSet() {
+            var data = JsonConvert.SerializeObject(dataSet);
+            JsonConvert.DeserializeObject(data);
+        }
+        [Benchmark]
+        public void NewtonJsonDeserializeDataSet() {
+            JsonConvert.DeserializeObject(newtonData);
+        }
     }
 }
