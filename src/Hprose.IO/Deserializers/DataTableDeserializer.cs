@@ -139,32 +139,6 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
         }
 
-        private static void ReadFirstRow(Reader reader, DataTable table, int tag) {
-            switch (tag) {
-                case TagMap:
-                    ReadMapAsFirstRow(reader, table);
-                    break;
-                case TagObject:
-                    ReadObjectAsFirstRow(reader, table);
-                    break;
-                default:
-                    throw new InvalidCastException("Cannot convert " + HproseTags.ToString(tag) + " to DataRow.");
-            }
-        }
-
-        private static void ReadRow(Reader reader, DataTable table, int tag) {
-            switch (tag) {
-                case TagMap:
-                    ReadMapAsRow(reader, table);
-                    break;
-                case TagObject:
-                    ReadObjectAsRow(reader, table);
-                    break;
-                default:
-                    throw new InvalidCastException("Cannot convert " + HproseTags.ToString(tag) + " to DataRow.");
-            }
-        }
-
         private static T Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
@@ -178,11 +152,25 @@ namespace Hprose.IO.Deserializers {
                 reader.ReadClass();
                 tag = stream.ReadByte();
             }
-            ReadFirstRow(reader, table, tag);
-            tag = stream.ReadByte();
-            for (int i = 1; i < count; ++i) {
-                ReadRow(reader, table, tag);
-                tag = stream.ReadByte();
+            switch (tag) {
+                case TagObject:
+                    ReadObjectAsFirstRow(reader, table);
+                    tag = stream.ReadByte();
+                    for (int i = 1; i < count; ++i) {
+                        ReadObjectAsRow(reader, table);
+                        tag = stream.ReadByte();
+                    }
+                    break;
+                case TagMap:
+                    ReadMapAsFirstRow(reader, table);
+                    tag = stream.ReadByte();
+                    for (int i = 1; i < count; ++i) {
+                        ReadMapAsRow(reader, table);
+                        tag = stream.ReadByte();
+                    }
+                    break;
+                default:
+                    throw new InvalidCastException("Cannot convert " + HproseTags.ToString(tag) + " to DataRow.");
             }
             return table;
         }
