@@ -190,7 +190,7 @@ namespace Hprose.Benchmark.IO.Serializers {
 
         [Benchmark]
         public void NewtonJsonDeserializeDataSet() {
-            JsonConvert.DeserializeObject(newtonData);
+            JsonConvert.DeserializeObject(newtonData, typeof(DataSet));
         }
     }
 }
