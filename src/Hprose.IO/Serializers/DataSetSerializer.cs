@@ -12,7 +12,7 @@
  *                                                        *
  * DataSetSerializer class for C#.                        *
  *                                                        *
- * LastModified: Apr 24, 2018                             *
+ * LastModified: Apr 27, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -28,13 +28,12 @@ namespace Hprose.IO.Serializers {
             var tables = obj.Tables;
             var length = tables.Count;
             var stream = writer.Stream;
-            stream.WriteByte(TagMap);
+            stream.WriteByte(TagList);
             if (length > 0) {
                 ValueWriter.WriteInt(stream, length);
             }
             stream.WriteByte(TagOpenbrace);
             for (int i = 0; i < length; ++i) {
-                Serializer<string>.Instance.Serialize(writer, tables[i].TableName);
                 Serializer<DataTable>.Instance.Serialize(writer, tables[i]);
             }
             stream.WriteByte(TagClosebrace);

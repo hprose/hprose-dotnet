@@ -24,7 +24,7 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
     class DataSetDeserializer<T> : Deserializer<T> where T : DataSet, new() {
-        private static T ReadListAsDataSet(Reader reader) {
+        private static T Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             T dataset = new T();
@@ -36,29 +36,11 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return dataset;
         }
-        private static T ReadMapAsDataSet(Reader reader) {
-            Stream stream = reader.Stream;
-            int count = ValueReader.ReadCount(stream);
-            T dataset = new T();
-            reader.SetRef(dataset);
-            var strDeserializer = Deserializer<string>.Instance;
-            var deserializer = Deserializer<DataTable>.Instance;
-            for (int i = 0; i < count; ++i) {
-                var name = strDeserializer.Deserialize(reader);
-                var table = deserializer.Deserialize(reader);
-                table.TableName = name;
-                dataset.Tables.Add(table);
-            }
-            stream.ReadByte();
-            return dataset;
-        }
         public override T Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {
                 case TagList:
-                    return ReadListAsDataSet(reader);
-                case TagMap:
-                    return ReadMapAsDataSet(reader);
+                    return Read(reader);
                 case TagEmpty:
                     return new T();
                 default:
