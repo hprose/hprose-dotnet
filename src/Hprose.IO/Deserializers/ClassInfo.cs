@@ -12,14 +12,14 @@
  *                                                        *
  * ClassInfo class for C#.                                *
  *                                                        *
- * LastModified: Apr 25, 2018                              *
+ * LastModified: Apr 27, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 using System;
 
 namespace Hprose.IO.Deserializers {
-    public struct ClassInfo {
+    public class ClassInfo {
         public string name;
         public Type type;
         public string[] names;
