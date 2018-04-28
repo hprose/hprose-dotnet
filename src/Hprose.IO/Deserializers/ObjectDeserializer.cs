@@ -131,6 +131,28 @@ namespace Hprose.IO.Deserializers {
         }
     }
 
+    static class Factory<T> {
+        private static readonly Func<T> constructor = CreateConstructor();
+        private static Func<T> CreateConstructor() {
+            try {
+                return Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
+            }
+            catch {
+                return () => {
+                    try {
+                        return (T)Activator.CreateInstance(typeof(T));
+                    }
+                    catch {
+                        return (T)Activator.CreateInstance(typeof(T), true);
+                    }
+                };
+            }
+        }
+        public static T New() {
+            return constructor();
+        }
+    }
+
     static class MembersReader<T> {
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readMemberActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
@@ -161,7 +183,7 @@ namespace Hprose.IO.Deserializers {
     class ObjectDeserializer<T> : Deserializer<T> where T : class {
         public static T Read(Reader reader) {
             Stream stream = reader.Stream;
-            T obj = (T)Activator.CreateInstance(typeof(T), true);
+            T obj = Factory<T>.New();
             reader.SetRef(obj);
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
             MembersReader.GetReadAction<T>(reader.Mode, reader.GetClassInfo(index).key)(reader, ref obj);
@@ -170,7 +192,7 @@ namespace Hprose.IO.Deserializers {
         }
         public static T ReadMapAsObject(Reader reader) {
             Stream stream = reader.Stream;
-            T obj = (T)Activator.CreateInstance(typeof(T), true);
+            T obj = Factory<T>.New();
             reader.SetRef(obj);
             int count = ValueReader.ReadCount(stream);
             var strDeserializer = Deserializer<string>.Instance;
@@ -188,7 +210,7 @@ namespace Hprose.IO.Deserializers {
                 case TagMap:
                     return ReadMapAsObject(reader);
                 case TagEmpty:
-                    return (T)Activator.CreateInstance(typeof(T), true);
+                    return Factory<T>.New();
                 default:
                     return base.Read(reader, tag);
             }
