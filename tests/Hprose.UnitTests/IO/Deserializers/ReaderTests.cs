@@ -1532,5 +1532,24 @@ namespace Hprose.UnitTests.IO.Deserializers {
                 Assert.AreEqual(o6.Name, "Anonymous");
             }
         }
+        [TestMethod]
+        public void TestDeserializeObject3() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream, false, Hprose.IO.HproseMode.FieldMode);
+                var o = new Person {
+                    Id = 0,
+                    Name = "Tom",
+                    Age = 48
+                };
+                writer.Serialize(o);
+                stream.Position = 0;
+                Reader reader = new Reader(stream, false, Hprose.IO.HproseMode.FieldMode);
+                dynamic o2 = reader.Deserialize();
+                Assert.AreEqual(0, o2.Id);
+                Assert.AreEqual("Tom", o2.Name);
+                Assert.AreEqual(48, o2.Age);
+            }
+        }
+
     }
 }

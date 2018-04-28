@@ -12,7 +12,7 @@
  *                                                        *
  * ObjectDeserializer class for C#.                       *
  *                                                        *
- * LastModified: Apr 27, 2018                             *
+ * LastModified: Apr 28, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -77,7 +77,9 @@ namespace Hprose.IO.Deserializers {
                 Type memberType = Accessor.GetMemberType(member);
                 var deserializer = typeof(Deserializer<>).MakeGenericType(memberType);
                 return Expression.Assign(
-                    Expression.PropertyOrField(obj, member.Name),
+                    member is FieldInfo ?
+                        Expression.Field(obj, (FieldInfo)member) :
+                        Expression.Property(obj, (PropertyInfo)member),
                     Expression.Call(
                         Expression.Property(null, deserializer, "Instance"),
                         deserializer.GetMethod("Deserialize", BindingAttr),

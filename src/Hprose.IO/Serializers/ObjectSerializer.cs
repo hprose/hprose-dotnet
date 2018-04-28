@@ -12,7 +12,7 @@
  *                                                        *
  * ObjectSerializer class for C#.                         *
  *                                                        *
- * LastModified: Apr 25, 2018                             *
+ * LastModified: Apr 28, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -62,7 +62,9 @@ namespace Hprose.IO.Serializers {
                         Expression.Property(null, elemSerializerType, "Instance"),
                         elemSerializerType.GetMethod("Serialize"),
                         writer,
-                        Expression.PropertyOrField(obj, member.Name)
+                        member is FieldInfo ?
+                        Expression.Field(obj, (FieldInfo)member) :
+                        Expression.Property(obj, (PropertyInfo)member)
                     )
                 );
             }
