@@ -75,14 +75,15 @@ namespace Hprose.IO.Deserializers {
         private static Expression CreateReadMemberExpression(MemberInfo member, ParameterExpression reader, ParameterExpression obj) {
             if (member != null) {
                 Type memberType = Accessor.GetMemberType(member);
-                var deserializer = typeof(Deserializer<>).MakeGenericType(memberType);
+                var deserializerType = typeof(Deserializer<>).MakeGenericType(memberType);
+                var deserializer = deserializerType.GetProperty("Instance").GetValue(null, null);
                 return Expression.Assign(
                     member is FieldInfo ?
                         Expression.Field(obj, (FieldInfo)member) :
                         Expression.Property(obj, (PropertyInfo)member),
                     Expression.Call(
-                        Expression.Property(null, deserializer, "Instance"),
-                        deserializer.GetMethod("Deserialize", BindingAttr),
+                        Expression.Constant(deserializer),
+                        deserializerType.GetMethod("Deserialize", BindingAttr),
                         reader
                     )
                 );

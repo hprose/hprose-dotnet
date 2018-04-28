@@ -57,9 +57,10 @@ namespace Hprose.IO.Serializers {
             foreach (MemberInfo member in members) {
                 Type memberType = Accessor.GetMemberType(member);
                 var elemSerializerType = typeof(Serializer<>).MakeGenericType(memberType);
+                var serializer = elemSerializerType.GetProperty("Instance").GetValue(null, null);
                 expressions.Add(
                     Expression.Call(
-                        Expression.Property(null, elemSerializerType, "Instance"),
+                        Expression.Constant(serializer),
                         elemSerializerType.GetMethod("Serialize"),
                         writer,
                         member is FieldInfo ?
