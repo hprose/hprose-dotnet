@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Converter class for C#.                         *
  *                                                        *
- * LastModified: Apr 21, 2018                             *
+ * LastModified: Apr 28, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -30,7 +30,6 @@ namespace Hprose.IO.Converters {
         internal static TypeConverter converter = TypeDescriptor.GetConverter(typeof(TOutput));
 
         static Converter() {
-            Converter<TOutput, TOutput>.convert = Convert;
             if (Converter<object, TOutput>.convert == null) {
                 Converter<object, TOutput>.convert = ConvertFrom;
             }
@@ -44,6 +43,7 @@ namespace Hprose.IO.Converters {
         }
 
         public static TOutput Convert<TInput>(TInput value) {
+            switch (value) { case TOutput result: return result; }
             var convert = Converter<TInput, TOutput>.convert;
             if (convert != null) {
                 return convert(value);
@@ -60,8 +60,6 @@ namespace Hprose.IO.Converters {
             }
             return ConvertFromObject(value);
         }
-
-        public static TOutput Convert(TOutput value) => value;
 
         internal static TOutput ConvertFromChars(char[] value) => (TOutput)converter.ConvertFrom(new string(value));
 
