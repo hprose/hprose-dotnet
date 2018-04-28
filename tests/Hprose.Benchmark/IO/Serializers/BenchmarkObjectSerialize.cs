@@ -17,7 +17,8 @@ namespace Hprose.Benchmark.IO.Serializers {
     [RPlotExporter, RankColumn]
     public class BenchmarkObjectSerialize {
         [DataContract(Name = "Person")]
-        public class Person {
+        public struct
+            Person {
             [DataMember(Order = 0)]
             public int Id;
             [DataMember(Order = 1)]
