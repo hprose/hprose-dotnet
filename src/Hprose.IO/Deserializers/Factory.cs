@@ -28,14 +28,7 @@ namespace Hprose.IO.Deserializers {
                 constructor = Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
             }
             catch {
-                constructor =() => {
-                    try {
-                        return (T)Activator.CreateInstance(typeof(T));
-                    }
-                    catch {
-                        return (T)Activator.CreateInstance(typeof(T), true);
-                    }
-                };
+                constructor = () => (T)Activator.CreateInstance(typeof(T), true);
             }
         }
         public static T New() {
