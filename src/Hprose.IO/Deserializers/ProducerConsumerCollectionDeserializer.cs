@@ -23,11 +23,11 @@ using System.Collections.Concurrent;
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
-    class ProducerConsumerCollectionDeserializer<T, E> : Deserializer<T> where T : IProducerConsumerCollection<E>, new() {
+    class ProducerConsumerCollectionDeserializer<T, E> : Deserializer<T> where T : IProducerConsumerCollection<E> {
         public static T Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
-            T collection = new T();
+            T collection = Factory<T>.New();
             reader.SetRef(collection);
             var deserializer = Deserializer<E>.Instance;
             for (int i = 0; i < count; ++i) {
@@ -41,7 +41,7 @@ namespace Hprose.IO.Deserializers {
                 case TagList:
                     return Read(reader);
                 case TagEmpty:
-                    return new T();
+                    return Factory<T>.New();
                 default:
                     return base.Read(reader, tag);
             }
