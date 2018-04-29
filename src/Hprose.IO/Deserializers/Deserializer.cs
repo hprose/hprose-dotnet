@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Deserializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 25, 2018                             *
+ * LastModified: Apr 29, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -21,12 +21,12 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data;
 using System.Dynamic;
 using System.IO;
 using System.Runtime.Serialization;
+
 using Hprose.Collections.Generic;
-using Hprose.IO.Accessors;
+
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
