@@ -349,38 +349,16 @@ namespace Hprose.IO.Deserializers {
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
             var classInfo = reader.GetClassInfo(index);
             var type = classInfo.type;
-            string[] names = classInfo.names;
-            object obj;
-            if (type != null && !type.IsValueType) {
-                obj = Activator.CreateInstance(type, true);
-                reader.SetRef(obj);
-                MembersReader.GetReadAction(reader.Mode, classInfo).DynamicInvoke(reader, obj);
+            if (type != null) {
+                return ((IObjectDeserializer)GetInstance(type)).ReadObject(reader, classInfo.key);
             }
-            else {
-                obj = new ExpandoObject();
-                reader.SetRef(obj);
-                var dict = (IDictionary<string, object>)(obj);
-                int count = names.Length;
-                if (type != null) {
-                    if (classInfo.type != null) {
-                        var members = Accessor.GetMembers(type, reader.Mode);
-                        for (int i = 0; i < count; ++i) {
-                            var name = names[i];
-                            var member = members[name];
-                            if (member != null) {
-                                dict.Add(member.Name, Deserialize(reader, Accessor.GetMemberType(member)));
-                            }
-                            else {
-                                dict.Add(name, Deserialize(reader));
-                            }
-                        }
-                    }
-                }
-                else {
-                    for (int i = 0; i < count; ++i) {
-                        dict.Add(names[i], Deserialize(reader));
-                    }
-                }
+            var obj = new ExpandoObject();
+            reader.SetRef(obj);
+            var dict = (IDictionary<string, object>)obj;
+            string[] names = classInfo.names;
+            int count = names.Length;
+            for (int i = 0; i < count; ++i) {
+                dict.Add(names[i], Deserialize(reader));
             }
             stream.ReadByte();
             return obj;
