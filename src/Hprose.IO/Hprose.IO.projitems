@@ -39,6 +39,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DataTableDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DictType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\BitArrayDeserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\Factory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\MembersReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ObjectDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ListType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\RealType.cs" />
