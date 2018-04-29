@@ -12,7 +12,7 @@
  *                                                        *
  * ListDeserializer class for C#.                         *
  *                                                        *
- * LastModified: Apr 18, 2018                             *
+ * LastModified: Apr 29, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -23,11 +23,11 @@ using System.Collections;
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
-    class ListDeserializer<I, T> : Deserializer<I> where T : I, IList, new() {
+    class ListDeserializer<I, T> : Deserializer<I> where T : I, IList {
         public static I Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
-            T collection = new T();
+            T collection = Factory<T>.New();
             reader.SetRef(collection);
             var deserializer = Deserializer.Instance;
             for (int i = 0; i < count; ++i) {
@@ -41,11 +41,11 @@ namespace Hprose.IO.Deserializers {
                 case TagList:
                     return Read(reader);
                 case TagEmpty:
-                    return new T();
+                    return Factory<T>.New();
                 default:
                     return base.Read(reader, tag);
             }
         }
     }
-    class ListDeserializer<T> : ListDeserializer<T, T> where T : IList, new() { }
+    class ListDeserializer<T> : ListDeserializer<T, T> where T : IList { }
 }
