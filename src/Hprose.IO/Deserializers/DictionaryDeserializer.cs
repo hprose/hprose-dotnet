@@ -12,7 +12,7 @@
  *                                                        *
  * DictionaryDeserializer class for C#.                   *
  *                                                        *
- * LastModified: Apr 25, 2018                             *
+ * LastModified: Apr 29, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -27,11 +27,11 @@ using Hprose.IO.Converters;
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
-    class DictionaryDeserializer<I, T, K, V> : Deserializer<I> where T : I, ICollection<KeyValuePair<K, V>>, new() {
+    class DictionaryDeserializer<I, T, K, V> : Deserializer<I> where T : I, ICollection<KeyValuePair<K, V>> {
         public static I Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
-            T dict = new T();
+            T dict = Factory<T>.New();
             reader.SetRef(dict);
             var keyDeserializer = Deserializer<K>.Instance;
             var valueDeserializer = Deserializer<V>.Instance;
@@ -46,7 +46,7 @@ namespace Hprose.IO.Deserializers {
         public static I ReadListAsMap(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
-            T dict = new T();
+            T dict = Factory<T>.New();
             reader.SetRef(dict);
             var deserializer = Deserializer<V>.Instance;
             for (int i = 0; i < count; ++i) {
@@ -62,20 +62,20 @@ namespace Hprose.IO.Deserializers {
                 case TagList:
                     return ReadListAsMap(reader);
                 case TagEmpty:
-                    return new T();
+                    return Factory<T>.New();
                 default:
                     return base.Read(reader, tag);
             }
         }
     }
-    class DictionaryDeserializer<T, K, V> : DictionaryDeserializer<T, T, K, V> where T : ICollection<KeyValuePair<K, V>>, new() { }
+    class DictionaryDeserializer<T, K, V> : DictionaryDeserializer<T, T, K, V> where T : ICollection<KeyValuePair<K, V>> { }
 
-    class StringObjectDictionaryDeserializer<I, T> : DictionaryDeserializer<I, T, string, object> where T : I, ICollection<KeyValuePair<string, object>>, new() {
+    class StringObjectDictionaryDeserializer<I, T> : DictionaryDeserializer<I, T, string, object> where T : I, ICollection<KeyValuePair<string, object>> {
         public static I ReadObjectAsMap(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
             ClassInfo classInfo = reader.GetClassInfo(index);
-            T dict = new T();
+            T dict = Factory<T>.New();
             reader.SetRef(dict);
             var deserializer = Deserializer.Instance;
             string[] names = classInfo.names;
@@ -110,13 +110,13 @@ namespace Hprose.IO.Deserializers {
             }
         }
     }
-    class StringObjectDictionaryDeserializer<T> : StringObjectDictionaryDeserializer<T, T> where T : ICollection<KeyValuePair<string, object>>, new() { }
+    class StringObjectDictionaryDeserializer<T> : StringObjectDictionaryDeserializer<T, T> where T : ICollection<KeyValuePair<string, object>> { }
 
-    class DictionaryDeserializer<I, T> : Deserializer<I> where T : I, IDictionary, new() {
+    class DictionaryDeserializer<I, T> : Deserializer<I> where T : I, IDictionary {
         public static I Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
-            T dict = new T();
+            T dict = Factory<T>.New();
             reader.SetRef(dict);
             var deserializer = Deserializer.Instance;
             for (int i = 0; i < count; ++i) {
@@ -130,7 +130,7 @@ namespace Hprose.IO.Deserializers {
         public static I ReadListAsMap(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
-            T dict = new T();
+            T dict = Factory<T>.New();
             reader.SetRef(dict);
             var deserializer = Deserializer.Instance;
             for (int i = 0; i < count; ++i) {
@@ -144,7 +144,7 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
             ClassInfo classInfo = reader.GetClassInfo(index);
-            T dict = new T();
+            T dict = Factory<T>.New();
             reader.SetRef(dict);
             var deserializer = Deserializer.Instance;
             var names = classInfo.names;
@@ -178,12 +178,12 @@ namespace Hprose.IO.Deserializers {
                 case TagObject:
                     return ReadObjectAsMap(reader);
                 case TagEmpty:
-                    return new T();
+                    return Factory<T>.New();
                 default:
                     return base.Read(reader, tag);
             }
         }
     }
 
-    class DictionaryDeserializer<T> : DictionaryDeserializer<T, T> where T : IDictionary, new() { }
+    class DictionaryDeserializer<T> : DictionaryDeserializer<T, T> where T : IDictionary { }
 }
