@@ -12,7 +12,7 @@
  *                                                        *
  * ObjectDeserializer class for C#.                       *
  *                                                        *
- * LastModified: Apr 28, 2018                             *
+ * LastModified: Apr 29, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -183,7 +183,7 @@ namespace Hprose.IO.Deserializers {
         public static ReadAction<T> GetReadMemberAction(string name) => readActions.GetOrAdd(name, readMemberActionFactory).Value;
     }
 
-    class ObjectDeserializer<T> : Deserializer<T> {
+    class ObjectDeserializer<T> : Deserializer<T> where T : class {
         public static T Read(Reader reader) {
             Stream stream = reader.Stream;
             T obj = Factory<T>.New();
@@ -203,6 +203,47 @@ namespace Hprose.IO.Deserializers {
                 var name = strDeserializer.Deserialize(reader);
                 MembersReader.GetReadMemberAction<T>(reader.Mode, name)(reader, ref obj);
             }
+            stream.ReadByte();
+            return obj;
+        }
+        public override T Read(Reader reader, int tag) {
+            switch (tag) {
+                case TagObject:
+                    return Read(reader);
+                case TagMap:
+                    return ReadMapAsObject(reader);
+                case TagEmpty:
+                    return Factory<T>.New();
+                default:
+                    return base.Read(reader, tag);
+            }
+        }
+    }
+
+    class StructDeserializer<T> : Deserializer<T> where T : struct {
+        public static T Read(Reader reader) {
+            Stream stream = reader.Stream;
+            T obj = Factory<T>.New();
+            reader.SetRef(null);
+            int refIndex = reader.LastRefIndex;
+            int index = ValueReader.ReadInt(stream, TagOpenbrace);
+            MembersReader.GetReadAction<T>(reader.Mode, reader.GetClassInfo(index).key)(reader, ref obj);
+            reader.SetRef(refIndex, obj);
+            stream.ReadByte();
+            return obj;
+        }
+        public static T ReadMapAsObject(Reader reader) {
+            Stream stream = reader.Stream;
+            T obj = Factory<T>.New();
+            reader.SetRef(null);
+            int refIndex = reader.LastRefIndex;
+            int count = ValueReader.ReadCount(stream);
+            var strDeserializer = Deserializer<string>.Instance;
+            for (int i = 0; i < count; ++i) {
+                var name = strDeserializer.Deserialize(reader);
+                MembersReader.GetReadMemberAction<T>(reader.Mode, name)(reader, ref obj);
+            }
+            reader.SetRef(refIndex, obj);
             stream.ReadByte();
             return obj;
         }

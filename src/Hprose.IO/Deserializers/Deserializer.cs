@@ -234,6 +234,9 @@ namespace Hprose.IO.Deserializers {
             //if (typeof(Stream).IsAssignableFrom(type)) {
             //    return typeof(StreamSerializer<>).MakeGenericType(type);
             //}
+            if (type.IsValueType) {
+                return typeof(StructDeserializer<>).MakeGenericType(type);
+            }
             return typeof(ObjectDeserializer<>).MakeGenericType(type);
         }
 
