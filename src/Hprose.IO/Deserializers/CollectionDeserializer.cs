@@ -12,7 +12,7 @@
  *                                                        *
  * CollectionDeserializer class for C#.                   *
  *                                                        *
- * LastModified: Apr 15, 2018                             *
+ * LastModified: Apr 29, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -23,11 +23,11 @@ using System.Collections.Generic;
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
-    class CollectionDeserializer<I, T, E> : Deserializer<I> where T : I, ICollection<E>, new() {
+    class CollectionDeserializer<I, T, E> : Deserializer<I> where T : I, ICollection<E> {
         public static I Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
-            T collection = new T();
+            T collection = Factory<T>.New();
             reader.SetRef(collection);
             var deserializer = Deserializer<E>.Instance;
             for (int i = 0; i < count; ++i) {
@@ -41,11 +41,11 @@ namespace Hprose.IO.Deserializers {
                 case TagList:
                     return Read(reader);
                 case TagEmpty:
-                    return new T();
+                    return Factory<T>.New();
                 default:
                     return base.Read(reader, tag);
             }
         }
     }
-    class CollectionDeserializer<T, E> : CollectionDeserializer<T, T, E> where T : ICollection<E>, new() { }
+    class CollectionDeserializer<T, E> : CollectionDeserializer<T, T, E> where T : ICollection<E> { }
 }
