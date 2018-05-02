@@ -12,14 +12,13 @@
  *                                                        *
  * ConcurrentStackDeserializer class for C#.              *
  *                                                        *
- * LastModified: May 2, 2018                              *
+ * LastModified: Apr 17, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
-using System.Buffers;
-using System.Collections.Concurrent;
 using System.IO;
+using System.Collections.Concurrent;
 
 using static Hprose.IO.HproseTags;
 
@@ -30,18 +29,13 @@ namespace Hprose.IO.Deserializers {
             int count = ValueReader.ReadCount(stream);
             ConcurrentStack<T> stack = new ConcurrentStack<T>();
             reader.SetRef(stack);
+            T[] array = new T[count];
             var deserializer = Deserializer<T>.Instance;
-            T[] buffer = ArrayPool<T>.Shared.Rent(count);
-            try {
-                for (int i = 0; i < count; ++i) {
-                    buffer[i] = deserializer.Deserialize(reader);
-                }
-                for (int i = count - 1; i >= 0; --i) {
-                    stack.Push(buffer[i]);
-                }
+            for (int i = 0; i < count; ++i) {
+                array[i] = deserializer.Deserialize(reader);
             }
-            finally {
-                ArrayPool<T>.Shared.Return(buffer, false);
+            for (int i = count - 1; i >= 0; --i) {
+                stack.Push(array[i]);
             }
             stream.ReadByte();
             return stack;
