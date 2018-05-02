@@ -16,6 +16,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\DecimalConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\DoubleConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\SingleConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\MemoryStreamConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\StreamConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\UInt64Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\UInt32Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Int32Converter.cs" />
@@ -35,6 +37,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BigIntegerConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Int64Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Converter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\StreamDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DataSetDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DataTableDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\StringObjectDictionaryDeserializer.cs" />
