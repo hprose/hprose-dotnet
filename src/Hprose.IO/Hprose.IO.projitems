@@ -37,6 +37,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BigIntegerConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Int64Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Converter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\RawReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\StreamDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DataSetDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DataTableDeserializer.cs" />

@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Reader class for C#.                            *
  *                                                        *
- * LastModified: Apr 27, 2018                             *
+ * LastModified: May 2, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -91,6 +91,17 @@ namespace Hprose.IO.Deserializers {
         public void SetRef(int index, object obj) => _refer?.Set(index, obj);
 
         public int LastRefIndex => _refer?.LastIndex ?? -1;
+
+        public MemoryStream ReadRaw() {
+            MemoryStream ostream = new MemoryStream();
+            ReadRaw(ostream);
+            ostream.Position = 0;
+            return ostream;
+        }
+
+        public void ReadRaw(Stream ostream) {
+            RawReader.ReadRaw(_stream, ostream, _stream.ReadByte());
+        }
 
         public void Reset() {
             _refer?.Reset();

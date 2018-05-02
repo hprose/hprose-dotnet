@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netcoreapp2.0;net40;net45;net451;net452;net46;net461;net462;net47;net471;monoandroid44;monoandroid50;monoandroid51;monoandroid60;monoandroid71;xamarinmac20;xamarinios10;xamarintvos10;xamarinwatchos10</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netcoreapp2.0;net45;net451;net452;net46;net461;net462;net47;net471;monoandroid44;monoandroid50;monoandroid51;monoandroid60;monoandroid71;xamarinios10;xamarintvos10;xamarinwatchos10</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
@@ -21,7 +21,7 @@
     <RepositoryType>git</RepositoryType>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
@@ -77,6 +77,10 @@
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net40')) Or $(TargetFramework.StartsWith('net45')) Or $(TargetFramework.StartsWith('net46')) ">
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" !($(TargetFramework.StartsWith('netcoreapp'))) ">
+    <PackageReference Include="System.Buffers" Version="4.4.0" />
   </ItemGroup>
 
   <Import Project="..\src\Hprose.Collections\Hprose.Collections.projitems" Label="Shared" />

@@ -418,7 +418,7 @@ namespace Hprose.IO.Deserializers {
             return tag;
         }
 
-        private static IOException BadEncoding(int b) {
+        internal static IOException BadEncoding(int b) {
             if (b == -1) return new EndOfStreamException();
             return new IOException("Bad UTF-8 encoding at 0x" + (b & 0xff).ToString("x2"));
         }
