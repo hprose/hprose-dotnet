@@ -12,12 +12,13 @@
  *                                                        *
  * DataTableDeserializer class for C#.                    *
  *                                                        *
- * LastModified: Apr 26, 2018                             *
+ * LastModified: May 2, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using System;
+using System.Buffers;
 using System.Data;
 using System.IO;
 
@@ -27,14 +28,14 @@ using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
     class DataTableDeserializer : Deserializer<DataTable> {
-        private static IDeserializer[] ReadMapAsFirstRow(Reader reader, DataTable table, Deserializer<string> strDeserializer) {
+        private static void ReadMapAsFirstRow(Reader reader, DataTable table, Deserializer<string> strDeserializer, out IDeserializer[] deserializers) {
             var columns = table.Columns;
             var row = table.NewRow();
             reader.SetRef(row);
             var stream = reader.Stream;
             var deserializer = Deserializer.Instance;
             int count = ValueReader.ReadCount(stream);
-            IDeserializer[] deserializers = new IDeserializer[count];
+            deserializers = ArrayPool<IDeserializer>.Shared.Rent(count);
             for (int i = 0; i < count; ++i) {
                 var name = strDeserializer.Deserialize(reader);
                 var value = deserializer.Deserialize(reader);
@@ -46,10 +47,9 @@ namespace Hprose.IO.Deserializers {
             }
             table.Rows.Add(row);
             stream.ReadByte();
-            return deserializers;
         }
 
-        private static IDeserializer[] ReadObjectAsFirstRow(Reader reader, DataTable table) {
+        private static void ReadObjectAsFirstRow(Reader reader, DataTable table, out IDeserializer[] deserializers) {
             var columns = table.Columns;
             var row = table.NewRow();
             reader.SetRef(row);
@@ -60,7 +60,7 @@ namespace Hprose.IO.Deserializers {
             var names = classInfo.names;
             var deserializer = Deserializer.Instance;
             var count = names.Length;
-            IDeserializer[] deserializers = new IDeserializer[count];
+            deserializers = ArrayPool<IDeserializer>.Shared.Rent(count);
             if (classInfo.type != null) {
                 var members = Accessor.GetMembers(classInfo.type, reader.Mode);
                 for (int i = 0; i < count; ++i) {
@@ -97,7 +97,6 @@ namespace Hprose.IO.Deserializers {
             }
             table.Rows.Add(row);
             stream.ReadByte();
-            return deserializers;
         }
 
         private static void ReadMapAsRow(Reader reader, DataTable table, Deserializer<string> strDeserializer, IDeserializer[] deserializers) {
@@ -144,27 +143,34 @@ namespace Hprose.IO.Deserializers {
                 tag = stream.ReadByte();
             }
             var deserializer = Deserializer.Instance;
-            IDeserializer[] deserializers;
-            switch (tag) {
-                case TagObject:
-                    deserializers = ReadObjectAsFirstRow(reader, table);
-                    tag = stream.ReadByte();
-                    for (int i = 1; i < count; ++i) {
-                        ReadObjectAsRow(reader, table, deserializers);
+            IDeserializer[] deserializers = null;
+            try {
+                switch (tag) {
+                    case TagObject:
+                        ReadObjectAsFirstRow(reader, table, out deserializers);
                         tag = stream.ReadByte();
-                    }
-                    break;
-                case TagMap:
-                    var strDeserializer = Deserializer<string>.Instance;
-                    deserializers = ReadMapAsFirstRow(reader, table, strDeserializer);
-                    tag = stream.ReadByte();
-                    for (int i = 1; i < count; ++i) {
-                        ReadMapAsRow(reader, table, strDeserializer, deserializers);
+                        for (int i = 1; i < count; ++i) {
+                            ReadObjectAsRow(reader, table, deserializers);
+                            tag = stream.ReadByte();
+                        }
+                        break;
+                    case TagMap:
+                        var strDeserializer = Deserializer<string>.Instance;
+                        ReadMapAsFirstRow(reader, table, strDeserializer, out deserializers);
                         tag = stream.ReadByte();
-                    }
-                    break;
-                default:
-                    throw new InvalidCastException("Cannot convert " + HproseTags.ToString(tag) + " to DataRow.");
+                        for (int i = 1; i < count; ++i) {
+                            ReadMapAsRow(reader, table, strDeserializer, deserializers);
+                            tag = stream.ReadByte();
+                        }
+                        break;
+                    default:
+                        throw new InvalidCastException("Cannot convert " + HproseTags.ToString(tag) + " to DataRow.");
+                }
+            }
+            finally {
+                if (deserializers != null) {
+                    ArrayPool<IDeserializer>.Shared.Return(deserializers);
+                }
             }
             return table;
         }
