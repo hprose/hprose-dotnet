@@ -98,6 +98,8 @@ namespace Hprose.IO.Deserializers {
             Register(() => new StringObjectDictionaryDeserializer<ExpandoObject>());
             Register(() => new DataTableDeserializer());
             Register(() => new DataSetDeserializer());
+            Register(() => new StreamDeserializer<Stream>());
+            Register(() => new StreamDeserializer<MemoryStream>());
         }
 
         public static void Initialize() { }
@@ -231,9 +233,6 @@ namespace Hprose.IO.Deserializers {
                     return typeof(ListDeserializer<>).MakeGenericType(type);
                 }
             }
-            //if (typeof(Stream).IsAssignableFrom(type)) {
-            //    return typeof(StreamSerializer<>).MakeGenericType(type);
-            //}
             if (type.IsValueType) {
                 return typeof(StructDeserializer<>).MakeGenericType(type);
             }

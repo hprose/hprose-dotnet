@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Converter class for C#.                         *
  *                                                        *
- * LastModified: Apr 28, 2018                             *
+ * LastModified: May 2, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -104,6 +104,8 @@ namespace Hprose.IO.Converters {
             DateTimeConverter.Initialize();
             TimeSpanConverter.Initialize();
             GuidConverter.Initialize();
+            MemoryStreamConverter.Initialize();
+            StreamConverter.Initialize();
         }
         internal static void Initialize() { }
         public static void Register<TInput, TOutput>(Func<TInput, TOutput> convert) => Converter<TInput, TOutput>.convert = convert;
