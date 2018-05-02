@@ -17,20 +17,13 @@
  *                                                        *
 \**********************************************************/
 
-using System.Buffers;
 using System.IO;
 using System.Runtime.Serialization;
+
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {
     public static class RawReader {
-        private static void Copy(Stream stream, Stream ostream, byte[] buffer, int len) {
-            int off = 0;
-            while (off < len) {
-                off += stream.Read(buffer, off, len - off);
-            }
-            ostream.Write(buffer, 0, len);
-        }
         private static void ReadNumberRaw(Stream stream, Stream ostream) {
             int tag;
             do {
@@ -78,6 +71,14 @@ namespace Hprose.IO.Deserializers {
                     throw ValueReader.BadEncoding(tag);
             }
         }
+        private static void Copy(Stream stream, Stream ostream, int len) {
+            byte[] buffer = new byte[len];
+            int off = 0;
+            while (off < len) {
+                off += stream.Read(buffer, off, len - off);
+            }
+            ostream.Write(buffer, 0, len);
+        }
         private static void ReadBytesRaw(Stream stream, Stream ostream) {
             int len = 0;
             int tag = '0';
@@ -87,24 +88,11 @@ namespace Hprose.IO.Deserializers {
                 tag = stream.ReadByte();
                 ostream.WriteByte((byte)tag);
             } while (tag != TagQuote);
-            byte[] buffer = ArrayPool<byte>.Shared.Rent(len);
-            try {
-                Copy(stream, ostream, buffer, len);
-            }
-            finally {
-                ArrayPool<byte>.Shared.Return(buffer, false);
-            }
+            Copy(stream, ostream, len);
             ostream.WriteByte((byte)stream.ReadByte());
         }
         private static void ReadGuidRaw(Stream stream, Stream ostream) {
-            const int len = 38;
-            byte[] buffer = ArrayPool<byte>.Shared.Rent(len);
-            try {
-                Copy(stream, ostream, buffer, len);
-            }
-            finally {
-                ArrayPool<byte>.Shared.Return(buffer, false);
-            }
+            Copy(stream, ostream, 38);
         }
         private static void ReadStringRaw(Stream stream, Stream ostream) {
             int count = 0;

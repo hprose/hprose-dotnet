@@ -40,10 +40,7 @@ namespace Hprose.IO.Serializers {
                 ValueWriter.WriteInt(stream, length);
             }
             stream.WriteByte(TagQuote);
-            byte[] buffer = new byte[4096];
-            while ((length = obj.Read(buffer, 0, 4096)) != 0) {
-                stream.Write(buffer, 0, length);
-            }
+            obj.CopyTo(stream);
             stream.WriteByte(TagQuote);
             if (obj.CanSeek) {
                 obj.Position = oldPos;
