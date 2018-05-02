@@ -19,6 +19,7 @@
 
 using System;
 using System.IO;
+
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Deserializers {

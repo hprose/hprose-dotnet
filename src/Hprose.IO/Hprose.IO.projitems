@@ -37,6 +37,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DataSetDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DataTableDeserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\StringObjectDictionaryDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DictType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\BitArrayDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\Factory.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)HproseTags.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DataSetSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DataTableSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\MembersWriter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\ObjectSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\AnonymousTypeSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\MultiDimArraySerializer.cs" />

@@ -46,9 +46,9 @@ namespace Hprose.IO.Serializers {
 
         public void Write<T>(T obj) => Serializer<T>.Instance.Write(this, obj);
 
-        internal bool WriteRef(object obj) => _refer?.Write(_stream, obj) ?? false;
+        public bool WriteRef(object obj) => _refer?.Write(_stream, obj) ?? false;
 
-        internal void SetRef(object obj) => _refer?.Set(obj);
+        public void SetRef(object obj) => _refer?.Set(obj);
 
         public void AddCount(int count) => _refer?.AddCount(count);
 

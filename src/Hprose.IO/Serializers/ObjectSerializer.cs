@@ -18,100 +18,10 @@
 \**********************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq.Expressions;
-using System.Reflection;
 
-using Hprose.IO.Accessors;
-
-using static Hprose.IO.HproseMode;
 using static Hprose.IO.HproseTags;
 
 namespace Hprose.IO.Serializers {
-
-    class MembersWriter {
-        public Delegate write;
-        public int count;
-        public byte[] data;
-        public static byte[] GetMetaData(string typeName, IEnumerable<string> memberNames, int count) {
-            using (var stream = new MemoryStream()) {
-                stream.WriteByte(TagClass);
-                ValueWriter.Write(stream, typeName);
-                if (count > 0) {
-                    ValueWriter.WriteInt(stream, count);
-                }
-                stream.WriteByte(TagOpenbrace);
-                foreach (string name in memberNames) {
-                    stream.WriteByte(TagString);
-                    ValueWriter.Write(stream, name);
-                }
-                stream.WriteByte(TagClosebrace);
-                return stream.ToArray();
-            }
-        }
-        public static Action<Writer, T> CreateWriteAction<T>(IEnumerable<MemberInfo> members) {
-            var writer = Expression.Variable(typeof(Writer), "writer");
-            var obj = Expression.Variable(typeof(T), "obj");
-            List<Expression> expressions = new List<Expression>();
-            foreach (MemberInfo member in members) {
-                Type memberType = Accessor.GetMemberType(member);
-                var elemSerializerType = typeof(Serializer<>).MakeGenericType(memberType);
-                var serializer = elemSerializerType.GetProperty("Instance").GetValue(null, null);
-                expressions.Add(
-                    Expression.Call(
-                        Expression.Constant(serializer),
-                        elemSerializerType.GetMethod("Serialize"),
-                        writer,
-                        member is FieldInfo ?
-                        Expression.Field(obj, (FieldInfo)member) :
-                        Expression.Property(obj, (PropertyInfo)member)
-                    )
-                );
-            }
-            return Expression.Lambda<Action<Writer, T>>(Expression.Block(expressions), writer, obj).Compile();
-        }
-        public static MembersWriter GetMembersWriter<T>(HproseMode mode) {
-            if (typeof(T).IsSerializable) {
-                switch (mode) {
-                    case FieldMode: return FieldsWriter<T>.Instance;
-                    case PropertyMode: return PropertiesWriter<T>.Instance;
-                }
-            }
-            return MembersWriter<T>.Instance;
-        }
-    }
-
-    class MembersWriter<T> : MembersWriter {
-        public static readonly MembersWriter Instance = new MembersWriter<T>();
-        private MembersWriter() {
-            var members = MembersAccessor<T>.Members;
-            count = members.Count;
-            data = GetMetaData(ClassManager.GetName<T>(), members.Keys, count);
-            write = CreateWriteAction<T>(members.Values);
-        }
-    }
-
-    class FieldsWriter<T> : MembersWriter {
-        public static readonly MembersWriter Instance = new FieldsWriter<T>();
-        private FieldsWriter() {
-            var fields = FieldsAccessor<T>.Fields;
-            count = fields.Count;
-            data = GetMetaData(ClassManager.GetName<T>(), fields.Keys, count);
-            write = CreateWriteAction<T>(fields.Values);
-        }
-    }
-
-    class PropertiesWriter<T> : MembersWriter {
-        public static readonly MembersWriter Instance = new PropertiesWriter<T>();
-        private PropertiesWriter() {
-            var properties = PropertiesAccessor<T>.Properties;
-            count = properties.Count;
-            data = GetMetaData(ClassManager.GetName<T>(), properties.Keys, count);
-            write = CreateWriteAction<T>(properties.Values);
-        }
-    }
-
     class ObjectSerializer<T> : ReferenceSerializer<T> {
         public override void Write(Writer writer, T obj) {
             MembersWriter membersWriter = MembersWriter.GetMembersWriter<T>(writer.Mode);

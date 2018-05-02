@@ -74,11 +74,11 @@ namespace Hprose.IO.Deserializers {
             _ref.Add(new ClassInfo(name, names));
         }
 
-        internal object ReadRef() {
+        public object ReadRef() {
             return _refer?.Read(ValueReader.ReadInt(_stream));
         }
 
-        internal T ReadRef<T>() {
+        public T ReadRef<T>() {
             object obj = _refer?.Read(ValueReader.ReadInt(_stream));
             if (obj != null) {
                 return Converter<T>.Convert(obj);
@@ -86,11 +86,11 @@ namespace Hprose.IO.Deserializers {
             throw new InvalidCastException("Cannot convert " + obj.GetType().ToString() + " to " + typeof(T).ToString() + ".");
         }
 
-        internal void SetRef(object obj) => _refer?.Set(obj);
+        public void SetRef(object obj) => _refer?.Set(obj);
 
-        internal void SetRef(int index, object obj) => _refer?.Set(index, obj);
+        public void SetRef(int index, object obj) => _refer?.Set(index, obj);
 
-        internal int LastRefIndex => _refer?.LastIndex ?? -1;
+        public int LastRefIndex => _refer?.LastIndex ?? -1;
 
         public void Reset() {
             _refer?.Reset();
