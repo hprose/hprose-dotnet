@@ -8,8 +8,7 @@ using BenchmarkDotNet.Attributes.Columns;
 using BenchmarkDotNet.Attributes.Exporters;
 using BenchmarkDotNet.Attributes.Jobs;
 
-using Hprose.IO.Serializers;
-using Hprose.IO.Deserializers;
+using Hprose.IO;
 
 using Newtonsoft.Json;
 
@@ -140,35 +139,20 @@ namespace Hprose.Benchmark.IO.Serializers {
         private static string newtonData;
 
         static BenchmarkDataSetSerialize() {
-            using (MemoryStream stream = new MemoryStream()) {
-                Writer writer = new Writer(stream);
-                writer.Serialize(dataSet);
-                stream.Position = 0;
-                hproseData = stream.ToArray();
-            }
+            hproseData = HproseFormatter.Serialize(dataSet);
+            newtonData = JsonConvert.SerializeObject(dataSet);
             using (MemoryStream stream = new MemoryStream()) {
                 DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(DataSet));
                 js.WriteObject(stream, dataSet);
                 stream.Position = 0;
                 dcData = stream.ToArray();
             }
-            newtonData = JsonConvert.SerializeObject(dataSet);
         }
 
         [Benchmark]
-        public void HproseSerializeDataSet() {
-            using (MemoryStream stream = new MemoryStream()) {
-                Writer writer = new Writer(stream);
-                writer.Serialize(dataSet);
-            }
-        }
+        public void HproseSerializeDataSet() => HproseFormatter.Serialize(dataSet);
         [Benchmark]
-        public void HproseDeserializeDataSet() {
-            using (MemoryStream stream = new MemoryStream(hproseData)) {
-                Reader reader = new Reader(stream);
-                reader.Deserialize<DataSet>();
-            }
-        }
+        public void NewtonJsonSerializeDataSet() => JsonConvert.SerializeObject(dataSet);
         [Benchmark]
         public void DataContractSerializeDataSet() {
             DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(DataSet));
@@ -177,20 +161,15 @@ namespace Hprose.Benchmark.IO.Serializers {
             }
         }
         [Benchmark]
+        public void HproseDeserializeDataSet() => HproseFormatter.Deserialize<DataSet>(hproseData);
+        [Benchmark]
+        public void NewtonJsonDeserializeDataSet() => JsonConvert.DeserializeObject<DataSet>(newtonData);
+        [Benchmark]
         public void DataContractDeserializeDataSet() {
             DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(DataSet));
             using (MemoryStream stream = new MemoryStream(dcData)) {
                 js.ReadObject(stream);
             }
-        }
-        [Benchmark]
-        public void NewtonJsonSerializeDataSet() {
-            var data = JsonConvert.SerializeObject(dataSet);
-        }
-
-        [Benchmark]
-        public void NewtonJsonDeserializeDataSet() {
-            JsonConvert.DeserializeObject(newtonData, typeof(DataSet));
         }
     }
 }

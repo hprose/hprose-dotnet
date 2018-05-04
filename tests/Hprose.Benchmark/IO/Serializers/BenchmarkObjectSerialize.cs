@@ -7,8 +7,7 @@ using BenchmarkDotNet.Attributes.Columns;
 using BenchmarkDotNet.Attributes.Exporters;
 using BenchmarkDotNet.Attributes.Jobs;
 
-using Hprose.IO.Serializers;
-using Hprose.IO.Deserializers;
+using Hprose.IO;
 
 using Newtonsoft.Json;
 
@@ -17,7 +16,7 @@ namespace Hprose.Benchmark.IO.Serializers {
     [RPlotExporter, RankColumn]
     public class BenchmarkObjectSerialize {
         [DataContract(Name = "Person")]
-        public struct Person {
+        public class Person {
             [DataMember(Order = 0)]
             public int Id;
             [DataMember(Order = 1)]
@@ -25,66 +24,59 @@ namespace Hprose.Benchmark.IO.Serializers {
             [DataMember(Order = 2)]
             public int Age;
         }
-        private static Person o = new Person {
-            Id = 0,
-            Name = "Tom",
-            Age = 48
+        private static Person[] persons = new Person[] {
+           new Person {
+               Id = 0,
+               Name = "Tom",
+               Age = 48
+           },
+           new Person {
+               Id = 1,
+               Name = "Jerry",
+               Age = 36
+           },
+           new Person {
+               Id = 2,
+               Name = "Spike",
+               Age = 53
+           }
         };
         private static byte[] hproseData;
         private static byte[] dcData;
         private static string newtonData;
 
         static BenchmarkObjectSerialize() {
+            hproseData = HproseFormatter.Serialize(persons);
+            newtonData = JsonConvert.SerializeObject(persons);
             using (MemoryStream stream = new MemoryStream()) {
-                Writer writer = new Writer(stream);
-                writer.Serialize(o);
-                stream.Position = 0;
-                Reader reader = new Reader(stream);
-                reader.Deserialize<Person>();
-                hproseData = stream.ToArray();
-            }
-            using (MemoryStream stream = new MemoryStream()) {
-                DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(Person));
-                js.WriteObject(stream, o);
+                DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(Person[]));
+                js.WriteObject(stream, persons);
                 stream.Position = 0;
                 dcData = stream.ToArray();
             }
-            newtonData = JsonConvert.SerializeObject(o);
         }
 
         [Benchmark]
-        public void HproseSerializeObject() {
-            using (MemoryStream stream = new MemoryStream()) {
-                Writer writer = new Writer(stream);
-                writer.Serialize(o);
-            }
-        }
+        public void HproseSerializeObject() => HproseFormatter.Serialize(persons);
         [Benchmark]
-        public void HproseDeserializeObject() {
-            using (MemoryStream stream = new MemoryStream(hproseData)) {
-                Reader reader = new Reader(stream);
-                reader.Deserialize<Person>();
-            }
-        }
+        public void NewtonJsonSerializeObject() => JsonConvert.SerializeObject(persons);
         [Benchmark]
         public void DataContractSerializeObject() {
             using (MemoryStream stream = new MemoryStream()) {
-                DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(Person));
-                js.WriteObject(stream, o);
-                stream.Position = 0;
-                js.ReadObject(stream);
+                DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(Person[]));
+                js.WriteObject(stream, persons);
             }
         }
+        [Benchmark]
+        public void HproseDeserializeObject() => HproseFormatter.Deserialize<Person[]>(hproseData);
+        [Benchmark]
+        public void NewtonJsonDeserializeObject() => JsonConvert.DeserializeObject<Person[]>(newtonData);
         [Benchmark]
         public void DataContractDeserializeObject() {
             using (MemoryStream stream = new MemoryStream(dcData)) {
-                DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(Person));
+                DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(Person[]));
                 js.ReadObject(stream);
             }
         }
-        [Benchmark]
-        public void NewtonJsonSerializeObject() => JsonConvert.SerializeObject(o);
-        [Benchmark]
-        public void NewtonJsonDeserializeObject() => JsonConvert.DeserializeObject(newtonData, typeof(Person));
     }
 }

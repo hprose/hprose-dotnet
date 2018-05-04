@@ -96,6 +96,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ValueReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ReaderRefer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\Reader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HproseFormatter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HproseMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClassManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HproseTags.cs" />

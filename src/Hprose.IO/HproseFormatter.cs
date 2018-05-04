@@ -29,25 +29,29 @@ namespace Hprose.IO {
         public static void Serialize<T>(T value, Stream stream, bool simple, HproseMode mode = HproseMode.MemberMode) => new Writer(stream, simple, mode).Serialize(value);
         public static void Serialize(object value, Stream stream, HproseMode mode = HproseMode.MemberMode) => new Writer(stream, mode).Serialize(value);
         public static void Serialize(object value, Stream stream, bool simple, HproseMode mode = HproseMode.MemberMode) => new Writer(stream, simple, mode).Serialize(value);
-        public static MemoryStream Serialize<T>(T value, HproseMode mode = HproseMode.MemberMode) {
-            MemoryStream stream = new MemoryStream();
-            Serialize(value, stream, mode);
-            return stream;
+        public static byte[] Serialize<T>(T value, HproseMode mode = HproseMode.MemberMode) {
+            using (MemoryStream stream = new MemoryStream()) {
+                Serialize(value, stream, mode);
+                return stream.ToArray();
+            }
         }
-        public static MemoryStream Serialize<T>(T value, bool simple, HproseMode mode = HproseMode.MemberMode) {
-            MemoryStream stream = new MemoryStream();
-            Serialize(value, stream, simple, mode);
-            return stream;
+        public static byte[] Serialize<T>(T value, bool simple, HproseMode mode = HproseMode.MemberMode) {
+            using (MemoryStream stream = new MemoryStream()) {
+                Serialize(value, stream, simple, mode);
+                return stream.ToArray();
+            }
         }
-        public static MemoryStream Serialize(object value, HproseMode mode = HproseMode.MemberMode) {
-            MemoryStream stream = new MemoryStream();
-            Serialize(value, stream, mode);
-            return stream;
+        public static byte[] Serialize(object value, HproseMode mode = HproseMode.MemberMode) {
+            using (MemoryStream stream = new MemoryStream()) {
+                Serialize(value, stream, mode);
+                return stream.ToArray();
+            }
         }
-        public static MemoryStream Serialize(object value, bool simple, HproseMode mode = HproseMode.MemberMode) {
-            MemoryStream stream = new MemoryStream();
-            Serialize(value, stream, simple, mode);
-            return stream;
+        public static byte[] Serialize(object value, bool simple, HproseMode mode = HproseMode.MemberMode) {
+            using (MemoryStream stream = new MemoryStream()) {
+                Serialize(value, stream, simple, mode);
+                return stream.ToArray();
+            }
         }
         public static T Deserialize<T>(Stream stream, HproseMode mode = HproseMode.MemberMode) => new Reader(stream, mode).Deserialize<T>();
         public static T Deserialize<T>(byte[] data, HproseMode mode = HproseMode.MemberMode) => Deserialize<T>(new MemoryStream(data), mode);
