@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Reader class for C#.                            *
  *                                                        *
- * LastModified: May 2, 2018                              *
+ * LastModified: May 4, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -46,7 +46,13 @@ namespace Hprose.IO.Deserializers {
 
         public ClassInfo GetClassInfo(int index) => _ref[index];
 
-        public Reader(Stream stream, bool simple = false, HproseMode mode = HproseMode.MemberMode) {
+        public Reader(Stream stream, HproseMode mode = HproseMode.MemberMode) {
+            _stream = stream;
+            _refer = new ReaderRefer();
+            _mode = mode;
+        }
+
+        public Reader(Stream stream, bool simple, HproseMode mode = HproseMode.MemberMode) {
             _stream = stream;
             _refer = simple ? null : new ReaderRefer();
             _mode = mode;

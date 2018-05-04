@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Writer class for C#.                            *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: May 4, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -32,7 +32,13 @@ namespace Hprose.IO.Serializers {
         public Stream Stream => _stream;
         public HproseMode Mode => _mode;
 
-        public Writer(Stream stream, bool simple = false, HproseMode mode = HproseMode.MemberMode) {
+        public Writer(Stream stream, HproseMode mode = HproseMode.MemberMode) {
+            _stream = stream;
+            _refer = new WriterRefer();
+            _mode = mode;
+        }
+
+        public Writer(Stream stream, bool simple, HproseMode mode = HproseMode.MemberMode) {
             _stream = stream;
             _refer = simple ? null : new WriterRefer();
             _mode = mode;

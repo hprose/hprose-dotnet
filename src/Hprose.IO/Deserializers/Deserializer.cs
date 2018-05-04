@@ -243,7 +243,7 @@ namespace Hprose.IO.Deserializers {
                 () => Activator.CreateInstance(GetDeserializerType(type)) as IDeserializer
             );
 
-        internal static IDeserializer GetInstance(Type type) => deserializers.GetOrAdd(type, deserializerFactory).Value;
+        internal static IDeserializer GetInstance(Type type) => type == null ? Instance : deserializers.GetOrAdd(type, deserializerFactory).Value;
 
         public static object Deserialize(Reader reader, Type type) => GetInstance(type).Deserialize(reader);
 
