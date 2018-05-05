@@ -12,7 +12,7 @@
  *                                                        *
  * Factory class for C#.                                  *
  *                                                        *
- * LastModified: Apr 29, 2018                             *
+ * LastModified: May 5, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -22,13 +22,13 @@ using System.Linq.Expressions;
 
 namespace Hprose.IO.Deserializers {
     public static class Factory<T> {
-        private static readonly Func<T> constructor;
-        static Factory() {
+        private static readonly Func<T> constructor = GetConstructor();
+        private static Func<T> GetConstructor() {
             try {
-                constructor = Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
+                return Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
             }
             catch {
-                constructor = () => (T)Activator.CreateInstance(typeof(T), true);
+                return () => (T)Activator.CreateInstance(typeof(T), true);
             }
         }
         public static T New() {
