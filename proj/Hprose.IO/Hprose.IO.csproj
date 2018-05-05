@@ -13,7 +13,7 @@
     <Company>hprose.com</Company>
     <Copyright>Copyright © http://www.hprose.com, All rights reserved.</Copyright>
     <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <Product>Hprose.Core</Product>
+    <Product>Hprose.IO</Product>
     <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
     <PackageProjectUrl>http://www.hprose.com</PackageProjectUrl>
     <PackageIconUrl>http://hprose.com/apple-touch-icon-180x180.png</PackageIconUrl>
@@ -79,18 +79,16 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
 
-  <Import Project="..\src\Hprose.Collections\Hprose.Collections.projitems" Label="Shared" />
+  <Import Project="..\..\src\Hprose.Collections\Hprose.Collections.projitems" Label="Shared" />
 
-  <Import Project="..\src\Hprose.IO\Hprose.IO.projitems" Label="Shared" />
-
-  <Import Project="..\src\Hprose.Reflection\Hprose.Reflection.projitems" Label="Shared" />
+  <Import Project="..\..\src\Hprose.IO\Hprose.IO.projitems" Label="Shared" />
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <PropertyGroup Condition=" '$(TargetFrameworkIdentifier)' != '' ">
-      <Product>Hprose.Core for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion)</Product>
+      <Product>Hprose.IO for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion)</Product>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(TargetFrameworkProfile)' != '' ">
-      <Product>Hprose.Core for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion) $(TargetFrameworkProfile) Profile</Product>
+      <Product>Hprose.IO for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion) $(TargetFrameworkProfile) Profile</Product>
     </PropertyGroup>
   </Target>
 
