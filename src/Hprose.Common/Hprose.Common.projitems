@@ -9,5 +9,11 @@
     <Import_RootNamespace>Hprose.Common</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ResultMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ResultModeAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MethodNameAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IdempotentAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FailswitchAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ByRefAttribute.cs" />
   </ItemGroup>
 </Project>
