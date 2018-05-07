@@ -8,7 +8,7 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * HproseMode.cs                                          *
+ * Mode.cs                                                *
  *                                                        *
  * hprose mode enum for C#.                               *
  *                                                        *
@@ -18,7 +18,7 @@
 \**********************************************************/
 
 namespace Hprose.IO {
-    public enum HproseMode {
+    public enum Mode {
         FieldMode, PropertyMode, MemberMode
     }
 }

@@ -24,7 +24,7 @@ namespace Hprose.IO.Serializers {
                 Serializer<T>.Instance.Serialize(writer, obj.Value);
             }
             else {
-                writer.Stream.WriteByte(HproseTags.TagNull);
+                writer.Stream.WriteByte(Tags.TagNull);
             }
         }
     }

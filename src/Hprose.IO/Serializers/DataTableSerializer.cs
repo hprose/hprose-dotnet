@@ -21,7 +21,7 @@ using System.Data;
 
 using Hprose.IO.Accessors;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Serializers {
     class DataTableSerializer<T> : ReferenceSerializer<T> where T : DataTable {

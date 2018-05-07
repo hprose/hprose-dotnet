@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Serializers {
     sealed class WriterRefer {

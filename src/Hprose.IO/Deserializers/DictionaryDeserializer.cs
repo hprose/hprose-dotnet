@@ -24,7 +24,7 @@ using System.IO;
 using Hprose.IO.Accessors;
 using Hprose.IO.Converters;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Deserializers {
     class DictionaryDeserializer<I, T, K, V> : Deserializer<I> where T : I, ICollection<KeyValuePair<K, V>> {

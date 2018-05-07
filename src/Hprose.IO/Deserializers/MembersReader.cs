@@ -25,7 +25,7 @@ using System.Reflection;
 
 using Hprose.IO.Accessors;
 
-using static Hprose.IO.HproseMode;
+using static Hprose.IO.Mode;
 
 namespace Hprose.IO.Deserializers {
     internal delegate void ReadAction<T>(Reader reader, ref T obj);

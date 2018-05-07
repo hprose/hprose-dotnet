@@ -20,7 +20,7 @@
 using System.IO;
 using System.Runtime.Serialization;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Deserializers {
     public static class RawReader {

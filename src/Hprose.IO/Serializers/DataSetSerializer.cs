@@ -19,7 +19,7 @@
 
 using System.Data;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Serializers {
     class DataSetSerializer<T> : ReferenceSerializer<T> where T : DataSet {

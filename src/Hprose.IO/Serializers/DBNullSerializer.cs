@@ -21,6 +21,6 @@ using System;
 
 namespace Hprose.IO.Serializers {
     class DBNullSerializer : Serializer<DBNull> {
-        public override void Write(Writer writer, DBNull obj) => writer.Stream.WriteByte(HproseTags.TagNull);
+        public override void Write(Writer writer, DBNull obj) => writer.Stream.WriteByte(Tags.TagNull);
     }
 }

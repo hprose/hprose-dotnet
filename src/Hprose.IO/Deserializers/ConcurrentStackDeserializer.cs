@@ -20,7 +20,7 @@
 using System.IO;
 using System.Collections.Concurrent;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Deserializers {
     class ConcurrentStackDeserializer<T> : Deserializer<ConcurrentStack<T>> {

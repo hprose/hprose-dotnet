@@ -22,7 +22,7 @@ using System.Text;
 
 using Hprose.IO.Converters;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Deserializers {
     class StringBuilderDeserializer : Deserializer<StringBuilder> {

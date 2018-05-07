@@ -23,7 +23,7 @@ using System.Numerics;
 using System.Text;
 
 using static System.DateTimeKind;
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Deserializers {
     public static class ValueReader {

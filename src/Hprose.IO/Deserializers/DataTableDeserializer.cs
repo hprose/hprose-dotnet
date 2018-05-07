@@ -23,7 +23,7 @@ using System.IO;
 
 using Hprose.IO.Accessors;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Deserializers {
     class DataTableDeserializer : Deserializer<DataTable> {
@@ -164,7 +164,7 @@ namespace Hprose.IO.Deserializers {
                     }
                     break;
                 default:
-                    throw new InvalidCastException("Cannot convert " + HproseTags.ToString(tag) + " to DataRow.");
+                    throw new InvalidCastException("Cannot convert " + Tags.ToString(tag) + " to DataRow.");
             }
             return table;
         }

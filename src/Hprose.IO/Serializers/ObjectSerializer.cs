@@ -19,7 +19,7 @@
 
 using System;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Serializers {
     class ObjectSerializer<T> : ReferenceSerializer<T> {

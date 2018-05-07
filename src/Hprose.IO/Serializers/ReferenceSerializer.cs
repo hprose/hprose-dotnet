@@ -30,7 +30,7 @@ namespace Hprose.IO.Serializers {
                 }
             }
             else {
-                writer.Stream.WriteByte(HproseTags.TagNull);
+                writer.Stream.WriteByte(Tags.TagNull);
             }
         }
 

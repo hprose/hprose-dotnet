@@ -35,12 +35,12 @@ namespace Hprose.IO.Accessors {
         private static readonly Func<Type, Lazy<Dictionary<string, MemberInfo>>> propertiesFactory = (type) => new Lazy<Dictionary<string, MemberInfo>>(() => PropertiesAccessor.GetProperties(type));
         private static readonly Func<Type, Lazy<Dictionary<string, MemberInfo>>> membersFactory = (type) => new Lazy<Dictionary<string, MemberInfo>>(() => MembersAccessor.GetMembers(type));
 
-        public static Dictionary<string, MemberInfo> GetMembers(Type type, HproseMode mode) {
+        public static Dictionary<string, MemberInfo> GetMembers(Type type, Mode mode) {
             if (type.IsSerializable) {
                 switch (mode) {
-                    case HproseMode.FieldMode:
+                    case Mode.FieldMode:
                         return fields.GetOrAdd(type, fieldsFactory).Value;
-                    case HproseMode.PropertyMode:
+                    case Mode.PropertyMode:
                         return properties.GetOrAdd(type, propertiesFactory).Value;
                 }
             }

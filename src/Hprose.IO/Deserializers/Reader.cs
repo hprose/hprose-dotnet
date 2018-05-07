@@ -27,7 +27,7 @@ namespace Hprose.IO.Deserializers {
     public class Reader {
         private readonly Stream _stream;
         private readonly ReaderRefer _refer;
-        private readonly HproseMode _mode;
+        private readonly Mode _mode;
         private readonly List<ClassInfo> _ref = new List<ClassInfo>();
         private volatile LongType _defaultLongType = LongType.BigInteger;
         private volatile RealType _defaultRealType = RealType.Double;
@@ -42,17 +42,17 @@ namespace Hprose.IO.Deserializers {
         public DictType DefaultDictType { get => _defaultDictType; set => _defaultDictType = value; }
 
         public Stream Stream => _stream;
-        public HproseMode Mode => _mode;
+        public Mode Mode => _mode;
 
         public ClassInfo GetClassInfo(int index) => _ref[index];
 
-        public Reader(Stream stream, HproseMode mode = HproseMode.MemberMode) {
+        public Reader(Stream stream, Mode mode = Mode.MemberMode) {
             _stream = stream;
             _refer = new ReaderRefer();
             _mode = mode;
         }
 
-        public Reader(Stream stream, bool simple, HproseMode mode = HproseMode.MemberMode) {
+        public Reader(Stream stream, bool simple, Mode mode = Mode.MemberMode) {
             _stream = stream;
             _refer = simple ? null : new ReaderRefer();
             _mode = mode;

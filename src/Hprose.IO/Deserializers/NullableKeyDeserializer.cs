@@ -19,7 +19,7 @@
 
 using Hprose.Collections.Generic;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Deserializers {
     class NullableKeyDeserializer<T> : Deserializer<NullableKey<T>> {

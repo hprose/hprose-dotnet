@@ -25,8 +25,8 @@ using System.Reflection;
 
 using Hprose.IO.Accessors;
 
-using static Hprose.IO.HproseMode;
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Mode;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Serializers {
 
@@ -71,7 +71,7 @@ namespace Hprose.IO.Serializers {
             }
             return Expression.Lambda<Action<Writer, T>>(Expression.Block(expressions), writer, obj).Compile();
         }
-        public static MembersWriter GetMembersWriter<T>(HproseMode mode) {
+        public static MembersWriter GetMembersWriter<T>(Mode mode) {
             if (typeof(T).IsSerializable) {
                 switch (mode) {
                     case FieldMode: return FieldsWriter<T>.Instance;

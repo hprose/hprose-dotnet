@@ -27,7 +27,7 @@ using System.Runtime.Serialization;
 
 using Hprose.Collections.Generic;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Deserializers {
     internal interface IDeserializer {
@@ -58,7 +58,7 @@ namespace Hprose.IO.Deserializers {
                 case TagError:
                     throw new SerializationException(reader.Deserialize<string>());
             }
-            throw new InvalidCastException("Cannot convert " + HproseTags.ToString(tag) + " to " + typeof(T).ToString() + ".");
+            throw new InvalidCastException("Cannot convert " + Tags.ToString(tag) + " to " + typeof(T).ToString() + ".");
         }
         public virtual T Deserialize(Reader reader) => Read(reader, reader.Stream.ReadByte());
         object IDeserializer.Read(Reader reader, int tag) => Read(reader, tag);

@@ -96,10 +96,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ValueReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ReaderRefer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\Reader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)HproseFormatter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)HproseMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Formatter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClassManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)HproseTags.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tags.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DataSetSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DataTableSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\MembersWriter.cs" />

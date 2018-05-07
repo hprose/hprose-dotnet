@@ -8,7 +8,7 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * HproseTags.cs                                          *
+ * Tags.cs                                                *
  *                                                        *
  * hprose tags class for C#.                              *
  *                                                        *
@@ -18,7 +18,7 @@
 \**********************************************************/
 
 namespace Hprose.IO {
-    public static class HproseTags {
+    public static class Tags {
         /* Serialize Tags */
         public const byte TagInteger = (byte)'i';
         public const byte TagLong = (byte)'l';

@@ -25,20 +25,20 @@ namespace Hprose.IO.Serializers {
     public class Writer {
         private readonly Stream _stream;
         private readonly WriterRefer _refer;
-        private readonly HproseMode _mode;
+        private readonly Mode _mode;
         private readonly Dictionary<object, int> _ref = new Dictionary<object, int>();
         private int _last = 0;
 
         public Stream Stream => _stream;
-        public HproseMode Mode => _mode;
+        public Mode Mode => _mode;
 
-        public Writer(Stream stream, HproseMode mode = HproseMode.MemberMode) {
+        public Writer(Stream stream, Mode mode = Mode.MemberMode) {
             _stream = stream;
             _refer = new WriterRefer();
             _mode = mode;
         }
 
-        public Writer(Stream stream, bool simple, HproseMode mode = HproseMode.MemberMode) {
+        public Writer(Stream stream, bool simple, Mode mode = Mode.MemberMode) {
             _stream = stream;
             _refer = simple ? null : new WriterRefer();
             _mode = mode;

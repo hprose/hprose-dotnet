@@ -19,7 +19,7 @@
 
 using System.Collections.Generic;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Serializers {
     class CollectionSerializer<T, V> : ReferenceSerializer<T> where T : ICollection<V> {

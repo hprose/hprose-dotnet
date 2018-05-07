@@ -20,7 +20,7 @@
 using System.IO;
 using System.Collections.Specialized;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Deserializers {
     class StringCollectionDeserializer : Deserializer<StringCollection> {

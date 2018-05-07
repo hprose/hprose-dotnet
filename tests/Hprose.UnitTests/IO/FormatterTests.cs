@@ -18,14 +18,14 @@ namespace Hprose.UnitTests.IO {
         [TestMethod]
         public void TestSerializeBasic() {
             using (MemoryStream stream = new MemoryStream()) {
-                HproseFormatter.Serialize(null, stream);
-                HproseFormatter.Serialize(true, stream);
-                HproseFormatter.Serialize(false, stream);
-                HproseFormatter.Serialize('0', stream);
-                HproseFormatter.Serialize('A', stream);
-                HproseFormatter.Serialize('人', stream);
-                HproseFormatter.Serialize((byte)123, stream);
-                HproseFormatter.Serialize((sbyte)-123, stream);
+                Hprose.IO.Formatter.Serialize(null, stream);
+                Hprose.IO.Formatter.Serialize(true, stream);
+                Hprose.IO.Formatter.Serialize(false, stream);
+                Hprose.IO.Formatter.Serialize('0', stream);
+                Hprose.IO.Formatter.Serialize('A', stream);
+                Hprose.IO.Formatter.Serialize('人', stream);
+                Hprose.IO.Formatter.Serialize((byte)123, stream);
+                Hprose.IO.Formatter.Serialize((sbyte)-123, stream);
                 Assert.AreEqual("ntfu0uAu人i123;i-123;", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
         }

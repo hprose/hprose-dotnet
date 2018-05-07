@@ -20,7 +20,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Serializers {
     class FastEnumerableSerializer<T, V> : ReferenceSerializer<T> where T : IEnumerable<V>, ICollection {

@@ -20,7 +20,7 @@
 using System.Data;
 using System.IO;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Deserializers {
     class DataSetDeserializer : Deserializer<DataSet> {

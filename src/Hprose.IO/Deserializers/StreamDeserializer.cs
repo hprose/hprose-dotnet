@@ -21,7 +21,7 @@ using System.IO;
 
 using Hprose.IO.Converters;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Deserializers {
     class StreamDeserializer<T> : Deserializer<T> where T : Stream {

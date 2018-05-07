@@ -190,7 +190,7 @@ namespace Hprose.IO.Serializers {
 
         public override void Serialize(Writer writer, object obj) {
             if (obj == null) {
-                writer.Stream.WriteByte(HproseTags.TagNull);
+                writer.Stream.WriteByte(Tags.TagNull);
             }
             else {
                 GetInstance(obj.GetType()).Serialize(writer, obj);
@@ -199,7 +199,7 @@ namespace Hprose.IO.Serializers {
 
         public override void Write(Writer writer, object obj) {
             if (obj == null) {
-                writer.Stream.WriteByte(HproseTags.TagNull);
+                writer.Stream.WriteByte(Tags.TagNull);
             }
             else {
                 GetInstance(obj.GetType()).Write(writer, obj);

@@ -20,7 +20,7 @@
 using System.Numerics;
 using Hprose.IO.Converters;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Deserializers {
     class BigIntegerDeserializer : Deserializer<BigInteger> {

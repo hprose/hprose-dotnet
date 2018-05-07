@@ -22,7 +22,7 @@ using System.IO;
 using System.Numerics;
 using System.Text;
 
-using static Hprose.IO.HproseTags;
+using static Hprose.IO.Tags;
 
 namespace Hprose.IO.Serializers {
     public static class ValueWriter {

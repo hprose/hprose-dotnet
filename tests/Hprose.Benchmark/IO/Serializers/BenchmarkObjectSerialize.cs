@@ -46,7 +46,7 @@ namespace Hprose.Benchmark.IO.Serializers {
         private static string newtonData;
 
         static BenchmarkObjectSerialize() {
-            hproseData = HproseFormatter.Serialize(persons);
+            hproseData = Hprose.IO.Formatter.Serialize(persons);
             newtonData = JsonConvert.SerializeObject(persons);
             using (MemoryStream stream = new MemoryStream()) {
                 DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(Person[]));
@@ -57,7 +57,7 @@ namespace Hprose.Benchmark.IO.Serializers {
         }
 
         [Benchmark]
-        public void HproseSerializeObject() => HproseFormatter.Serialize(persons);
+        public void HproseSerializeObject() => Hprose.IO.Formatter.Serialize(persons);
         [Benchmark]
         public void NewtonJsonSerializeObject() => JsonConvert.SerializeObject(persons);
         [Benchmark]
@@ -68,7 +68,7 @@ namespace Hprose.Benchmark.IO.Serializers {
             }
         }
         [Benchmark]
-        public void HproseDeserializeObject() => HproseFormatter.Deserialize<Person[]>(hproseData);
+        public void HproseDeserializeObject() => Hprose.IO.Formatter.Deserialize<Person[]>(hproseData);
         [Benchmark]
         public void NewtonJsonDeserializeObject() => JsonConvert.DeserializeObject<Person[]>(newtonData);
         [Benchmark]
