@@ -12,7 +12,7 @@
  *                                                        *
  * ObjectSerializer class for C#.                         *
  *                                                        *
- * LastModified: Apr 28, 2018                             *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -31,7 +31,7 @@ namespace Hprose.IO.Serializers {
             int r = writer.WriteClass(type, () => {
                 byte[] data = membersWriter.data;
                 stream.Write(data, 0, data.Length);
-                writer.AddCount(count);
+                writer.AddReferenceCount(count);
             });
             base.Write(writer, obj);
             stream.WriteByte(TagObject);

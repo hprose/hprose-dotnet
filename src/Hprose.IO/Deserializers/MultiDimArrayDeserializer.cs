@@ -12,7 +12,7 @@
  *                                                        *
  * MultiDimArrayDeserializer class for C#.                *
  *                                                        *
- * LastModified: Apr 25, 2018                             *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -37,9 +37,9 @@ namespace Hprose.IO.Deserializers {
                 len[i] = ValueReader.ReadCount(stream);
             }
             var a = Array.CreateInstance(typeof(E), len);
-            reader.SetRef(a);
+            reader.AddReference(a);
             for (int i = 1; i < rank; ++i) {
-                reader.SetRef(null);
+                reader.AddReference(null);
             }
             int maxrank = rank - 1;
             var deserializer = Deserializer<E>.Instance;
@@ -70,7 +70,7 @@ namespace Hprose.IO.Deserializers {
                 }
                 for (int i = rank - n; i < rank; ++i) {
                     stream.ReadByte();
-                    reader.SetRef(null);
+                    reader.AddReference(null);
                     ValueReader.SkipUntil(stream, TagOpenbrace);
                 }
             }

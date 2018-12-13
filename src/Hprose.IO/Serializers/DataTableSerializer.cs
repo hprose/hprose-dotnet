@@ -12,7 +12,7 @@
  *                                                        *
  * DataTableSerializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -53,7 +53,7 @@ namespace Hprose.IO.Serializers {
             });
             var serializer = Serializer.Instance;
             for (int i = 0; i < length; ++i) {
-                writer.AddCount(1);
+                writer.AddReferenceCount(1);
                 stream.WriteByte(TagObject);
                 ValueWriter.WriteInt(stream, r);
                 stream.WriteByte(TagOpenbrace);

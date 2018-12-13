@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Writer class for C#.                            *
  *                                                        *
- * LastModified: May 4, 2018                              *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -52,11 +52,11 @@ namespace Hprose.IO.Serializers {
 
         public void Write<T>(T obj) => Serializer<T>.Instance.Write(this, obj);
 
-        public bool WriteRef(object obj) => _refer?.Write(_stream, obj) ?? false;
+        public bool WriteReference(object obj) => _refer?.Write(_stream, obj) ?? false;
 
-        public void SetRef(object obj) => _refer?.Set(obj);
+        public void SetReference(object obj) => _refer?.Set(obj);
 
-        public void AddCount(int count) => _refer?.AddCount(count);
+        public void AddReferenceCount(int count) => _refer?.AddCount(count);
 
         public int WriteClass(object type, Action action) {
             if (!_ref.TryGetValue(type, out int r)) {

@@ -12,7 +12,7 @@
  *                                                        *
  * DataTableDeserializer class for C#.                    *
  *                                                        *
- * LastModified: Apr 26, 2018                             *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -30,7 +30,7 @@ namespace Hprose.IO.Deserializers {
         private static IDeserializer[] ReadMapAsFirstRow(Reader reader, DataTable table, Deserializer<string> strDeserializer) {
             var columns = table.Columns;
             var row = table.NewRow();
-            reader.SetRef(row);
+            reader.AddReference(row);
             var stream = reader.Stream;
             var deserializer = Deserializer.Instance;
             int count = ValueReader.ReadCount(stream);
@@ -52,7 +52,7 @@ namespace Hprose.IO.Deserializers {
         private static IDeserializer[] ReadObjectAsFirstRow(Reader reader, DataTable table) {
             var columns = table.Columns;
             var row = table.NewRow();
-            reader.SetRef(row);
+            reader.AddReference(row);
             var stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
             ClassInfo classInfo = reader.GetClassInfo(index);
@@ -102,7 +102,7 @@ namespace Hprose.IO.Deserializers {
 
         private static void ReadMapAsRow(Reader reader, DataTable table, Deserializer<string> strDeserializer, IDeserializer[] deserializers) {
             var row = table.NewRow();
-            reader.SetRef(row);
+            reader.AddReference(row);
             var stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             for (int i = 0; i < count; ++i) {
@@ -116,7 +116,7 @@ namespace Hprose.IO.Deserializers {
 
         private static void ReadObjectAsRow(Reader reader, DataTable table, IDeserializer[] deserializers) {
             var row = table.NewRow();
-            reader.SetRef(row);
+            reader.AddReference(row);
             var stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
             var columns = table.Columns;
@@ -134,7 +134,7 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             DataTable table = new DataTable();
-            reader.SetRef(table);
+            reader.AddReference(table);
             int tag = stream.ReadByte();
             if (count == 0) {
                 return table;

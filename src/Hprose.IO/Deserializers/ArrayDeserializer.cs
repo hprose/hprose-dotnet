@@ -12,7 +12,7 @@
  *                                                        *
  * ArrayDeserializer class for C#.                        *
  *                                                        *
- * LastModified: Apr 25, 2018                             *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -47,8 +47,8 @@ namespace Hprose.IO.Deserializers {
             }
             int count2 = ValueReader.ReadCount(stream);
             T[,] a = new T[count1, count2];
-            reader.SetRef(a);
-            reader.SetRef(null);
+            reader.AddReference(a);
+            reader.AddReference(null);
             var deserializer = Deserializer<T>.Instance;
             for (int i = 0; i < count1; ++i) {
                 for (int j = 0; j < count2; ++j) {
@@ -60,7 +60,7 @@ namespace Hprose.IO.Deserializers {
                         throw new RankException();
                     }
                     ValueReader.SkipUntil(stream, TagOpenbrace);
-                    reader.SetRef(null);
+                    reader.AddReference(null);
                 }
             }
             stream.ReadByte();

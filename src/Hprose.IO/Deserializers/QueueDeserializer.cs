@@ -12,7 +12,7 @@
  *                                                        *
  * QueueDeserializer class for C#.                        *
  *                                                        *
- * LastModified: Apr 16, 2018                             *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -28,7 +28,7 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             Queue<T> queue = new Queue<T>();
-            reader.SetRef(queue);
+            reader.AddReference(queue);
             var deserializer = Deserializer<T>.Instance;
             for (int i = 0; i < count; ++i) {
                 queue.Enqueue(deserializer.Deserialize(reader));

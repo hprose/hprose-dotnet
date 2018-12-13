@@ -12,7 +12,7 @@
  *                                                        *
  * ObjectDeserializer class for C#.                       *
  *                                                        *
- * LastModified: Apr 29, 2018                             *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -30,7 +30,7 @@ namespace Hprose.IO.Deserializers {
         private static T Read(Reader reader, string key) {
             Stream stream = reader.Stream;
             T obj = Factory<T>.New();
-            reader.SetRef(obj);
+            reader.AddReference(obj);
             MembersReader.ReadAllMembers(reader, key, ref obj);
             stream.ReadByte();
             return obj;
@@ -43,7 +43,7 @@ namespace Hprose.IO.Deserializers {
         private static T ReadMapAsObject(Reader reader) {
             Stream stream = reader.Stream;
             T obj = Factory<T>.New();
-            reader.SetRef(obj);
+            reader.AddReference(obj);
             int count = ValueReader.ReadCount(stream);
             var strDeserializer = Deserializer<string>.Instance;
             for (int i = 0; i < count; ++i) {
@@ -73,10 +73,10 @@ namespace Hprose.IO.Deserializers {
         private static T Read(Reader reader, string key) {
             Stream stream = reader.Stream;
             T obj = Factory<T>.New();
-            reader.SetRef(null);
+            reader.AddReference(null);
             int refIndex = reader.LastRefIndex;
             MembersReader.ReadAllMembers(reader, key, ref obj);
-            reader.SetRef(refIndex, obj);
+            reader.SetReference(refIndex, obj);
             stream.ReadByte();
             return obj;
         }
@@ -88,7 +88,7 @@ namespace Hprose.IO.Deserializers {
         private static T ReadMapAsObject(Reader reader) {
             Stream stream = reader.Stream;
             T obj = Factory<T>.New();
-            reader.SetRef(null);
+            reader.AddReference(null);
             int refIndex = reader.LastRefIndex;
             int count = ValueReader.ReadCount(stream);
             var strDeserializer = Deserializer<string>.Instance;
@@ -96,7 +96,7 @@ namespace Hprose.IO.Deserializers {
                 var name = strDeserializer.Deserialize(reader);
                 MembersReader.ReadMember(reader, name, ref obj);
             }
-            reader.SetRef(refIndex, obj);
+            reader.SetReference(refIndex, obj);
             stream.ReadByte();
             return obj;
         }

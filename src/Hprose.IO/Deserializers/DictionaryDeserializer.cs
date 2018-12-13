@@ -12,7 +12,7 @@
  *                                                        *
  * DictionaryDeserializer class for C#.                   *
  *                                                        *
- * LastModified: Apr 29, 2018                             *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -32,7 +32,7 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             T dict = Factory<T>.New();
-            reader.SetRef(dict);
+            reader.AddReference(dict);
             var keyDeserializer = Deserializer<K>.Instance;
             var valueDeserializer = Deserializer<V>.Instance;
             for (int i = 0; i < count; ++i) {
@@ -47,7 +47,7 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             T dict = Factory<T>.New();
-            reader.SetRef(dict);
+            reader.AddReference(dict);
             var deserializer = Deserializer<V>.Instance;
             for (int i = 0; i < count; ++i) {
                 dict.Add(new KeyValuePair<K, V>(Converter<K>.Convert(i), deserializer.Deserialize(reader)));
@@ -75,7 +75,7 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             T dict = Factory<T>.New();
-            reader.SetRef(dict);
+            reader.AddReference(dict);
             var deserializer = Deserializer.Instance;
             for (int i = 0; i < count; ++i) {
                 var k = deserializer.Deserialize(reader);
@@ -89,7 +89,7 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             T dict = Factory<T>.New();
-            reader.SetRef(dict);
+            reader.AddReference(dict);
             var deserializer = Deserializer.Instance;
             for (int i = 0; i < count; ++i) {
                 var v = deserializer.Deserialize(reader);
@@ -103,7 +103,7 @@ namespace Hprose.IO.Deserializers {
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
             ClassInfo classInfo = reader.GetClassInfo(index);
             T dict = Factory<T>.New();
-            reader.SetRef(dict);
+            reader.AddReference(dict);
             var deserializer = Deserializer.Instance;
             var names = classInfo.names;
             int count = names.Length;

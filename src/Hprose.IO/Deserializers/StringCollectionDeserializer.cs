@@ -12,7 +12,7 @@
  *                                                        *
  * StringCollectionDeserializer class for C#.             *
  *                                                        *
- * LastModified: Apr 17, 2018                             *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -28,7 +28,7 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             StringCollection collection = new StringCollection();
-            reader.SetRef(collection);
+            reader.AddReference(collection);
             var deserializer = Deserializer<string>.Instance;
             for (int i = 0; i < count; ++i) {
                 collection.Add(deserializer.Deserialize(reader));

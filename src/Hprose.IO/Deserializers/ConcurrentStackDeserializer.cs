@@ -12,7 +12,7 @@
  *                                                        *
  * ConcurrentStackDeserializer class for C#.              *
  *                                                        *
- * LastModified: Apr 17, 2018                             *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -28,7 +28,7 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             ConcurrentStack<T> stack = new ConcurrentStack<T>();
-            reader.SetRef(stack);
+            reader.AddReference(stack);
             T[] array = new T[count];
             var deserializer = Deserializer<T>.Instance;
             for (int i = 0; i < count; ++i) {

@@ -12,7 +12,7 @@
  *                                                        *
  * DataSetDeserializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 26, 2018                             *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -28,7 +28,7 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             DataSet dataset = new DataSet();
-            reader.SetRef(dataset);
+            reader.AddReference(dataset);
             var deserializer = Deserializer<DataTable>.Instance;
             for (int i = 0; i < count; ++i) {
                 dataset.Tables.Add(deserializer.Deserialize(reader));

@@ -12,7 +12,7 @@
  *                                                        *
  * ProducerConsumerCollectionDeserializer class for C#.   *
  *                                                        *
- * LastModified: Apr 17, 2018                             *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -28,7 +28,7 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             T collection = Factory<T>.New();
-            reader.SetRef(collection);
+            reader.AddReference(collection);
             var deserializer = Deserializer<E>.Instance;
             for (int i = 0; i < count; ++i) {
                 collection.TryAdd(deserializer.Deserialize(reader));

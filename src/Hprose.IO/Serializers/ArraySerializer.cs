@@ -12,7 +12,7 @@
  *                                                        *
  * ArraySerializer class for C#.                          *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -50,7 +50,7 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagOpenbrace);
             var serializer = Serializer<T>.Instance;
             for (int i = 0; i < length; ++i) {
-                writer.SetRef(new object());
+                writer.SetReference(new object());
                 stream.WriteByte(TagList);
                 if (length2 > 0) {
                     ValueWriter.WriteInt(stream, length2);

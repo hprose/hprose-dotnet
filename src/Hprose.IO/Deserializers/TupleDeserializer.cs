@@ -12,7 +12,7 @@
  *                                                        *
  * TupleDeserializer class for C#.                        *
  *                                                        *
- * LastModified: Apr 25, 2018                             *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -164,10 +164,10 @@ namespace Hprose.IO.Deserializers {
         public static T Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
-            reader.SetRef(null);
+            reader.AddReference(null);
             int index = reader.LastRefIndex;
             T tuple = TupleHelper<T>.read(reader, count);
-            reader.SetRef(index, tuple);
+            reader.SetReference(index, tuple);
             stream.ReadByte();
             return tuple;
         }

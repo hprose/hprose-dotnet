@@ -12,7 +12,7 @@
  *                                                        *
  * StringObjectDictionaryDeserializer class for C#.       *
  *                                                        *
- * LastModified: Apr 29, 2018                             *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -31,7 +31,7 @@ namespace Hprose.IO.Deserializers {
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
             ClassInfo classInfo = reader.GetClassInfo(index);
             T dict = Factory<T>.New();
-            reader.SetRef(dict);
+            reader.AddReference(dict);
             var deserializer = Deserializer.Instance;
             string[] names = classInfo.names;
             int count = names.Length;

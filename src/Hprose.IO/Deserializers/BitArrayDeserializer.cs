@@ -12,7 +12,7 @@
  *                                                        *
  * BitArrayDeserializer class for C#.                     *
  *                                                        *
- * LastModified: Apr 22, 2018                             *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -28,7 +28,7 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             BitArray array = new BitArray(count);
-            reader.SetRef(array);
+            reader.AddReference(array);
             var deserializer = Deserializer<bool>.Instance;
             for (int i = 0; i < count; ++i) {
                 array[i] = deserializer.Deserialize(reader);

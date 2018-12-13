@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Deserializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 29, 2018                             *
+ * LastModified: Dec 13, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -51,7 +51,7 @@ namespace Hprose.IO.Deserializers {
                 case TagNull:
                     return default;
                 case TagRef:
-                    return reader.ReadRef<T>();
+                    return reader.ReadReference<T>();
                 case TagClass:
                     reader.ReadClass();
                     return Deserialize(reader);
@@ -272,7 +272,7 @@ namespace Hprose.IO.Deserializers {
                 case TagObject:
                     return Read(reader);
                 case TagRef:
-                    return reader.ReadRef();
+                    return reader.ReadReference();
                 case TagDate:
                     return ReferenceReader.ReadDateTime(reader);
                 case TagTime:
@@ -352,7 +352,7 @@ namespace Hprose.IO.Deserializers {
                 return ((IObjectDeserializer)GetInstance(type)).ReadObject(reader, classInfo.key);
             }
             var obj = new ExpandoObject();
-            reader.SetRef(obj);
+            reader.AddReference(obj);
             var dict = (IDictionary<string, object>)obj;
             string[] names = classInfo.names;
             int count = names.Length;
