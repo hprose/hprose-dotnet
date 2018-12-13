@@ -187,7 +187,7 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
             reader.AddReference(null);
-            int index = reader.LastRefIndex;
+            int index = reader.LastReferenceIndex;
             T tuple = ValueTupleHelper<T>.read(reader, count);
             reader.SetReference(index, tuple);
             stream.ReadByte();

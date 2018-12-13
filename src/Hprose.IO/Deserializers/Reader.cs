@@ -94,7 +94,7 @@ namespace Hprose.IO.Deserializers {
 
         public void SetReference(int index, object obj) => _refer?.Set(index, obj);
 
-        public int LastRefIndex => _refer?.LastIndex ?? -1;
+        public int LastReferenceIndex => _refer?.LastIndex ?? -1;
 
         public MemoryStream ReadRaw() {
             MemoryStream ostream = new MemoryStream();

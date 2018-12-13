@@ -74,7 +74,7 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             T obj = Factory<T>.New();
             reader.AddReference(null);
-            int refIndex = reader.LastRefIndex;
+            int refIndex = reader.LastReferenceIndex;
             MembersReader.ReadAllMembers(reader, key, ref obj);
             reader.SetReference(refIndex, obj);
             stream.ReadByte();
@@ -89,7 +89,7 @@ namespace Hprose.IO.Deserializers {
             Stream stream = reader.Stream;
             T obj = Factory<T>.New();
             reader.AddReference(null);
-            int refIndex = reader.LastRefIndex;
+            int refIndex = reader.LastReferenceIndex;
             int count = ValueReader.ReadCount(stream);
             var strDeserializer = Deserializer<string>.Instance;
             for (int i = 0; i < count; ++i) {
