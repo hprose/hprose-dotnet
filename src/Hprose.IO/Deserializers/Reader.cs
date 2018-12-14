@@ -58,7 +58,7 @@ namespace Hprose.IO.Deserializers {
 
         public object Deserialize() => Deserializer.Instance.Deserialize(this);
 
-        public object Deserialize(Type type) => Deserializer.Deserialize(this, type);
+        public object Deserialize(Type type) => Deserializers.GetInstance(type).Deserialize(this);
 
         public T Deserialize<T>() => Deserializer<T>.Instance.Deserialize(this);
 

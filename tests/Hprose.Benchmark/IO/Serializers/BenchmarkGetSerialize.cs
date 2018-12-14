@@ -11,7 +11,7 @@ namespace Hprose.Benchmark.IO.Serializers {
     [RPlotExporter, RankColumn]
     public class BenchmarkGetSerializer {
         [Benchmark]
-        public Serializer<string> GetSerializerFromDictionary() => Serializer.GetInstance(typeof(string)) as Serializer<string>;
+        public Serializer<string> GetSerializerFromDictionary() => Hprose.IO.Serializers.Serializers.GetInstance(typeof(string)) as Serializer<string>;
         [Benchmark]
         public Serializer<string> GetSerializerFromStaticProperty() => Serializer<string>.Instance;
     }
