@@ -38,7 +38,7 @@ namespace Hprose.IO.Deserializers {
         private static T Read(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            return Read(reader, reader.GetClassInfo(index).key);
+            return Read(reader, reader.GetTypeInfo(index).key);
         }
         private static T ReadMapAsObject(Reader reader) {
             Stream stream = reader.Stream;
@@ -83,7 +83,7 @@ namespace Hprose.IO.Deserializers {
         private static T Read(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            return Read(reader, reader.GetClassInfo(index).key);
+            return Read(reader, reader.GetTypeInfo(index).key);
         }
         private static T ReadMapAsObject(Reader reader) {
             Stream stream = reader.Stream;

@@ -12,7 +12,7 @@
  *                                                        *
  * DataTableDeserializer class for C#.                    *
  *                                                        *
- * LastModified: Dec 13, 2018                             *
+ * LastModified: Dec 14, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -55,14 +55,14 @@ namespace Hprose.IO.Deserializers {
             reader.AddReference(row);
             var stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            ClassInfo classInfo = reader.GetClassInfo(index);
-            table.TableName = classInfo.name;
-            var names = classInfo.names;
+            TypeInfo typeInfo = reader.GetTypeInfo(index);
+            table.TableName = typeInfo.name;
+            var names = typeInfo.names;
             var deserializer = Deserializer.Instance;
             var count = names.Length;
             IDeserializer[] deserializers = new IDeserializer[count];
-            if (classInfo.type != null) {
-                var members = Accessor.GetMembers(classInfo.type, reader.Mode);
+            if (typeInfo.type != null) {
+                var members = Accessor.GetMembers(typeInfo.type, reader.Mode);
                 for (int i = 0; i < count; ++i) {
                     var name = names[i];
                     var member = members[name];

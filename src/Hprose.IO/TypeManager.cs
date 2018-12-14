@@ -8,11 +8,11 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * ClassManager.cs                                        *
+ * TypeManager.cs                                         *
  *                                                        *
- * hprose ClassManager class for C#.                      *
+ * hprose TypeManager class for C#.                       *
  *                                                        *
- * LastModified: Apr 25, 2018                             *
+ * LastModified: Dec 14, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -23,8 +23,8 @@ using System.Reflection;
 using System.Runtime.Serialization;
 
 namespace Hprose.IO {
-    public static class ClassManager {
-        static class ClassName<T> {
+    public static class TypeManager {
+        static class TypeName<T> {
             private static volatile string name;
             public static string Name {
                 get => name;
@@ -32,7 +32,7 @@ namespace Hprose.IO {
             }
         }
         private static readonly Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-        private static readonly ConcurrentDictionary<string, Lazy<Type>> classCache = new ConcurrentDictionary<string, Lazy<Type>>();
+        private static readonly ConcurrentDictionary<string, Lazy<Type>> typeCache = new ConcurrentDictionary<string, Lazy<Type>>();
         public static void Register<T>(string name = null) {
             Type type = typeof(T);
             if (name == null || name.Length == 0) {
@@ -43,20 +43,20 @@ namespace Hprose.IO {
             if (index > 0) {
                 name = name.Substring(0, index);
             }
-            classCache.AddOrUpdate(name,
-                (alias) => { ClassName<T>.Name = alias; return new Lazy<Type>(() => type); },
-                (alias, _) => { ClassName<T>.Name = alias; return new Lazy<Type>(() => type); }
+            typeCache.AddOrUpdate(name,
+                (alias) => { TypeName<T>.Name = alias; return new Lazy<Type>(() => type); },
+                (alias, _) => { TypeName<T>.Name = alias; return new Lazy<Type>(() => type); }
             );
         }
-        public static bool IsRegistered(string name) => classCache.ContainsKey(name);
+        public static bool IsRegistered(string name) => typeCache.ContainsKey(name);
         public static string GetName<T>() {
-            if (ClassName<T>.Name == null) {
+            if (TypeName<T>.Name == null) {
                 Register<T>();
             }
-            return ClassName<T>.Name;
+            return TypeName<T>.Name;
         }
         private static readonly Func<string, Lazy<Type>> typeFactory = (name) => new Lazy<Type>(() => LoadType(name));
-        public static Type GetType(string name) => classCache.GetOrAdd(name, typeFactory).Value;
+        public static Type GetType(string name) => typeCache.GetOrAdd(name, typeFactory).Value;
         private static Type LoadType(string alias) {
             Type type;
             int length = alias.Length - alias.Replace("_", "").Length;

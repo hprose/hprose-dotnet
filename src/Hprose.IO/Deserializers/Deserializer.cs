@@ -163,15 +163,15 @@ namespace Hprose.IO.Deserializers {
         private object Read(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            var classInfo = reader.GetClassInfo(index);
-            var type = classInfo.type;
+            var typeInfo = reader.GetTypeInfo(index);
+            var type = typeInfo.type;
             if (type != null) {
-                return ((IObjectDeserializer)Deserializers.GetInstance(type)).ReadObject(reader, classInfo.key);
+                return ((IObjectDeserializer)Deserializers.GetInstance(type)).ReadObject(reader, typeInfo.key);
             }
             var obj = new ExpandoObject();
             reader.AddReference(obj);
             var dict = (IDictionary<string, object>)obj;
-            string[] names = classInfo.names;
+            string[] names = typeInfo.names;
             int count = names.Length;
             for (int i = 0; i < count; ++i) {
                 dict.Add(names[i], Deserialize(reader));

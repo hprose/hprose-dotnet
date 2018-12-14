@@ -12,7 +12,7 @@
  *                                                        *
  * DictionaryDeserializer class for C#.                   *
  *                                                        *
- * LastModified: Dec 13, 2018                             *
+ * LastModified: Dec 14, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -101,14 +101,14 @@ namespace Hprose.IO.Deserializers {
         public static I ReadObjectAsMap(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            ClassInfo classInfo = reader.GetClassInfo(index);
+            TypeInfo typeInfo = reader.GetTypeInfo(index);
             T dict = Factory<T>.New();
             reader.AddReference(dict);
             var deserializer = Deserializer.Instance;
-            var names = classInfo.names;
+            var names = typeInfo.names;
             int count = names.Length;
-            if (classInfo.type != null) {
-                var members = Accessor.GetMembers(classInfo.type, reader.Mode);
+            if (typeInfo.type != null) {
+                var members = Accessor.GetMembers(typeInfo.type, reader.Mode);
                 for (int i = 0; i < count; ++i) {
                     var member = members[names[i]];
                     if (member != null) {

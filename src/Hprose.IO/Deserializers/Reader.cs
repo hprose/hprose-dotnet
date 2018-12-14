@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Reader class for C#.                            *
  *                                                        *
- * LastModified: Dec 13, 2018                             *
+ * LastModified: Dec 14, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -26,7 +26,7 @@ using Hprose.IO.Converters;
 namespace Hprose.IO.Deserializers {
     public class Reader {
         private readonly ReaderRefer _refer;
-        private readonly List<ClassInfo> _ref = new List<ClassInfo>();
+        private readonly List<TypeInfo> _ref = new List<TypeInfo>();
         private volatile LongType _defaultLongType = LongType.BigInteger;
         private volatile RealType _defaultRealType = RealType.Double;
         private volatile CharType _defaultCharType = CharType.String;
@@ -42,7 +42,7 @@ namespace Hprose.IO.Deserializers {
         public Stream Stream { get; private set; }
         public Mode Mode { get; private set; }
 
-        public ClassInfo GetClassInfo(int index) => _ref[index];
+        public TypeInfo GetTypeInfo(int index) => _ref[index];
 
         public Reader(Stream stream, Mode mode = Mode.MemberMode) {
             Stream = stream;
@@ -75,7 +75,7 @@ namespace Hprose.IO.Deserializers {
                 names[i] = strDeserialize.Deserialize(this);
             }
             Stream.ReadByte();
-            _ref.Add(new ClassInfo(name, names));
+            _ref.Add(new TypeInfo(name, names));
         }
 
         public object ReadReference() {
