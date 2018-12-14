@@ -50,6 +50,7 @@ namespace Hprose.IO {
         public const byte TagQuote = (byte)'"';
         public const byte TagPoint = (byte)'.';
         /* Protocol Tags */
+        public const byte TagHeader = (byte)'H';
         public const byte TagFunctions = (byte)'F';
         public const byte TagCall = (byte)'C';
         public const byte TagResult = (byte)'R';
