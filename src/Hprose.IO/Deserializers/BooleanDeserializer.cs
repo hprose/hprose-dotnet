@@ -12,7 +12,7 @@
  *                                                        *
  * BooleanDeserializer class for C#.                      *
  *                                                        *
- * LastModified: Apr 10, 2018                             *
+ * LastModified: Dec 16, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -27,10 +27,10 @@ namespace Hprose.IO.Deserializers {
             var stream = reader.Stream;
             switch (tag) {
                 case TagTrue:
-                case TagNaN:
                     return true;
                 case TagFalse:
                 case TagEmpty:
+                case TagNaN:
                 case '0':
                     return false;
                 case TagInteger:
