@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Hprose.Collections.Generic;
+using Hprose.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -6,13 +9,7 @@ using System.Dynamic;
 using System.IO;
 using System.Runtime.Serialization;
 
-using Hprose.Collections.Generic;
-using Hprose.IO.Serializers;
-using Hprose.IO;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace Hprose.UnitTests.IO.Serializers {
+namespace Hprose.UnitTests.IO {
     [TestClass]
     public class WriterTests {
         [TestMethod]

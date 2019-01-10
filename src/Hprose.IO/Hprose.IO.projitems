@@ -9,11 +9,32 @@
     <Import_RootNamespace>Hprose.IO</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Accessors\Accessor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Accessors\FieldsAccessor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Accessors\PropertiesAccessor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Accessors\MembersAccessor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Converters\Converter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Accessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CharType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DictType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Factory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FieldsAccessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Formatter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ListType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LongType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MembersAccessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MembersReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MembersWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertiesAccessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RawReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Reader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RealType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReferenceReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tags.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ValueReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ValueWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Writer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\DecimalConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\DoubleConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\SingleConverter.cs" />
@@ -37,22 +58,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converters\TimeSpanConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BigIntegerConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\Int64Converter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\RawReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\StreamDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DataSetDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DataTableDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\StringObjectDictionaryDeserializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DictType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\BitArrayDeserializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Factory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\MembersReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ObjectDeserializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ListType.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RealType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ListDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\DictionaryDeserializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CharType.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)LongType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\StringCollectionDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ProducerConsumerCollectionDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\EnumDeserializer.cs" />
@@ -90,18 +103,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\Int16Deserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\SByteDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ByteDeserializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Deserializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TypeInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ReferenceReader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ValueReader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Reader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Formatter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Mode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TypeManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tags.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DataSetSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DataTableSerializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Serializers\MembersWriter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\ObjectSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\AnonymousTypeSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\MultiDimArraySerializer.cs" />
@@ -139,10 +142,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\SByteSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\EnumSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\CharSerializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Serializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\BooleanSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DBNullSerializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ValueWriter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Writer.cs" />
   </ItemGroup>
 </Project>

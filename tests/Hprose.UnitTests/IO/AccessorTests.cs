@@ -1,14 +1,10 @@
-﻿using System;
+﻿using Hprose.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
 using System.Runtime.Serialization;
 
-using Hprose.IO.Accessors;
-using Hprose.IO.Serializers;
-using Hprose.IO;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace Hprose.UnitTests.IO.Serializers {
+namespace Hprose.UnitTests.IO {
     [TestClass]
     public class AccessorTests {
         [DataContract(Name = "Hello")]

@@ -1,12 +1,9 @@
-﻿using System.Data;
+﻿using Hprose.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Data;
 using System.IO;
 
-using Hprose.IO;
-using Hprose.IO.Deserializers;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace Hprose.UnitTests.IO.Deserializers {
+namespace Hprose.UnitTests.IO {
     [TestClass]
     public class DataTableDeserializerTests {
         [TestMethod]

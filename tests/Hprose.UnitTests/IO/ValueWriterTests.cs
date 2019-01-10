@@ -1,11 +1,9 @@
-﻿using System.IO;
+﻿using Hprose.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.IO;
 using System.Text;
 
-using Hprose.IO;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace Hprose.UnitTests.IO.Serializers {
+namespace Hprose.UnitTests.IO {
     [TestClass]
     public class ValueWriterTests {
         private string WriteInt(int i) {

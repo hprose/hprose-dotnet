@@ -1,22 +1,19 @@
-﻿using System;
+﻿using Hprose.Collections.Generic;
+using Hprose.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Dynamic;
 using System.IO;
-using System.Runtime.Serialization;
-
-using Hprose.Collections.Generic;
-using Hprose.IO;
-using Hprose.IO.Deserializers;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Numerics;
-using System.Text;
-using System.Collections.Specialized;
 using System.Linq;
+using System.Numerics;
+using System.Runtime.Serialization;
+using System.Text;
 
-namespace Hprose.UnitTests.IO.Deserializers {
+namespace Hprose.UnitTests.IO {
     [TestClass]
     public class ReaderTests {
         [TestMethod]

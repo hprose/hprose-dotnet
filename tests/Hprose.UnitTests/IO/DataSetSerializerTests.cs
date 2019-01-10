@@ -1,12 +1,9 @@
-﻿using System.Data;
+﻿using Hprose.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Data;
 using System.IO;
 
-using Hprose.IO;
-using Hprose.IO.Serializers;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace Hprose.UnitTests.IO.Serializers {
+namespace Hprose.UnitTests.IO {
     [TestClass]
     public class DataSetSerializerTests {
         [TestMethod]
