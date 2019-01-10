@@ -7,7 +7,7 @@ using System.IO;
 using System.Runtime.Serialization;
 
 using Hprose.Collections.Generic;
-using Hprose.IO.Serializers;
+using Hprose.IO;
 using Hprose.IO.Deserializers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;

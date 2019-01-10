@@ -2,7 +2,7 @@
 
 using BenchmarkDotNet.Running;
 
-namespace Hprose.Benchmark.IO.Serializers {
+namespace Hprose.Benchmark.IO {
     public class Benchmark {
         static void Main(string[] args) {
             //BenchmarkRunner.Run<BenchmarkNew>();

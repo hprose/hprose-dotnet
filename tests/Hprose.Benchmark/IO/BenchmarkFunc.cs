@@ -3,7 +3,7 @@ using System;
 
 using BenchmarkDotNet.Attributes;
 
-namespace Hprose.Benchmark.IO.Serializers {
+namespace Hprose.Benchmark.IO {
     [ClrJob, CoreJob, MonoJob]
     [RPlotExporter, RankColumn]
     public class BenchmarkFunc {

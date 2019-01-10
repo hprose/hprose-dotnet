@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.IO;
 
-using Hprose.IO.Serializers;
+using Hprose.IO;
 using Hprose.IO.Deserializers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;

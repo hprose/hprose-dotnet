@@ -10,13 +10,14 @@
  *                                                        *
  * Serializer.cs                                          *
  *                                                        *
- * hprose Serializers class for C#.                       *
+ * hprose Serializer class for C#.                        *
  *                                                        *
- * LastModified: Dec 12, 2018                             *
+ * LastModified: Jan 10, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
+using Hprose.Collections.Generic;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -25,12 +26,34 @@ using System.Data;
 using System.Dynamic;
 using System.IO;
 
-using Hprose.Collections.Generic;
+using Hprose.IO.Serializers;
 
-namespace Hprose.IO.Serializers {
-    public static class Serializers {
+namespace Hprose.IO {
+    public interface ISerializer {
+        void Write(Writer writer, object obj);
+        void Serialize(Writer writer, object obj);
+    }
+
+    public abstract class Serializer<T> : ISerializer {
+        static Serializer() => Serializer.Initialize();
+        private static volatile Serializer<T> instance;
+        public static Serializer<T> Instance {
+            get {
+                if (instance == null) {
+                    instance = Serializer.GetInstance(typeof(T)) as Serializer<T>;
+                }
+                return instance;
+            }
+        }
+        public abstract void Write(Writer writer, T obj);
+        public virtual void Serialize(Writer writer, T obj) => Write(writer, obj);
+        void ISerializer.Write(Writer writer, object obj) => Write(writer, (T)obj);
+        void ISerializer.Serialize(Writer writer, object obj) => Serialize(writer, (T)obj);
+    }
+
+    public class Serializer : Serializer<object> {
         private static readonly ConcurrentDictionary<Type, Lazy<ISerializer>> serializers = new ConcurrentDictionary<Type, Lazy<ISerializer>>();
-        static Serializers() {
+        static Serializer() {
             Register(() => new Serializer());
             Register(() => new DBNullSerializer());
             Register(() => new BooleanSerializer());
@@ -164,6 +187,24 @@ namespace Hprose.IO.Serializers {
                 () => Activator.CreateInstance(GetSerializerType(type)) as ISerializer
             );
 
-        internal static ISerializer GetInstance(Type type) => serializers.GetOrAdd(type, serializerFactory).Value;
+        public static ISerializer GetInstance(Type type) => serializers.GetOrAdd(type, serializerFactory).Value;
+
+        public override void Serialize(Writer writer, object obj) {
+            if (obj == null) {
+                writer.Stream.WriteByte(Tags.TagNull);
+            }
+            else {
+                GetInstance(obj.GetType()).Serialize(writer, obj);
+            }
+        }
+
+        public override void Write(Writer writer, object obj) {
+            if (obj == null) {
+                writer.Stream.WriteByte(Tags.TagNull);
+            }
+            else {
+                GetInstance(obj.GetType()).Write(writer, obj);
+            }
+        }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using BenchmarkDotNet.Attributes;
 using Hprose.IO.Deserializers;
 
-namespace Hprose.Benchmark.IO.Serializers {
+namespace Hprose.Benchmark.IO {
     [ClrJob, CoreJob, MonoJob]
     [RPlotExporter, RankColumn]
     public class BenchmarkNew {

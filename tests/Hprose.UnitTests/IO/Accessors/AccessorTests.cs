@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 
 using Hprose.IO.Accessors;
 using Hprose.IO.Serializers;
+using Hprose.IO;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

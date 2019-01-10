@@ -12,7 +12,7 @@
  *                                                        *
  * DataTableDeserializer class for C#.                    *
  *                                                        *
- * LastModified: Dec 14, 2018                             *
+ * LastModified: Jan 10, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -39,7 +39,7 @@ namespace Hprose.IO.Deserializers {
                 var name = strDeserializer.Deserialize(reader);
                 var value = deserializer.Deserialize(reader);
                 var type = value?.GetType() ?? typeof(string);
-                deserializers[i] = Deserializers.GetInstance(type);
+                deserializers[i] = Deserializer.GetInstance(type);
                 var column = new DataColumn(name, type);
                 columns.Add(column);
                 row[column] = value ?? DBNull.Value;
@@ -68,7 +68,7 @@ namespace Hprose.IO.Deserializers {
                     var member = members[name];
                     if (member != null) {
                         var type = Accessor.GetMemberType(member);
-                        deserializers[i] = Deserializers.GetInstance(type);
+                        deserializers[i] = Deserializer.GetInstance(type);
                         var value = deserializers[i].Deserialize(reader);
                         var column = new DataColumn(member.Name, type);
                         columns.Add(column);
@@ -77,7 +77,7 @@ namespace Hprose.IO.Deserializers {
                     else {
                         var value = deserializer.Deserialize(reader);
                         var type = value?.GetType() ?? typeof(string);
-                        deserializers[i] = Deserializers.GetInstance(type);
+                        deserializers[i] = Deserializer.GetInstance(type);
                         var column = new DataColumn(name, type);
                         columns.Add(column);
                         row[column] = value ?? DBNull.Value;
@@ -89,7 +89,7 @@ namespace Hprose.IO.Deserializers {
                     var name = names[i];
                     var value = deserializer.Deserialize(reader);
                     var type = value?.GetType() ?? typeof(string);
-                    deserializers[i] = Deserializers.GetInstance(type);
+                    deserializers[i] = Deserializer.GetInstance(type);
                     var column = new DataColumn(name, type);
                     columns.Add(column);
                     row[column] = value ?? DBNull.Value;

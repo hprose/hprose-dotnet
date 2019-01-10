@@ -6,7 +6,7 @@ using BenchmarkDotNet.Attributes;
 
 using Newtonsoft.Json;
 
-namespace Hprose.Benchmark.IO.Serializers {
+namespace Hprose.Benchmark.IO {
     [ClrJob, CoreJob, MonoJob]
     [RPlotExporter, RankColumn]
     public class BenchmarkObjectSerialize {
