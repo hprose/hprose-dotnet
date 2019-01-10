@@ -12,12 +12,12 @@
  *                                                        *
  * hprose ListType enum for C#.                           *
  *                                                        *
- * LastModified: Apr 18, 2018                             *
+ * LastModified: Jan 10, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
-namespace Hprose.IO.Deserializers {
+namespace Hprose.IO {
     public enum ListType {
         List, Array, ArrayList
     }

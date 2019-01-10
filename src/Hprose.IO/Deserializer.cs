@@ -12,12 +12,13 @@
  *                                                        *
  * hprose Deserializer class for C#.                      *
  *                                                        *
- * LastModified: Dec 13, 2018                             *
+ * LastModified: Jan 10, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using Hprose.Collections.Generic;
+using Hprose.IO.Deserializers;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -27,7 +28,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using static Hprose.IO.Tags;
 
-namespace Hprose.IO.Deserializers {
+namespace Hprose.IO {
     public interface IDeserializer {
         object Read(Reader reader, int tag);
         object Deserialize(Reader reader);

@@ -8,24 +8,17 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * ReaderRefer.cs                                         *
+ * DictType.cs                                            *
  *                                                        *
- * ReaderRefer class for C#.                              *
+ * hprose DictType enum for C#.                           *
  *                                                        *
- * LastModified: Dec 13, 2018                             *
+ * LastModified: Jan 10, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
-using System.Collections.Generic;
-
-namespace Hprose.IO.Deserializers {
-    sealed class ReaderRefer {
-        private readonly List<object> _ref = new List<object>();
-        public int LastIndex => _ref.Count - 1;
-        public void Add(object obj) => _ref.Add(obj);
-        public void Set(int index, object obj) => _ref[index] = obj;
-        public object Read(int index) => _ref[index];
-        public void Reset() => _ref.Clear();
+namespace Hprose.IO {
+    public enum DictType {
+        NullableKeyDictionary, Dictionary, ExpandoObject, Hashtable
     }
 }

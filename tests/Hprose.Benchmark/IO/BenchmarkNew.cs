@@ -2,7 +2,7 @@
 using System;
 using System.Linq.Expressions;
 using BenchmarkDotNet.Attributes;
-using Hprose.IO.Deserializers;
+using Hprose.IO;
 
 namespace Hprose.Benchmark.IO {
     [ClrJob, CoreJob, MonoJob]

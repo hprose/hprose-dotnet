@@ -12,18 +12,27 @@
  *                                                        *
  * hprose Reader class for C#.                            *
  *                                                        *
- * LastModified: Dec 14, 2018                             *
+ * LastModified: Jan 10, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
+using Hprose.IO.Converters;
+using Hprose.IO.Deserializers;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Hprose.IO.Converters;
+namespace Hprose.IO {
+    sealed class ReaderRefer {
+        private readonly List<object> _ref = new List<object>();
+        public int LastIndex => _ref.Count - 1;
+        public void Add(object obj) => _ref.Add(obj);
+        public void Set(int index, object obj) => _ref[index] = obj;
+        public object Read(int index) => _ref[index];
+        public void Reset() => _ref.Clear();
+    }
 
-namespace Hprose.IO.Deserializers {
     public class Reader {
         private readonly ReaderRefer _refer;
         private readonly List<TypeInfo> _ref = new List<TypeInfo>();

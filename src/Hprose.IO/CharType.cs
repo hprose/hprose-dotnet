@@ -8,17 +8,17 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * LongType.cs                                            *
+ * CharType.cs                                            *
  *                                                        *
- * hprose LongType enum for C#.                           *
+ * hprose CharType enum for C#.                           *
  *                                                        *
- * LastModified: Apr 18, 2018                             *
+ * LastModified: Jan 10, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
-namespace Hprose.IO.Deserializers {
-    public enum LongType {
-        BigInteger, Int64, UInt64
+namespace Hprose.IO {
+    public enum CharType {
+        String, Char
     }
 }
