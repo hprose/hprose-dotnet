@@ -2,13 +2,10 @@
 using System;
 using System.Linq.Expressions;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Columns;
-using BenchmarkDotNet.Attributes.Exporters;
-using BenchmarkDotNet.Attributes.Jobs;
 using Hprose.IO.Deserializers;
 
 namespace Hprose.Benchmark.IO.Serializers {
-    [ClrJob(isBaseline: true), CoreJob, MonoJob]
+    [ClrJob, CoreJob, MonoJob]
     [RPlotExporter, RankColumn]
     public class BenchmarkNew {
         public T New<T>() where T : new() => new T();

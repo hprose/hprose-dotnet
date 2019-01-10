@@ -4,16 +4,13 @@ using System.IO;
 using System.Runtime.Serialization.Json;
 
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Columns;
-using BenchmarkDotNet.Attributes.Exporters;
-using BenchmarkDotNet.Attributes.Jobs;
 
 using Hprose.IO;
 
 using Newtonsoft.Json;
 
 namespace Hprose.Benchmark.IO.Serializers {
-    [ClrJob(isBaseline: true), CoreJob, MonoJob]
+    [ClrJob, CoreJob, MonoJob]
     [RPlotExporter, RankColumn]
     public class BenchmarkDataSetSerialize {
         private static DataSet MakeDataSet() {

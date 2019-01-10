@@ -2,12 +2,9 @@
 using System;
 
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Columns;
-using BenchmarkDotNet.Attributes.Exporters;
-using BenchmarkDotNet.Attributes.Jobs;
 
 namespace Hprose.Benchmark.IO.Serializers {
-    [ClrJob(isBaseline: true), CoreJob, MonoJob]
+    [ClrJob, CoreJob, MonoJob]
     [RPlotExporter, RankColumn]
     public class BenchmarkFunc {
         private Func<int, bool> ToBoolean = Convert.ToBoolean;
