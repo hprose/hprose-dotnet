@@ -12,18 +12,16 @@
  *                                                        *
  * EnumDeserializer class for C#.                         *
  *                                                        *
- * LastModified: Apr 17, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using System;
 
-using Hprose.IO.Converters;
-
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class EnumDeserializer<T> : Deserializer<T> where T : struct, IComparable, IConvertible, IFormattable {
         public override T Read(Reader reader, int tag) {
             Type type = typeof(T);

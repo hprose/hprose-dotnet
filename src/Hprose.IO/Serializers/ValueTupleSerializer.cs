@@ -12,16 +12,16 @@
  *                                                        *
  * ValueTupleSerializer class for C#.                     *
  *                                                        *
- * LastModified: Apr 25, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using System;
 
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Serializers {
+    using static Tags;
+
     static class ValueTupleHelper<T> {
         public static volatile int length;
         public static volatile Action<Writer, T> write;

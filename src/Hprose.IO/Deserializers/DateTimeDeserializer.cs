@@ -12,18 +12,16 @@
  *                                                        *
  * DateTimeDeserializer class for C#.                     *
  *                                                        *
- * LastModified: Apr 14, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using System;
 
-using Hprose.IO.Converters;
-
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class DateTimeDeserializer : Deserializer<DateTime> {
         public override DateTime Read(Reader reader, int tag) {
             var stream = reader.Stream;

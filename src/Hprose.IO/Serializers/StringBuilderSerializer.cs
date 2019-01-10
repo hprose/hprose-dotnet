@@ -12,16 +12,16 @@
  *                                                        *
  * StringBuilderSerializer class for C#.                  *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using System.Text;
 
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Serializers {
+    using static Tags;
+
     class StringBuilderSerializer : ReferenceSerializer<StringBuilder> {
         public override void Write(Writer writer, StringBuilder obj) {
             base.Write(writer, obj);

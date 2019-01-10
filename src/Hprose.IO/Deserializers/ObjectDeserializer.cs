@@ -12,16 +12,16 @@
  *                                                        *
  * ObjectDeserializer class for C#.                       *
  *                                                        *
- * LastModified: Dec 13, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using System.IO;
 
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     interface IObjectDeserializer {
         object ReadObject(Reader reader, string key);
     }

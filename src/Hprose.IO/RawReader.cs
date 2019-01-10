@@ -12,7 +12,7 @@
  *                                                        *
  * RawReader class for C#.                                *
  *                                                        *
- * LastModified: Jan 10, 2019                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -20,9 +20,9 @@
 using System.IO;
 using System.Runtime.Serialization;
 
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO {
+    using static Tags;
+
     public static class RawReader {
         private static void ReadNumberRaw(Stream stream, Stream ostream) {
             int tag;

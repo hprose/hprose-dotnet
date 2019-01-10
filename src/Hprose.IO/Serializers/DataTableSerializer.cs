@@ -12,18 +12,16 @@
  *                                                        *
  * DataTableSerializer class for C#.                      *
  *                                                        *
- * LastModified: Dec 13, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using System.Data;
 
-using Hprose.IO.Accessors;
-
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Serializers {
+    using static Tags;
+
     class DataTableSerializer<T> : ReferenceSerializer<T> where T : DataTable {
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);

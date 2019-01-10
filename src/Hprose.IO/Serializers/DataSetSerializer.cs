@@ -12,16 +12,16 @@
  *                                                        *
  * DataSetSerializer class for C#.                        *
  *                                                        *
- * LastModified: Apr 27, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using System.Data;
 
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Serializers {
+    using static Tags;
+
     class DataSetSerializer<T> : ReferenceSerializer<T> where T : DataSet {
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);

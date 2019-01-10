@@ -12,22 +12,22 @@
  *                                                        *
  * hprose Converter class for C#.                         *
  *                                                        *
- * LastModified: May 2, 2018                              *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
+using Hprose.IO.Converters;
 using System;
-using System.ComponentModel;
 using System.Text;
 
-namespace Hprose.IO.Converters {
+namespace Hprose.IO {
     class Converter<TInput, TOutput> {
         public static volatile Func<TInput, TOutput> convert;
     }
 
     public class Converter<TOutput> {
-        internal static TypeConverter converter = TypeDescriptor.GetConverter(typeof(TOutput));
+        internal static System.ComponentModel.TypeConverter converter = System.ComponentModel.TypeDescriptor.GetConverter(typeof(TOutput));
 
         static Converter() {
             if (Converter<object, TOutput>.convert == null) {

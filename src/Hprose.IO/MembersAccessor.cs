@@ -8,9 +8,9 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * PropertiesAccessor.cs                                  *
+ * MembersAccessor.cs                                     *
  *                                                        *
- * PropertiesAccessor class for C#.                       *
+ * MembersAccessor class for C#.                          *
  *                                                        *
  * LastModified: Apr 25, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
@@ -25,24 +25,36 @@ using System.Runtime.Serialization;
 
 using static System.Reflection.BindingFlags;
 
-namespace Hprose.IO.Accessors {
-    internal static class PropertiesAccessor {
-        public static Dictionary<string, MemberInfo> GetProperties(Type type) {
+namespace Hprose.IO {
+    internal static class MembersAccessor {
+        public static Dictionary<string, MemberInfo> GetMembers(Type type) {
             var members = new Dictionary<string, MemberInfo>();
-            if (!type.IsSerializable) {
-                return members;
-            }
             var flags = Public | Instance;
-            var ignoreDataMember = typeof(IgnoreDataMemberAttribute);
+            var isDataContract = type.IsDefined(typeof(DataContractAttribute), false);
+            if (isDataContract) {
+                flags |= NonPublic;
+            }
             var properties = type.GetProperties(flags);
+            var ignoreDataMember = typeof(IgnoreDataMemberAttribute);
+            string name;
             foreach (var property in properties) {
                 var dataMember = Attribute.GetCustomAttribute(property, typeof(DataMemberAttribute), false) as DataMemberAttribute;
-                string name;
                 if (property.CanRead && property.CanWrite &&
+                    (!isDataContract || dataMember != null) &&
                     !property.IsDefined(ignoreDataMember, false) &&
                     property.GetIndexParameters().Length == 0 &&
                     !members.ContainsKey(name = Accessor.UnifiedName(dataMember?.Name ?? property.Name))) {
                     members[name] = property;
+                }
+            }
+            var fields = type.GetFields(flags);
+            foreach (var field in fields) {
+                var dataMember = Attribute.GetCustomAttribute(field, typeof(DataMemberAttribute), false) as DataMemberAttribute;
+                if ((!isDataContract || dataMember != null) &&
+                    !field.IsDefined(ignoreDataMember, false) &&
+                    !field.IsNotSerialized &&
+                    !members.ContainsKey(name = Accessor.UnifiedName(dataMember?.Name ?? field.Name))) {
+                    members[name] = field;
                 }
             }
             return (from entry in members
@@ -54,8 +66,8 @@ namespace Hprose.IO.Accessors {
                     );
         }
     }
-    public static class PropertiesAccessor<T> {
-        private static readonly Dictionary<string, MemberInfo> properties = PropertiesAccessor.GetProperties(typeof(T));
-        public static Dictionary<string, MemberInfo> Properties => properties;
+    public static class MembersAccessor<T> {
+        private static readonly Dictionary<string, MemberInfo> members = MembersAccessor.GetMembers(typeof(T));
+        public static Dictionary<string, MemberInfo> Members => members;
     }
 }

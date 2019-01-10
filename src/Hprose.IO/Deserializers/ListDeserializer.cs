@@ -12,17 +12,17 @@
  *                                                        *
  * ListDeserializer class for C#.                         *
  *                                                        *
- * LastModified: Dec 13, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
-using System.IO;
 using System.Collections;
-
-using static Hprose.IO.Tags;
+using System.IO;
 
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class ListDeserializer<I, T> : Deserializer<I> where T : I, IList {
         public static I Read(Reader reader) {
             Stream stream = reader.Stream;

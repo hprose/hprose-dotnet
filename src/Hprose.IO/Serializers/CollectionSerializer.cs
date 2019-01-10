@@ -12,16 +12,16 @@
  *                                                        *
  * CollectionSerializer class for C#.                     *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using System.Collections.Generic;
 
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Serializers {
+    using static Tags;
+
     class CollectionSerializer<T, V> : ReferenceSerializer<T> where T : ICollection<V> {
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);

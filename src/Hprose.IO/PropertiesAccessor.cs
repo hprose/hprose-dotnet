@@ -8,9 +8,9 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * FieldsAccessor.cs                                      *
+ * PropertiesAccessor.cs                                  *
  *                                                        *
- * FieldsAccessor class for C#.                           *
+ * PropertiesAccessor class for C#.                       *
  *                                                        *
  * LastModified: Apr 25, 2018                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
@@ -25,27 +25,25 @@ using System.Runtime.Serialization;
 
 using static System.Reflection.BindingFlags;
 
-namespace Hprose.IO.Accessors {
-    internal static class FieldsAccessor {
-        public static Dictionary<string, MemberInfo> GetFields(Type type) {
+namespace Hprose.IO {
+    internal static class PropertiesAccessor {
+        public static Dictionary<string, MemberInfo> GetProperties(Type type) {
             var members = new Dictionary<string, MemberInfo>();
             if (!type.IsSerializable) {
                 return members;
             }
-            var flags = Public | NonPublic | DeclaredOnly | Instance;
+            var flags = Public | Instance;
             var ignoreDataMember = typeof(IgnoreDataMemberAttribute);
-            while (type != typeof(object) && type.IsSerializable) {
-                var fields = type.GetFields(flags);
-                foreach (var field in fields) {
-                    var dataMember = Attribute.GetCustomAttribute(field, typeof(DataMemberAttribute), false) as DataMemberAttribute;
-                    string name;
-                    if (!field.IsDefined(ignoreDataMember, false) &&
-                        !field.IsNotSerialized &&
-                        !members.ContainsKey(name = Accessor.UnifiedName(dataMember?.Name ?? field.Name))) {
-                        members[name] = field;
-                    }
+            var properties = type.GetProperties(flags);
+            foreach (var property in properties) {
+                var dataMember = Attribute.GetCustomAttribute(property, typeof(DataMemberAttribute), false) as DataMemberAttribute;
+                string name;
+                if (property.CanRead && property.CanWrite &&
+                    !property.IsDefined(ignoreDataMember, false) &&
+                    property.GetIndexParameters().Length == 0 &&
+                    !members.ContainsKey(name = Accessor.UnifiedName(dataMember?.Name ?? property.Name))) {
+                    members[name] = property;
                 }
-                type = type.BaseType;
             }
             return (from entry in members
                     orderby (Attribute.GetCustomAttribute(entry.Value, typeof(DataMemberAttribute), false) as DataMemberAttribute)?.Order ?? 0
@@ -56,8 +54,8 @@ namespace Hprose.IO.Accessors {
                     );
         }
     }
-    public static class FieldsAccessor<T> {
-        private static readonly Dictionary<string, MemberInfo> fields = FieldsAccessor.GetFields(typeof(T));
-        public static Dictionary<string, MemberInfo> Fields => fields;
+    public static class PropertiesAccessor<T> {
+        private static readonly Dictionary<string, MemberInfo> properties = PropertiesAccessor.GetProperties(typeof(T));
+        public static Dictionary<string, MemberInfo> Properties => properties;
     }
 }

@@ -12,7 +12,7 @@
  *                                                        *
  * DictionaryDeserializer class for C#.                   *
  *                                                        *
- * LastModified: Dec 14, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -21,12 +21,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-using Hprose.IO.Accessors;
-using Hprose.IO.Converters;
-
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class DictionaryDeserializer<I, T, K, V> : Deserializer<I> where T : I, ICollection<KeyValuePair<K, V>> {
         public static I Read(Reader reader) {
             Stream stream = reader.Stream;

@@ -12,7 +12,7 @@
  *                                                        *
  * ValueReader class for C#.                              *
  *                                                        *
- * LastModified: Jan 10, 2019                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -21,10 +21,11 @@ using System;
 using System.IO;
 using System.Numerics;
 using System.Text;
-using static Hprose.IO.Tags;
 using static System.DateTimeKind;
 
 namespace Hprose.IO {
+    using static Tags;
+
     public static class ValueReader {
         public static int ReadInt(Stream stream, int tag) {
             int result = 0;

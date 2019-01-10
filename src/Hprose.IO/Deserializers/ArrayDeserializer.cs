@@ -12,7 +12,7 @@
  *                                                        *
  * ArrayDeserializer class for C#.                        *
  *                                                        *
- * LastModified: Dec 13, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -20,9 +20,9 @@
 using System;
 using System.IO;
 
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class ArrayDeserializer<T> : Deserializer<T[]> {
         private static readonly T[] empty = new T[0] { };
         public override T[] Read(Reader reader, int tag) {

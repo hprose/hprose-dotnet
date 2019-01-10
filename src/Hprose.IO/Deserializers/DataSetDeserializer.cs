@@ -12,7 +12,7 @@
  *                                                        *
  * DataSetDeserializer class for C#.                      *
  *                                                        *
- * LastModified: Dec 13, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -20,9 +20,9 @@
 using System.Data;
 using System.IO;
 
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class DataSetDeserializer : Deserializer<DataSet> {
         private static DataSet Read(Reader reader) {
             Stream stream = reader.Stream;

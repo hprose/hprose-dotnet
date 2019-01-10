@@ -12,16 +12,16 @@
  *                                                        *
  * ObjectSerializer class for C#.                         *
  *                                                        *
- * LastModified: Dec 13, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using System;
 
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Serializers {
+    using static Tags;
+
     class ObjectSerializer<T> : ReferenceSerializer<T> {
         public override void Write(Writer writer, T obj) {
             MembersWriter membersWriter = MembersWriter.GetMembersWriter<T>(writer.Mode);

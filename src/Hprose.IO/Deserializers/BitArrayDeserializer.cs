@@ -12,7 +12,7 @@
  *                                                        *
  * BitArrayDeserializer class for C#.                     *
  *                                                        *
- * LastModified: Dec 13, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -20,9 +20,9 @@
 using System.IO;
 using System.Collections;
 
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class BitArrayDeserializer : Deserializer<BitArray> {
         public static BitArray Read(Reader reader) {
             Stream stream = reader.Stream;

@@ -12,7 +12,7 @@
  *                                                        *
  * StringObjectDictionaryDeserializer class for C#.       *
  *                                                        *
- * LastModified: Dec 14, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -20,11 +20,9 @@
 using System.Collections.Generic;
 using System.IO;
 
-using Hprose.IO.Accessors;
-
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class StringObjectDictionaryDeserializer<I, T> : DictionaryDeserializer<I, T, string, object> where T : I, ICollection<KeyValuePair<string, object>> {
         public static I ReadObjectAsMap(Reader reader) {
             Stream stream = reader.Stream;

@@ -23,11 +23,9 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
-using Hprose.IO.Accessors;
+namespace Hprose.IO {
+    using static Mode;
 
-using static Hprose.IO.Mode;
-
-namespace Hprose.IO.Deserializers {
     internal delegate void ReadAction<T>(Reader reader, ref T obj);
 
     static class MembersReader {

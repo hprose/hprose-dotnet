@@ -12,7 +12,7 @@
  *                                                        *
  * Accessor class for C#.                                 *
  *                                                        *
- * LastModified: Apr 25, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -22,7 +22,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Hprose.IO.Accessors {
+namespace Hprose.IO {
     public static class Accessor {
         public static string UnifiedName(string name) => char.ToLowerInvariant(name[0]) + name.Substring(1);
         public static Type GetMemberType(MemberInfo member) => member is FieldInfo ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType;

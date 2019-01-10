@@ -12,7 +12,7 @@
  *                                                        *
  * EnumerableSerializer class for C#.                     *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -20,9 +20,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Serializers {
+    using static Tags;
+
     class FastEnumerableSerializer<T, V> : ReferenceSerializer<T> where T : IEnumerable<V>, ICollection {
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);

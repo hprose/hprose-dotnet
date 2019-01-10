@@ -12,14 +12,14 @@
  *                                                        *
  * NullableDeserializer class for C#.                     *
  *                                                        *
- * LastModified: Apr 17, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class NullableDeserializer<T> : Deserializer<T?> where T : struct {
         public override T? Read(Reader reader, int tag) {
             if (tag == TagNull) {

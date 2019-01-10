@@ -12,7 +12,7 @@
  *                                                        *
  * DataTableDeserializer class for C#.                    *
  *                                                        *
- * LastModified: Jan 10, 2019                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -21,11 +21,9 @@ using System;
 using System.Data;
 using System.IO;
 
-using Hprose.IO.Accessors;
-
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class DataTableDeserializer : Deserializer<DataTable> {
         private static IDeserializer[] ReadMapAsFirstRow(Reader reader, DataTable table, Deserializer<string> strDeserializer) {
             var columns = table.Columns;

@@ -12,16 +12,14 @@
  *                                                        *
  * SingleDeserializer class for C#.                       *
  *                                                        *
- * LastModified: Apr 10, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
-using Hprose.IO.Converters;
-
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class SingleDeserializer : Deserializer<float> {
         public override float Read(Reader reader, int tag) {
             var stream = reader.Stream;

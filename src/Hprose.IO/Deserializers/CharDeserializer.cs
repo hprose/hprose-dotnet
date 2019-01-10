@@ -12,16 +12,14 @@
  *                                                        *
  * CharDeserializer class for C#.                         *
  *                                                        *
- * LastModified: Apr 13, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
-using Hprose.IO.Converters;
-
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class CharDeserializer : Deserializer<char> {
         public override char Read(Reader reader, int tag) {
             var stream = reader.Stream;

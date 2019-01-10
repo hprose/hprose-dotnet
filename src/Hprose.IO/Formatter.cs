@@ -12,16 +12,13 @@
  *                                                        *
  * hprose Formatter for C#.                               *
  *                                                        *
- * LastModified: May 4, 2018                              *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using System;
 using System.IO;
-
-using Hprose.IO.Deserializers;
-using Hprose.IO.Serializers;
 
 namespace Hprose.IO {
     public static class Formatter {

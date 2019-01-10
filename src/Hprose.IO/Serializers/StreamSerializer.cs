@@ -12,16 +12,16 @@
  *                                                        *
  * StreamSerializer class for C#.                         *
  *                                                        *
- * LastModified: Apr 26, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
 using System.IO;
 
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Serializers {
+    using static Tags;
+
     class StreamSerializer<T> : ReferenceSerializer<T> where T : Stream {
         public override void Write(Writer writer, T obj) {
             if (!obj.CanRead) {

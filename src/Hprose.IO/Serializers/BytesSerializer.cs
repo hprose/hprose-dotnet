@@ -12,14 +12,14 @@
  *                                                        *
  * BytesSerializer class for C#.                          *
  *                                                        *
- * LastModified: Apr 7, 2018                              *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Serializers {
+    using static Tags;
+
     class BytesSerializer : ReferenceSerializer<byte[]> {
         public override void Write(Writer writer, byte[] obj) {
             base.Write(writer, obj);

@@ -12,17 +12,17 @@
  *                                                        *
  * QueueDeserializer class for C#.                        *
  *                                                        *
- * LastModified: Dec 13, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
-using System.IO;
 using System.Collections.Generic;
-
-using static Hprose.IO.Tags;
+using System.IO;
 
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class QueueDeserializer<T> : Deserializer<Queue<T>> {
         public static Queue<T> Read(Reader reader) {
             Stream stream = reader.Stream;

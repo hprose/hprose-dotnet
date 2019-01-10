@@ -12,7 +12,7 @@
  *                                                        *
  * ObjectSerializer class for C#.                         *
  *                                                        *
- * LastModified: Apr 28, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -23,12 +23,9 @@ using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
 
-using Hprose.IO.Accessors;
-
-using static Hprose.IO.Mode;
-using static Hprose.IO.Tags;
-
-namespace Hprose.IO.Serializers {
+namespace Hprose.IO {
+    using static Mode;
+    using static Tags;
 
     class MembersWriter {
         public Delegate write;

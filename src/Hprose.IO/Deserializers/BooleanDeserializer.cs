@@ -12,16 +12,14 @@
  *                                                        *
  * BooleanDeserializer class for C#.                      *
  *                                                        *
- * LastModified: Dec 16, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
-using Hprose.IO.Converters;
-
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class BooleanDeserializer : Deserializer<bool> {
         public override bool Read(Reader reader, int tag) {
             var stream = reader.Stream;

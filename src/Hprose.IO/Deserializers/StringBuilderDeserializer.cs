@@ -12,19 +12,16 @@
  *                                                        *
  * StringBuilderDeserializer class for C#.                *
  *                                                        *
- * LastModified: Apr 14, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
-using System;
 using System.Text;
 
-using Hprose.IO.Converters;
-
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class StringBuilderDeserializer : Deserializer<StringBuilder> {
         public override StringBuilder Read(Reader reader, int tag) {
             var stream = reader.Stream;

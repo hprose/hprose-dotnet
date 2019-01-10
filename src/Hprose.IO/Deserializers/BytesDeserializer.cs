@@ -12,16 +12,14 @@
  *                                                        *
  * BytesDeserializer class for C#.                        *
  *                                                        *
- * LastModified: Apr 25, 2018                             *
+ * LastModified: Jan 11, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 
-using Hprose.IO.Converters;
-
-using static Hprose.IO.Tags;
-
 namespace Hprose.IO.Deserializers {
+    using static Tags;
+
     class BytesDeserializer : Deserializer<byte[]> {
         private static readonly byte[] empty = new byte[0] { };
         public override byte[] Read(Reader reader, int tag) {
