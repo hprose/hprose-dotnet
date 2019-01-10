@@ -18,6 +18,7 @@
 \**********************************************************/
 
 using Hprose.Collections.Generic;
+using Hprose.IO.Serializers;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -25,8 +26,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
 using System.IO;
-
-using Hprose.IO.Serializers;
 
 namespace Hprose.IO {
     public interface ISerializer {

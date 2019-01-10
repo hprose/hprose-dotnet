@@ -12,7 +12,7 @@
  *                                                        *
  * ReferenceReader class for C#.                          *
  *                                                        *
- * LastModified: Dec 13, 2018                             *
+ * LastModified: Jan 10, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -20,7 +20,7 @@
 using System;
 using System.IO;
 
-namespace Hprose.IO.Deserializers {
+namespace Hprose.IO {
     public static class ReferenceReader {
         public static byte[] ReadBytes(Reader reader) {
             var result = ValueReader.ReadBytes(reader.Stream);

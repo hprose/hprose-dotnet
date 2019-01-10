@@ -91,9 +91,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\SByteDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ByteDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\TypeInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ReferenceReader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ValueReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReferenceReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ValueReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Reader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Formatter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Mode.cs" />
@@ -142,7 +142,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Serializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\BooleanSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\DBNullSerializer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Serializers\ValueWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ValueWriter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Writer.cs" />
   </ItemGroup>
 </Project>

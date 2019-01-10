@@ -12,7 +12,7 @@
  *                                                        *
  * ValueWriter class for C#.                              *
  *                                                        *
- * LastModified: Apr 10, 2018                             *
+ * LastModified: Jan 10, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -24,7 +24,7 @@ using System.Text;
 
 using static Hprose.IO.Tags;
 
-namespace Hprose.IO.Serializers {
+namespace Hprose.IO {
     public static class ValueWriter {
         private const int INT_SIZE = 11;
         private const int LONG_SIZE = 20;

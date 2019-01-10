@@ -12,13 +12,13 @@
  *                                                        *
  * TypeInfo class for C#.                                 *
  *                                                        *
- * LastModified: Dec 14, 2018                             *
+ * LastModified: Jan 10, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
 using System;
 
-namespace Hprose.IO.Deserializers {
+namespace Hprose.IO {
     public class TypeInfo {
         public readonly string name;
         public readonly string[] names;

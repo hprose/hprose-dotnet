@@ -18,7 +18,6 @@
 \**********************************************************/
 
 using Hprose.IO.Converters;
-using Hprose.IO.Deserializers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -104,17 +103,6 @@ namespace Hprose.IO {
         public void SetReference(int index, object obj) => _refer?.Set(index, obj);
 
         public int LastReferenceIndex => _refer?.LastIndex ?? -1;
-
-        public MemoryStream ReadRaw() {
-            MemoryStream ostream = new MemoryStream();
-            ReadRaw(ostream);
-            ostream.Position = 0;
-            return ostream;
-        }
-
-        public void ReadRaw(Stream ostream) {
-            RawReader.ReadRaw(Stream, ostream, Stream.ReadByte());
-        }
 
         public void Reset() {
             _refer?.Reset();

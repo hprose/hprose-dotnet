@@ -12,7 +12,7 @@
  *                                                        *
  * RawReader class for C#.                                *
  *                                                        *
- * LastModified: May 2, 2018                              *
+ * LastModified: Jan 10, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -22,7 +22,7 @@ using System.Runtime.Serialization;
 
 using static Hprose.IO.Tags;
 
-namespace Hprose.IO.Deserializers {
+namespace Hprose.IO {
     public static class RawReader {
         private static void ReadNumberRaw(Stream stream, Stream ostream) {
             int tag;
@@ -162,9 +162,6 @@ namespace Hprose.IO.Deserializers {
             }
             ostream.WriteByte((byte)tag);
         }
-        private static void ReadRaw(Stream stream, Stream ostream) {
-            ReadRaw(stream, ostream, stream.ReadByte());
-        }
         public static void ReadRaw(Stream stream, Stream ostream, int tag) {
             ostream.WriteByte((byte)tag);
             switch (tag) {
@@ -226,6 +223,15 @@ namespace Hprose.IO.Deserializers {
                 default:
                     throw new SerializationException("Unexpected serialize tag '" + (char)tag + "' in stream");
             }
+        }
+        public static void ReadRaw(Stream stream, Stream ostream) {
+            ReadRaw(stream, ostream, stream.ReadByte());
+        }
+        public static MemoryStream ReadRaw(Stream stream) {
+            MemoryStream ostream = new MemoryStream();
+            ReadRaw(stream, ostream);
+            ostream.Position = 0;
+            return ostream;
         }
     }
 }

@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Hprose.IO.Serializers;
 
 namespace Hprose.IO {
     using static Tags;
