@@ -55,6 +55,22 @@ namespace Hprose.IO {
         private static readonly byte[] minLongBuf = GetASCII("-9223372036854775808");
         public static readonly UTF8Encoding UTF8 = new UTF8Encoding();
 
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+        public static void WriteASCII(Stream stream, string s) {
+            int size = s.Length;
+            Span<byte> buf = stackalloc byte[size];
+            while (--size >= 0) {
+                buf[size] = (byte)s[size];
+            }
+            stream.Write(buf);
+        }
+#else
+        public static void WriteASCII(Stream stream, string s) {
+            byte[] buf = GetASCII(s);
+            stream.Write(buf, 0, buf.Length);
+        }
+#endif
+
         public static byte[] GetASCII(string s) {
             int size = s.Length;
             byte[] buf = new byte[size];
@@ -72,12 +88,20 @@ namespace Hprose.IO {
                 stream.Write(minIntBuf, 0, minIntBuf.Length);
             }
             else {
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+                Span<byte> buf = stackalloc byte[INT_SIZE];
+#else
                 byte[] buf = new byte[INT_SIZE];
+#endif
                 int off = ToBytes((uint)((i < 0) ? -i : i), buf, INT_SIZE);
                 if (i < 0) {
                     buf[--off] = (byte)'-';
                 }
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+                stream.Write(buf.Slice(off, INT_SIZE - off));
+#else
                 stream.Write(buf, off, INT_SIZE - off);
+#endif
             }
         }
 
@@ -86,9 +110,15 @@ namespace Hprose.IO {
                 stream.WriteByte(digits[i]);
             }
             else {
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+                Span<byte> buf = stackalloc byte[INT_SIZE];
+                int off = ToBytes(i, buf, INT_SIZE);
+                stream.Write(buf.Slice(off, INT_SIZE - off));
+#else
                 byte[] buf = new byte[INT_SIZE];
                 int off = ToBytes(i, buf, INT_SIZE);
                 stream.Write(buf, off, INT_SIZE - off);
+#endif
             }
         }
 
@@ -100,12 +130,20 @@ namespace Hprose.IO {
                 stream.Write(minLongBuf, 0, minLongBuf.Length);
             }
             else {
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+                Span<byte> buf = stackalloc byte[LONG_SIZE];
+#else
                 byte[] buf = new byte[LONG_SIZE];
+#endif
                 int off = ToBytes((ulong)((i < 0) ? -i : i), buf, LONG_SIZE);
                 if (i < 0) {
                     buf[--off] = (byte)'-';
                 }
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+                stream.Write(buf.Slice(off, LONG_SIZE - off));
+#else
                 stream.Write(buf, off, LONG_SIZE - off);
+#endif
             }
         }
 
@@ -114,13 +152,23 @@ namespace Hprose.IO {
                 stream.WriteByte(digits[i]);
             }
             else {
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+                Span<byte> buf = stackalloc byte[LONG_SIZE];
+                int off = ToBytes(i, buf, LONG_SIZE);
+                stream.Write(buf.Slice(off, LONG_SIZE - off));
+#else
                 byte[] buf = new byte[LONG_SIZE];
                 int off = ToBytes(i, buf, LONG_SIZE);
                 stream.Write(buf, off, LONG_SIZE - off);
+#endif
             }
         }
 
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+        private static int ToBytes(uint i, Span<byte> buf, int off) {
+#else
         private static int ToBytes(uint i, byte[] buf, int off) {
+#endif
             uint q, r;
             while (i >= 65536) {
                 q = i / 100;
@@ -139,7 +187,11 @@ namespace Hprose.IO {
             return off;
         }
 
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+        private static int ToBytes(ulong i, Span<byte> buf, int off) {
+#else
         private static int ToBytes(ulong i, byte[] buf, int off) {
+#endif
             ulong q, r;
             while (i > int.MaxValue) {
                 q = i / 100;
@@ -207,8 +259,7 @@ namespace Hprose.IO {
             }
             else {
                 stream.WriteByte(TagDouble);
-                byte[] buf = GetASCII(n.ToString("R"));
-                stream.Write(buf, 0, buf.Length);
+                WriteASCII(stream, n.ToString("R"));
                 stream.WriteByte(TagSemicolon);
             }
         }
@@ -223,23 +274,20 @@ namespace Hprose.IO {
             }
             else {
                 stream.WriteByte(TagDouble);
-                byte[] buf = GetASCII(n.ToString("R"));
-                stream.Write(buf, 0, buf.Length);
+                WriteASCII(stream, n.ToString("R"));
                 stream.WriteByte(TagSemicolon);
             }
         }
 
         public static void Write(Stream stream, decimal n) {
             stream.WriteByte(TagDouble);
-            byte[] buf = GetASCII(n.ToString());
-            stream.Write(buf, 0, buf.Length);
+            WriteASCII(stream, n.ToString());
             stream.WriteByte(TagSemicolon);
         }
 
         public static void Write(Stream stream, BigInteger n) {
             stream.WriteByte(TagLong);
-            byte[] buf = GetASCII(n.ToString());
-            stream.Write(buf, 0, buf.Length);
+            WriteASCII(stream, n.ToString());
             stream.WriteByte(TagSemicolon);
         }
 

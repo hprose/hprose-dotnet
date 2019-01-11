@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.11.3" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="ServiceStack.Text" Version="5.4.0" />
   </ItemGroup>
 
   <Import Project="..\..\src\Hprose.Collections\Hprose.Collections.projitems" Label="Shared" />

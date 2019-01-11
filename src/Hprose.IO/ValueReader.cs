@@ -343,7 +343,11 @@ namespace Hprose.IO {
         }
 
         public static Guid ReadGuid(Stream stream) {
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+            Span<char> buf = stackalloc char[38];
+#else
             char[] buf = new char[38];
+#endif
             for (int i = 0; i < 38; ++i) {
                 buf[i] = (char)stream.ReadByte();
             }

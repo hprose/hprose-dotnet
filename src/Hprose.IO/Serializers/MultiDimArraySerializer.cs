@@ -28,25 +28,32 @@ namespace Hprose.IO.Serializers {
             Array array = (Array)(object)obj;
             int rank = array.Rank;
             int i;
-            int[,] des = new int[rank, 2];
-            int[] loc = new int[rank];
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+            Span<int> lb = stackalloc int[rank];
+            Span<int> ub = stackalloc int[rank];
+            Span<int> len = stackalloc int[rank];
+#else
+            int[] lb = new int[rank];
+            int[] ub = new int[rank];
             int[] len = new int[rank];
+#endif
+            int[] loc = new int[rank];
             int maxrank = rank - 1;
             for (i = 0; i < rank; ++i) {
-                des[i, 0] = array.GetLowerBound(i);
-                des[i, 1] = array.GetUpperBound(i);
-                loc[i] = des[i, 0];
+                lb[i] = array.GetLowerBound(i);
+                ub[i] = array.GetUpperBound(i);
                 len[i] = array.GetLength(i);
+                loc[i] = lb[i];
             }
             var stream = writer.Stream;
             stream.WriteByte(TagList);
             if (len[0] > 0) ValueWriter.WriteInt(stream, len[0]);
             stream.WriteByte(TagOpenbrace);
             var serializer = Serializer.Instance;
-            while (loc[0] <= des[0, 1]) {
+            while (loc[0] <= ub[0]) {
                 int n = 0;
                 for (i = maxrank; i > 0; i--) {
-                    if (loc[i] == des[i, 0]) {
+                    if (loc[i] == lb[i]) {
                         n++;
                     }
                     else {
@@ -59,14 +66,14 @@ namespace Hprose.IO.Serializers {
                     if (len[i] > 0) ValueWriter.WriteInt(stream, len[i]);
                     stream.WriteByte(TagOpenbrace);
                 }
-                for (loc[maxrank] = des[maxrank, 0];
-                     loc[maxrank] <= des[maxrank, 1];
+                for (loc[maxrank] = lb[maxrank];
+                     loc[maxrank] <= ub[maxrank];
                      loc[maxrank]++) {
                     serializer.Serialize(writer, array.GetValue(loc));
                 }
                 for (i = maxrank; i > 0; i--) {
-                    if (loc[i] > des[i, 1]) {
-                        loc[i] = des[i, 0];
+                    if (loc[i] > ub[i]) {
+                        loc[i] = lb[i];
                         loc[i - 1]++;
                         stream.WriteByte(TagClosebrace);
                     }

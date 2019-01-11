@@ -29,8 +29,7 @@ namespace Hprose.IO.Serializers {
             Stream stream = writer.Stream;
             stream.WriteByte(TagGuid);
             stream.WriteByte(TagOpenbrace);
-            byte[] buf = ValueWriter.GetASCII(obj.ToString());
-            stream.Write(buf, 0, buf.Length);
+            ValueWriter.WriteASCII(stream, obj.ToString());
             stream.WriteByte(TagClosebrace);
         }
     }
