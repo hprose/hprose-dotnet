@@ -91,7 +91,7 @@ namespace Hprose.IO {
         }
 
         public T ReadReference<T>() {
-            object obj = _refer?.Read(ValueReader.ReadInt(Stream));
+            object obj = ReadReference();
             if (obj != null) {
                 return Converter<T>.Convert(obj);
             }

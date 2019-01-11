@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CharType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ArraySegmentDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DictType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Factory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FieldsAccessor.cs" />
@@ -29,6 +30,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RealType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ReferenceReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\ArraySegmentSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tags.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeManager.cs" />

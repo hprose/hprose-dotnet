@@ -116,6 +116,9 @@ namespace Hprose.IO {
                 if (genericType == typeof(NullableKey<>)) {
                     return typeof(NullableKeySerializer<>).MakeGenericType(genericArgs);
                 }
+                if (genericType == typeof(ArraySegment<>)) {
+                    return typeof(ArraySegmentSerializer<>).MakeGenericType(genericArgs);
+                }
                 switch (genericArgs.Length) {
                     case 1:
                         bool isGenericCollection = typeof(ICollection<>).MakeGenericType(genericArgs).IsAssignableFrom(type);

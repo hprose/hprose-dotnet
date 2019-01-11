@@ -809,6 +809,21 @@ namespace Hprose.UnitTests.IO {
                 AreEqual(array, reader.Deserialize<int[]>());
             }
         }
+        [TestMethod]
+        public void TestDeserializeArraySegment() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var array = new int[] { '0', '1', '2', '3', '4', '5' };
+                writer.Serialize(null);
+                writer.Serialize(array);
+                writer.Serialize(array);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Assert.AreEqual(default, reader.Deserialize<ArraySegment<int>>());
+                AreEqual(array, reader.Deserialize<ArraySegment<int>>().Array);
+                AreEqual(array, reader.Deserialize<ArraySegment<int>>().Array);
+            }
+        }
         private void AreEqual<T>(ICollection<T> c1, ICollection<T> c2) {
             Assert.AreEqual(c1.Count, c2.Count);
             foreach (var e in c1) {

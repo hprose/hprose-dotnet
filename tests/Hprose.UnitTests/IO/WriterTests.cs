@@ -154,6 +154,17 @@ namespace Hprose.UnitTests.IO {
             }
         }
         [TestMethod]
+        public void TestSerializeArraySegment() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var a = new ArraySegment<int>(new int[] { 1,2,3,4,5 });
+                writer.Serialize(a);
+                writer.Serialize(a);
+                writer.Serialize(new ArraySegment<int>(a.Array, 3, 2));
+                Assert.AreEqual("a5{12345}r0;a2{45}", ValueWriter.UTF8.GetString(stream.ToArray()));
+            }
+        }
+        [TestMethod]
         public void TestSerializeList() {
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);

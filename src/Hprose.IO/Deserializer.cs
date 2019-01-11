@@ -136,6 +136,9 @@ namespace Hprose.IO {
                         if (genericType == typeof(NullableKey<>)) {
                             return typeof(NullableKeyDeserializer<>).MakeGenericType(genericArgs);
                         }
+                        if (genericType == typeof(ArraySegment<>)) {
+                            return typeof(ArraySegmentDeserializer<>).MakeGenericType(genericArgs);
+                        }
                         if (type.IsInterface) {
                             var pairType = typeof(KeyValuePair<,>);
                             if (typeof(ISet<>) == genericType) {
