@@ -293,7 +293,7 @@ namespace Hprose.UnitTests.IO {
                 Assert.IsTrue(reader.Deserialize<bool>());
                 Assert.IsTrue(reader.Deserialize<bool>());
                 Assert.IsTrue(reader.Deserialize<bool>());
-                Assert.IsTrue(reader.Deserialize<bool>());
+                Assert.IsFalse(reader.Deserialize<bool>());
                 Assert.IsTrue(reader.Deserialize<bool>());
                 Assert.IsTrue(reader.Deserialize<bool>());
             }
