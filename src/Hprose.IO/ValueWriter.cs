@@ -56,11 +56,15 @@ namespace Hprose.IO {
         public static readonly UTF8Encoding UTF8 = new UTF8Encoding();
 
 #if NETCOREAPP2_1 || NETCOREAPP2_2
-        public static void WriteASCII(Stream stream, string s) {
+        public static unsafe void WriteASCII(Stream stream, string s) {
             int size = s.Length;
             Span<byte> buf = stackalloc byte[size];
-            while (--size >= 0) {
-                buf[size] = (byte)s[size];
+            fixed (byte *bp = buf) {
+                unchecked {
+                    while (--size >= 0) {
+                        bp[size] = (byte)s[size];
+                    }
+                }
             }
             stream.Write(buf);
         }
@@ -71,11 +75,15 @@ namespace Hprose.IO {
         }
 #endif
 
-        public static byte[] GetASCII(string s) {
+        public static unsafe byte[] GetASCII(string s) {
             int size = s.Length;
             byte[] buf = new byte[size];
-            while (--size >= 0) {
-                buf[size] = (byte)s[size];
+            fixed (byte* bp = buf) {
+                unchecked {
+                    while (--size >= 0) {
+                        bp[size] = (byte)s[size];
+                    }
+                }
             }
             return buf;
         }
@@ -165,40 +173,48 @@ namespace Hprose.IO {
         }
 
 #if NETCOREAPP2_1 || NETCOREAPP2_2
-        private static int ToBytes(uint i, Span<byte> buf, int off) {
+        private static unsafe int ToBytes(uint i, Span<byte> buf, int off) {
 #else
-        private static int ToBytes(uint i, byte[] buf, int off) {
+        private static unsafe int ToBytes(uint i, byte[] buf, int off) {
 #endif
-            uint q, r;
-            while (i >= 65536) {
-                q = i / 100;
-                r = i - (q * 100);
-                i = q;
-                buf[--off] = digitOnes[r];
-                buf[--off] = digitTens[r];
-            }
-            for (; ; ) {
-                q = (i * 52429) >> (16 + 3);
-                r = i - (q * 10);
-                buf[--off] = digits[r];
-                i = q;
-                if (i == 0) break;
+            fixed (byte* bp = buf, d1p = digitOnes, d10p = digitTens, dp = digits) {
+                unchecked {
+                    uint q, r;
+                    while (i >= 65536) {
+                        q = i / 100;
+                        r = i - (q * 100);
+                        i = q;
+                        bp[--off] = d1p[r];
+                        bp[--off] = d10p[r];
+                    }
+                    for (; ; ) {
+                        q = (i * 52429) >> (16 + 3);
+                        r = i - (q * 10);
+                        bp[--off] = dp[r];
+                        i = q;
+                        if (i == 0) break;
+                    }
+                }
             }
             return off;
         }
 
 #if NETCOREAPP2_1 || NETCOREAPP2_2
-        private static int ToBytes(ulong i, Span<byte> buf, int off) {
+        private static unsafe int ToBytes(ulong i, Span<byte> buf, int off) {
 #else
-        private static int ToBytes(ulong i, byte[] buf, int off) {
+        private static unsafe int ToBytes(ulong i, byte[] buf, int off) {
 #endif
-            ulong q, r;
-            while (i > int.MaxValue) {
-                q = i / 100;
-                r = i - (q * 100);
-                i = q;
-                buf[--off] = digitOnes[r];
-                buf[--off] = digitTens[r];
+            fixed (byte* bp = buf, d1p = digitOnes, d10p = digitTens) {
+                unchecked {
+                    ulong q, r;
+                    while (i > int.MaxValue) {
+                        q = i / 100;
+                        r = i - (q * 100);
+                        i = q;
+                        bp[--off] = d1p[r];
+                        bp[--off] = d10p[r];
+                    }
+                }
             }
             return ToBytes((uint)i, buf, off);
         }
