@@ -17,7 +17,6 @@
  *                                                        *
 \**********************************************************/
 
-using Hprose.IO.Converters;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -86,9 +85,7 @@ namespace Hprose.IO {
             _ref.Add(new TypeInfo(name, names));
         }
 
-        public object ReadReference() {
-            return _refer?.Read(ValueReader.ReadInt(Stream));
-        }
+        public object ReadReference() => _refer?.Read(ValueReader.ReadInt(Stream));
 
         public T ReadReference<T>() {
             object obj = ReadReference();

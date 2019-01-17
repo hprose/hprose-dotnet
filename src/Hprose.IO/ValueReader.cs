@@ -12,7 +12,7 @@
  *                                                        *
  * ValueReader class for C#.                              *
  *                                                        *
- * LastModified: Jan 11, 2019                             *
+ * LastModified: Jan 17, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -177,13 +177,9 @@ namespace Hprose.IO {
             return result;
         }
 
-        public static int ReadLength(Stream stream) {
-            return ReadInt(stream, TagQuote);
-        }
+        public static int ReadLength(Stream stream) => ReadInt(stream, TagQuote);
 
-        public static int ReadCount(Stream stream) {
-            return ReadInt(stream, TagOpenbrace);
-        }
+        public static int ReadCount(Stream stream) => ReadInt(stream, TagOpenbrace);
 
         public static StringBuilder ReadUntil(Stream stream, int tag) {
             StringBuilder sb = new StringBuilder();
@@ -199,62 +195,6 @@ namespace Hprose.IO {
             while ((i != tag) && (i != -1)) {
                 i = stream.ReadByte();
             }
-        }
-        public static char[] ReadChars(Stream stream) {
-            int len = ReadLength(stream);
-            char[] buf = new char[len];
-            int b1, b2, b3, b4;
-            for (int i = 0; i < len; ++i) {
-                b1 = stream.ReadByte();
-                switch (b1 >> 4) {
-                    case 0:
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                        // 0xxx xxxx
-                        buf[i] = (char)b1;
-                        break;
-                    case 12:
-                    case 13:
-                        // 110x xxxx   10xx xxxx
-                        b2 = stream.ReadByte();
-                        buf[i] = (char)(((b1 & 0x1f) << 6) |
-                                         (b2 & 0x3f));
-                        break;
-                    case 14:
-                        b2 = stream.ReadByte();
-                        b3 = stream.ReadByte();
-                        buf[i] = (char)(((b1 & 0x0f) << 12) |
-                                        ((b2 & 0x3f) << 6) |
-                                         (b3 & 0x3f));
-                        break;
-                    case 15:
-                        // 1111 0xxx  10xx xxxx  10xx xxxx  10xx xxxx
-                        if ((b1 & 0xf) <= 4) {
-                            b2 = stream.ReadByte();
-                            b3 = stream.ReadByte();
-                            b4 = stream.ReadByte();
-                            int s = (((b1 & 0x07) << 18) |
-                                     ((b2 & 0x3f) << 12) |
-                                     ((b3 & 0x3f) << 6) |
-                                      (b4 & 0x3f)) - 0x10000;
-                            if (0 <= s && s <= 0xfffff) {
-                                buf[i] = (char)(((s >> 10) & 0x03ff) | 0xd800);
-                                buf[++i] = (char)((s & 0x03ff) | 0xdc00);
-                                break;
-                            }
-                        }
-                        goto default;
-                    default:
-                        throw BadEncoding(b1);
-                }
-            }
-            stream.ReadByte();
-            return buf;
         }
         public static char ReadChar(Stream stream) {
             char u;
@@ -289,46 +229,101 @@ namespace Hprose.IO {
             return u;
         }
 
-        public static int ReadInt(Stream stream) {
-            return ReadInt(stream, TagSemicolon);
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+        private static unsafe void ReadChars(Span<char> buf, Stream stream) {
+#else
+        private static unsafe void ReadChars(char[] buf, Stream stream) {
+#endif
+            int b1, b2, b3, b4;
+            int len = buf.Length;
+            fixed(char* bp = &buf[0]) {
+                for (int i = 0; i < len; ++i) {
+                    b1 = stream.ReadByte();
+                    switch (b1 >> 4) {
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                            // 0xxx xxxx
+                            bp[i] = (char)b1;
+                            break;
+                        case 12:
+                        case 13:
+                            // 110x xxxx   10xx xxxx
+                            b2 = stream.ReadByte();
+                            bp[i] = (char)(((b1 & 0x1f) << 6) |
+                                             (b2 & 0x3f));
+                            break;
+                        case 14:
+                            b2 = stream.ReadByte();
+                            b3 = stream.ReadByte();
+                            bp[i] = (char)(((b1 & 0x0f) << 12) |
+                                            ((b2 & 0x3f) << 6) |
+                                             (b3 & 0x3f));
+                            break;
+                        case 15:
+                            // 1111 0xxx  10xx xxxx  10xx xxxx  10xx xxxx
+                            if ((b1 & 0xf) <= 4) {
+                                b2 = stream.ReadByte();
+                                b3 = stream.ReadByte();
+                                b4 = stream.ReadByte();
+                                int s = (((b1 & 0x07) << 18) |
+                                         ((b2 & 0x3f) << 12) |
+                                         ((b3 & 0x3f) << 6) |
+                                          (b4 & 0x3f)) - 0x10000;
+                                if (0 <= s && s <= 0xfffff) {
+                                    bp[i] = (char)(((s >> 10) & 0x03ff) | 0xd800);
+                                    bp[++i] = (char)((s & 0x03ff) | 0xdc00);
+                                    break;
+                                }
+                            }
+                            goto default;
+                        default:
+                            throw BadEncoding(b1);
+                    }
+                }
+            }
+            stream.ReadByte();
         }
 
-        public static long ReadLong(Stream stream) {
-            return ReadLong(stream, TagSemicolon);
+        public static char[] ReadChars(Stream stream) {
+            int len = ReadLength(stream);
+            char[] buf = new char[len];
+            ReadChars(buf, stream);
+            return buf;
         }
 
-        public static BigInteger ReadBigInteger(Stream stream) {
-            return BigInteger.Parse(ReadUntil(stream, TagSemicolon).ToString());
-        }
+        public static int ReadInt(Stream stream) => ReadInt(stream, TagSemicolon);
 
-        public static float ReadSingle(Stream stream) {
-            return float.Parse(ReadUntil(stream, TagSemicolon).ToString());
-        }
+        public static long ReadLong(Stream stream) => ReadLong(stream, TagSemicolon);
 
-        public static double ReadDouble(Stream stream) {
-            return double.Parse(ReadUntil(stream, TagSemicolon).ToString());
-        }
+        public static BigInteger ReadBigInteger(Stream stream) => BigInteger.Parse(ReadUntil(stream, TagSemicolon).ToString());
 
-        public static decimal ReadDecimal(Stream stream) {
-            return decimal.Parse(ReadUntil(stream, TagSemicolon).ToString());
-        }
+        public static float ReadSingle(Stream stream) => float.Parse(ReadUntil(stream, TagSemicolon).ToString());
 
-        public static float ReadSingleInfinity(Stream stream) {
-            return (stream.ReadByte() == TagNeg) ? float.NegativeInfinity : float.PositiveInfinity;
-        }
+        public static double ReadDouble(Stream stream) => double.Parse(ReadUntil(stream, TagSemicolon).ToString());
 
-        public static double ReadInfinity(Stream stream) {
-            return (stream.ReadByte() == TagNeg) ? double.NegativeInfinity : double.PositiveInfinity;
-        }
+        public static decimal ReadDecimal(Stream stream) => decimal.Parse(ReadUntil(stream, TagSemicolon).ToString());
 
+        public static float ReadSingleInfinity(Stream stream) => (stream.ReadByte() == TagNeg) ? float.NegativeInfinity : float.PositiveInfinity;
+
+        public static double ReadInfinity(Stream stream) => (stream.ReadByte() == TagNeg) ? double.NegativeInfinity : double.PositiveInfinity;
+
+        public static string ReadUTF8Char(Stream stream) => new string(ReadChar(stream), 1);
+
+#if NETCOREAPP2_1 || NETCOREAPP2_2
         public static string ReadString(Stream stream) {
-            return new string(ReadChars(stream));
+            int len = ReadLength(stream);
+            return string.Create<Stream>(len, stream, ReadChars);
         }
+#else
+        public static string ReadString(Stream stream) => new string(ReadChars(stream));
 
-        public static string ReadUTF8Char(Stream stream) {
-            return new string(ReadChar(stream), 1);
-        }
-
+#endif
         public static byte[] ReadBytes(Stream stream) {
             int len = ReadLength(stream);
             int off = 0;
@@ -342,14 +337,16 @@ namespace Hprose.IO {
             return b;
         }
 
-        public static Guid ReadGuid(Stream stream) {
+        public static unsafe Guid ReadGuid(Stream stream) {
 #if NETCOREAPP2_1 || NETCOREAPP2_2
             Span<char> buf = stackalloc char[38];
 #else
             char[] buf = new char[38];
 #endif
-            for (int i = 0; i < 38; ++i) {
-                buf[i] = (char)stream.ReadByte();
+            fixed (char* bp = &buf[0]) {
+                for (int i = 0; i < 38; ++i) {
+                    bp[i] = (char)stream.ReadByte();
+                }
             }
             return new Guid(new String(buf));
         }

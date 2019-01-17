@@ -91,9 +91,7 @@ namespace Hprose.IO {
             Copy(stream, ostream, len);
             ostream.WriteByte((byte)stream.ReadByte());
         }
-        private static void ReadGuidRaw(Stream stream, Stream ostream) {
-            Copy(stream, ostream, 38);
-        }
+        private static void ReadGuidRaw(Stream stream, Stream ostream) => Copy(stream, ostream, 38);
         private static void ReadStringRaw(Stream stream, Stream ostream) {
             int count = 0;
             int tag = '0';
@@ -224,9 +222,7 @@ namespace Hprose.IO {
                     throw new SerializationException("Unexpected serialize tag '" + (char)tag + "' in stream");
             }
         }
-        public static void ReadRaw(Stream stream, Stream ostream) {
-            ReadRaw(stream, ostream, stream.ReadByte());
-        }
+        public static void ReadRaw(Stream stream, Stream ostream) => ReadRaw(stream, ostream, stream.ReadByte());
         public static MemoryStream ReadRaw(Stream stream) {
             MemoryStream ostream = new MemoryStream();
             ReadRaw(stream, ostream);

@@ -65,9 +65,7 @@ namespace Hprose.IO.Deserializers {
                     return base.Read(reader, tag);
             }
         }
-        public object ReadObject(Reader reader, string key) {
-            return Read(reader, key);
-        }
+        public object ReadObject(Reader reader, string key) => Read(reader, key);
     }
     class StructDeserializer<T> : Deserializer<T>, IObjectDeserializer where T : struct {
         private static T Read(Reader reader, string key) {
@@ -112,8 +110,7 @@ namespace Hprose.IO.Deserializers {
                     return base.Read(reader, tag);
             }
         }
-        public object ReadObject(Reader reader, string key) {
-            return Read(reader, key);
-        }
+
+        public object ReadObject(Reader reader, string key) => Read(reader, key);
     }
 }

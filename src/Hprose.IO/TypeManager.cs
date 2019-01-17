@@ -12,7 +12,7 @@
  *                                                        *
  * hprose TypeManager class for C#.                       *
  *                                                        *
- * LastModified: Dec 14, 2018                             *
+ * LastModified: Jan 17, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -61,7 +61,11 @@ namespace Hprose.IO {
             Type type;
             int length = alias.Length - alias.Replace("_", "").Length;
             if (length > 0) {
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+                Span<int> positions = stackalloc int[length];
+#else
                 int[] positions = new int[length];
+#endif
                 int pos = alias.IndexOf('_');
                 for (int i = 0; i < length; ++i) {
                     positions[i] = pos;
@@ -88,7 +92,11 @@ namespace Hprose.IO {
             }
             return type;
         }
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+        private static Type GetNestedType(char[] name, Span<int> positions, int i, char c) {
+#else
         private static Type GetNestedType(char[] name, int[] positions, int i, char c) {
+#endif
             int length = positions.Length;
             Type type;
             if (i < length) {
@@ -103,7 +111,11 @@ namespace Hprose.IO {
             }
             return type;
         }
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+        private static Type GetType(char[] name, Span<int> positions, int i, char c) {
+#else
         private static Type GetType(char[] name, int[] positions, int i, char c) {
+#endif
             int length = positions.Length;
             Type type;
             if (i < length) {
