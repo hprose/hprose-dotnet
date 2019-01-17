@@ -7,15 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1F8BC289-8A9
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.IO", "src\Hprose.IO\Hprose.IO.shproj", "{3BBAFD96-BCE6-4D52-A2B4-8ABD2250465F}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.Reflection", "src\Hprose.Reflection\Hprose.Reflection.shproj", "{E6D9923E-BAB1-42C5-8F14-54E5DF7CDBC0}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.Collections", "src\Hprose.Collections\Hprose.Collections.shproj", "{645EF886-F73B-46A5-A484-7EBE81209303}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.Common", "src\Hprose.Common\Hprose.Common.shproj", "{12DBE6FD-77F9-47A5-B255-056A9B23496A}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.Client", "src\Hprose.Client\Hprose.Client.shproj", "{26AF48AD-8F09-4146-BC18-D35529AFA89E}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.Server", "src\Hprose.Server\Hprose.Server.shproj", "{4221BD53-5C13-4AA8-98F7-15FE52D91AAF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hprose.IO", "proj\Hprose.IO\Hprose.IO.csproj", "{2D93D037-2300-4B33-8FCB-099D41AA579F}"
 EndProject
@@ -27,16 +19,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hprose.Benchmark", "tests\H
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "proj", "proj", "{133CF4A1-F478-4AD3-86BA-6F2D55A08A0A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hprose.Common", "proj\Hprose.Common\Hprose.Common.csproj", "{51D3034A-D18B-411B-91CE-8530A516F0F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hprose.RPC", "proj\Hprose.RPC\Hprose.RPC.csproj", "{51D3034A-D18B-411B-91CE-8530A516F0F1}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.RPC", "src\Hprose.RPC\Hprose.RPC.shproj", "{26AF48AD-8F09-4146-BC18-D35529AFA89E}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\Hprose.Common\Hprose.Common.projitems*{12dbe6fd-77f9-47a5-b255-056a9b23496a}*SharedItemsImports = 13
-		src\Hprose.Client\Hprose.Client.projitems*{26af48ad-8f09-4146-bc18-d35529afa89e}*SharedItemsImports = 13
+		src\Hprose.RPC\Hprose.RPC.projitems*{26af48ad-8f09-4146-bc18-d35529afa89e}*SharedItemsImports = 13
 		src\Hprose.IO\Hprose.IO.projitems*{3bbafd96-bce6-4d52-a2b4-8abd2250465f}*SharedItemsImports = 13
-		src\Hprose.Server\Hprose.Server.projitems*{4221bd53-5c13-4aa8-98f7-15fe52d91aaf}*SharedItemsImports = 13
 		src\Hprose.Collections\Hprose.Collections.projitems*{645ef886-f73b-46a5-a484-7ebe81209303}*SharedItemsImports = 13
-		src\Hprose.Reflection\Hprose.Reflection.projitems*{e6d9923e-bab1-42c5-8f14-54e5df7cdbc0}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -119,15 +110,12 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3BBAFD96-BCE6-4D52-A2B4-8ABD2250465F} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
-		{E6D9923E-BAB1-42C5-8F14-54E5DF7CDBC0} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
 		{645EF886-F73B-46A5-A484-7EBE81209303} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
-		{12DBE6FD-77F9-47A5-B255-056A9B23496A} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
-		{26AF48AD-8F09-4146-BC18-D35529AFA89E} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
-		{4221BD53-5C13-4AA8-98F7-15FE52D91AAF} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
 		{2D93D037-2300-4B33-8FCB-099D41AA579F} = {133CF4A1-F478-4AD3-86BA-6F2D55A08A0A}
 		{E86F21D8-9031-41CC-A21F-A2F859A0CD6E} = {30A67E52-BF38-4C95-8A80-B0A4F98658B2}
 		{3CF692BC-DF52-4FBA-BE0F-7644909A08CD} = {30A67E52-BF38-4C95-8A80-B0A4F98658B2}
 		{51D3034A-D18B-411B-91CE-8530A516F0F1} = {133CF4A1-F478-4AD3-86BA-6F2D55A08A0A}
+		{26AF48AD-8F09-4146-BC18-D35529AFA89E} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2EEAB779-9719-4703-8BDF-9C5F995D8A68}

@@ -19,7 +19,7 @@
 
 using System;
 
-namespace Hprose.Common {
+namespace Hprose.RPC.Common {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public class MethodNameAttribute : Attribute {
         public MethodNameAttribute(string value) => Value = value;
