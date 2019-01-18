@@ -42,18 +42,16 @@ namespace Hprose.IO {
                     i = stream.ReadByte();
                     break;
             }
-            unchecked {
-                if (neg) {
-                    while ((i != tag) && (i != -1)) {
-                        result = result * 10 - (i - '0');
-                        i = stream.ReadByte();
-                    }
+            if (neg) {
+                while ((i != tag) && (i != -1)) {
+                    result = result * 10 - (i - '0');
+                    i = stream.ReadByte();
                 }
-                else {
-                    while ((i != tag) && (i != -1)) {
-                        result = result * 10 + (i - '0');
-                        i = stream.ReadByte();
-                    }
+            }
+            else {
+                while ((i != tag) && (i != -1)) {
+                    result = result * 10 + (i - '0');
+                    i = stream.ReadByte();
                 }
             }
             return result;
@@ -74,18 +72,16 @@ namespace Hprose.IO {
                     i = stream.ReadByte();
                     break;
             }
-            unchecked {
-                if (neg) {
-                    while ((i != tag) && (i != -1)) {
-                        result = result * 10 - (i - '0');
-                        i = stream.ReadByte();
-                    }
+            if (neg) {
+                while ((i != tag) && (i != -1)) {
+                    result = result * 10 - (i - '0');
+                    i = stream.ReadByte();
                 }
-                else {
-                    while ((i != tag) && (i != -1)) {
-                        result = result * 10 + (i - '0');
-                        i = stream.ReadByte();
-                    }
+            }
+            else {
+                while ((i != tag) && (i != -1)) {
+                    result = result * 10 + (i - '0');
+                    i = stream.ReadByte();
                 }
             }
             return result;
@@ -106,18 +102,16 @@ namespace Hprose.IO {
                     i = stream.ReadByte();
                     break;
             }
-            unchecked {
-                if (neg) {
-                    while ((i != TagSemicolon) && (i != -1)) {
-                        result = result * 10 - (i - '0');
-                        i = stream.ReadByte();
-                    }
+            if (neg) {
+                while ((i != TagSemicolon) && (i != -1)) {
+                    result = result * 10 - (i - '0');
+                    i = stream.ReadByte();
                 }
-                else {
-                    while ((i != TagSemicolon) && (i != -1)) {
-                        result = result * 10 + (i - '0');
-                        i = stream.ReadByte();
-                    }
+            }
+            else {
+                while ((i != TagSemicolon) && (i != -1)) {
+                    result = result * 10 + (i - '0');
+                    i = stream.ReadByte();
                 }
             }
             return result;
@@ -138,18 +132,16 @@ namespace Hprose.IO {
                     i = stream.ReadByte();
                     break;
             }
-            unchecked {
-                if (neg) {
-                    while ((i != TagSemicolon) && (i != -1)) {
-                        result = result * 10 - (i - '0');
-                        i = stream.ReadByte();
-                    }
+            if (neg) {
+                while ((i != TagSemicolon) && (i != -1)) {
+                    result = result * 10 - (i - '0');
+                    i = stream.ReadByte();
                 }
-                else {
-                    while ((i != TagSemicolon) && (i != -1)) {
-                        result = result * 10 + (i - '0');
-                        i = stream.ReadByte();
-                    }
+            }
+            else {
+                while ((i != TagSemicolon) && (i != -1)) {
+                    result = result * 10 + (i - '0');
+                    i = stream.ReadByte();
                 }
             }
             return result;
@@ -170,18 +162,16 @@ namespace Hprose.IO {
                     i = stream.ReadByte();
                     break;
             }
-            unchecked {
-                if (neg) {
-                    while ((i != TagSemicolon) && (i != -1)) {
-                        result = result * 10 - (i - '0');
-                        i = stream.ReadByte();
-                    }
+            if (neg) {
+                while ((i != TagSemicolon) && (i != -1)) {
+                    result = result * 10 - (i - '0');
+                    i = stream.ReadByte();
                 }
-                else {
-                    while ((i != TagSemicolon) && (i != -1)) {
-                        result = result * 10 + (i - '0');
-                        i = stream.ReadByte();
-                    }
+            }
+            else {
+                while ((i != TagSemicolon) && (i != -1)) {
+                    result = result * 10 + (i - '0');
+                    i = stream.ReadByte();
                 }
             }
             return result;
@@ -240,61 +230,59 @@ namespace Hprose.IO {
         }
 
 #if NETCOREAPP2_1 || NETCOREAPP2_2
-        private static unsafe void ReadChars(Span<char> buf, Stream stream) {
+        private static void ReadChars(Span<char> buf, Stream stream) {
 #else
-        private static unsafe void ReadChars(char[] buf, Stream stream) {
+        private static void ReadChars(char[] buf, Stream stream) {
 #endif
             int b1, b2, b3, b4;
             int len = buf.Length;
-            fixed(char* bp = buf) {
-                for (int i = 0; i < len; ++i) {
-                    b1 = stream.ReadByte();
-                    switch (b1 >> 4) {
-                        case 0:
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                        case 5:
-                        case 6:
-                        case 7:
-                            // 0xxx xxxx
-                            bp[i] = (char)b1;
-                            break;
-                        case 12:
-                        case 13:
-                            // 110x xxxx   10xx xxxx
-                            b2 = stream.ReadByte();
-                            bp[i] = (char)(((b1 & 0x1f) << 6) |
-                                             (b2 & 0x3f));
-                            break;
-                        case 14:
+            for (int i = 0; i < len; ++i) {
+                b1 = stream.ReadByte();
+                switch (b1 >> 4) {
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                        // 0xxx xxxx
+                        buf[i] = (char)b1;
+                        break;
+                    case 12:
+                    case 13:
+                        // 110x xxxx   10xx xxxx
+                        b2 = stream.ReadByte();
+                        buf[i] = (char)(((b1 & 0x1f) << 6) |
+                                         (b2 & 0x3f));
+                        break;
+                    case 14:
+                        b2 = stream.ReadByte();
+                        b3 = stream.ReadByte();
+                        buf[i] = (char)(((b1 & 0x0f) << 12) |
+                                        ((b2 & 0x3f) << 6) |
+                                         (b3 & 0x3f));
+                        break;
+                    case 15:
+                        // 1111 0xxx  10xx xxxx  10xx xxxx  10xx xxxx
+                        if ((b1 & 0xf) <= 4) {
                             b2 = stream.ReadByte();
                             b3 = stream.ReadByte();
-                            bp[i] = (char)(((b1 & 0x0f) << 12) |
-                                            ((b2 & 0x3f) << 6) |
-                                             (b3 & 0x3f));
-                            break;
-                        case 15:
-                            // 1111 0xxx  10xx xxxx  10xx xxxx  10xx xxxx
-                            if ((b1 & 0xf) <= 4) {
-                                b2 = stream.ReadByte();
-                                b3 = stream.ReadByte();
-                                b4 = stream.ReadByte();
-                                int s = (((b1 & 0x07) << 18) |
-                                         ((b2 & 0x3f) << 12) |
-                                         ((b3 & 0x3f) << 6) |
-                                          (b4 & 0x3f)) - 0x10000;
-                                if (0 <= s && s <= 0xfffff) {
-                                    bp[i] = (char)(((s >> 10) & 0x03ff) | 0xd800);
-                                    bp[++i] = (char)((s & 0x03ff) | 0xdc00);
-                                    break;
-                                }
+                            b4 = stream.ReadByte();
+                            int s = (((b1 & 0x07) << 18) |
+                                     ((b2 & 0x3f) << 12) |
+                                     ((b3 & 0x3f) << 6) |
+                                      (b4 & 0x3f)) - 0x10000;
+                            if (0 <= s && s <= 0xfffff) {
+                                buf[i] = (char)(((s >> 10) & 0x03ff) | 0xd800);
+                                buf[++i] = (char)((s & 0x03ff) | 0xdc00);
+                                break;
                             }
-                            goto default;
-                        default:
-                            throw BadEncoding(b1);
-                    }
+                        }
+                        goto default;
+                    default:
+                        throw BadEncoding(b1);
                 }
             }
             stream.ReadByte();
@@ -308,21 +296,13 @@ namespace Hprose.IO {
         }
 
         public static int ReadInt(Stream stream) => ReadInt(stream, TagSemicolon);
-
         public static long ReadLong(Stream stream) => ReadLong(stream, TagSemicolon);
-
         public static BigInteger ReadBigInteger(Stream stream) => BigInteger.Parse(ReadUntil(stream, TagSemicolon).ToString());
-
         public static float ReadSingle(Stream stream) => float.Parse(ReadUntil(stream, TagSemicolon).ToString());
-
         public static double ReadDouble(Stream stream) => double.Parse(ReadUntil(stream, TagSemicolon).ToString());
-
         public static decimal ReadDecimal(Stream stream) => decimal.Parse(ReadUntil(stream, TagSemicolon).ToString());
-
         public static float ReadSingleInfinity(Stream stream) => (stream.ReadByte() == TagNeg) ? float.NegativeInfinity : float.PositiveInfinity;
-
         public static double ReadInfinity(Stream stream) => (stream.ReadByte() == TagNeg) ? double.NegativeInfinity : double.PositiveInfinity;
-
         public static string ReadUTF8Char(Stream stream) => new string(ReadChar(stream), 1);
 
 #if NETCOREAPP2_1 || NETCOREAPP2_2
@@ -347,16 +327,14 @@ namespace Hprose.IO {
             return b;
         }
 
-        public static unsafe Guid ReadGuid(Stream stream) {
+        public static Guid ReadGuid(Stream stream) {
 #if NETCOREAPP2_1 || NETCOREAPP2_2
             Span<char> buf = stackalloc char[38];
 #else
             char[] buf = new char[38];
 #endif
-            fixed (char* bp = buf) {
-                for (int i = 0; i < 38; ++i) {
-                    bp[i] = (char)stream.ReadByte();
-                }
+            for (int i = 0; i < 38; ++i) {
+                buf[i] = (char)stream.ReadByte();
             }
             return new Guid(new String(buf));
         }
