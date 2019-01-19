@@ -12,7 +12,7 @@
  *                                                        *
  * Accessor class for C#.                                 *
  *                                                        *
- * LastModified: Jan 11, 2019                             *
+ * LastModified: Jan 19, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -32,8 +32,13 @@ namespace Hprose.IO {
             src.AsSpan().CopyTo(dist);
             dist[0] = char.ToLowerInvariant(src[0]);
         });
+        public static string TitleCaseName(string name) => string.Create(name.Length, name, (Span<char> dist, string src) => {
+            src.AsSpan().CopyTo(dist);
+            dist[0] = char.ToUpperInvariant(src[0]);
+        });
 #else
         public static string UnifiedName(string name) => char.ToLowerInvariant(name[0]) + name.Substring(1);
+        public static string TitleCaseName(string name) => char.ToUpperInvariant(name[0]) + name.Substring(1);
 #endif
         public static Type GetMemberType(MemberInfo member) => member is FieldInfo ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType;
 

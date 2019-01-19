@@ -12,7 +12,7 @@
  *                                                        *
  * AnonymousTypeSerializer class for C#.                  *
  *                                                        *
- * LastModified: Jan 11, 2019                             *
+ * LastModified: Jan 19, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -42,7 +42,7 @@ namespace Hprose.IO.Serializers {
                         strSerializer,
                         strSerializerType.GetMethod("Serialize"),
                         writer,
-                        Expression.Constant(property.Name)
+                        Expression.Constant(Accessor.UnifiedName(property.Name))
                     )
                 );
                 var elemSerializerType = typeof(Serializer<>).MakeGenericType(property.PropertyType);

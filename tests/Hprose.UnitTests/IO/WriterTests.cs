@@ -379,7 +379,7 @@ namespace Hprose.UnitTests.IO {
                 var v = new { Amount = 108, Message = "Hello" };
                 writer.Serialize(v);
                 writer.Serialize(v);
-                Assert.AreEqual("m2{s6\"Amount\"i108;s7\"Message\"s5\"Hello\"}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+                Assert.AreEqual("m2{s6\"amount\"i108;s7\"message\"s5\"Hello\"}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
         }
         [DataContract(Name = "Person")]
@@ -418,9 +418,10 @@ namespace Hprose.UnitTests.IO {
                 dynamic o = new ExpandoObject();
                 o.Id = 1;
                 o.Name = "Test";
+                Assert.AreEqual((o as IDictionary<string, object>).ContainsKey("Id"), true);
                 writer.Serialize(o);
                 writer.Serialize(o);
-                Assert.AreEqual("m2{s2\"Id\"1s4\"Name\"s4\"Test\"}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+                Assert.AreEqual("m2{s2\"id\"1s4\"name\"s4\"Test\"}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
             }
         }
     }

@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Deserializer class for C#.                      *
  *                                                        *
- * LastModified: Jan 11, 2019                             *
+ * LastModified: Jan 19, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -100,7 +100,7 @@ namespace Hprose.IO {
             Register(() => new StringCollectionDeserializer());
             Register(() => new ValueTupleDeserializer());
             Register(() => new BitArrayDeserializer());
-            Register(() => new StringObjectDictionaryDeserializer<ExpandoObject>());
+            Register(() => new ExpandoObjectDeserializer());
             Register(() => new DataTableDeserializer());
             Register(() => new DataSetDeserializer());
             Register(() => new StreamDeserializer<Stream>());
@@ -334,7 +334,7 @@ namespace Hprose.IO {
                         case DictType.Dictionary:
                             return DictionaryDeserializer<Dictionary<object, object>, object, object>.Read(reader);
                         case DictType.ExpandoObject:
-                            return StringObjectDictionaryDeserializer<ExpandoObject>.Read(reader);
+                            return ExpandoObjectDeserializer.Read(reader);
                         case DictType.Hashtable:
                             return DictionaryDeserializer<Hashtable>.Read(reader);
                         default:
@@ -359,7 +359,7 @@ namespace Hprose.IO {
             string[] names = typeInfo.names;
             int count = names.Length;
             for (int i = 0; i < count; ++i) {
-                dict.Add(names[i], Deserialize(reader));
+                dict.Add(Accessor.TitleCaseName(names[i]), Deserialize(reader));
             }
             stream.ReadByte();
             return obj;
