@@ -1157,7 +1157,7 @@ namespace Hprose.UnitTests.IO {
                 writer.Serialize(c);
                 stream.Position = 0;
                 Reader reader = new Reader(stream) {
-                    DefaultCharType = CharType.Char
+                    CharType = CharType.Char
                 };
                 Assert.AreEqual(null, reader.Deserialize<ArrayList>());
                 AreEqual(c.ToArray(), reader.Deserialize<ArrayList>().ToArray());
@@ -1180,7 +1180,7 @@ namespace Hprose.UnitTests.IO {
                 writer.Serialize(c);
                 stream.Position = 0;
                 Reader reader = new Reader(stream) {
-                    DefaultCharType = CharType.Char
+                    CharType = CharType.Char
                 };
                 Assert.AreEqual(null, reader.Deserialize<BitArray>());
                 AreEqual(c, reader.Deserialize<BitArray>());
@@ -1527,7 +1527,7 @@ namespace Hprose.UnitTests.IO {
                 });
                 stream.Position = 0;
                 Reader reader = new Reader(stream) {
-                    DefaultDictType = DictType.ExpandoObject
+                    DictType = DictType.ExpandoObject
                 };
                 dynamic o3 = reader.Deserialize();
                 dynamic o4 = reader.Deserialize();

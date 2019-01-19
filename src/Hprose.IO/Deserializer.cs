@@ -282,7 +282,7 @@ namespace Hprose.IO {
                 case TagGuid:
                     return ReferenceReader.ReadGuid(reader);
                 case TagLong:
-                    switch (reader.DefaultLongType) {
+                    switch (reader.LongType) {
                         case LongType.Int64:
                             return ValueReader.ReadLong(stream);
                         case LongType.UInt64:
@@ -291,7 +291,7 @@ namespace Hprose.IO {
                             return ValueReader.ReadBigInteger(stream);
                     }
                 case TagDouble:
-                    switch (reader.DefaultRealType) {
+                    switch (reader.RealType) {
                         case RealType.Single:
                             return ValueReader.ReadSingle(stream);
                         case RealType.Decimal:
@@ -300,28 +300,28 @@ namespace Hprose.IO {
                             return ValueReader.ReadDouble(stream);
                     }
                 case TagNaN:
-                    switch (reader.DefaultRealType) {
+                    switch (reader.RealType) {
                         case RealType.Single:
                             return float.NaN;
                         default:
                             return double.NaN;
                     }
                 case TagInfinity:
-                    switch (reader.DefaultRealType) {
+                    switch (reader.RealType) {
                         case RealType.Single:
                             return ValueReader.ReadSingleInfinity(stream);
                         default:
                             return ValueReader.ReadInfinity(stream);
                     }
                 case TagUTF8Char:
-                    switch (reader.DefaultCharType) {
+                    switch (reader.CharType) {
                         case CharType.Char:
                             return ValueReader.ReadChar(stream);
                         default:
                             return ValueReader.ReadUTF8Char(stream);
                     }
                 case TagList:
-                    switch (reader.DefaultListType) {
+                    switch (reader.ListType) {
                         case ListType.Array:
                             return ReferenceReader.ReadArray<object>(reader);
                         case ListType.ArrayList:
@@ -330,7 +330,7 @@ namespace Hprose.IO {
                             return CollectionDeserializer<List<object>, object>.Read(reader);
                     }
                 case TagMap:
-                    switch (reader.DefaultDictType) {
+                    switch (reader.DictType) {
                         case DictType.Dictionary:
                             return DictionaryDeserializer<Dictionary<object, object>, object, object>.Read(reader);
                         case DictType.ExpandoObject:

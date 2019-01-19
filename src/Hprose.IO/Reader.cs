@@ -12,7 +12,7 @@
  *                                                        *
  * hprose Reader class for C#.                            *
  *                                                        *
- * LastModified: Jan 10, 2019                             *
+ * LastModified: Jan 19, 2019                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -23,44 +23,44 @@ using System.IO;
 
 namespace Hprose.IO {
     sealed class ReaderRefer {
-        private readonly List<object> _ref = new List<object>();
-        public int LastIndex => _ref.Count - 1;
-        public void Add(object obj) => _ref.Add(obj);
-        public void Set(int index, object obj) => _ref[index] = obj;
-        public object Read(int index) => _ref[index];
-        public void Reset() => _ref.Clear();
+        private readonly List<object> @ref = new List<object>();
+        public int LastIndex => @ref.Count - 1;
+        public void Add(object obj) => @ref.Add(obj);
+        public void Set(int index, object obj) => @ref[index] = obj;
+        public object Read(int index) => @ref[index];
+        public void Reset() => @ref.Clear();
     }
 
     public class Reader {
-        private readonly ReaderRefer _refer;
-        private readonly List<TypeInfo> _ref = new List<TypeInfo>();
-        private volatile LongType _defaultLongType = LongType.BigInteger;
-        private volatile RealType _defaultRealType = RealType.Double;
-        private volatile CharType _defaultCharType = CharType.String;
-        private volatile ListType _defaultListType = ListType.List;
-        private volatile DictType _defaultDictType = DictType.NullableKeyDictionary;
+        private readonly ReaderRefer refer;
+        private readonly List<TypeInfo> @ref = new List<TypeInfo>();
+        private volatile LongType longType = LongType.BigInteger;
+        private volatile RealType realType = RealType.Double;
+        private volatile CharType charType = CharType.String;
+        private volatile ListType listType = ListType.List;
+        private volatile DictType dictType = DictType.NullableKeyDictionary;
 
-        public LongType DefaultLongType { get => _defaultLongType; set => _defaultLongType = value; }
-        public RealType DefaultRealType { get => _defaultRealType; set => _defaultRealType = value; }
-        public CharType DefaultCharType { get => _defaultCharType; set => _defaultCharType = value; }
-        public ListType DefaultListType { get => _defaultListType; set => _defaultListType = value; }
-        public DictType DefaultDictType { get => _defaultDictType; set => _defaultDictType = value; }
+        public LongType LongType { get => longType; set => longType = value; }
+        public RealType RealType { get => realType; set => realType = value; }
+        public CharType CharType { get => charType; set => charType = value; }
+        public ListType ListType { get => listType; set => listType = value; }
+        public DictType DictType { get => dictType; set => dictType = value; }
 
         public Stream Stream { get; private set; }
         public Mode Mode { get; private set; }
 
-        public TypeInfo GetTypeInfo(int index) => _ref[index];
+        public TypeInfo GetTypeInfo(int index) => @ref[index];
 
         public Reader(Stream stream, Mode mode = Mode.MemberMode) {
             Stream = stream;
             Mode = mode;
-            _refer = new ReaderRefer();
+            refer = new ReaderRefer();
         }
 
         public Reader(Stream stream, bool simple, Mode mode = Mode.MemberMode) {
             Stream = stream;
             Mode = mode;
-            _refer = simple ? null : new ReaderRefer();
+            refer = simple ? null : new ReaderRefer();
         }
 
         public object Deserialize() => Deserializer.Instance.Deserialize(this);
@@ -82,10 +82,10 @@ namespace Hprose.IO {
                 names[i] = strDeserialize.Deserialize(this);
             }
             Stream.ReadByte();
-            _ref.Add(new TypeInfo(name, names));
+            @ref.Add(new TypeInfo(name, names));
         }
 
-        public object ReadReference() => _refer?.Read(ValueReader.ReadInt(Stream));
+        public object ReadReference() => refer?.Read(ValueReader.ReadInt(Stream));
 
         public T ReadReference<T>() {
             object obj = ReadReference();
@@ -95,15 +95,15 @@ namespace Hprose.IO {
             throw new InvalidCastException("Cannot convert " + obj.GetType().ToString() + " to " + typeof(T).ToString() + ".");
         }
 
-        public void AddReference(object obj) => _refer?.Add(obj);
+        public void AddReference(object obj) => refer?.Add(obj);
 
-        public void SetReference(int index, object obj) => _refer?.Set(index, obj);
+        public void SetReference(int index, object obj) => refer?.Set(index, obj);
 
-        public int LastReferenceIndex => _refer?.LastIndex ?? -1;
+        public int LastReferenceIndex => refer?.LastIndex ?? -1;
 
         public void Reset() {
-            _refer?.Reset();
-            _ref.Clear();
+            refer?.Reset();
+            @ref.Clear();
         }
     }
 }
