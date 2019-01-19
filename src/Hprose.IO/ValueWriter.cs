@@ -21,6 +21,9 @@ using System;
 using System.IO;
 using System.Numerics;
 using System.Text;
+#if !(NETCOREAPP2_1 || NETCOREAPP2_2)
+using System.Threading;
+#endif
 
 namespace Hprose.IO {
     using static Tags;
@@ -53,6 +56,10 @@ namespace Hprose.IO {
             "0123456789");
         private static readonly byte[] minIntBuf = GetASCII("-2147483648");
         private static readonly byte[] minLongBuf = GetASCII("-9223372036854775808");
+#if !(NETCOREAPP2_1 || NETCOREAPP2_2)
+        private static readonly ThreadLocal<byte[]> intBuf = new ThreadLocal<byte[]>(() => new byte[INT_SIZE]);
+        private static readonly ThreadLocal<byte[]> longBuf = new ThreadLocal<byte[]>(() => new byte[LONG_SIZE]);
+#endif
         public static readonly UTF8Encoding UTF8 = new UTF8Encoding();
 
 #if NETCOREAPP2_1 || NETCOREAPP2_2
@@ -91,7 +98,7 @@ namespace Hprose.IO {
 #if NETCOREAPP2_1 || NETCOREAPP2_2
                 Span<byte> buf = stackalloc byte[INT_SIZE];
 #else
-                byte[] buf = new byte[INT_SIZE];
+                byte[] buf = intBuf.Value;
 #endif
                 int off = ToBytes((uint)((i < 0) ? -i : i), buf, INT_SIZE);
                 if (i < 0) {
@@ -115,7 +122,7 @@ namespace Hprose.IO {
                 int off = ToBytes(i, buf, INT_SIZE);
                 stream.Write(buf.Slice(off, INT_SIZE - off));
 #else
-                byte[] buf = new byte[INT_SIZE];
+                byte[] buf =intBuf.Value;
                 int off = ToBytes(i, buf, INT_SIZE);
                 stream.Write(buf, off, INT_SIZE - off);
 #endif
@@ -133,7 +140,7 @@ namespace Hprose.IO {
 #if NETCOREAPP2_1 || NETCOREAPP2_2
                 Span<byte> buf = stackalloc byte[LONG_SIZE];
 #else
-                byte[] buf = new byte[LONG_SIZE];
+                byte[] buf = longBuf.Value;
 #endif
                 int off = ToBytes((ulong)((i < 0) ? -i : i), buf, LONG_SIZE);
                 if (i < 0) {
@@ -157,7 +164,7 @@ namespace Hprose.IO {
                 int off = ToBytes(i, buf, LONG_SIZE);
                 stream.Write(buf.Slice(off, LONG_SIZE - off));
 #else
-                byte[] buf = new byte[LONG_SIZE];
+                byte[] buf = longBuf.Value;
                 int off = ToBytes(i, buf, LONG_SIZE);
                 stream.Write(buf, off, LONG_SIZE - off);
 #endif
