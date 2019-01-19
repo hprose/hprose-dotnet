@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * TypeInfo.cs                                            *
- *                                                        *
- * TypeInfo class for C#.                                 *
- *                                                        *
- * LastModified: Jan 10, 2019                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  TypeInfo.cs                                             |
+|                                                          |
+|  TypeInfo class for C#.                                  |
+|                                                          |
+|  LastModified: Jan 10, 2019                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 using System;
 
 namespace Hprose.IO {

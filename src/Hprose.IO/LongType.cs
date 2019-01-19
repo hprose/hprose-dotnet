@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * LongType.cs                                            *
- *                                                        *
- * hprose LongType enum for C#.                           *
- *                                                        *
- * LastModified: Jan 10, 2019                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  LongType.cs                                             |
+|                                                          |
+|  hprose LongType enum for C#.                            |
+|                                                          |
+|  LastModified: Jan 10, 2019                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 namespace Hprose.IO {
     public enum LongType {

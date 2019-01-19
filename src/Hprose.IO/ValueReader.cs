@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * ValueReader.cs                                         *
- *                                                        *
- * ValueReader class for C#.                              *
- *                                                        *
- * LastModified: Jan 17, 2019                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  ValueReader.cs                                          |
+|                                                          |
+|  ValueReader class for C#.                               |
+|                                                          |
+|  LastModified: Jan 17, 2019                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 using System;
 using System.IO;

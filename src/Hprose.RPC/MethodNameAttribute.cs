@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * MethodNameAttribute.cs                                 *
- *                                                        *
- * MethodName Attribute for C#.                           *
- *                                                        *
- * LastModified: May 7, 2018                              *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  MethodNameAttribute.cs                                  |
+|                                                          |
+|  MethodName Attribute for C#.                            |
+|                                                          |
+|  LastModified: May 7, 2018                               |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 using System;
 

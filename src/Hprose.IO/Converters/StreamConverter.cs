@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * StreamConverter.cs                                     *
- *                                                        *
- * hprose StreamConverter class for C#.                   *
- *                                                        *
- * LastModified: May 2, 2018                              *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  StreamConverter.cs                                      |
+|                                                          |
+|  hprose StreamConverter class for C#.                    |
+|                                                          |
+|  LastModified: May 2, 2018                               |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 using System.Collections.Generic;
 using System.IO;

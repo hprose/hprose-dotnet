@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * Tags.cs                                                *
- *                                                        *
- * hprose tags class for C#.                              *
- *                                                        *
- * LastModified: Apr 10, 2018                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  Tags.cs                                                 |
+|                                                          |
+|  hprose tags class for C#.                               |
+|                                                          |
+|  LastModified: Apr 10, 2018                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 namespace Hprose.IO {
     public static class Tags {

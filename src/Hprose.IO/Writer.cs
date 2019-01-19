@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * Writer.cs                                              *
- *                                                        *
- * hprose Writer class for C#.                            *
- *                                                        *
- * LastModified: Jan 19, 2019                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  Writer.cs                                               |
+|                                                          |
+|  hprose Writer class for C#.                             |
+|                                                          |
+|  LastModified: Jan 19, 2019                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 using System;
 using System.Collections.Generic;

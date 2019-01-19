@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * Converter.cs                                           *
- *                                                        *
- * hprose Converter class for C#.                         *
- *                                                        *
- * LastModified: Jan 11, 2019                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  Converter.cs                                            |
+|                                                          |
+|  hprose Converter class for C#.                          |
+|                                                          |
+|  LastModified: Jan 11, 2019                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 using Hprose.IO.Converters;
 using System;

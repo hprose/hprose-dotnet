@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * Deserializer.cs                                        *
- *                                                        *
- * hprose Deserializer class for C#.                      *
- *                                                        *
- * LastModified: Jan 19, 2019                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  Deserializer.cs                                         |
+|                                                          |
+|  hprose Deserializer class for C#.                       |
+|                                                          |
+|  LastModified: Jan 19, 2019                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 using Hprose.Collections.Generic;
 using Hprose.IO.Deserializers;

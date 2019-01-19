@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * DictionarySerializer.cs                                *
- *                                                        *
- * DictionarySerializer class for C#.                     *
- *                                                        *
- * LastModified: Jan 11, 2019                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  DictionarySerializer.cs                                 |
+|                                                          |
+|  DictionarySerializer class for C#.                      |
+|                                                          |
+|  LastModified: Jan 11, 2019                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 using System.Collections;
 using System.Collections.Generic;

@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * ListType.cs                                            *
- *                                                        *
- * hprose ListType enum for C#.                           *
- *                                                        *
- * LastModified: Jan 10, 2019                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  ListType.cs                                             |
+|                                                          |
+|  hprose ListType enum for C#.                            |
+|                                                          |
+|  LastModified: Jan 10, 2019                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 namespace Hprose.IO {
     public enum ListType {

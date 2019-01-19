@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * Reader.cs                                              *
- *                                                        *
- * hprose Reader class for C#.                            *
- *                                                        *
- * LastModified: Jan 19, 2019                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  Reader.cs                                               |
+|                                                          |
+|  hprose Reader class for C#.                             |
+|                                                          |
+|  LastModified: Jan 19, 2019                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 using System;
 using System.Collections.Generic;
@@ -34,7 +30,7 @@ namespace Hprose.IO {
     public class Reader {
         private readonly ReaderRefer refer;
         private readonly List<TypeInfo> @ref = new List<TypeInfo>();
-        private volatile LongType longType = LongType.BigInteger;
+        private volatile LongType longType = LongType.Int64;
         private volatile RealType realType = RealType.Double;
         private volatile CharType charType = CharType.String;
         private volatile ListType listType = ListType.List;

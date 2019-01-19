@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * TypeManager.cs                                         *
- *                                                        *
- * hprose TypeManager class for C#.                       *
- *                                                        *
- * LastModified: Jan 17, 2019                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  TypeManager.cs                                          |
+|                                                          |
+|  hprose TypeManager class for C#.                        |
+|                                                          |
+|  LastModified: Jan 17, 2019                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 using System;
 using System.Collections.Concurrent;

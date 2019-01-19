@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * CharSerializer.cs                                      *
- *                                                        *
- * CharSerializer class for C#.                           *
- *                                                        *
- * LastModified: Apr 7, 2018                              *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  CharSerializer.cs                                       |
+|                                                          |
+|  CharSerializer class for C#.                            |
+|                                                          |
+|  LastModified: Apr 7, 2018                               |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 namespace Hprose.IO.Serializers {
     class CharSerializer : Serializer<char> {

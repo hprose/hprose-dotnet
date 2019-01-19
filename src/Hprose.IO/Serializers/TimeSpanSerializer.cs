@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * TimeSpanSerializer.cs                                  *
- *                                                        *
- * TimeSpanSerializer class for C#.                       *
- *                                                        *
- * LastModified: Apr 7, 2018                              *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  TimeSpanSerializer.cs                                   |
+|                                                          |
+|  TimeSpanSerializer class for C#.                        |
+|                                                          |
+|  LastModified: Apr 7, 2018                               |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 using System;
 

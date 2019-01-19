@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * DoubleConverter.cs                                     *
- *                                                        *
- * hprose DoubleConverter class for C#.                   *
- *                                                        *
- * LastModified: Apr 21, 2018                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  DoubleConverter.cs                                      |
+|                                                          |
+|  hprose DoubleConverter class for C#.                    |
+|                                                          |
+|  LastModified: Apr 21, 2018                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 using System;
 using System.Numerics;

@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * TimeSpanConverter.cs                                   *
- *                                                        *
- * hprose TimeSpanConverter class for C#.                 *
- *                                                        *
- * LastModified: Apr 21, 2018                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  TimeSpanConverter.cs                                    |
+|                                                          |
+|  hprose TimeSpanConverter class for C#.                  |
+|                                                          |
+|  LastModified: Apr 21, 2018                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 using System;
 using System.Text;

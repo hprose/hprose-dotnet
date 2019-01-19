@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * ReferenceSerializer.cs                                 *
- *                                                        *
- * hprose ReferenceSerializer class for C#.               *
- *                                                        *
- * LastModified: Dec 13, 2018                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+|  ReferenceSerializer.cs                                  |
+|                                                          |
+|  hprose ReferenceSerializer class for C#.                |
+|                                                          |
+|  LastModified: Dec 13, 2018                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 namespace Hprose.IO.Serializers {
     public abstract class ReferenceSerializer<T> : Serializer<T> {

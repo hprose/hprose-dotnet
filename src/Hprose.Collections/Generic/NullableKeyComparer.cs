@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * NullableKeyComparer.cs                                 *
- *                                                        *
- * NullableKeyComparer class for C#.                      *
- *                                                        *
- * LastModified: Mar 29, 2018                             *
- * Authors: Ma Bingyao <andot@hprose.com>                 *
- *                                                        *
-\**********************************************************/
+|  NullableKeyComparer.cs                                  |
+|                                                          |
+|  NullableKeyComparer class for C#.                       |
+|                                                          |
+|  LastModified: Mar 29, 2018                              |
+|  Authors: Ma Bingyao <andot@hprose.com>                  |
+|                                                          |
+\*________________________________________________________*/
 using System.Collections.Generic;
 
 namespace Hprose.Collections.Generic {

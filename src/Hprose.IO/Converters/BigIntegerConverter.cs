@@ -1,21 +1,17 @@
-﻿/**********************************************************\
+﻿/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * BigIntegerConverter.cs                                 *
- *                                                        *
- * hprose BigIntegerConverter class for C#.               *
- *                                                        *
- * LastModified: Apr 13, 2018                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+| BigIntegerConverter.cs                                   |
+|                                                          |
+| hprose BigIntegerConverter class for C#.                 |
+|                                                          |
+| LastModified: Apr 13, 2018                               |
+| Author: Ma Bingyao <andot@hprose.com>                    |
+|                                                          |
+\*________________________________________________________*/
 
 using System;
 using System.Numerics;
