@@ -29,6 +29,19 @@ namespace Hprose.IO {
         }
         private static readonly Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
         private static readonly ConcurrentDictionary<string, Lazy<Type>> typeCache = new ConcurrentDictionary<string, Lazy<Type>>();
+        private static readonly ConcurrentDictionary<Type, Type> intfCache = new ConcurrentDictionary<Type, Type>();
+        public static void Register<T, I>(string name = null) where T : I {
+            Type type = typeof(T);
+            Type intf = typeof(I);
+            if (type.IsInterface) {
+                throw new ArgumentException("T must be a class or struct.");
+            }
+            if (!intf.IsInterface) {
+                throw new ArgumentException("I must be a interface.");
+            }
+            intfCache.AddOrUpdate(intf, (i) => type, (i, _) => type);
+            Register<T>(name);
+        }
         public static void Register<T>(string name = null) {
             Type type = typeof(T);
             if (name == null || name.Length == 0) {
@@ -52,6 +65,10 @@ namespace Hprose.IO {
             return TypeName<T>.Name;
         }
         private static readonly Func<string, Lazy<Type>> typeFactory = (name) => new Lazy<Type>(() => LoadType(name));
+        public static Type GetType<I>() {
+            intfCache.TryGetValue(typeof(I), out Type result);
+            return result;
+        }
         public static Type GetType(string name) => typeCache.GetOrAdd(name, typeFactory).Value;
         private static Type LoadType(string alias) {
             Type type;

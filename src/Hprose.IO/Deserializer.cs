@@ -240,6 +240,9 @@ namespace Hprose.IO {
             if (type.IsValueType) {
                 return typeof(StructDeserializer<>).MakeGenericType(type);
             }
+            if (type.IsInterface) {
+                return typeof(InterfaceDeserializer<>).MakeGenericType(type);
+            }
             return typeof(ObjectDeserializer<>).MakeGenericType(type);
         }
 

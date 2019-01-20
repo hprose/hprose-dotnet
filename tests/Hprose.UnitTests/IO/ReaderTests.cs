@@ -1408,8 +1408,12 @@ namespace Hprose.UnitTests.IO {
                 Assert.AreEqual(tuple, tuple3);
             }
         }
+        public interface IPerson {
+            string Name { get; set; }
+            int Age { get; set; }
+        }
         [DataContract(Name = "Person")]
-        public class Person {
+        public class Person : IPerson {
             [DataMember(Order = 0)]
             public int Id;
             [DataMember(Order = 1)]
@@ -1457,7 +1461,7 @@ namespace Hprose.UnitTests.IO {
             }
         }
         [DataContract(Name = "Person2")]
-        public struct Person2 {
+        public struct Person2 : IPerson {
             [DataMember(Order = 0)]
             public int Id;
             [DataMember(Order = 1)]
@@ -1562,6 +1566,47 @@ namespace Hprose.UnitTests.IO {
                 Assert.AreEqual(48, o2.Age);
             }
         }
-
+        [TestMethod]
+        public void TestDeserializeObject4() {
+            TypeManager.Register<Person, IPerson>();
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                var o = new Person {
+                    Id = 0,
+                    Name = "Tom",
+                    Age = 48
+                };
+                var o2 = new Person2 {
+                    Id = 1,
+                    Name = "Jerry",
+                    Age = 36
+                };
+                writer.Serialize(o);
+                writer.Serialize(o2);
+                writer.Serialize(o);
+                writer.Serialize(new {
+                    Id = 2,
+                    Name = "Anonymous"
+                });
+                stream.Position = 0;
+                Reader reader = new Reader(stream) {
+                    DictType = DictType.ExpandoObject
+                };
+                IPerson o3 = reader.Deserialize<IPerson>();
+                Assert.IsInstanceOfType(o3, typeof(Person));
+                IPerson o4 = reader.Deserialize<IPerson>();
+                Assert.IsInstanceOfType(o4, typeof(Person2));
+                IPerson o5 = reader.Deserialize<IPerson>();
+                Assert.IsInstanceOfType(o5, typeof(Person));
+                IPerson o6 = reader.Deserialize<IPerson>();
+                Assert.IsInstanceOfType(o6, typeof(Person));
+                Assert.AreEqual("Tom", o3.Name);
+                Assert.AreEqual(48, o3.Age);
+                Assert.AreEqual("Jerry", o4.Name);
+                Assert.AreEqual(36, o4.Age);
+                Assert.AreEqual(o3, o5);
+                Assert.AreEqual(o6.Name, "Anonymous");
+            }
+        }
     }
 }
