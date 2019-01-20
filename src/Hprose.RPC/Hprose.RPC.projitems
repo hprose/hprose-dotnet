@@ -8,4 +8,15 @@
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>Hprose.RPC</Import_RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Client.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ClientContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Codec\ClientCodec.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Context.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HandlerManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IClientCodec.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InvocationHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Proxy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
+  </ItemGroup>
 </Project>
