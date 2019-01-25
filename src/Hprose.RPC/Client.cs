@@ -8,7 +8,7 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Jan 20, 2019                              |
+|  LastModified: Jan 26, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -24,8 +24,22 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC {
-    public abstract class Client {
-        public ConcurrentDictionary<string, Settings> Settings { get; } = new ConcurrentDictionary<string, Settings>();
+    public interface ITransport {
+        Task<Stream> Transport(Stream request, Context context);
+        Task Abort();
+    }
+    public class Client {
+        private static readonly List<ValueTuple<string, Type>> transTypes = new List<ValueTuple<string, Type>>();
+        private static readonly Dictionary<string, string> schemes = new Dictionary<string, string>();
+        public static void Register<T>(string name, string[] schemes) where T: ITransport, new() {
+            transTypes.Add((name, typeof(T)));
+            for (int i = 0, n = schemes.Length; i < n; ++i) {
+                var scheme = schemes[i];
+                Client.schemes[scheme] = name;
+            }
+        }
+        private readonly Dictionary<string, ITransport> transports = new Dictionary<string, ITransport>();
+        public ITransport this[string name] => transports[name];
         public ExpandoObject RequestHeaders { get; set; } = new ExpandoObject();
         public int Timeout { get; set; } = 30000;
         public bool Simple { get; set; } = false;
@@ -47,10 +61,25 @@ namespace Hprose.RPC {
             }
         }
         private readonly HandlerManager handlerManager;
-        Client() => handlerManager = new HandlerManager(Call, Transport);
+        Client() {
+            handlerManager = new HandlerManager(Call, Transport);
+            for (int i = 0, n = transTypes.Count; i < n; ++i) {
+                var (name, type) = transTypes[i];
+                transports[name] = (ITransport)Activator.CreateInstance(type);
+            };
+        }
         Client(string uri) : this() => urilist.Add(uri);
         Client(string[] uris) : this() => urilist.AddRange(uris);
-
+        public T UseService<T>(string ns = "") {
+            Type type = typeof(T);
+            InvocationHandler handler = new InvocationHandler(this, ns);
+            if (type.IsInterface) {
+                return (T)Proxy.NewInstance(new Type[] { type }, handler);
+            }
+            else {
+                return (T)Proxy.NewInstance(type.GetInterfaces(), handler);
+            }
+        }
         public Client Use(params InvokeHandler[] handlers) {
             handlerManager.Use(handlers);
             return this;
@@ -76,6 +105,25 @@ namespace Hprose.RPC {
             var response = await handlerManager.IOHandler(request, context);
             return Codec.Decode(response, context as ClientContext);
         }
-        public abstract Task<Stream> Transport(Stream request, Context context);
+        public async Task<Stream> Transport(Stream request, Context context) {
+            var uri = new Uri((context as ClientContext).Uri);
+            var scheme = uri.Scheme;
+            if (schemes.ContainsKey(scheme)) {
+                return await transports[schemes[scheme]].Transport(request, context);
+            }
+            throw new NotSupportedException("The protocol " + scheme + " is not supported.");
+        }
+        public async Task Abort() {
+            var results = new Task[transports.Count];
+            var i = 0;
+            foreach (var pair in transports) {
+                results[i++] = pair.Value.Abort();
+            }
+#if NET40
+            await TaskEx.WhenAll(results);
+#else
+            await Task.WhenAll(results);
+#endif
+        }
     }
 }

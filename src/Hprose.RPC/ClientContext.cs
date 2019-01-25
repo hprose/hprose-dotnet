@@ -37,20 +37,17 @@ namespace Hprose.RPC {
         public ClientContext(Client client, string fullname, Type type, Settings settings = null) {
             Client = client;
             Uri = (client.Uris.Count > 0) ? client.Uris[0] : "";
-            client.Settings.TryGetValue(fullname, out Settings defaultSettings);
-            Simple = settings?.Simple ?? defaultSettings?.Simple ?? client.Simple;
-            Mode = settings?.Mode ?? defaultSettings?.Mode ?? client.Mode;
-            LongType = settings?.LongType ?? defaultSettings?.LongType ?? client.LongType;
-            RealType = settings?.RealType ?? defaultSettings?.RealType ?? client.RealType;
-            CharType = settings?.CharType ?? defaultSettings?.CharType ?? client.CharType;
-            ListType = settings?.ListType ?? defaultSettings?.ListType ?? client.ListType;
-            DictType = settings?.DictType ?? defaultSettings?.DictType ?? client.DictType;
-            Type = settings?.Type ?? defaultSettings?.Type;
+            Simple = settings?.Simple ?? client.Simple;
+            Mode = settings?.Mode ?? client.Mode;
+            LongType = settings?.LongType ?? client.LongType;
+            RealType = settings?.RealType ?? client.RealType;
+            CharType = settings?.CharType ?? client.CharType;
+            ListType = settings?.ListType ?? client.ListType;
+            DictType = settings?.DictType ?? client.DictType;
+            Type = settings?.Type;
             if (!type.IsAssignableFrom(Type)) Type = type;
             Copy(client.RequestHeaders, RequestHeaders);
-            Copy(defaultSettings?.RequestHeaders, RequestHeaders);
             Copy(settings?.RequestHeaders, RequestHeaders);
-            Copy(defaultSettings?.Context, items);
             Copy(settings?.Context, items);
         }
     }

@@ -4,19 +4,22 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-|  IInvocationHandler.cs                                   |
+|  CharTypeAttribute.cs                                    |
 |                                                          |
-|  IInvocationHandler interface for C#.                    |
+|  CharType Attribute for C#.                              |
 |                                                          |
-|  LastModified: Jan 20, 2019                              |
+|  LastModified: Jan 25, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
-using System.Reflection;
+using Hprose.IO;
+using System;
 
 namespace Hprose.RPC {
-    public interface IInvocationHandler {
-        object Invoke(object proxy, MethodInfo method, object[] args);
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+    public class CharTypeAttribute : Attribute {
+        public CharTypeAttribute(CharType value) => Value = value;
+        public CharType Value { get; set; }
     }
 }

@@ -4,19 +4,22 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-|  IInvocationHandler.cs                                   |
+|  ModeAttribute.cs                                        |
 |                                                          |
-|  IInvocationHandler interface for C#.                    |
+|  Mode Attribute for C#.                                  |
 |                                                          |
-|  LastModified: Jan 20, 2019                              |
+|  LastModified: Jan 25, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
-using System.Reflection;
+using Hprose.IO;
+using System;
 
 namespace Hprose.RPC {
-    public interface IInvocationHandler {
-        object Invoke(object proxy, MethodInfo method, object[] args);
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+    public class ModeAttribute : Attribute {
+        public ModeAttribute(Mode value) => Value = value;
+        public Mode Value { get; set; }
     }
 }

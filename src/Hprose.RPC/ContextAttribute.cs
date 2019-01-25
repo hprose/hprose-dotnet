@@ -4,21 +4,21 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-|  IdempotentAttribute.cs                                  |
+|  ContextAttribute.cs                                     |
 |                                                          |
-|  Idempotent Attribute for C#.                            |
+|  Context Attribute for C#.                               |
 |                                                          |
-|  LastModified: May 7, 2018                               |
+|  LastModified: Jan 25, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
 using System;
 
-namespace Hprose.RPC.Common {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    public class IdempotentAttribute : Attribute {
-        public IdempotentAttribute(bool value = true) => Value = value;
-        public bool Value { get; set; }
+namespace Hprose.RPC {
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class ContextAttribute : Attribute {
+        public ContextAttribute(string key, object value) => Value = (key, value);
+        public (string, object) Value { get; set; }
     }
 }
