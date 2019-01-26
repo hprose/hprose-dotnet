@@ -16,7 +16,6 @@
 using Hprose.IO;
 using Hprose.RPC.Codec;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
