@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DictTypeAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ContextAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HttpTransport.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ListTypeAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Client.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClientContext.cs" />

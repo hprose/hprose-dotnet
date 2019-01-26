@@ -26,9 +26,9 @@ using System.Threading.Tasks;
 namespace Hprose.RPC {
     public interface ITransport {
         Task<Stream> Transport(Stream request, Context context);
-        Task Abort();
+        void Abort();
     }
-    public class Client {
+    public partial class Client {
         private static readonly List<ValueTuple<string, Type>> transTypes = new List<ValueTuple<string, Type>>();
         private static readonly Dictionary<string, string> schemes = new Dictionary<string, string>();
         public static void Register<T>(string name, string[] schemes) where T: ITransport, new() {
@@ -41,7 +41,6 @@ namespace Hprose.RPC {
         private readonly Dictionary<string, ITransport> transports = new Dictionary<string, ITransport>();
         public ITransport this[string name] => transports[name];
         public ExpandoObject RequestHeaders { get; set; } = new ExpandoObject();
-        public int Timeout { get; set; } = 30000;
         public bool Simple { get; set; } = false;
         public Mode Mode { get; set; } = Mode.MemberMode;
         public LongType LongType { get; set; } = LongType.Int64;
@@ -113,17 +112,10 @@ namespace Hprose.RPC {
             }
             throw new NotSupportedException("The protocol " + scheme + " is not supported.");
         }
-        public async Task Abort() {
-            var results = new Task[transports.Count];
-            var i = 0;
+        public void Abort() {
             foreach (var pair in transports) {
-                results[i++] = pair.Value.Abort();
+                pair.Value.Abort();
             }
-#if NET40
-            await TaskEx.WhenAll(results);
-#else
-            await Task.WhenAll(results);
-#endif
         }
     }
 }
