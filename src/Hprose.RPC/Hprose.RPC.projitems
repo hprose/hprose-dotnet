@@ -9,10 +9,8 @@
     <Import_RootNamespace>Hprose.RPC</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)DictTypeAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ContextAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpTransport.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ListTypeAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Client.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClientContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Codec\ClientCodec.cs" />
@@ -21,15 +19,17 @@
     <Compile Include="$(MSBuildThisFileDirectory)IClientCodec.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IInvocationHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InvocationHandler.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CharTypeAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HeaderAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RealTypeAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)LongTypeAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ModeAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SimpleAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MethodManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Method.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Service.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IServiceCodec.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Codec\ServiceCodec.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NameAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Plugins\IdempotentAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Proxy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TaskResult.cs" />
   </ItemGroup>
 </Project>

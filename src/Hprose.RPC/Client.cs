@@ -8,12 +8,11 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Jan 26, 2019                              |
+|  LastModified: Jan 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
-using Hprose.IO;
 using Hprose.RPC.Codec;
 using System;
 using System.Collections.Generic;
@@ -26,6 +25,14 @@ namespace Hprose.RPC {
     public interface ITransport {
         Task<Stream> Transport(Stream request, Context context);
         void Abort();
+    }
+    public class Result<T> {
+        public T Value { get; private set; }
+        public Context Context { get; private set; }
+        public Result(T value, Context context) {
+            Value = value;
+            Context = context;
+        }
     }
     public partial class Client {
         private static readonly List<ValueTuple<string, Type>> transTypes = new List<ValueTuple<string, Type>>();
@@ -40,13 +47,6 @@ namespace Hprose.RPC {
         private readonly Dictionary<string, ITransport> transports = new Dictionary<string, ITransport>();
         public ITransport this[string name] => transports[name];
         public ExpandoObject RequestHeaders { get; set; } = new ExpandoObject();
-        public bool Simple { get; set; } = false;
-        public Mode Mode { get; set; } = Mode.MemberMode;
-        public LongType LongType { get; set; } = LongType.Int64;
-        public RealType RealType { get; set; } = RealType.Double;
-        public CharType CharType { get; set; } = CharType.String;
-        public ListType ListType { get; set; } = ListType.List;
-        public DictType DictType { get; set; } = DictType.NullableKeyDictionary;
         public IClientCodec Codec { get; set; } = ClientCodec.Instance;
         private List<string> urilist = new List<string>();
         public List<string> Uris {
@@ -95,13 +95,22 @@ namespace Hprose.RPC {
             return this;
         }
         public async Task<T> Invoke<T>(string fullname, object[] args = null, Settings settings = null) {
-            var context = new ClientContext(this, fullname, typeof(T), settings);
-            return (T)(await handlerManager.InvokeHandler(fullname, args, context));
+            Type type = typeof(T);
+            bool isResultType = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Result<>);
+            if (isResultType) {
+                type = type.GetGenericArguments()[0];
+            }
+            var context = new ClientContext(this, fullname, type, settings);
+            var result = await handlerManager.InvokeHandler(fullname, args, context);
+            if (isResultType) {
+                return (T)Activator.CreateInstance(typeof(T), new object[] { result, context });
+            }
+            return (T)result;
         }
         public async Task<object> Call(string fullname, object[] args, Context context) {
             var request = Codec.Encode(fullname, args, context as ClientContext);
             var response = await handlerManager.IOHandler(request, context);
-            return Codec.Decode(response, context as ClientContext);
+            return await Codec.Decode(response, context as ClientContext);
         }
         public async Task<Stream> Transport(Stream request, Context context) {
             var uri = new Uri((context as ClientContext).Uri);

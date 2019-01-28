@@ -20,13 +20,6 @@ using System.Dynamic;
 
 namespace Hprose.RPC {
     public class Settings {
-        public bool? Simple { get; set; } = null;
-        public Mode? Mode { get; set; } = null;
-        public LongType? LongType { get; set; } = null;
-        public RealType? RealType { get; set; } = null;
-        public CharType? CharType { get; set; } = null;
-        public ListType? ListType { get; set; } = null;
-        public DictType? DictType { get; set; } = null;
         public Type Type { get; set; } = null;
         public ExpandoObject RequestHeaders { get; set; } = null;
         public IDictionary<string, object> Context { get; set; } = null;

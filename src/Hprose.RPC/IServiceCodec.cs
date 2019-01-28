@@ -4,22 +4,21 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-|  ListTypeAttribute.cs                                    |
+|  IServiceCodec.cs                                        |
 |                                                          |
-|  ListType Attribute for C#.                              |
+|  IServiceCodec interface for C#.                         |
 |                                                          |
-|  LastModified: Jan 25, 2019                              |
+|  LastModified: Jan 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
-using Hprose.IO;
-using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Hprose.RPC {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    public class ListTypeAttribute : Attribute {
-        public ListTypeAttribute(ListType value) => Value = value;
-        public ListType Value { get; set; }
+    public interface IServiceCodec {
+        Stream Encode(object result, ServiceContext context);
+        Task<(string, object[])> Decode(Stream request, ServiceContext context);
     }
 }

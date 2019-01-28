@@ -5,7 +5,7 @@ using Hprose.Collections.Generic;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Hprose.Core.UnitTests.Hprose.UnitTests.Collections.Generic {
+namespace Hprose.UnitTests.Collections.Generic {
     [TestClass]
     public class NullableKeyDictionaryTests {
         [TestMethod]

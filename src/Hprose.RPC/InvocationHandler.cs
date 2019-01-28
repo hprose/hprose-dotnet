@@ -8,7 +8,7 @@
 |                                                          |
 |  InvocationHandler class for C#.                         |
 |                                                          |
-|  LastModified: Jan 26, 2019                              |
+|  LastModified: Jan 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -75,27 +75,6 @@ namespace Hprose.RPC {
             foreach (var attribute in attributes) {
                 if (attribute is NameAttribute) {
                     name = ((NameAttribute)attribute).Value;
-                }
-                else if (attribute is SimpleAttribute) {
-                    settings.Simple = ((SimpleAttribute)attribute).Value;
-                }
-                else if (attribute is ModeAttribute) {
-                    settings.Mode = ((ModeAttribute)attribute).Value;
-                }
-                else if (attribute is LongTypeAttribute) {
-                    settings.LongType = ((LongTypeAttribute)attribute).Value;
-                }
-                else if (attribute is RealTypeAttribute) {
-                    settings.RealType = ((RealTypeAttribute)attribute).Value;
-                }
-                else if (attribute is CharTypeAttribute) {
-                    settings.CharType = ((CharTypeAttribute)attribute).Value;
-                }
-                else if (attribute is ListTypeAttribute) {
-                    settings.ListType = ((ListTypeAttribute)attribute).Value;
-                }
-                else if (attribute is DictTypeAttribute) {
-                    settings.DictType = ((DictTypeAttribute)attribute).Value;
                 }
                 else if (attribute is HeaderAttribute) {
                     if (settings.RequestHeaders == null) {

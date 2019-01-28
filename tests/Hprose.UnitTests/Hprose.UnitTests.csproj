@@ -18,8 +18,9 @@
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 
-  <Import Project="..\..\src\Hprose.Collections\Hprose.Collections.projitems" Label="Shared" />
-
-  <Import Project="..\..\src\Hprose.IO\Hprose.IO.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\proj\Hprose.IO\Hprose.IO.csproj" />
+    <ProjectReference Include="..\..\proj\Hprose.RPC\Hprose.RPC.csproj" />
+  </ItemGroup>
 
 </Project>

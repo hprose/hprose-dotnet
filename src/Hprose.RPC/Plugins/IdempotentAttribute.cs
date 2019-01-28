@@ -17,8 +17,7 @@ using System;
 
 namespace Hprose.RPC.Plugins {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    public class IdempotentAttribute : Attribute {
-        public IdempotentAttribute(bool value = true) => Value = value;
-        public bool Value { get; set; }
+    public class IdempotentAttribute : ContextAttribute {
+        public IdempotentAttribute(bool value = true) : base("Idempotent", value) { }
     }
 }

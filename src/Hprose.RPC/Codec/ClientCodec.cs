@@ -8,7 +8,7 @@
 |                                                          |
 |  ClientCodec class for C#.                               |
 |                                                          |
-|  LastModified: Jan 20, 2019                              |
+|  LastModified: Jan 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -23,10 +23,17 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC.Codec {
     class ClientCodec : IClientCodec {
-        public static IClientCodec Instance { get; } = new ClientCodec();
+        public static ClientCodec Instance { get; } = new ClientCodec();
+        public bool Simple { get; set; } = false;
+        public Mode Mode { get; set; } = Mode.MemberMode;
+        public LongType LongType { get; set; } = LongType.Int64;
+        public RealType RealType { get; set; } = RealType.Double;
+        public CharType CharType { get; set; } = CharType.String;
+        public ListType ListType { get; set; } = ListType.List;
+        public DictType DictType { get; set; } = DictType.NullableKeyDictionary;
         public Stream Encode(string name, object[] args, ClientContext context) {
             var stream = new MemoryStream();
-            var writer = new Writer(stream, context.Simple, context.Mode);
+            var writer = new Writer(stream, Simple, Mode);
             if ((context.RequestHeaders as IDictionary<string, object>).Count > 0) {
                 stream.WriteByte(Tags.TagHeader);
                 writer.Serialize(context.RequestHeaders);
@@ -51,12 +58,12 @@ namespace Hprose.RPC.Codec {
                 stream = new MemoryStream();
                 await response.CopyToAsync(stream);
             }
-            var reader = new Reader(stream, false, context.Mode) {
-                LongType = context.LongType,
-                RealType = context.RealType,
-                CharType = context.CharType,
-                ListType = context.ListType,
-                DictType = context.DictType
+            var reader = new Reader(stream, false, Mode) {
+                LongType = LongType,
+                RealType = RealType,
+                CharType = CharType,
+                ListType = ListType,
+                DictType = DictType
             };
             var tag = stream.ReadByte();
             if (tag == Tags.TagHeader) {
