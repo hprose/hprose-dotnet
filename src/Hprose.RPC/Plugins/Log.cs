@@ -57,7 +57,7 @@ namespace Hprose.RPC.Plugins {
                 throw e;
             }
         }
-        public static string Stringify(object obj) {
+        private static string Stringify(object obj) {
             using (MemoryStream stream = new MemoryStream()) {
                 DataContractJsonSerializer js = new DataContractJsonSerializer(obj.GetType());
                 js.WriteObject(stream, obj);
