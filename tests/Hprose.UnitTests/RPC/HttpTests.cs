@@ -1,4 +1,5 @@
 ﻿using Hprose.RPC;
+using Hprose.RPC.Plugins;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Net;
 using System.Threading.Tasks;
@@ -18,9 +19,11 @@ namespace Hprose.UnitTests.RPC {
             server.Prefixes.Add("http://127.0.0.1:8080/");
             server.Start();
             var service = new Service();
-            service.AddMethod("Hello", this);
-            service.AddMethod("Sum", this);
-            service.Bind(server);
+            service.Use(Log.IOHandler)
+                   .Use(Log.InvokeHandler)
+                   .AddMethod("Hello", this)
+                   .AddMethod("Sum", this)
+                   .Bind(server);
             var client = new Client("http://127.0.0.1:8080/");
             var result = await client.Invoke<string>("hello", new object[] { "world" });
             Assert.AreEqual("Hello world", result);
@@ -37,10 +40,11 @@ namespace Hprose.UnitTests.RPC {
             server.Prefixes.Add("http://127.0.0.1:8081/");
             server.Start();
             var service = new Service();
-            service.AddMethod("Hello", this);
-            service.AddMethod("Sum", this);
-            service.Bind(server, "http");
+            service.AddMethod("Hello", this)
+                   .AddMethod("Sum", this)
+                   .Bind(server, "http");
             var client = new Client("http://127.0.0.1:8081/");
+            client.Use(Log.IOHandler).Use(Log.InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
             var result = await proxy.Hello("world");
             Assert.AreEqual("Hello world", result);

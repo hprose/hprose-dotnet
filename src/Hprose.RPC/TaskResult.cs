@@ -1,4 +1,19 @@
-﻿using System;
+﻿/*--------------------------------------------------------*\
+|                                                          |
+|                          hprose                          |
+|                                                          |
+| Official WebSite: https://hprose.com                     |
+|                                                          |
+|  TaskResult.cs                                           |
+|                                                          |
+|  TaskResult class for C#.                                |
+|                                                          |
+|  LastModified: Jan 29, 2019                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
+
+using System;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
