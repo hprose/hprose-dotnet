@@ -13,7 +13,6 @@
 |                                                          |
 \*________________________________________________________*/
 
-using Hprose.RPC.Codec;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -59,15 +58,15 @@ namespace Hprose.RPC {
             }
         }
         private readonly HandlerManager handlerManager;
-        Client() {
+        public Client() {
             handlerManager = new HandlerManager(Call, Transport);
             for (int i = 0, n = transTypes.Count; i < n; ++i) {
                 var (name, type) = transTypes[i];
                 transports[name] = (ITransport)Activator.CreateInstance(type);
             };
         }
-        Client(string uri) : this() => urilist.Add(uri);
-        Client(string[] uris) : this() => urilist.AddRange(uris);
+        public Client(string uri) : this() => urilist.Add(uri);
+        public Client(string[] uris) : this() => urilist.AddRange(uris);
         public T UseService<T>(string ns = "") {
             Type type = typeof(T);
             InvocationHandler handler = new InvocationHandler(this, ns);

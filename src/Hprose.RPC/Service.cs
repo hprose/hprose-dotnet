@@ -13,7 +13,6 @@
 |                                                          |
 \*________________________________________________________*/
 
-using Hprose.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,13 +20,41 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC {
-    public class Service {
+    public interface IHandler<T> {
+        Task Bind(T server);
+    }
+    public partial class Service {
+        private readonly static List<(string, Type)> handlerTypes = new List<(string, Type)>();
+        private readonly static Dictionary<Type, string> serverTypes = new Dictionary<Type, string>();
+        public static void Register<HT, ST>(string name) where HT: IHandler<ST> {
+            handlerTypes.Add((name, typeof(HT)));
+            serverTypes[typeof(ST)] = name;
+        }
         public TimeSpan Timeout { get; set; } = new TimeSpan(3000000);
         public IServiceCodec Codec { get; set; } = ServiceCodec.Instance;
         public int MaxRequestLength { get; set; } = 0x7FFFFFFF;
         private readonly HandlerManager handlerManager;
         private readonly MethodManager methodManager = new MethodManager();
+        private readonly Dictionary<string, object> handlers = new Dictionary<string, object>();
+        public object this[string name] => handlers[name];
         public Service() {
+            handlerManager = new HandlerManager(Execute, Process);
+            foreach (var (name, type) in handlerTypes) {
+                var handler = Activator.CreateInstance(type, new object[] { this });
+                handlers[name] = handler;
+            }
+            AddMethod("GetNames", methodManager, "~");
+        }
+        public async Task Bind<T>(T server) {
+            var serverType = typeof(T);
+            if (serverTypes.ContainsKey(serverType)) {
+                var handler = handlers[serverTypes[serverType]];
+                var bindMethod = handler.GetType().GetMethod("Bind");
+                await (Task)(bindMethod.Invoke(handler, new object[] { server }));
+            }
+            else {
+                throw new NotSupportedException("This type server is not supported.");
+            }
         }
         public Task<Stream> Handle(Stream request, Context context) => handlerManager.IOHandler(request, context);
         public async Task<Stream> Process(Stream request, Context context) {

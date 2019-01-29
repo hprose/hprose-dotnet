@@ -90,10 +90,6 @@ namespace Hprose.RPC {
             return args;
         }
         public async Task<(string, object[])> Decode(Stream request, ServiceContext context) {
-            if (request.Length == 0) {
-                DecodeMethod("~", 0, context);
-                return ("~", emptyArgs);
-            }
             MemoryStream stream;
             if (request is MemoryStream) {
                 stream = (MemoryStream)request;
@@ -101,6 +97,11 @@ namespace Hprose.RPC {
             else {
                 stream = new MemoryStream();
                 await request.CopyToAsync(stream);
+            }
+            stream.Position = 0;
+            if (stream.Length == 0) {
+                DecodeMethod("~", 0, context);
+                return ("~", emptyArgs);
             }
             var reader = new Reader(stream, false, Mode) {
                 LongType = LongType,

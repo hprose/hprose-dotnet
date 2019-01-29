@@ -21,7 +21,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hprose.RPC.Codec {
+namespace Hprose.RPC {
     class ClientCodec : IClientCodec {
         public static ClientCodec Instance { get; } = new ClientCodec();
         public bool Simple { get; set; } = false;
@@ -58,6 +58,7 @@ namespace Hprose.RPC.Codec {
                 stream = new MemoryStream();
                 await response.CopyToAsync(stream);
             }
+            stream.Position = 0;
             var reader = new Reader(stream, false, Mode) {
                 LongType = LongType,
                 RealType = RealType,

@@ -10,10 +10,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ContextAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HttpHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpTransport.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Client.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClientContext.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Codec\ClientCodec.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ClientCodec.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Context.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HandlerManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IClientCodec.cs" />
@@ -24,12 +25,15 @@
     <Compile Include="$(MSBuildThisFileDirectory)Method.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Service.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IServiceCodec.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Codec\ServiceCodec.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceCodec.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NameAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Plugins\IdempotentAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Proxy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TaskResult.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Codec\" />
   </ItemGroup>
 </Project>
