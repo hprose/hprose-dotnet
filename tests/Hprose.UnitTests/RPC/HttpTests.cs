@@ -1,9 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Threading.Tasks;
-using System.Reflection;
-using System;
-using Hprose.RPC;
+﻿using Hprose.RPC;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Hprose.UnitTests.RPC {
     [TestClass]
