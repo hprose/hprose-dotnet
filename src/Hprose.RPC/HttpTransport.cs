@@ -55,9 +55,9 @@ namespace Hprose.RPC {
         }
     }
     public partial class Client {
-        public HttpTransport Http => (HttpTransport)this["Http"];
+        public HttpTransport Http => (HttpTransport)this["http"];
         static Client() {
-            Register<HttpTransport>("Http", new string[] { "http", "https" });
+            Register<HttpTransport>("http", new string[] { "http", "https" });
         }
     }
 }

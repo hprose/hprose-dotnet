@@ -39,7 +39,7 @@ namespace Hprose.UnitTests.RPC {
             var service = new Service();
             service.AddMethod("Hello", this);
             service.AddMethod("Sum", this);
-            service.Bind(server);
+            service.Bind(server, "http");
             var client = new Client("http://127.0.0.1:8081/");
             var proxy = client.UseService<ITestInterface>();
             var result = await proxy.Hello("world");

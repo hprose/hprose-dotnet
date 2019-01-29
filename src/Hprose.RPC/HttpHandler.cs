@@ -19,6 +19,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Threading.Tasks;
+using System.Text;
 
 namespace Hprose.RPC {
     public class HttpListenerServiceContext : ServiceContext {
@@ -39,8 +40,8 @@ namespace Hprose.RPC {
         public bool Compress { get; set; } = false;
         public string CrossDomainXmlFile { get; set; } = null;
         public string ClientAccessPolicyXmlFile { get; set; } = null;
-        private string lastModified;
-        private string etag;
+        private readonly string lastModified;
+        private readonly string etag;
         private readonly Dictionary<string, bool> origins = new Dictionary<string, bool>();
         public Service Service { get; private set; }
         public HttpHandler(Service service) {
@@ -51,7 +52,7 @@ namespace Hprose.RPC {
         }
         public async Task Bind(HttpListener server) {
             while (server.IsListening) {
-                await Handler(await server.GetContextAsync());
+                Handler(await server.GetContextAsync());
             }
         }
         public void AddAccessControlAllowOrigin(string origin) {
@@ -144,7 +145,7 @@ namespace Hprose.RPC {
             }
             return false;
         }
-        public async Task Handler(HttpListenerContext httpContext) {
+        public async void Handler(HttpListenerContext httpContext) {
             HttpListenerServiceContext context = new HttpListenerServiceContext(Service, httpContext);
             var request = httpContext.Request;
             var response = httpContext.Response;
@@ -175,7 +176,15 @@ namespace Hprose.RPC {
                     }
                     goto case "POST";
                 case "POST":
-                    outstream = await Service.Handle(stream, context);
+                    try {
+                        outstream = await Service.Handle(stream, context);
+                    }
+                    catch(Exception e) {
+                        response.StatusCode = 500;
+                        response.StatusDescription = "Internal Server Error";
+                        var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
+                        await response.OutputStream.WriteAsync(stackTrace, 0, stackTrace.Length);
+                    }
                     break;
             }
             SendHeader(request, response);
@@ -187,9 +196,9 @@ namespace Hprose.RPC {
     }
 
     public partial class Service {
-        public HttpHandler Http => (HttpHandler)this["Http"];
+        public HttpHandler Http => (HttpHandler)this["http"];
         static Service() {
-            Register<HttpHandler, HttpListener>("Http");
+            Register<HttpHandler, HttpListener>("http");
         }
     }
 }

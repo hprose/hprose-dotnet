@@ -25,10 +25,15 @@ namespace Hprose.RPC {
     }
     public partial class Service {
         private readonly static List<(string, Type)> handlerTypes = new List<(string, Type)>();
-        private readonly static Dictionary<Type, string> serverTypes = new Dictionary<Type, string>();
+        private readonly static Dictionary<Type, List<string>> serverTypes = new Dictionary<Type, List<string>>();
         public static void Register<HT, ST>(string name) where HT: IHandler<ST> {
             handlerTypes.Add((name, typeof(HT)));
-            serverTypes[typeof(ST)] = name;
+            if (serverTypes.ContainsKey(typeof(ST))) {
+                serverTypes[typeof(ST)].Add(name);
+            }
+            else {
+                serverTypes[typeof(ST)] = new List<string>(new string[] { name });
+            }
         }
         public TimeSpan Timeout { get; set; } = new TimeSpan(3000000);
         public IServiceCodec Codec { get; set; } = ServiceCodec.Instance;
@@ -45,18 +50,36 @@ namespace Hprose.RPC {
             }
             AddMethod("GetNames", methodManager, "~");
         }
-        public async Task Bind<T>(T server) {
+        public void Bind<T>(T server, string name = null) {
             var serverType = typeof(T);
             if (serverTypes.ContainsKey(serverType)) {
-                var handler = handlers[serverTypes[serverType]];
-                var bindMethod = handler.GetType().GetMethod("Bind");
-                await (Task)(bindMethod.Invoke(handler, new object[] { server }));
+                var names = serverTypes[serverType];
+                foreach (var n in names) {
+                    if (name == null || name == n) {
+                        var handler = handlers[n];
+                        var bindMethod = handler.GetType().GetMethod("Bind");
+                        bindMethod.Invoke(handler, new object[] { server });
+                    }
+                }
             }
             else {
                 throw new NotSupportedException("This type server is not supported.");
             }
         }
-        public Task<Stream> Handle(Stream request, Context context) => handlerManager.IOHandler(request, context);
+        public async Task<Stream> Handle(Stream request, Context context) {
+            var result = handlerManager.IOHandler(request, context);
+#if NET40
+            var timer = TaskEx.Delay(Timeout);
+            var task = await TaskEx.WhenAny(result, timer);
+#else
+            var timer = Task.Delay(Timeout);
+            var task = await Task.WhenAny(result, timer);
+#endif
+            if (task == timer) {
+                throw new TimeoutException();
+            }
+            return await result;
+        }
         public async Task<Stream> Process(Stream request, Context context) {
             object result;
             try {
