@@ -8,7 +8,7 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Jan 27, 2019                              |
+|  LastModified: Jan 30, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -34,6 +34,7 @@ namespace Hprose.RPC {
         }
     }
     public partial class Client {
+        private static readonly Random random = new Random(Guid.NewGuid().GetHashCode());
         private static readonly List<ValueTuple<string, Type>> transTypes = new List<ValueTuple<string, Type>>();
         private static readonly Dictionary<string, string> schemes = new Dictionary<string, string>();
         public static void Register<T>(string name, string[] schemes) where T: ITransport, new() {
@@ -52,7 +53,6 @@ namespace Hprose.RPC {
             get => urilist;
             set {
                 if (value.Count > 0) {
-                    var random = new Random(Guid.NewGuid().GetHashCode());
                     urilist = value.OrderBy(x => random.Next()).ToList();
                 }
             }

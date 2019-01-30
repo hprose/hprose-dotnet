@@ -44,6 +44,7 @@ namespace Hprose.UnitTests.RPC {
                    .AddMethod("Sum", this)
                    .Bind(server, "http");
             var client = new Client("http://127.0.0.1:8081/");
+            ((ClientCodec)(client.Codec)).Simple = true;
             client.Use(Log.IOHandler).Use(Log.InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
             var result = await proxy.Hello("world");

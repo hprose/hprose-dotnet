@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Writer class for C#.                             |
 |                                                          |
-|  LastModified: Jan 19, 2019                              |
+|  LastModified: Jan 30, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -41,13 +41,20 @@ namespace Hprose.IO {
     }
 
     public class Writer {
-        private readonly WriterRefer refer;
+        private volatile WriterRefer refer;
         private readonly Dictionary<object, int> @ref = new Dictionary<object, int>();
         private int last = 0;
 
         public Stream Stream { get; private set; }
         public Mode Mode { get; private set; }
-
+        public bool Simple {
+            get {
+                return refer == null;
+            }
+            set {
+                refer = value ? null : new WriterRefer();
+            }
+        }
         public Writer(Stream stream, Mode mode = Mode.MemberMode) {
             Stream = stream;
             refer = new WriterRefer();
@@ -56,7 +63,7 @@ namespace Hprose.IO {
 
         public Writer(Stream stream, bool simple, Mode mode = Mode.MemberMode) {
             Stream = stream;
-            refer = simple ? null : new WriterRefer();
+            Simple = simple;
             Mode = mode;
         }
 

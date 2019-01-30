@@ -8,7 +8,7 @@
 |                                                          |
 |  ClientCodec class for C#.                               |
 |                                                          |
-|  LastModified: Jan 27, 2019                              |
+|  LastModified: Jan 30, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -22,7 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC {
-    class ClientCodec : IClientCodec {
+    public class ClientCodec : IClientCodec {
         public static ClientCodec Instance { get; } = new ClientCodec();
         public bool Simple { get; set; } = false;
         public Mode Mode { get; set; } = Mode.MemberMode;
@@ -34,6 +34,9 @@ namespace Hprose.RPC {
         public Stream Encode(string name, object[] args, ClientContext context) {
             var stream = new MemoryStream();
             var writer = new Writer(stream, Simple, Mode);
+            if (Simple) {
+                ((dynamic)context.RequestHeaders).Simple = true;
+            }
             if ((context.RequestHeaders as IDictionary<string, object>).Count > 0) {
                 stream.WriteByte(Tags.TagHeader);
                 writer.Serialize(context.RequestHeaders);
@@ -78,6 +81,10 @@ namespace Hprose.RPC {
             }
             switch (tag) {
                 case Tags.TagResult:
+                    if (((IDictionary<string, object>)context.ResponseHeaders).ContainsKey("Simple")
+                        && ((dynamic)context.ResponseHeaders).Simple) {
+                        reader.Simple = true;
+                    }
                     return reader.Deserialize(context.Type);
                 case Tags.TagError:
                     throw new Exception(reader.Deserialize<string>());

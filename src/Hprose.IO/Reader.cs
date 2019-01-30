@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Reader class for C#.                             |
 |                                                          |
-|  LastModified: Jan 19, 2019                              |
+|  LastModified: Jan 30, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -28,8 +28,8 @@ namespace Hprose.IO {
     }
 
     public class Reader {
-        private readonly ReaderRefer refer;
         private readonly List<TypeInfo> @ref = new List<TypeInfo>();
+        private volatile ReaderRefer refer;
         private volatile LongType longType = LongType.Int64;
         private volatile RealType realType = RealType.Double;
         private volatile CharType charType = CharType.String;
@@ -44,19 +44,26 @@ namespace Hprose.IO {
 
         public Stream Stream { get; private set; }
         public Mode Mode { get; private set; }
-
+        public bool Simple {
+            get {
+                return refer == null;
+            }
+            set {
+                refer = value ? null : new ReaderRefer();
+            }
+        }
         public TypeInfo GetTypeInfo(int index) => @ref[index];
 
         public Reader(Stream stream, Mode mode = Mode.MemberMode) {
             Stream = stream;
-            Mode = mode;
             refer = new ReaderRefer();
+            Mode = mode;
         }
 
         public Reader(Stream stream, bool simple, Mode mode = Mode.MemberMode) {
             Stream = stream;
+            Simple = simple;
             Mode = mode;
-            refer = simple ? null : new ReaderRefer();
         }
 
         public object Deserialize() => Deserializer.Instance.Deserialize(this);

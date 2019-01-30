@@ -8,7 +8,7 @@
 |                                                          |
 |  ServiceCodec class for C#.                              |
 |                                                          |
-|  LastModified: Jan 29, 2019                              |
+|  LastModified: Jan 30, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -36,6 +36,9 @@ namespace Hprose.RPC {
         public Stream Encode(object result, ServiceContext context) {
             var stream = new MemoryStream();
             var writer = new Writer(stream, Simple, Mode);
+            if (Simple) {
+                ((dynamic)context.RequestHeaders).Simple = true;
+            }
             if ((context.ResponseHeaders as IDictionary<string, object>).Count > 0) {
                 stream.WriteByte(Tags.TagHeader);
                 writer.Serialize(context.ResponseHeaders);
@@ -122,6 +125,10 @@ namespace Hprose.RPC {
             }
             switch (tag) {
                 case Tags.TagCall:
+                    if (((IDictionary<string, object>)context.RequestHeaders).ContainsKey("Simple")
+                        && ((dynamic)context.RequestHeaders).Simple) {
+                        reader.Simple = true;
+                    }
                     var fullname = reader.Deserialize<string>();
                     var args = DecodeArguments(fullname, reader, context);
                     return (fullname, args);
