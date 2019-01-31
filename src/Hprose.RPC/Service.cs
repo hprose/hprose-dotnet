@@ -35,7 +35,7 @@ namespace Hprose.RPC {
                 serverTypes[typeof(ST)] = new List<string>(new string[] { name });
             }
         }
-        public TimeSpan Timeout { get; set; } = new TimeSpan(3000000);
+        public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         public IServiceCodec Codec { get; set; } = ServiceCodec.Instance;
         public int MaxRequestLength { get; set; } = 0x7FFFFFFF;
         private readonly HandlerManager handlerManager;
@@ -68,15 +68,17 @@ namespace Hprose.RPC {
         }
         public async Task<Stream> Handle(Stream request, Context context) {
             var result = handlerManager.IOHandler(request, context);
+            if (Timeout.Ticks > 0) {
 #if NET40
-            var timer = TaskEx.Delay(Timeout);
-            var task = await TaskEx.WhenAny(result, timer);
+                var timer = TaskEx.Delay(Timeout);
+                var task = await TaskEx.WhenAny(result, timer);
 #else
-            var timer = Task.Delay(Timeout);
-            var task = await Task.WhenAny(result, timer);
+                var timer = Task.Delay(Timeout);
+                var task = await Task.WhenAny(result, timer);
 #endif
-            if (task == timer) {
-                throw new TimeoutException();
+                if (task == timer) {
+                    throw new TimeoutException();
+                }
             }
             return await result;
         }
