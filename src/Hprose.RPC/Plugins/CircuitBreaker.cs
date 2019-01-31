@@ -68,7 +68,7 @@ namespace Hprose.RPC.Plugins {
             try {
                 return await next(name, args, context);
             }
-            catch (BreakerException e) {
+            catch (BreakerException) {
                 return await MockService.Invoke(name, args, context);
             }
         }
