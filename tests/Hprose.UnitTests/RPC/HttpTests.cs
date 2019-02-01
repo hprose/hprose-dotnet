@@ -10,7 +10,9 @@ namespace Hprose.UnitTests.RPC {
         public Task<int> Sum(int x, int y) {
             return Task<int>.Factory.StartNew(() => x + y);
         }
-        public string Hello(string name) {
+        public string Hello(string name, Context context) {
+            System.Console.WriteLine((context as ServiceContext).Method.Fullname);
+            System.Console.WriteLine((context as dynamic).Request.RemoteEndPoint.Address);
             return "Hello " + name;
         }
         [TestMethod]

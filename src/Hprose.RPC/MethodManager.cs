@@ -57,7 +57,7 @@ namespace Hprose.RPC {
             var autoParams = 0;
             for (int i = 0; i < n; i++) {
                 var p = parameters[i];
-                if (p.ParameterType.IsSubclassOf(typeof(Context))) {
+                if (typeof(Context).IsAssignableFrom(p.ParameterType)) {
                     autoParams = 1;
                 }
 #if NET40

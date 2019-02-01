@@ -79,7 +79,7 @@ namespace Hprose.RPC {
             args = new object[n];
             var autoParams = 0;
             for (int i = 0; i < n; i++) {
-                if (parameters[i].ParameterType.IsSubclassOf(typeof(Context))) {
+                if (typeof(Context).IsAssignableFrom(parameters[i].ParameterType)) {
                     autoParams = 1;
                     args[i] = context;
                 }
