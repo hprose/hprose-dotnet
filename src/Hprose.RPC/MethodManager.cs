@@ -15,6 +15,7 @@
 
 using Hprose.IO;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -23,12 +24,11 @@ namespace Hprose.RPC {
     public class MethodManager {
         private readonly string[] instanceMethodsOnObject = { "Equals", "GetHashCode", "GetType", "ToString" };
         private readonly string[] staticMethodsOnObject = { "Equals", "ReferenceEquals" };
-        public Dictionary<string, Dictionary<int, Method>> Methods { get; } = new Dictionary<string, Dictionary<int, Method>>(StringComparer.OrdinalIgnoreCase);
+        public ConcurrentDictionary<string, ConcurrentDictionary<int, Method>> Methods { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, Method>>(StringComparer.OrdinalIgnoreCase);
         public Method Get(string fullname, int paramCount) {
-            if (Methods.ContainsKey(fullname)) {
-                var methods = Methods[fullname];
-                if (methods.ContainsKey(paramCount)) {
-                    return methods[paramCount];
+            if (Methods.TryGetValue(fullname, out var methods)) {
+                if (methods.TryGetValue(paramCount, out var method)) {
+                    return method;
                 }
             }
             return null;
@@ -37,9 +37,9 @@ namespace Hprose.RPC {
             return Methods.Keys;
         }
         public void Add(Method method) {
-            Dictionary<int, Method> methods;
+            ConcurrentDictionary<int, Method> methods;
             if (!Methods.ContainsKey(method.Fullname)) {
-                Methods.Add(method.Fullname, new Dictionary<int, Method>());
+                Methods.TryAdd(method.Fullname, new ConcurrentDictionary<int, Method>());
             }
             methods = Methods[method.Fullname];
             var parameters = method.Parameters;
@@ -55,10 +55,10 @@ namespace Hprose.RPC {
 #else
                 else if (p.IsOptional && p.HasDefaultValue) {
 #endif
-                    methods.Add(i - autoParams, method);
+                    methods.AddOrUpdate(i - autoParams, method, (key, value) => method);
                 }
             }
-            methods.Add(n - autoParams, method);
+            methods.AddOrUpdate(n - autoParams, method, (key, value) => method);
         }
         public void Add(MethodInfo methodInfo, string fullname, object target = null) {
             Add(new Method(methodInfo, fullname, target));
