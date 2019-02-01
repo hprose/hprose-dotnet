@@ -114,8 +114,8 @@ namespace Hprose.RPC {
         public async Task<Stream> Transport(Stream request, Context context) {
             var uri = new Uri((context as ClientContext).Uri);
             var scheme = uri.Scheme;
-            if (schemes.ContainsKey(scheme)) {
-                return await transports[schemes[scheme]].Transport(request, context);
+            if (schemes.TryGetValue(scheme, out string name)) {
+                return await transports[name].Transport(request, context);
             }
             throw new NotSupportedException("The protocol " + scheme + " is not supported.");
         }
