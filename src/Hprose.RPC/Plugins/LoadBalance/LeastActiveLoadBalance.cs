@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 namespace Hprose.RPC.Plugins.LoadBalance {
     public class LeastActiveLoadBalance {
         private readonly Random random = new Random(Guid.NewGuid().GetHashCode());
-        private int[] actives = null;
+        private int[] actives = new int[0];
         private readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
         public async Task<Stream> Handler(Stream request, Context context, NextIOHandler next) {
             var clientContext = context as ClientContext;
@@ -32,7 +32,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
             var leastActiveIndexes = new List<int>(n);
 
             rwlock.EnterUpgradeableReadLock();
-            if (actives == null || actives.Length < n) {
+            if (actives.Length < n) {
                 rwlock.EnterWriteLock();
                 actives = new int[n];
                 rwlock.ExitWriteLock();
@@ -40,7 +40,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
             rwlock.ExitUpgradeableReadLock();
 
             rwlock.EnterReadLock();
-            var leastActive = actives.Min();
+            var leastActive = (actives.Length > n) ? actives.Take(n).Min() : actives.Min();
             for (int i = 0; i < n; ++i) {
                 if (actives[i] == leastActive) {
                     leastActiveIndexes.Add(i);
