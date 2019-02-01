@@ -32,7 +32,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
             var leastActiveIndexes = new List<int>(n);
 
             rwlock.EnterUpgradeableReadLock();
-            if (actives == null) {
+            if (actives == null || actives.Length < n) {
                 rwlock.EnterWriteLock();
                 actives = new int[n];
                 rwlock.ExitWriteLock();
@@ -53,7 +53,9 @@ namespace Hprose.RPC.Plugins.LoadBalance {
             if (count > 1) {
                 index = leastActiveIndexes[random.Next(count)];
             }
-                (context as ClientContext).Uri = uris[index];
+
+            (context as ClientContext).Uri = uris[index];
+
             rwlock.EnterWriteLock();
             actives[index]++;
             rwlock.ExitWriteLock();
