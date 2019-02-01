@@ -8,7 +8,7 @@
 |                                                          |
 |  CircuitBreaker plugin for C#.                           |
 |                                                          |
-|  LastModified: Jan 31, 2019                              |
+|  LastModified: Feb 1, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -18,16 +18,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Hprose.RPC.Plugins {
-    public interface IMockService {
-        Task<object> Invoke(string name, object[] args, Context context);
-    }
-
-    public class BreakerException : Exception {
-        public BreakerException() : base("service breaked") { }
-        public BreakerException(string message) : base(message) { }
-    }
-
+namespace Hprose.RPC.Plugins.CircuitBreaker {
     public class CircuitBreaker {
         private DateTime lastFailTime = new DateTime(0);
         private volatile int failCount = 0;
