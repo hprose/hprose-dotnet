@@ -19,7 +19,7 @@ namespace Hprose.Benchmark.IO {
             [DataMember(Order = 2)]
             public int Age;
         }
-        private static Person[] persons = new Person[] {
+        private static readonly Person[] persons = new Person[] {
            new Person {
                Id = 0,
                Name = "Tom",
@@ -36,10 +36,10 @@ namespace Hprose.Benchmark.IO {
                Age = 53
            }
         };
-        private static byte[] hproseData;
-        private static byte[] dcData;
-        private static string newtonData;
-        private static string sstextData;
+        private static readonly byte[] hproseData;
+        private static readonly byte[] dcData;
+        private static readonly string newtonData;
+        private static readonly string sstextData;
 
         static BenchmarkObjectSerialize() {
             hproseData = Hprose.IO.Formatter.Serialize(persons);

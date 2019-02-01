@@ -4,9 +4,9 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-|  IdempotentAttribute.cs                                  |
+|  LogAttribute.cs                                         |
 |                                                          |
-|  Idempotent Attribute for C#.                            |
+|  Log Attribute for C#.                                   |
 |                                                          |
 |  LastModified: Feb 2, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
@@ -15,9 +15,9 @@
 
 using System;
 
-namespace Hprose.RPC.Plugins.Cluster {
+namespace Hprose.RPC.Plugins.Log {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    public class IdempotentAttribute : ContextAttribute {
-        public IdempotentAttribute() : base("Idempotent", true) { }
+    public class LogAttribute : ContextAttribute {
+        public LogAttribute(bool enabled) : base("Log", enabled) { }
     }
 }

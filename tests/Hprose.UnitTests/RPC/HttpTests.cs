@@ -1,5 +1,5 @@
 ﻿using Hprose.RPC;
-using Hprose.RPC.Plugins;
+using Hprose.RPC.Plugins.Log;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Net;
 using System.Threading.Tasks;
@@ -34,6 +34,7 @@ namespace Hprose.UnitTests.RPC {
         }
         public interface ITestInterface {
             int Sum(int x, int y);
+            [Log(false)]
             Task<string> Hello(string name);
         }
         [TestMethod]
@@ -47,7 +48,8 @@ namespace Hprose.UnitTests.RPC {
                    .Bind(server, "http");
             var client = new Client("http://127.0.0.1:8081/");
             ((ClientCodec)(client.Codec)).Simple = true;
-            client.Use(Log.IOHandler).Use(Log.InvokeHandler);
+            var log = new Log();
+            client.Use(log.IOHandler).Use(log.InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
             var result = await proxy.Hello("world");
             Assert.AreEqual("Hello world", result);

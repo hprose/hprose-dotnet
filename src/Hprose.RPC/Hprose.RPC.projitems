@@ -49,7 +49,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\WeightedRandomLoadBalance.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\RandomLoadBalance.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\WeightedLoadBalance.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Log.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Log\Log.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Log\LogAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Oneway\OnewayAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Oneway\Oneway.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Codec\" />
