@@ -43,7 +43,7 @@ namespace Hprose.RPC.Plugins.Cluster {
                     }
                     if (idempotent && clientContext.Retried < retry) {
                         var interval = Config.OnRetry(context);
-                        if (interval > new TimeSpan(0)) {
+                        if (interval > TimeSpan.Zero) {
 #if NET40
                             await TaskEx.Delay(interval);
 #else
@@ -57,7 +57,7 @@ namespace Hprose.RPC.Plugins.Cluster {
             }
         }
         public static async Task<object> Forking(string name, object[] args, Context context, NextInvokeHandler next) {
-            var promise = new TaskCompletionSource<object>();
+            var deferred = new TaskCompletionSource<object>();
             var clientContext = context as ClientContext;
             var uris = clientContext.Client.Uris;
             var n = uris.Count;
@@ -68,15 +68,15 @@ namespace Hprose.RPC.Plugins.Cluster {
                 var result = next(name, args, forkingContext).ContinueWith((task) => {
                     if (task.Exception != null) {
                         if (Interlocked.Decrement(ref count) == 0) {
-                            promise.TrySetException(task.Exception);
+                            deferred.TrySetException(task.Exception);
                         }
                     }
                     else {
-                        promise.TrySetResult(task.Result);
+                        deferred.TrySetResult(task.Result);
                     }
                 });
             }
-            return await promise.Task;
+            return await deferred.Task;
         }
         public static async Task<object> Broadcast(string name, object[] args, Context context, NextInvokeHandler next) {
             var clientContext = context as ClientContext;
