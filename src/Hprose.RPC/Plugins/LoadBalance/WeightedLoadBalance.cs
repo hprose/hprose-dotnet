@@ -37,6 +37,9 @@ namespace Hprose.RPC.Plugins.LoadBalance {
                     throw new ArgumentOutOfRangeException("Weight must be great than 0");
                 }
             }
+            if (uris.Length == 0) {
+                throw new ArgumentException("uriList cannot be empty");
+            }
         }
         public abstract Task<Stream> Handler(Stream request, Context context, NextIOHandler next);
     }
