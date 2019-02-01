@@ -124,6 +124,10 @@ namespace Hprose.RPC {
             return this;
         }
         public Method Get(string fullname, int paramCount) => methodManager.Get(fullname, paramCount);
+        public Service Remove(string fullname, int paramCount = -1) {
+            methodManager.Remove(fullname, paramCount);
+            return this;
+        }
         public Service Add(Method method) {
             methodManager.Add(method);
             return this;

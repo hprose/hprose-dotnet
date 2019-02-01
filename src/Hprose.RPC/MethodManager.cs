@@ -36,6 +36,16 @@ namespace Hprose.RPC {
         public ICollection<string> GetNames() {
             return Methods.Keys;
         }
+        public void Remove(string fullname, int paramCount = -1) {
+            if (paramCount < 0) {
+                Methods.TryRemove(fullname, out var temp);
+            }
+            else {
+                if (Methods.TryGetValue(fullname, out var methods)) {
+                    methods.TryRemove(paramCount, out var method);
+                }
+            }
+        }
         public void Add(Method method) {
             ConcurrentDictionary<int, Method> methods;
             if (!Methods.ContainsKey(method.Fullname)) {
