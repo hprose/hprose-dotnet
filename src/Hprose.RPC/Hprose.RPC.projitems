@@ -23,6 +23,17 @@
     <Compile Include="$(MSBuildThisFileDirectory)HeaderAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MethodManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Method.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\CircuitBreaker\IMockService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\CircuitBreaker\BreakerException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\CircuitBreaker\CircuitBreaker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\WeightedLeastActiveLoadBalance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\NginxRoundRobinLoadBalance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\LeastActiveLoadBalance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\WeightedRoundRobinLoadBalance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\RoundRobinLoadBalance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\WeightedRandomLoadBalance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\RandomLoadBalance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\WeightedLoadBalance.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Plugins\Log.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Service.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IServiceCodec.cs" />
