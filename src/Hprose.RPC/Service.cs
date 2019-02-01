@@ -14,6 +14,7 @@
 \*________________________________________________________*/
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -25,15 +26,10 @@ namespace Hprose.RPC {
     }
     public partial class Service {
         private readonly static List<(string, Type)> handlerTypes = new List<(string, Type)>();
-        private readonly static Dictionary<Type, List<string>> serverTypes = new Dictionary<Type, List<string>>();
+        private readonly static ConcurrentDictionary<Type, List<string>> serverTypes = new ConcurrentDictionary<Type, List<string>>();
         public static void Register<HT, ST>(string name) where HT: IHandler<ST> {
             handlerTypes.Add((name, typeof(HT)));
-            if (serverTypes.ContainsKey(typeof(ST))) {
-                serverTypes[typeof(ST)].Add(name);
-            }
-            else {
-                serverTypes[typeof(ST)] = new List<string>(new string[] { name });
-            }
+            serverTypes.GetOrAdd(typeof(ST), new List<string>()).Add(name);
         }
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         public IServiceCodec Codec { get; set; } = ServiceCodec.Instance;
@@ -51,9 +47,7 @@ namespace Hprose.RPC {
             AddMethod("GetNames", methodManager, "~");
         }
         public void Bind<T>(T server, string name = null) {
-            var serverType = typeof(T);
-            if (serverTypes.ContainsKey(serverType)) {
-                var names = serverTypes[serverType];
+            if (serverTypes.TryGetValue(typeof(T), out var names)) {
                 foreach (var n in names) {
                     if (name == null || name == n) {
                         var handler = handlers[n];
