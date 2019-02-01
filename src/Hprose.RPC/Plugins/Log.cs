@@ -14,8 +14,10 @@
 \*________________________________________________________*/
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
@@ -66,7 +68,7 @@ namespace Hprose.RPC.Plugins {
             }
         }
         public static async Task<object> InvokeHandler(string name, object[] args, Context context, NextInvokeHandler next) {
-            string a = Stringify(args);
+            string a = typeof(Context).IsAssignableFrom(args.Last().GetType()) ? Stringify(new List<object>(args.Take(args.Length - 1))) : Stringify(args);
             try {
                 var result = await next(name, args, context);
                 Trace.TraceInformation(name + "(" + a.Substring(1, a.Length - 2) + ") = " + Stringify(result));
