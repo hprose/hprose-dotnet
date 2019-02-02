@@ -89,8 +89,11 @@ namespace Hprose.RPC.Plugins.Push {
             }
             return false;
         }
-        public async Task<bool> Subscribe<T>(string topic, Action<string, T> callback) {
-            return await Subscribe(topic, (message) => callback(message.From, Converter<T>.Convert(message.Data)));
+        public async Task<bool> Subscribe<T>(string topic, Action<T, string> callback) {
+            return await Subscribe(topic, (message) => callback(Converter<T>.Convert(message.Data), message.From));
+        }
+        public async Task<bool> Subscribe<T>(string topic, Action<T> callback) {
+            return await Subscribe(topic, (message) => callback(Converter<T>.Convert(message.Data)));
         }
         public async Task<bool> Unsubscribe(string topic) {
             if (Id != null && Id.Length > 0) {
