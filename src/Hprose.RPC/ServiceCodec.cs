@@ -8,7 +8,7 @@
 |                                                          |
 |  ServiceCodec class for C#.                              |
 |                                                          |
-|  LastModified: Jan 30, 2019                              |
+|  LastModified: Feb 2, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -100,6 +100,7 @@ namespace Hprose.RPC {
             else {
                 stream = new MemoryStream();
                 await request.CopyToAsync(stream);
+                request.Dispose();
             }
             stream.Position = 0;
             if (stream.Length == 0) {
