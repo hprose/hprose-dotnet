@@ -8,7 +8,7 @@
 |                                                          |
 |  Service class for C#.                                   |
 |                                                          |
-|  LastModified: Jan 28, 2019                              |
+|  LastModified: Feb 2, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -18,6 +18,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC {
@@ -62,16 +63,20 @@ namespace Hprose.RPC {
         }
         public async Task<Stream> Handle(Stream request, Context context) {
             var result = handlerManager.IOHandler(request, context);
-            if (Timeout.Ticks > 0) {
+            if (Timeout > TimeSpan.Zero) {
+                using (CancellationTokenSource source = new CancellationTokenSource()) {
+
 #if NET40
-                var timer = TaskEx.Delay(Timeout);
-                var task = await TaskEx.WhenAny(result, timer);
+                    var timer = TaskEx.Delay(Timeout, source.Token);
+                    var task = await TaskEx.WhenAny(result, timer);
 #else
-                var timer = Task.Delay(Timeout);
-                var task = await Task.WhenAny(result, timer);
+                    var timer = Task.Delay(Timeout, source.Token);
+                    var task = await Task.WhenAny(result, timer);
 #endif
-                if (task == timer) {
-                    throw new TimeoutException();
+                    source.Cancel();
+                    if (task == timer) {
+                        throw new TimeoutException();
+                    }
                 }
             }
             return await result;
