@@ -27,7 +27,7 @@ namespace Hprose.RPC {
         public object Target { get; private set; }
         public Method(MethodInfo methodInfo, string fullname, object target = null) {
             MethodInfo = methodInfo;
-            Fullname = fullname;
+            Fullname = fullname ?? methodInfo.Name;
             Target = target;
             Parameters = methodInfo.GetParameters();
         }
