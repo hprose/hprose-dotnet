@@ -33,15 +33,18 @@ namespace Hprose.RPC.Plugins.Limiter {
             var deferred = new TaskCompletionSource<bool>();
             tasks.Enqueue(deferred);
             if (Timeout > TimeSpan.Zero) {
+                using (CancellationTokenSource source = new CancellationTokenSource()) {
 #if NET40
-                var timer = TaskEx.Delay(Timeout);
-                var task = await TaskEx.WhenAny(timer, deferred.Task);
+                    var timer = TaskEx.Delay(Timeout, source.Token);
+                    var task = await TaskEx.WhenAny(timer, deferred.Task);
 #else
-                var timer = Task.Delay(Timeout);
-                var task = await Task.WhenAny(timer, deferred.Task);
+                    var timer = Task.Delay(Timeout, source.Token);
+                    var task = await Task.WhenAny(timer, deferred.Task);
 #endif
-                if (task == timer) {
-                    deferred.TrySetException(new TimeoutException());
+                    source.Cancel();
+                    if (task == timer) {
+                        deferred.TrySetException(new TimeoutException());
+                    }
                 }
             }
             await deferred.Task;
