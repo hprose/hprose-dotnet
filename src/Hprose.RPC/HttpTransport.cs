@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpTransport class for C#.                             |
 |                                                          |
-|  LastModified: Jan 26, 2019                              |
+|  LastModified: Feb 2, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -36,21 +36,22 @@ namespace Hprose.RPC {
         }
         public async Task<Stream> Transport(Stream request, Context context) {
             dynamic clientContext = context;
-            HttpContent httpContext = new StreamContent(request);
-            if (context.Contains("HttpRequestHeaders")) {
-                HttpContentHeaders headers = clientContext.HttpRequestHeaders;
-                foreach (var pair in headers) {
-                    httpContext.Headers.Add(pair.Key, pair.Value);
+            using (HttpContent httpContext = new StreamContent(request)) {
+                if (context.Contains("HttpRequestHeaders")) {
+                    HttpContentHeaders headers = clientContext.HttpRequestHeaders;
+                    foreach (var pair in headers) {
+                        httpContext.Headers.Add(pair.Key, pair.Value);
+                    }
                 }
-            }
-            httpContext.Headers.ContentLength = request.Length;
-            HttpResponseMessage response = await httpClient.PostAsync(clientContext.Uri, httpContext);
-            if (response.IsSuccessStatusCode) {
-                clientContext.HttpResponseHeaders = response.Headers;
-                return await response.Content.ReadAsStreamAsync();
-            }
-            else {
-                throw new Exception(((int)response.StatusCode) + ":" + response.ReasonPhrase);
+                httpContext.Headers.ContentLength = request.Length;
+                HttpResponseMessage response = await httpClient.PostAsync(clientContext.Uri, httpContext);
+                if (response.IsSuccessStatusCode) {
+                    clientContext.HttpResponseHeaders = response.Headers;
+                    return await response.Content.ReadAsStreamAsync();
+                }
+                else {
+                    throw new Exception(((int)response.StatusCode) + ":" + response.ReasonPhrase);
+                }
             }
         }
     }
