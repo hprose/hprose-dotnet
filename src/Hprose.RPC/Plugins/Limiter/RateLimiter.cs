@@ -56,6 +56,7 @@ namespace Hprose.RPC.Plugins.Limiter {
                 MemoryStream stream = new MemoryStream();
                 await request.CopyToAsync(stream);
                 stream.Position = 0;
+                request.Dispose();
                 request = stream;
             }
             await Acquire(request.Length);
