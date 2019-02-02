@@ -25,6 +25,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Method.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Plugins\Limiter\RateLimiter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Plugins\Limiter\Limiter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Push\Prosumer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Push\Message.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Push\Broker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Push\IProducer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Service.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IServiceCodec.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceCodec.cs" />

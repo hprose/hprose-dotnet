@@ -1,5 +1,7 @@
-﻿using Hprose.RPC;
+﻿using Hprose.IO;
+using Hprose.RPC;
 using Hprose.RPC.Plugins.Log;
+using Hprose.RPC.Plugins.Push;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Net;
@@ -58,6 +60,39 @@ namespace Hprose.UnitTests.RPC {
             var result = await proxy.Hello("world");
             Assert.AreEqual("Hello world", result);
             Assert.AreEqual(3, proxy.Sum(1, 2));
+            server.Stop();
+        }
+        [TestMethod]
+        public async Task Test3() {
+            HttpListener server = new HttpListener();
+            server.Prefixes.Add("http://127.0.0.1:8082/");
+            server.Start();
+            var service = new Broker(new Service()).Service;
+            ServiceCodec.Instance.Debug = true;
+            service.Use(Log.IOHandler)
+                   .Use(Log.InvokeHandler)
+                   .Bind(server);
+
+            var client1 = new Client("http://127.0.0.1:8082/");
+            var prosumer1 = new Prosumer(client1, "1");
+            var client2 = new Client("http://127.0.0.1:8082/");
+            var prosumer2 = new Prosumer(client2, "2");
+            await prosumer1.Subscribe<string>("test", (from, data) => {
+                Assert.AreEqual("2", from);
+                Assert.AreEqual("hello", data);
+            });
+            await prosumer1.Subscribe<string>("test2", (from, data) => {
+                Assert.AreEqual("2", from);
+                Assert.AreEqual("world", data);
+            });
+            var r1 = prosumer2.Push("hello", "test", "1");
+            var r2 = prosumer2.Push("hello", "test", "1");
+            var r3 = prosumer2.Push("world", "test2", "1");
+            var r4 = prosumer2.Push("world", "test2", "1");
+            await Task.WhenAll(r1, r2, r3, r4);
+            await Task.Delay(100);
+            await prosumer1.Unsubscribe("test");
+            await prosumer1.Unsubscribe("test2");
             server.Stop();
         }
     }
