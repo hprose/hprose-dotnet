@@ -1,6 +1,7 @@
 ﻿using Hprose.RPC;
 using Hprose.RPC.Plugins.Log;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -21,15 +22,18 @@ namespace Hprose.UnitTests.RPC {
             server.Prefixes.Add("http://127.0.0.1:8080/");
             server.Start();
             var service = new Service();
+            ServiceCodec.Instance.Debug = true;
             service.Use(Log.IOHandler)
                    .Use(Log.InvokeHandler)
-                   .AddMethod("Hello", this)
-                   .AddMethod("Sum", this)
+                   .Add<string, Context, string>(Hello)
+                   .Add<int, int, Task<int>>(Sum)
+                   .Add(() => { return "good"; }, "Good")
                    .Bind(server);
             var client = new Client("http://127.0.0.1:8080/");
             var result = await client.Invoke<string>("hello", new object[] { "world" });
             Assert.AreEqual("Hello world", result);
             Assert.AreEqual(3, await client.Invoke<int>("sum", new object[] { 1, 2 }));
+            Assert.AreEqual("good", await client.Invoke<string>("good"));
             server.Stop();
         }
         public interface ITestInterface {
