@@ -35,7 +35,7 @@ namespace Hprose.RPC {
             var stream = new MemoryStream();
             var writer = new Writer(stream, Simple, Mode);
             if (Simple) {
-                ((dynamic)context.RequestHeaders).Simple = true;
+                context.RequestHeaders.Simple = true;
             }
             if ((context.RequestHeaders as IDictionary<string, object>).Count > 0) {
                 stream.WriteByte(Tags.TagHeader);
@@ -83,7 +83,7 @@ namespace Hprose.RPC {
             switch (tag) {
                 case Tags.TagResult:
                     if (((IDictionary<string, object>)context.ResponseHeaders).ContainsKey("Simple")
-                        && ((dynamic)context.ResponseHeaders).Simple) {
+                        && context.ResponseHeaders.Simple) {
                         reader.Simple = true;
                     }
                     return reader.Deserialize(context.Type);
