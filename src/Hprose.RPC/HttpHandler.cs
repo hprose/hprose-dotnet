@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpHandler class for C#.                               |
 |                                                          |
-|  LastModified: Jan 29, 2019                              |
+|  LastModified: Feb 2, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -33,7 +33,6 @@ namespace Hprose.RPC {
         }
     }
     public class HttpHandler : IHandler<HttpListener> {
-        private static readonly MemoryStream emptyStream = new MemoryStream(0);
         public bool CrossDomain { get; set; } = true;
         public bool P3P { get; set; } = true;
         public bool Get { get; set; } = true;
@@ -111,7 +110,9 @@ namespace Hprose.RPC {
                     response.AppendHeader("Etag", etag);
                     response.ContentType = "text/xml";
                     using (var fileStream = new FileStream(CrossDomainXmlFile, FileMode.Open, FileAccess.Read)) {
-                        await fileStream.CopyToAsync(GetOutputStream(request, response));
+                        using (var outputStream = GetOutputStream(request, response)) {
+                            await fileStream.CopyToAsync(outputStream);
+                        }
                     };
                 }
                 else {
@@ -134,7 +135,9 @@ namespace Hprose.RPC {
                     response.AppendHeader("Etag", etag);
                     response.ContentType = "text/xml";
                     using (var fileStream = new FileStream(ClientAccessPolicyXmlFile, FileMode.Open, FileAccess.Read)) {
-                        await fileStream.CopyToAsync(GetOutputStream(request, response));
+                        using (var outputStream = GetOutputStream(request, response)) {
+                            await fileStream.CopyToAsync(outputStream);
+                        }
                     };
                 }
                 else {
@@ -155,41 +158,48 @@ namespace Hprose.RPC {
             if (await CrossDomainXmlHandler(request, response)) {
                 return;
             }
-            var stream = request.InputStream ?? emptyStream;
-            if (request.ContentLength64 > Service.MaxRequestLength
-                || request.ContentLength64 == -1
-                    && stream.CanSeek
-                    && stream.Length > Service.MaxRequestLength) {
-                response.StatusCode = 413;
-                response.StatusDescription = "Request Entity Too Large";
-                response.Close();
-                return;
-            }
-            string method = request.HttpMethod;
-            Stream outstream = null;
-            switch (method) {
-                case "GET":
-                    if (!Get) {
-                        response.StatusCode = 403;
-                        response.StatusDescription = "Forbidden";
+            using (var instream = request.InputStream) {
+                if (request.ContentLength64 > Service.MaxRequestLength
+                    || request.ContentLength64 == -1
+                        && instream.CanSeek
+                        && instream.Length > Service.MaxRequestLength) {
+                    instream.Dispose();
+                    response.StatusCode = 413;
+                    response.StatusDescription = "Request Entity Too Large";
+                    response.Close();
+                    return;
+                }
+                string method = request.HttpMethod;
+                Stream outstream = null;
+                switch (method) {
+                    case "GET":
+                        if (!Get) {
+                            response.StatusCode = 403;
+                            response.StatusDescription = "Forbidden";
+                            break;
+                        }
+                        goto case "POST";
+                    case "POST":
+                        try {
+                            outstream = await Service.Handle(instream, context);
+                        }
+                        catch (Exception e) {
+                            response.StatusCode = 500;
+                            response.StatusDescription = "Internal Server Error";
+                            var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
+                            using (var outputStream = GetOutputStream(request, response)) {
+                                await outputStream.WriteAsync(stackTrace, 0, stackTrace.Length);
+                            }
+                        }
                         break;
+                }
+                SendHeader(request, response);
+                if (outstream != null) {
+                    using (var outputStream = GetOutputStream(request, response)) {
+                        await outstream.CopyToAsync(outputStream);
                     }
-                    goto case "POST";
-                case "POST":
-                    try {
-                        outstream = await Service.Handle(stream, context);
-                    }
-                    catch(Exception e) {
-                        response.StatusCode = 500;
-                        response.StatusDescription = "Internal Server Error";
-                        var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
-                        await response.OutputStream.WriteAsync(stackTrace, 0, stackTrace.Length);
-                    }
-                    break;
-            }
-            SendHeader(request, response);
-            if (outstream != null) {
-                await outstream.CopyToAsync(GetOutputStream(request, response));
+                    outstream.Dispose();
+                }
             }
             response.Close();
         }
