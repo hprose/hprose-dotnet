@@ -28,7 +28,7 @@ namespace Hprose.RPC {
     public partial class Service {
         private readonly static List<(string, Type)> handlerTypes = new List<(string, Type)>();
         private readonly static ConcurrentDictionary<Type, List<string>> serverTypes = new ConcurrentDictionary<Type, List<string>>();
-        public static void Register<HT, ST>(string name) where HT: IHandler<ST> {
+        public static void Register<HT, ST>(string name) where HT : IHandler<ST> {
             handlerTypes.Add((name, typeof(HT)));
             serverTypes.GetOrAdd(typeof(ST), new List<string>()).Add(name);
         }
@@ -87,8 +87,8 @@ namespace Hprose.RPC {
                 var (fullname, args) = await Codec.Decode(request, context as ServiceContext);
                 result = await handlerManager.InvokeHandler(fullname, args, context);
             }
-            catch(Exception e) {
-                result = e;
+            catch (Exception e) {
+                result = e.InnerException ?? e;
             }
             return Codec.Encode(result, context as ServiceContext);
         }
