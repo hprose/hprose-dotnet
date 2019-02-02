@@ -37,17 +37,13 @@ namespace Hprose.RPC.Plugins.Log {
         }
     }
     public static class LogExtensions {
-        private static async Task<MemoryStream> ToMemoryStreamAsync(Stream stream) {
-            MemoryStream memoryStream;
-            if (stream is MemoryStream) {
-                memoryStream = (MemoryStream)stream;
-            }
-            else {
-                memoryStream = new MemoryStream();
-                await stream.CopyToAsync(memoryStream);
-            }
+        private static async Task<Stream> ToMemoryStream(Stream stream) {
+            MemoryStream memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
             memoryStream.Position = 0;
-            return memoryStream;
+            stream.Dispose();
+            stream = memoryStream;
+            return stream;
         }
         private static string ToString(MemoryStream stream) {
             byte[] data = stream.ToArray();
@@ -69,13 +65,17 @@ namespace Hprose.RPC.Plugins.Log {
         public static async Task<Stream> IOHandler(this Log log, Stream request, Context context, NextIOHandler next) {
             bool enabled = context.Contains("Log") ? (context as dynamic).Log : log.Enabled;
             if (!enabled) return await next(request, context);
-            var stream = await ToMemoryStreamAsync(request);
-            Trace.TraceInformation(ToString(stream));
+            if (!(request is MemoryStream)) {
+                request = await ToMemoryStream(request);
+            }
+            Trace.TraceInformation(ToString(request as MemoryStream));
             try {
-                var response = await next(stream, context);
-                stream = await ToMemoryStreamAsync(response);
-                Trace.TraceInformation(ToString(stream));
-                return stream;
+                var response = await next(request, context);
+                if (!(response is MemoryStream)) {
+                    response = await ToMemoryStream(response);
+                }
+                Trace.TraceInformation(ToString(response as MemoryStream));
+                return response;
             }
             catch (Exception e) {
                 Trace.TraceError(e.StackTrace);
