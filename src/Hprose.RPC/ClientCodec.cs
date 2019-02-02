@@ -8,7 +8,7 @@
 |                                                          |
 |  ClientCodec class for C#.                               |
 |                                                          |
-|  LastModified: Jan 30, 2019                              |
+|  LastModified: Feb 2, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -60,6 +60,7 @@ namespace Hprose.RPC {
             else {
                 stream = new MemoryStream();
                 await response.CopyToAsync(stream);
+                response.Dispose();
             }
             stream.Position = 0;
             var reader = new Reader(stream, false, Mode) {
