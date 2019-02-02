@@ -135,6 +135,142 @@ namespace Hprose.RPC {
             methodManager.Add(methodInfo, fullname, target);
             return this;
         }
+        public Service Add(Action action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T>(Action<T> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T1, T2>(Action<T1, T2> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3>(Action<T1, T2, T3> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5>(Action<T1, T2, T3, T4, T5> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6>(Action<T1, T2, T3, T4, T5, T6> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7>(Action<T1, T2, T3, T4, T5, T6, T7> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8>(Action<T1, T2, T3, T4, T5, T6, T7, T8> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> action, string fullname = null) {
+            methodManager.Add(action, fullname);
+            return this;
+        }
+        public Service Add<TResult>(Func<TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, TResult>(Func<T1, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, TResult>(Func<T1, T2, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, TResult>(Func<T1, T2, T3, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, TResult>(Func<T1, T2, T3, T4, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, TResult>(Func<T1, T2, T3, T4, T5, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, TResult>(Func<T1, T2, T3, T4, T5, T6, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, TResult>(Func<T1, T2, T3, T4, T5, T6, T7, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, TResult>(Func<T1, T2, T3, T4, T5, T6, T7, T8, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, TResult>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, TResult>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, TResult>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
+        public Service Add<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, TResult>(Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, TResult> func, string fullname = null) {
+            methodManager.Add(func, fullname);
+            return this;
+        }
         public Service AddMethod(string name, object target, string fullname = "") {
             methodManager.AddMethod(name, target, fullname);
             return this;
