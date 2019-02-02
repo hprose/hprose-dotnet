@@ -17,7 +17,7 @@ using Hprose.IO;
 
 namespace Hprose.RPC.Plugins.Push {
     public struct Message {
-        public string From;
         public object Data;
+        public string From;
     }
 }
