@@ -180,7 +180,7 @@ namespace Hprose.RPC.Plugins.Push {
         public bool Unicast(object data, string topic, string id, string from = "") {
             if (Messages.TryGetValue(id, out var topics)) {
                 if (topics.TryGetValue(topic, out var messages)) {
-                    if (messages.TryAdd(new Message() { From = from, Data = data })) {
+                    if (messages.TryAdd(new Message() { Data = data, From = from })) {
                         Response(id);
                         return true;
                     }
@@ -200,7 +200,7 @@ namespace Hprose.RPC.Plugins.Push {
             foreach (var topics in Messages) {
                 if (topics.Value.TryGetValue(topic, out var messages)) {
                     var id = topics.Key;
-                    if (messages.TryAdd(new Message() { From = from, Data = data })) {
+                    if (messages.TryAdd(new Message() { Data = data, From = from })) {
                         Response(id);
                         result.Add(id, true);
                     }
