@@ -46,7 +46,7 @@ namespace Hprose.RPC {
         }
         private readonly Dictionary<string, ITransport> transports = new Dictionary<string, ITransport>();
         public ITransport this[string name] => transports[name];
-        public ExpandoObject RequestHeaders { get; set; } = new ExpandoObject();
+        public dynamic RequestHeaders { get; set; } = new ExpandoObject();
         public IClientCodec Codec { get; set; } = ClientCodec.Instance;
         private List<string> urilist = new List<string>();
         public List<string> Uris {
