@@ -72,8 +72,8 @@ namespace Hprose.RPC {
             };
             var tag = stream.ReadByte();
             if (tag == Tags.TagHeader) {
-                var headers = reader.Deserialize<ExpandoObject>();
-                var responseHeaders = context.ResponseHeaders as IDictionary<string, object>;
+                IDictionary<string, object> headers = reader.Deserialize<ExpandoObject>();
+                IDictionary<string, object> responseHeaders = context.ResponseHeaders;
                 foreach (var pair in headers) {
                     responseHeaders[pair.Key] = pair.Value;
                 }
