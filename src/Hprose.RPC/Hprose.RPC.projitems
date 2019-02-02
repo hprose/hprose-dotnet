@@ -23,6 +23,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)HeaderAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MethodManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Method.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Limiter\RateLimiter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Plugins\Limiter\Limiter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Service.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IServiceCodec.cs" />
