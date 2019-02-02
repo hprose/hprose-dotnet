@@ -75,14 +75,19 @@ namespace Hprose.UnitTests.RPC {
 
             var client1 = new Client("http://127.0.0.1:8082/");
             var prosumer1 = new Prosumer(client1, "1");
+            prosumer1.OnSubscribe = (topic) => {
+                Console.WriteLine(topic + " is subscribed.");
+            };
+            prosumer1.OnUnsubscribe = (topic) => {
+                Console.WriteLine(topic + " is unsubscribed.");
+            };
             var client2 = new Client("http://127.0.0.1:8082/");
             var prosumer2 = new Prosumer(client2, "2");
-            await prosumer1.Subscribe<string>("test", (from, data) => {
-                Assert.AreEqual("2", from);
+            await prosumer1.Subscribe<string>("test", (data, from) => {
                 Assert.AreEqual("hello", data);
-            });
-            await prosumer1.Subscribe<string>("test2", (from, data) => {
                 Assert.AreEqual("2", from);
+            });
+            await prosumer1.Subscribe<string>("test2", (data) => {
                 Assert.AreEqual("world", data);
             });
             var r1 = prosumer2.Push("hello", "test", "1");
