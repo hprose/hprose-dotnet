@@ -56,7 +56,7 @@ namespace Hprose.RPC.Plugins.Log {
         }
         private static string Stringify(object obj) {
             using (MemoryStream stream = new MemoryStream()) {
-                DataContractJsonSerializer js = new DataContractJsonSerializer(obj.GetType());
+                DataContractJsonSerializer js = new DataContractJsonSerializer(obj?.GetType() ?? typeof(object));
                 js.WriteObject(stream, obj);
                 stream.Position = 0;
                 return ToString(stream);
