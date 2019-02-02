@@ -85,7 +85,7 @@ namespace Hprose.RPC.Plugins.Log {
         public static async Task<object> InvokeHandler(this Log log, string name, object[] args, Context context, NextInvokeHandler next) {
             bool enabled = context.Contains("Log") ? (context as dynamic).Log : log.Enabled;
             if (!enabled) return await next(name, args, context);
-            string a = typeof(Context).IsAssignableFrom(args.Last().GetType()) ? Stringify(new List<object>(args.Take(args.Length - 1))) : Stringify(args);
+            string a = (args.Length > 0) && typeof(Context).IsAssignableFrom(args.Last().GetType()) ? Stringify(new List<object>(args.Take(args.Length - 1))) : Stringify(args);
             try {
                 var result = await next(name, args, context);
                 Trace.TraceInformation(name + "(" + a.Substring(1, a.Length - 2) + ") = " + Stringify(result));
