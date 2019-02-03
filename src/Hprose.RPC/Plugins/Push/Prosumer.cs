@@ -56,6 +56,7 @@ namespace Hprose.RPC.Plugins.Push {
                 foreach (var topic in topics) {
                     if (callbacks.TryGetValue(topic.Key, out var callback)) {
                         if (topic.Value == null) {
+                            callbacks.TryRemove(topic.Key, out callback);
                             OnUnsubscribe?.Invoke(topic.Key);
                         }
                         else {
@@ -68,7 +69,7 @@ namespace Hprose.RPC.Plugins.Push {
             });
         }
         private async void Message() {
-            while(true) {
+            while(!callbacks.IsEmpty) {
                 try {
                     var topics = await Client.Invoke<Dictionary<string, Message[]>>("<");
                     if (topics == null) return;
