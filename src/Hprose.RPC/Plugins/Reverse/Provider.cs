@@ -17,10 +17,12 @@ using Hprose.IO;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.Reverse {
     public class Provider {
+        private volatile int closed = 1;
         private readonly MethodManager methodManager = new MethodManager();
         private readonly InvokeManager invokeManager;
         public bool Debug { get; set; } = false;
@@ -120,7 +122,8 @@ namespace Hprose.RPC.Plugins.Reverse {
             }
         }
         public async Task Listen() {
-            while(true) {
+            Interlocked.Exchange(ref closed, 0);
+            while(closed == 0) {
                 try {
                     var calls = await Client.Invoke<(int index, string name, object[] args)[]>("!");
                     if (calls == null) return;
@@ -130,6 +133,10 @@ namespace Hprose.RPC.Plugins.Reverse {
                     OnError?.Invoke(e);
                 }
             }
+        }
+        public async Task Close() {
+            Interlocked.Exchange(ref closed, 1);
+            await Client.Invoke("!!");
         }
         public Provider Use(params InvokeHandler[] handlers) {
             invokeManager.Use(handlers);
