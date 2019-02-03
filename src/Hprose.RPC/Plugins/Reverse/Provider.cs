@@ -43,6 +43,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             if (id != null && id.Length > 0) {
                 Id = id;
             }
+            Add(methodManager.GetNames, "~");
         }
         public async Task<object> Execute(string fullname, object[] args, Context context) {
             var method = (context as ProviderContext).Method;
