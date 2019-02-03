@@ -133,8 +133,10 @@ namespace Hprose.RPC.Plugins.Push {
         }
         protected void Response(string id) {
             if (Responders.TryGetValue(id, out var responder)) {
-                if (Send(id, responder)) {
-                    Responders.TryRemove(id, out responder);
+                if (responder != null) {
+                    if (Send(id, responder)) {
+                        Responders.TryUpdate(id, null, responder);
+                    }
                 }
             }
         }
@@ -157,7 +159,7 @@ namespace Hprose.RPC.Plugins.Push {
         protected async Task<Dictionary<string, Message[]>> Message(Context context) {
             var id = Id(context);
             if (Responders.TryRemove(id, out var responder)) {
-                responder.TrySetResult(null);
+                responder?.TrySetResult(null);
             }
             if (Timers.TryRemove(id, out var timer)) {
                 timer.TrySetResult(false);
@@ -165,7 +167,7 @@ namespace Hprose.RPC.Plugins.Push {
             responder = new TaskCompletionSource<Dictionary<string, Message[]>>();
             if (!Send(id, responder)) {
                 Responders.AddOrUpdate(id, responder, (_, oldResponder) => {
-                    oldResponder.TrySetResult(null);
+                    oldResponder?.TrySetResult(null);
                     return responder;
                 });
                 if (Timeout > TimeSpan.Zero) {
