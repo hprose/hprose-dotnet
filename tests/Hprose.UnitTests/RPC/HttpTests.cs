@@ -101,5 +101,24 @@ namespace Hprose.UnitTests.RPC {
             await prosumer1.Unsubscribe("test2");
             server.Stop();
         }
+        public object Missing(string name, object[] args, Context context) {
+            return name + ":" + args.Length + ":" + (context as dynamic).Request.RemoteEndPoint.Address;
+        }
+        [TestMethod]
+        public async Task Test4() {
+            HttpListener server = new HttpListener();
+            server.Prefixes.Add("http://127.0.0.1:8083/");
+            server.Start();
+            var service = new Service();
+            service.AddMissingMethod(Missing).Bind(server);
+            var client = new Client("http://127.0.0.1:8083/");
+            var log = new Log();
+            client.Use(log.IOHandler).Use(log.InvokeHandler);
+            var result = await client.Invoke<string>("hello", new object[] { "world" });
+            Assert.AreEqual("hello:1:127.0.0.1", result);
+            result = await client.Invoke<string>("sum", new object[] { 1, 2 });
+            Assert.AreEqual("sum:2:127.0.0.1", result);
+            server.Stop();
+        }
     }
 }

@@ -31,6 +31,9 @@ namespace Hprose.RPC {
                     return method;
                 }
             }
+            if (fullname != "*") {
+                return Get("*", 2);
+            }
             return null;
         }
         public ICollection<string> GetNames() {
@@ -257,22 +260,25 @@ namespace Hprose.RPC {
                 }
             }
         }
-        private void AddMissingMethod(Delegate method) {
+        public void AddMissingMethod(Func<string, object[], Task<object>> method) {
             Add(new Method(method.Method, "*", method.Target) {
                 Missing = true
             });
         }
-        public void AddMissingMethod(Func<string, object[], Task<object>> method) {
-            AddMissingMethod(method);
-        }
         public void AddMissingMethod(Func<string, object[], object> method) {
-            AddMissingMethod(method);
+            Add(new Method(method.Method, "*", method.Target) {
+                Missing = true
+            });
         }
         public void AddMissingMethod(Func<string, object[], Context, Task<object>> method) {
-            AddMissingMethod(method);
+            Add(new Method(method.Method, "*", method.Target) {
+                Missing = true
+            });
         }
         public void AddMissingMethod(Func<string, object[], Context, object> method) {
-            AddMissingMethod(method);
+            Add(new Method(method.Method, "*", method.Target) {
+                Missing = true
+            });
         }
     }
 }

@@ -94,13 +94,14 @@ namespace Hprose.RPC {
         }
         public async Task<object> Execute(string fullname, object[] args, Context context) {
             var method = (context as ServiceContext).Method;
-            object result;
-            if (method.Missing) {
-                result = method.MethodInfo.Invoke(method.Target, new object[] { fullname, args });
-            }
-            else {
-                result = method.MethodInfo.Invoke(method.Target, args);
-            }
+            var result = method.MethodInfo.Invoke(
+                method.Target,
+                method.Missing ? 
+                method.Parameters.Length == 3 ?
+                new object[] { fullname, args, context } :
+                new object[] { fullname, args } :
+                args
+            );
             if (result is Task) {
                 return await TaskResult.Get((Task)result);
             }

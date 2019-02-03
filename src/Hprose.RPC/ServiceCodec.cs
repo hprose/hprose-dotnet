@@ -74,6 +74,13 @@ namespace Hprose.RPC {
                 reader.AddReference(null);
             }
             Method method = DecodeMethod(fullname, count, context);
+            if (method.Missing) {
+                args = new object[count];
+                for (int i = 0; i < count; i++) {
+                    args[i] = reader.Deserialize();
+                }
+                return args;
+            }
             var parameters = method.Parameters;
             var n = parameters.Length;
             args = new object[n];
