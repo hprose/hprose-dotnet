@@ -8,7 +8,7 @@
 |                                                          |
 |  RateLimiter plugin for C#.                              |
 |                                                          |
-|  LastModified: Feb 2, 2019                               |
+|  LastModified: Feb 4, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -33,7 +33,7 @@ namespace Hprose.RPC.Plugins.Limiter {
         }
         public async Task<long> Acquire(long tokens = 1) {
             var now = DateTime.Now.Ticks;
-            long last = next;
+            long last = Interlocked.Read(ref next);
             var permits = (now - last) / interval - tokens;
             if (permits > MaxPermits) {
                 permits = MaxPermits;
