@@ -8,7 +8,7 @@
 |                                                          |
 |  Broker plugin for C#.                                   |
 |                                                          |
-|  LastModified: Feb 3, 2019                               |
+|  LastModified: Feb 4, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -68,7 +68,10 @@ namespace Hprose.RPC.Plugins.Push {
                         temp?.Dispose();
                     }
                     else {
-                        topics.TryUpdate(name, new BlockingCollection<Message>(MessageQueueMaxLength), messages);
+                        var newmessages = new BlockingCollection<Message>(MessageQueueMaxLength);
+                        if (!topics.TryUpdate(name, newmessages, messages)) {
+                            newmessages.Dispose();
+                        }
                         messages.Dispose();
                     }
                 }
@@ -117,8 +120,14 @@ namespace Hprose.RPC.Plugins.Push {
             if (topics.TryGetValue(topic, out var messages)) {
                 if (messages != null) return false;
             }
-            messages = new BlockingCollection<Message>();
-            topics.AddOrUpdate(topic, messages, (_, oldmessages) => oldmessages ?? messages);
+            messages = new BlockingCollection<Message>(MessageQueueMaxLength);
+            topics.AddOrUpdate(topic, messages, (_, oldmessages) => {
+                if (oldmessages != null) {
+                    messages.Dispose();
+                    return oldmessages;
+                }
+                return messages;
+            });
             OnSubscribe?.Invoke(id, topic, context);
             return true;
         }
