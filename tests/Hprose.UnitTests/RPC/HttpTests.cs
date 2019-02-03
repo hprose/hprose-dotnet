@@ -14,9 +14,12 @@ namespace Hprose.UnitTests.RPC {
             return Task<int>.Factory.StartNew(() => x + y);
         }
         public string Hello(string name, Context context) {
-            System.Console.WriteLine((context as ServiceContext).Method.Fullname);
-            System.Console.WriteLine((context as dynamic).Request.RemoteEndPoint.Address);
+            Console.WriteLine((context as ServiceContext).Method.Fullname);
+            Console.WriteLine((context as dynamic).Request.RemoteEndPoint.Address);
             return "Hello " + name;
+        }
+        public void OnewayCall(string name) {
+            Console.WriteLine(name);
         }
         [TestMethod]
         public async Task Test1() {
@@ -42,6 +45,9 @@ namespace Hprose.UnitTests.RPC {
             int Sum(int x, int y);
             [Log(false)]
             Task<string> Hello(string name);
+            [Name("OnewayCall")]
+            Task OnewayCallAsync(string name);
+            void OnewayCall(string name);
         }
         [TestMethod]
         public async Task Test2() {
@@ -51,6 +57,7 @@ namespace Hprose.UnitTests.RPC {
             var service = new Service();
             service.AddMethod("Hello", this)
                    .AddMethod("Sum", this)
+                   .Add<string>(OnewayCall)
                    .Bind(server, "http");
             var client = new Client("http://127.0.0.1:8081/");
             ((ClientCodec)(client.Codec)).Simple = true;
@@ -60,6 +67,8 @@ namespace Hprose.UnitTests.RPC {
             var result = await proxy.Hello("world");
             Assert.AreEqual("Hello world", result);
             Assert.AreEqual(3, proxy.Sum(1, 2));
+            proxy.OnewayCall("Oneway Sync");
+            await proxy.OnewayCallAsync("Oneway Async");
             server.Stop();
         }
         [TestMethod]
