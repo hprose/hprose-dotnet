@@ -47,7 +47,7 @@ namespace Hprose.RPC {
                 var handler = Activator.CreateInstance(type, new object[] { this });
                 handlers[name] = handler;
             }
-            AddMethod("GetNames", methodManager, "~");
+            Add(methodManager.GetNames, "~");
         }
         public void Bind<T>(T server, string name = null) {
             if (serverTypes.TryGetValue(typeof(T), out var names)) {
