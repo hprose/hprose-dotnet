@@ -25,6 +25,7 @@ namespace Hprose.RPC.Plugins.Push {
         static Broker() {
             TypeManager.Register<Message>("@");
         }
+        private static readonly Dictionary<string, Message[]> emptyMessage = new Dictionary<string, Message[]>(0);
         protected ConcurrentDictionary<string, ConcurrentDictionary<string, BlockingCollection<Message>>> Messages { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<string, BlockingCollection<Message>>>();
         protected ConcurrentDictionary<string, TaskCompletionSource<Dictionary<string, Message[]>>> Responders { get; } = new ConcurrentDictionary<string, TaskCompletionSource<Dictionary<string, Message[]>>>();
         protected ConcurrentDictionary<string, TaskCompletionSource<bool>> Timers { get; } = new ConcurrentDictionary<string, TaskCompletionSource<bool>>();
@@ -173,15 +174,15 @@ namespace Hprose.RPC.Plugins.Push {
                 if (Timeout > TimeSpan.Zero) {
                     using (CancellationTokenSource source = new CancellationTokenSource()) {
 #if NET40
-                        var delay = TaskEx.Delay(HeartBeat, source.Token);
+                        var delay = TaskEx.Delay(Timeout, source.Token);
                         var task = await TaskEx.WhenAny(responder.Task, delay);
 #else
-                        var delay = Task.Delay(HeartBeat, source.Token);
+                        var delay = Task.Delay(Timeout, source.Token);
                         var task = await Task.WhenAny(responder.Task, delay);
 #endif
                         source.Cancel();
                         if (task == delay) {
-                            responder.TrySetResult(new Dictionary<string, Message[]>());
+                            responder.TrySetResult(emptyMessage);
                         }
                     }
                 }
