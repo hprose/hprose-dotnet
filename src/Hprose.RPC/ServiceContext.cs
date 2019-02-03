@@ -8,14 +8,10 @@
 |                                                          |
 |  ServiceContext class for C#.                            |
 |                                                          |
-|  LastModified: Jan 27, 2019                              |
+|  LastModified: Feb 3, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
-
-using Hprose.IO;
-using System;
-using System.Collections.Generic;
 
 namespace Hprose.RPC {
     public class ServiceContext : Context {

@@ -8,7 +8,7 @@
 |                                                          |
 |  Service class for C#.                                   |
 |                                                          |
-|  LastModified: Feb 2, 2019                               |
+|  LastModified: Feb 4, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -35,12 +35,14 @@ namespace Hprose.RPC {
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         public IServiceCodec Codec { get; set; } = ServiceCodec.Instance;
         public int MaxRequestLength { get; set; } = 0x7FFFFFFF;
-        private readonly HandlerManager handlerManager;
+        private readonly InvokeManager invokeManager;
+        private readonly IOManager ioManager;
         private readonly MethodManager methodManager = new MethodManager();
         private readonly Dictionary<string, object> handlers = new Dictionary<string, object>();
         public object this[string name] => handlers[name];
         public Service() {
-            handlerManager = new HandlerManager(Execute, Process);
+            invokeManager = new InvokeManager(Execute);
+            ioManager = new IOManager(Process);
             foreach (var (name, type) in handlerTypes) {
                 var handler = Activator.CreateInstance(type, new object[] { this });
                 handlers[name] = handler;
@@ -62,7 +64,7 @@ namespace Hprose.RPC {
             }
         }
         public async Task<Stream> Handle(Stream request, Context context) {
-            var result = handlerManager.IOHandler(request, context);
+            var result = ioManager.Handler(request, context);
             if (Timeout > TimeSpan.Zero) {
                 using (CancellationTokenSource source = new CancellationTokenSource()) {
 
@@ -85,7 +87,7 @@ namespace Hprose.RPC {
             object result;
             try {
                 var (fullname, args) = await Codec.Decode(request, context as ServiceContext);
-                result = await handlerManager.InvokeHandler(fullname, args, context);
+                result = await invokeManager.Handler(fullname, args, context);
             }
             catch (Exception e) {
                 result = e.InnerException ?? e;
@@ -108,19 +110,19 @@ namespace Hprose.RPC {
             return result;
         }
         public Service Use(params InvokeHandler[] handlers) {
-            handlerManager.Use(handlers);
+            invokeManager.Use(handlers);
             return this;
         }
         public Service Use(params IOHandler[] handlers) {
-            handlerManager.Use(handlers);
+            ioManager.Use(handlers);
             return this;
         }
         public Service Unuse(params InvokeHandler[] handlers) {
-            handlerManager.Unuse(handlers);
+            invokeManager.Unuse(handlers);
             return this;
         }
         public Service Unuse(params IOHandler[] handlers) {
-            handlerManager.Unuse(handlers);
+            ioManager.Unuse(handlers);
             return this;
         }
         public Method Get(string fullname, int paramCount) => methodManager.Get(fullname, paramCount);

@@ -8,7 +8,7 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Feb 3, 2019                               |
+|  LastModified: Feb 4, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -57,9 +57,11 @@ namespace Hprose.RPC {
                 }
             }
         }
-        private readonly HandlerManager handlerManager;
+        private readonly InvokeManager invokeManager;
+        private readonly IOManager ioManager;
         public Client() {
-            handlerManager = new HandlerManager(Call, Transport);
+            invokeManager = new InvokeManager(Call);
+            ioManager = new IOManager(Transport);
             for (int i = 0, n = transTypes.Count; i < n; ++i) {
                 var (name, type) = transTypes[i];
                 transports[name] = (ITransport)Activator.CreateInstance(type);
@@ -78,24 +80,24 @@ namespace Hprose.RPC {
             }
         }
         public Client Use(params InvokeHandler[] handlers) {
-            handlerManager.Use(handlers);
+            invokeManager.Use(handlers);
             return this;
         }
         public Client Use(params IOHandler[] handlers) {
-            handlerManager.Use(handlers);
+            ioManager.Use(handlers);
             return this;
         }
         public Client Unuse(params InvokeHandler[] handlers) {
-            handlerManager.Unuse(handlers);
+            invokeManager.Unuse(handlers);
             return this;
         }
         public Client Unuse(params IOHandler[] handlers) {
-            handlerManager.Unuse(handlers);
+            ioManager.Unuse(handlers);
             return this;
         }
         public Task Invoke(string fullname, in object[] args = null, Settings settings = null) {
             var context = new ClientContext(this, fullname, null, settings);
-            return handlerManager.InvokeHandler(fullname, args, context);
+            return invokeManager.Handler(fullname, args, context);
         }
         public Task<T> Invoke<T>(string fullname, in object[] args = null, Settings settings = null) {
             return InvokeAsync<T>(fullname, args, settings);
@@ -107,7 +109,7 @@ namespace Hprose.RPC {
                 type = type.GetGenericArguments()[0];
             }
             var context = new ClientContext(this, fullname, type, settings);
-            var result = await handlerManager.InvokeHandler(fullname, args, context);
+            var result = await invokeManager.Handler(fullname, args, context);
             if (isResultType) {
                 return (T)Activator.CreateInstance(typeof(T), new object[] { result, context });
             }
@@ -115,7 +117,7 @@ namespace Hprose.RPC {
         }
         public async Task<object> Call(string fullname, object[] args, Context context) {
             var request = Codec.Encode(fullname, args, context as ClientContext);
-            var response = await handlerManager.IOHandler(request, context);
+            var response = await ioManager.Handler(request, context);
             return await Codec.Decode(response, context as ClientContext);
         }
         public async Task<Stream> Transport(Stream request, Context context) {
