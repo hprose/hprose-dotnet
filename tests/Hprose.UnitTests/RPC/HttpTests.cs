@@ -105,7 +105,7 @@ namespace Hprose.UnitTests.RPC {
             var r3 = prosumer2.Push("world", "test2", "1");
             var r4 = prosumer2.Push("world", "test2", "1");
             await Task.WhenAll(r1, r2, r3, r4);
-            await Task.Delay(100);
+            await Task.Delay(10);
             await prosumer1.Unsubscribe("test");
             await prosumer1.Unsubscribe("test2");
             server.Stop();
