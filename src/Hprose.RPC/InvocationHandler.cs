@@ -8,7 +8,7 @@
 |                                                          |
 |  InvocationHandler class for C#.                         |
 |                                                          |
-|  LastModified: Jan 27, 2019                              |
+|  LastModified: Feb 3, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -40,6 +40,21 @@ namespace Hprose.RPC {
         }
     }
 
+    class SyncInvoker : IInvoker {
+        private readonly Client client;
+        private readonly string name;
+        private readonly Settings settings;
+        public SyncInvoker(Client client, string name, Settings settings) {
+            this.client = client;
+            this.name = name;
+            this.settings = settings;
+        }
+        public object Invoke(object[] args) {
+            client.Invoke(name, args, settings).Wait();
+            return null;
+        }
+    }
+
     class AsyncInvoker<T> : IInvoker {
         private readonly Client client;
         private readonly string name;
@@ -51,6 +66,20 @@ namespace Hprose.RPC {
         }
         public object Invoke(object[] args) {
             return client.Invoke<T>(name, args, settings);
+        }
+    }
+
+    class AsyncInvoker : IInvoker {
+        private readonly Client client;
+        private readonly string name;
+        private readonly Settings settings;
+        public AsyncInvoker(Client client, string name, Settings settings) {
+            this.client = client;
+            this.name = name;
+            this.settings = settings;
+        }
+        public object Invoke(object[] args) {
+            return client.Invoke(name, args, settings);
         }
     }
 
@@ -96,21 +125,19 @@ namespace Hprose.RPC {
             if (ns != null && ns != "") {
                 name = ns + '_' + name;
             }
-            if (returnType.IsSubclassOf(typeof(Task))) {
+            if (typeof(Task).IsAssignableFrom(returnType)) {
                 if (returnType == typeof(Task)) {
-                    settings.Type = typeof(object);
+                    return new AsyncInvoker(client, name, settings);
                 }
-                else if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>)) {
+                if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>)) {
                     settings.Type = returnType.GetGenericArguments()[0];
                 }
                 return (IInvoker)Activator.CreateInstance(typeof(AsyncInvoker<>).MakeGenericType(settings.Type), new object[] { client, name, settings });
             }
             if (returnType == typeof(void)) {
-                settings.Type = typeof(object);
+                return new SyncInvoker(client, name, settings);
             }
-            else {
-                settings.Type = returnType;
-            }
+            settings.Type = returnType;
             return (IInvoker)Activator.CreateInstance(typeof(SyncInvoker<>).MakeGenericType(settings.Type), new object[] { client, name, settings });
         }
     }
