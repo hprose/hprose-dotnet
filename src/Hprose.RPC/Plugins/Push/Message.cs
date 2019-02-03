@@ -13,8 +13,6 @@
 |                                                          |
 \*________________________________________________________*/
 
-using Hprose.IO;
-
 namespace Hprose.RPC.Plugins.Push {
     public struct Message {
         public object Data;
