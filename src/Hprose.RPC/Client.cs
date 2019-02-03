@@ -8,7 +8,7 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Jan 30, 2019                              |
+|  LastModified: Feb 3, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -93,7 +93,14 @@ namespace Hprose.RPC {
             handlerManager.Unuse(handlers);
             return this;
         }
-        public async Task<T> Invoke<T>(string fullname, object[] args = null, Settings settings = null) {
+        public Task Invoke(string fullname, in object[] args = null, Settings settings = null) {
+            var context = new ClientContext(this, fullname, null, settings);
+            return handlerManager.InvokeHandler(fullname, args, context);
+        }
+        public Task<T> Invoke<T>(string fullname, in object[] args = null, Settings settings = null) {
+            return InvokeAsync<T>(fullname, args, settings);
+        }
+        private async Task<T> InvokeAsync<T>(string fullname, object[] args = null, Settings settings = null) {
             Type type = typeof(T);
             bool isResultType = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Result<>);
             if (isResultType) {
