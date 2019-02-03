@@ -13,6 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
+using Hprose.IO;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -43,6 +44,21 @@ namespace Hprose.RPC.Plugins.Reverse {
                 Id = id;
             }
         }
+        public async Task<object> Execute(string fullname, object[] args, Context context) {
+            var method = (context as ProviderContext).Method;
+            var result = method.MethodInfo.Invoke(
+                method.Target,
+                method.Missing ?
+                method.Parameters.Length == 3 ?
+                new object[] { fullname, args, context } :
+                new object[] { fullname, args } :
+                args
+            );
+            if (result is Task) {
+                return await TaskResult.Get((Task)result);
+            }
+            return result;
+        }
         private async Task<Tuple<int, object, string>> Process((int index, string name, object[] args) call) {
             var (index, name, args) = call;
             var method = Get(name, args.Length);
@@ -58,12 +74,19 @@ namespace Hprose.RPC.Plugins.Reverse {
                     var arguments = new object[n];
                     var autoParams = 0;
                     for (int i = 0; i < n; ++i) {
-                        if (typeof(Context).IsAssignableFrom(parameters[i].ParameterType)) {
+                        var paramType = parameters[i].ParameterType;
+                        if (typeof(Context).IsAssignableFrom(paramType)) {
                             autoParams = 1;
                             arguments[i] = context;
                         }
                         else if (i - autoParams < count) {
-                            arguments[i] = args[i - autoParams];
+                            var argument = args[i - autoParams];
+                            if (paramType.IsAssignableFrom(argument.GetType())) {
+                                arguments[i] = argument;
+                            }
+                            else {
+                                arguments[i] = Formatter.Deserialize(Formatter.Serialize(argument), paramType);
+                            }
                         }
                         else {
                             arguments[i] = parameters[i].RawDefaultValue;
@@ -77,21 +100,6 @@ namespace Hprose.RPC.Plugins.Reverse {
             catch (Exception e) {
                 return new Tuple<int, object, string>(index, null, Debug ? e.ToString() : e.Message);
             }
-        }
-        public async Task<object> Execute(string fullname, object[] args, Context context) {
-            var method = (context as ProviderContext).Method;
-            var result = method.MethodInfo.Invoke(
-                method.Target,
-                method.Missing ?
-                method.Parameters.Length == 3 ?
-                new object[] { fullname, args, context } :
-                new object[] { fullname, args } :
-                args
-            );
-            if (result is Task) {
-                return await TaskResult.Get((Task)result);
-            }
-            return result;
         }
         private async void Dispatch((int index, string name, object[] args)[] calls) {
             var n = calls.Length;
