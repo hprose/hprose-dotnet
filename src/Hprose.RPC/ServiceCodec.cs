@@ -85,7 +85,7 @@ namespace Hprose.RPC {
             var n = parameters.Length;
             args = new object[n];
             var autoParams = 0;
-            for (int i = 0; i < n; i++) {
+            for (int i = 0; i < n; ++i) {
                 if (typeof(Context).IsAssignableFrom(parameters[i].ParameterType)) {
                     autoParams = 1;
                     args[i] = context;
