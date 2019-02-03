@@ -47,7 +47,7 @@ namespace Hprose.RPC {
             if (result is Exception) {
                 stream.WriteByte(Tags.TagError);
                 var error = result as Exception;
-                writer.Serialize(Debug ? error.StackTrace : error.Message);
+                writer.Serialize(Debug ? error.ToString() : error.Message);
             }
             else {
                 stream.WriteByte(Tags.TagResult);
