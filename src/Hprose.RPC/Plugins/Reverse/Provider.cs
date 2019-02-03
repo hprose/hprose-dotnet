@@ -8,12 +8,11 @@
 |                                                          |
 |  Provider class for C#.                                  |
 |                                                          |
-|  LastModified: Feb 2, 2019                               |
+|  LastModified: Feb 4, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
-using Hprose.IO;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -122,6 +121,14 @@ namespace Hprose.RPC.Plugins.Reverse {
                     OnError?.Invoke(e);
                 }
             }
+        }
+        public Provider Use(params InvokeHandler[] handlers) {
+            invokeManager.Use(handlers);
+            return this;
+        }
+        public Provider Unuse(params InvokeHandler[] handlers) {
+            invokeManager.Unuse(handlers);
+            return this;
         }
         public Method Get(string fullname, int paramCount) {
             return methodManager.Get(fullname, paramCount);
