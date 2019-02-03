@@ -8,7 +8,7 @@
 |                                                          |
 |  InvocationHandler class for C#.                         |
 |                                                          |
-|  LastModified: Feb 3, 2019                               |
+|  LastModified: Feb 4, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -129,9 +129,7 @@ namespace Hprose.RPC {
                 if (returnType == typeof(Task)) {
                     return new AsyncInvoker(client, name, settings);
                 }
-                if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>)) {
-                    settings.Type = returnType.GetGenericArguments()[0];
-                }
+                settings.Type = returnType.GetGenericArguments()[0];
                 return (IInvoker)Activator.CreateInstance(typeof(AsyncInvoker<>).MakeGenericType(settings.Type), new object[] { client, name, settings });
             }
             if (returnType == typeof(void)) {
