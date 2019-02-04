@@ -8,18 +8,16 @@
 |                                                          |
 |  Log plugin for C#.                                      |
 |                                                          |
-|  LastModified: Feb 2, 2019                               |
+|  LastModified: Feb 4, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
-using Hprose.IO;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -56,13 +54,7 @@ namespace Hprose.RPC.Plugins.Log {
             }
         }
         private static string Stringify(object obj) {
-            using (MemoryStream stream = new MemoryStream()) {
-                //Formatter.Serialize(obj, stream);
-                DataContractJsonSerializer js = new DataContractJsonSerializer(obj?.GetType() ?? typeof(object));
-                js.WriteObject(stream, obj);
-                stream.Position = 0;
-                return ToString(stream);
-            }
+            return Newtonsoft.Json.JsonConvert.SerializeObject(obj);
         }
         public static async Task<Stream> IOHandler(this Log log, Stream request, Context context, NextIOHandler next) {
             bool enabled = context.Contains("Log") ? (context as dynamic).Log : log.Enabled;
