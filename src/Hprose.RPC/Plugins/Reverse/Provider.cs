@@ -101,6 +101,7 @@ namespace Hprose.RPC.Plugins.Reverse {
                 return new Tuple<int, object, string>(index, result, null);
             }
             catch (Exception e) {
+                e = e.InnerException ?? e;
                 return new Tuple<int, object, string>(index, null, Debug ? e.ToString() : e.Message);
             }
         }
@@ -112,9 +113,9 @@ namespace Hprose.RPC.Plugins.Reverse {
             }
             try {
 #if NET40
-                await Client.Invoke("=", await TaskEx.WhenAll(results));
+                await Client.Invoke("=", new object[] { await TaskEx.WhenAll(results) });
 #else
-                await Client.Invoke("=", await Task.WhenAll(results));
+                await Client.Invoke("=", new object[] { await Task.WhenAll(results) });
 #endif
             }
             catch (Exception e) {
