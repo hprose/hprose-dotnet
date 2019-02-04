@@ -8,7 +8,7 @@
 |                                                          |
 |  ClientContext class for C#.                             |
 |                                                          |
-|  LastModified: Jan 27, 2019                              |
+|  LastModified: Feb 4, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -29,7 +29,7 @@ namespace Hprose.RPC {
             if (type != null && !type.IsAssignableFrom(Type)) Type = type;
             Copy(client.RequestHeaders, RequestHeaders);
             Copy(settings?.RequestHeaders, RequestHeaders);
-            Copy(settings?.Context, items);
+            Copy(settings?.Context, Items);
         }
     }
 }
