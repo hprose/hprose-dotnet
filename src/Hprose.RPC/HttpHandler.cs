@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpHandler class for C#.                               |
 |                                                          |
-|  LastModified: Feb 2, 2019                               |
+|  LastModified: Feb 4, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -22,16 +22,6 @@ using System.Threading.Tasks;
 using System.Text;
 
 namespace Hprose.RPC {
-    public class HttpListenerServiceContext : ServiceContext {
-        public HttpListenerRequest Request { get; private set; }
-        public HttpListenerResponse Response { get; private set; }
-        public System.Security.Principal.IPrincipal User { get; private set; }
-        public HttpListenerServiceContext(Service service, HttpListenerContext context) : base(service) {
-            Request = context.Request;
-            Response = context.Response;
-            User = context.User;
-        }
-    }
     public class HttpHandler : IHandler<HttpListener> {
         public bool CrossDomain { get; set; } = true;
         public bool P3P { get; set; } = true;
@@ -149,7 +139,11 @@ namespace Hprose.RPC {
             return false;
         }
         public async void Handler(HttpListenerContext httpContext) {
-            HttpListenerServiceContext context = new HttpListenerServiceContext(Service, httpContext);
+            dynamic context = new ServiceContext(Service);
+            context.Request = httpContext.Request;
+            context.Response = httpContext.Response;
+            context.User = httpContext.User;
+            context.Handler = this;
             var request = httpContext.Request;
             var response = httpContext.Response;
             if (await ClientAccessPolicyXmlHandler(request, response)) {
