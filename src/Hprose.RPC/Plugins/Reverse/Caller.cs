@@ -24,23 +24,26 @@ namespace Hprose.RPC.Plugins.Reverse {
     public class Caller {
         private static readonly (int, string, object[])[] emptyCall = new (int, string, object[])[0];
         private volatile int counter = 0;
-        protected ConcurrentDictionary<string, BlockingCollection<(int, string, object[])>> Calls { get; } = new ConcurrentDictionary<string, BlockingCollection<(int, string, object[])>>();
-        protected ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>> Results { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>>();
-        protected ConcurrentDictionary<string, TaskCompletionSource<(int, string, object[])[]>> Responders { get; } = new ConcurrentDictionary<string, TaskCompletionSource<(int, string, object[])[]>>();
-        protected ConcurrentDictionary<string, TaskCompletionSource<bool>> Timers { get; } = new ConcurrentDictionary<string, TaskCompletionSource<bool>>();
+        private ConcurrentDictionary<string, BlockingCollection<(int, string, object[])>> Calls { get; } = new ConcurrentDictionary<string, BlockingCollection<(int, string, object[])>>();
+        private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>> Results { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>>();
+        private ConcurrentDictionary<string, TaskCompletionSource<(int, string, object[])[]>> Responders { get; } = new ConcurrentDictionary<string, TaskCompletionSource<(int, string, object[])[]>>();
+        private ConcurrentDictionary<string, TaskCompletionSource<bool>> Timers { get; } = new ConcurrentDictionary<string, TaskCompletionSource<bool>>();
         public Service Service { get; private set; }
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 2, 0);
         public Caller(Service service) {
             Service = service;
-
+            Service.Add<Context, string>(Close, "!!")
+                   .Add<Context, Task<(int, string, object[])[]>>(Begin, "!")
+                   .Add<(int, object, string)[], Context>(End, "=")
+                   .Use(Handler);
         }
-        protected string Id(Context context) {
+        internal string Id(Context context) {
             if (((IDictionary<string, object>)context.RequestHeaders).TryGetValue("Id", out var id)) {
                 return id.ToString();
             }
             throw new KeyNotFoundException("client unique id not found");
         }
-        protected bool Send(string id, TaskCompletionSource<(int, string, object[])[]> responder) {
+        private bool Send(string id, TaskCompletionSource<(int, string, object[])[]> responder) {
             if (Calls.TryRemove(id, out var calls)) {
                 if (calls.Count == 0) {
                     return false;
@@ -59,7 +62,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             }
             return false;
         }
-        protected void Response(string id) {
+        private void Response(string id) {
             if (Responders.TryGetValue(id, out var responder)) {
                 if (responder != null) {
                     if (Send(id, responder)) {
@@ -68,14 +71,14 @@ namespace Hprose.RPC.Plugins.Reverse {
                 }
             }
         }
-        protected string Close(Context context) {
+        private string Close(Context context) {
             var id = Id(context);
             if (Responders.TryRemove(id, out var responder)) {
                 responder?.TrySetResult(null);
             }
             return id;
         }
-        protected async Task<(int, string, object[])[]> Begin(Context context) {
+        private async Task<(int, string, object[])[]> Begin(Context context) {
             var id = Close(context);
             var responder = new TaskCompletionSource<(int, string, object[])[]>();
             if (!Send(id, responder)) {
@@ -101,7 +104,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             }
             return await responder.Task;
         }
-        protected void End((int, object, string)[] results, Context context) {
+        private void End((int, object, string)[] results, Context context) {
             var id = Id(context);
             foreach (var (index, value, error) in results) {
                 if (Results.TryGetValue(id, out var result) && result.TryRemove(index, out var task)) {
@@ -150,6 +153,9 @@ namespace Hprose.RPC.Plugins.Reverse {
                 return (T)Proxy.NewInstance(type.GetInterfaces(), handler);
             }
         }
-
+        private async Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
+            context = new CallerContext(this, context as ServiceContext);
+            return await next(name, args, context);
+        }
     }
 }
