@@ -136,9 +136,9 @@ namespace Hprose.UnitTests.RPC {
             var log = new Log();
             ServiceCodec.Instance.Debug = true;
             var service = new Service();
-            //service
-                //.Use(log.InvokeHandler)
-                //.Use(log.IOHandler);
+            service
+                .Use(log.InvokeHandler)
+                .Use(log.IOHandler);
             var caller = new Caller(service);
             service.Bind(server);
 
