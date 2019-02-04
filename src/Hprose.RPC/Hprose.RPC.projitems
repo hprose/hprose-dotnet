@@ -34,6 +34,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Plugins\Reverse\CallerHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Plugins\Reverse\Provider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Plugins\Reverse\Caller.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Reverse\CallerContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Plugins\Reverse\ProviderContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Service.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IServiceCodec.cs" />
