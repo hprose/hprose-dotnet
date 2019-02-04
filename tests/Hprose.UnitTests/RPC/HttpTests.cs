@@ -2,6 +2,7 @@
 using Hprose.RPC;
 using Hprose.RPC.Plugins.Log;
 using Hprose.RPC.Plugins.Push;
+using Hprose.RPC.Plugins.Reverse;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Net;
@@ -14,8 +15,6 @@ namespace Hprose.UnitTests.RPC {
             return Task<int>.Factory.StartNew(() => x + y);
         }
         public string Hello(string name, Context context) {
-            Console.WriteLine((context as ServiceContext).Method.Fullname);
-            Console.WriteLine((context as dynamic).Request.RemoteEndPoint.Address);
             return "Hello " + name;
         }
         public void OnewayCall(string name) {
@@ -127,6 +126,44 @@ namespace Hprose.UnitTests.RPC {
             Assert.AreEqual("hello:1:127.0.0.1", result);
             result = await client.Invoke<string>("sum", new object[] { 1, 2 });
             Assert.AreEqual("sum:2:127.0.0.1", result);
+            server.Stop();
+        }
+        [TestMethod]
+        public async Task Test5() {
+            HttpListener server = new HttpListener();
+            server.Prefixes.Add("http://127.0.0.1:8084/");
+            server.Start();
+            var log = new Log();
+            ServiceCodec.Instance.Debug = true;
+            var service = new Service();
+            //service
+                //.Use(log.InvokeHandler)
+                //.Use(log.IOHandler);
+            var caller = new Caller(service);
+            service.Bind(server);
+
+            var client = new Client("http://127.0.0.1:8084/");
+            var provider = new Provider(client, "1") {
+                Debug = true
+            };
+            var listening = provider.Add<string, Context, string>(Hello)
+                   .Add<int, int, Task<int>>(Sum)
+                   .Use(log.InvokeHandler)
+                   .Listen();
+
+            var proxy = caller.UseService<ITestInterface>("1");
+            //var result1 = caller.Invoke<string>("1", "hello", new object[] { "world1" });
+            //var result2 = caller.Invoke<string>("1", "hello", new object[] { "world2" });
+            //var result3 = caller.Invoke<string>("1", "hello", new object[] { "world3" });
+            var result1 = proxy.Hello("world1");
+            var result2 = proxy.Hello("world2");
+            var result3 = proxy.Hello("world3");
+            var results = await Task.WhenAll(result1, result2, result3);
+            Assert.AreEqual(results[0], "Hello world1");
+            Assert.AreEqual(results[1], "Hello world2");
+            Assert.AreEqual(results[2], "Hello world3");
+            await Task.Delay(100);
+            await provider.Close();
             server.Stop();
         }
     }
