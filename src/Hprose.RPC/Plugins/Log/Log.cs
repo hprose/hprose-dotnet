@@ -13,6 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
+using Hprose.IO;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -56,6 +57,7 @@ namespace Hprose.RPC.Plugins.Log {
         }
         private static string Stringify(object obj) {
             using (MemoryStream stream = new MemoryStream()) {
+                //Formatter.Serialize(obj, stream);
                 DataContractJsonSerializer js = new DataContractJsonSerializer(obj?.GetType() ?? typeof(object));
                 js.WriteObject(stream, obj);
                 stream.Position = 0;
@@ -85,10 +87,21 @@ namespace Hprose.RPC.Plugins.Log {
         public static async Task<object> InvokeHandler(this Log log, string name, object[] args, Context context, NextInvokeHandler next) {
             bool enabled = context.Contains("Log") ? (context as dynamic).Log : log.Enabled;
             if (!enabled) return await next(name, args, context);
-            string a = (args.Length > 0) && typeof(Context).IsAssignableFrom(args.Last().GetType()) ? Stringify(new List<object>(args.Take(args.Length - 1))) : Stringify(args);
+            string a = "";
+            try {
+                a = (args.Length > 0) && typeof(Context).IsAssignableFrom(args.Last().GetType()) ? Stringify(new List<object>(args.Take(args.Length - 1))) : Stringify(args);
+            }
+            catch (Exception e) {
+                Trace.TraceError(e.StackTrace);
+            }
             try {
                 var result = await next(name, args, context);
-                Trace.TraceInformation(name + "(" + a.Substring(1, a.Length - 2) + ") = " + Stringify(result));
+                try {
+                    Trace.TraceInformation(name + "(" + a.Substring(1, a.Length - 2) + ") = " + Stringify(result));
+                }
+                catch (Exception e) {
+                    Trace.TraceError(e.StackTrace);
+                }
                 return result;
             }
             catch (Exception e) {
