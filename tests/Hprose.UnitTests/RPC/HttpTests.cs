@@ -162,7 +162,6 @@ namespace Hprose.UnitTests.RPC {
             Assert.AreEqual(results[0], "Hello world1");
             Assert.AreEqual(results[1], "Hello world2");
             Assert.AreEqual(results[2], "Hello world3");
-            await Task.Delay(100);
             await provider.Close();
             server.Stop();
         }
