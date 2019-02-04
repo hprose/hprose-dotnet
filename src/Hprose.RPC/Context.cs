@@ -8,7 +8,7 @@
 |                                                          |
 |  Context class for C#.                                   |
 |                                                          |
-|  LastModified: Feb 2, 2019                               |
+|  LastModified: Feb 4, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -21,23 +21,27 @@ namespace Hprose.RPC {
     public class Context : DynamicObject, ICloneable {
         public dynamic RequestHeaders { get; } = new ExpandoObject();
         public dynamic ResponseHeaders { get; } = new ExpandoObject();
-        protected readonly Dictionary<string, object> items = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, object> Items { get; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        public dynamic this[string name] {
+            get => Items[name];
+            set => Items[name] = value;
+        }
         protected void Copy(IDictionary<string, object> src, IDictionary<string, object> dist) {
             if (src != null) {
                 foreach (var p in src) dist[p.Key] = p.Value;
             }
         }
         public override bool TryGetMember(GetMemberBinder binder, out object result) {
-            return items.TryGetValue(binder.Name, out result);
+            return Items.TryGetValue(binder.Name, out result);
 
         }
         public override bool TrySetMember(SetMemberBinder binder, object value) {
-            items[binder.Name] = value;
+            Items[binder.Name] = value;
             return true;
         }
         public override bool TryDeleteMember(DeleteMemberBinder binder) {
             try {
-                items.Remove(binder.Name);
+                Items.Remove(binder.Name);
                 return true;
             }
             catch {
@@ -45,7 +49,7 @@ namespace Hprose.RPC {
             }
         }
         public bool Contains(string name) {
-            return items.ContainsKey(name);
+            return Items.ContainsKey(name);
         }
 
         public object Clone() {
