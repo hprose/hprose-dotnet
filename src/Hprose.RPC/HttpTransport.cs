@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpTransport class for C#.                             |
 |                                                          |
-|  LastModified: Feb 2, 2019                               |
+|  LastModified: Feb 5, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     public class HttpTransport : ITransport {
+        public static string[] Schemes { get; } = new string[] { "http", "https" };
         private readonly HttpClient httpClient = new HttpClient();
         public HttpRequestHeaders HttpRequestHeaders => httpClient.DefaultRequestHeaders;
         public TimeSpan Timeout {
@@ -43,7 +44,9 @@ namespace Hprose.RPC {
                         httpContext.Headers.Add(pair.Key, pair.Value);
                     }
                 }
-                httpContext.Headers.ContentLength = request.Length;
+                if (request.CanSeek) {
+                    httpContext.Headers.ContentLength = request.Length;
+                }
                 HttpResponseMessage response = await httpClient.PostAsync(clientContext.Uri, httpContext);
                 if (response.IsSuccessStatusCode) {
                     clientContext.HttpResponseHeaders = response.Headers;
@@ -53,12 +56,6 @@ namespace Hprose.RPC {
                     throw new Exception(((int)response.StatusCode) + ":" + response.ReasonPhrase);
                 }
             }
-        }
-    }
-    public partial class Client {
-        public HttpTransport Http => (HttpTransport)this["http"];
-        static Client() {
-            Register<HttpTransport>("http", new string[] { "http", "https" });
         }
     }
 }
