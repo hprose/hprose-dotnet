@@ -8,7 +8,7 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Feb 4, 2019                               |
+|  LastModified: Feb 5, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -19,6 +19,7 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace Hprose.RPC {
     public interface ITransport {
@@ -33,17 +34,25 @@ namespace Hprose.RPC {
             Context = context;
         }
     }
-    public partial class Client {
+    public class Client {
         private static readonly Random random = new Random(Guid.NewGuid().GetHashCode());
         private static readonly List<ValueTuple<string, Type>> transTypes = new List<ValueTuple<string, Type>>();
         private static readonly Dictionary<string, string> schemes = new Dictionary<string, string>();
-        public static void Register<T>(string name, string[] schemes) where T: ITransport, new() {
-            transTypes.Add((name, typeof(T)));
+        public static void Register<T>(string name) where T : ITransport, new() {
+            var type = typeof(T);
+            var schemes = type.GetProperty("Schemes", BindingFlags.Public | BindingFlags.Static).GetValue(type, null) as string[];
+            transTypes.Add((name, type));
             for (int i = 0, n = schemes.Length; i < n; ++i) {
                 var scheme = schemes[i];
                 Client.schemes[scheme] = name;
             }
         }
+        static Client() {
+            Register<HttpTransport>("http");
+            Register<TcpTransport>("tcp");
+        }
+        public HttpTransport Http => (HttpTransport)this["http"];
+        public TcpTransport Tcp => (TcpTransport)this["tcp"];
         private readonly Dictionary<string, ITransport> transports = new Dictionary<string, ITransport>();
         public ITransport this[string name] => transports[name];
         public dynamic RequestHeaders { get; set; } = new ExpandoObject();
