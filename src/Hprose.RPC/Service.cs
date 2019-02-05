@@ -8,7 +8,7 @@
 |                                                          |
 |  Service class for C#.                                   |
 |                                                          |
-|  LastModified: Feb 4, 2019                               |
+|  LastModified: Feb 5, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -17,6 +17,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,13 +26,17 @@ namespace Hprose.RPC {
     public interface IHandler<T> {
         Task Bind(T server);
     }
-    public partial class Service {
+    public class Service {
         private readonly static List<(string, Type)> handlerTypes = new List<(string, Type)>();
         private readonly static ConcurrentDictionary<Type, List<string>> serverTypes = new ConcurrentDictionary<Type, List<string>>();
         public static void Register<HT, ST>(string name) where HT : IHandler<ST> {
             handlerTypes.Add((name, typeof(HT)));
             serverTypes.GetOrAdd(typeof(ST), new List<string>()).Add(name);
         }
+        static Service() {
+            Register<HttpHandler, HttpListener>("http");
+        }
+        public HttpHandler Http => (HttpHandler)this["http"];
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         public IServiceCodec Codec { get; set; } = ServiceCodec.Instance;
         public int MaxRequestLength { get; set; } = 0x7FFFFFFF;
