@@ -10,7 +10,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ContextAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CRC32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HandlerManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TcpTransport.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IOManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpTransport.cs" />
@@ -33,8 +35,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Proxy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TaskResult.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Codec\" />
   </ItemGroup>
 </Project>
