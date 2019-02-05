@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\proj\Hprose.IO\Hprose.IO.csproj" />
     <ProjectReference Include="..\..\proj\Hprose.RPC\Hprose.RPC.csproj" />
+    <ProjectReference Include="..\..\proj\Hprose.RPC.Plugins\Hprose.RPC.Plugins.csproj" />
   </ItemGroup>
 
 </Project>

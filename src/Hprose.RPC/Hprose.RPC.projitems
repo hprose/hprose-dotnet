@@ -25,17 +25,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)HeaderAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MethodManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Method.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Limiter\RateLimiter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Limiter\Limiter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Push\Prosumer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Push\Message.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Push\Broker.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Push\IProducer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Reverse\CallerHandler.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Reverse\Provider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Reverse\Caller.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Reverse\CallerContext.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Reverse\ProviderContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Service.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IServiceCodec.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceCodec.cs" />
@@ -44,28 +33,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Proxy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TaskResult.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\CircuitBreaker\IMockService.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\CircuitBreaker\BreakerException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\CircuitBreaker\CircuitBreaker.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Cluster\Cluster.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Cluster\FailfastConfig.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Cluster\FailtryConfig.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Cluster\FailoverConfig.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Cluster\ClusterConfig.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Cluster\RetryAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Cluster\IdempotentAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\WeightedLeastActiveLoadBalance.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\NginxRoundRobinLoadBalance.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\LeastActiveLoadBalance.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\WeightedRoundRobinLoadBalance.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\RoundRobinLoadBalance.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\WeightedRandomLoadBalance.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\RandomLoadBalance.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\LoadBalance\WeightedLoadBalance.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Log\Log.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Log\LogAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Oneway\OnewayAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Plugins\Oneway\Oneway.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Codec\" />

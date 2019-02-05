@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>bd74acf1-7335-44d8-ab5d-c71e56117c43</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Hprose.RPC.Plugins</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CircuitBreaker\IMockService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CircuitBreaker\BreakerException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CircuitBreaker\CircuitBreaker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Cluster\Cluster.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Cluster\FailfastConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Cluster\FailtryConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Cluster\FailoverConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Cluster\ClusterConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Cluster\RetryAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Cluster\IdempotentAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LoadBalance\WeightedLeastActiveLoadBalance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LoadBalance\NginxRoundRobinLoadBalance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LoadBalance\LeastActiveLoadBalance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LoadBalance\WeightedRoundRobinLoadBalance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LoadBalance\RoundRobinLoadBalance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LoadBalance\WeightedRandomLoadBalance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LoadBalance\RandomLoadBalance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LoadBalance\WeightedLoadBalance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Log\Log.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Log\LogAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Oneway\OnewayAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Oneway\Oneway.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Limiter\RateLimiter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Limiter\Limiter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Push\Prosumer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Push\Message.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Push\Broker.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Push\IProducer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Reverse\CallerHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Reverse\Provider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Reverse\Caller.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Reverse\CallerContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Reverse\ProviderContext.cs" />
+  </ItemGroup>
+</Project>

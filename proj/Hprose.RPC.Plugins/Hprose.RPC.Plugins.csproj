@@ -13,7 +13,7 @@
     <Company>hprose.com</Company>
     <Copyright>Copyright © http://www.hprose.com, All rights reserved.</Copyright>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <Product>Hprose.RPC</Product>
+    <Product>Hprose.RPC.Plugins</Product>
     <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
     <PackageProjectUrl>http://www.hprose.com</PackageProjectUrl>
     <PackageIconUrl>http://hprose.com/apple-touch-icon-180x180.png</PackageIconUrl>
@@ -63,7 +63,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin')) ">
@@ -72,7 +71,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'xamarinmac20' ">
@@ -85,33 +83,29 @@
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net40')) ">
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" />
-    <PackageReference Include="Microsoft.Net.Http" Version="2.2.29" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" !$(TargetFramework.StartsWith('net40')) And !$(TargetFramework.StartsWith('netstandard')) ">
-    <Reference Include="System.Net.Http" />
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <ProjectReference Include="..\Hprose.IO\Hprose.IO.csproj" />
+    <ProjectReference Include="..\Hprose.RPC\Hprose.RPC.csproj" />
   </ItemGroup>
 
-  <Import Project="..\..\src\Hprose.RPC\Hprose.RPC.projitems" Label="Shared" />
+  <Import Project="..\..\src\Hprose.RPC.Plugins\Hprose.RPC.Plugins.projitems" Label="Shared" />
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <PropertyGroup Condition=" '$(TargetFrameworkIdentifier)' != '' ">
-      <Product>Hprose.RPC for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion)</Product>
+      <Product>Hprose.RPC.Plugins for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion)</Product>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(TargetFrameworkProfile)' != '' ">
-      <Product>Hprose.RPC for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion) $(TargetFrameworkProfile) Profile</Product>
+      <Product>Hprose.RPC.Plugins for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion) $(TargetFrameworkProfile) Profile</Product>
     </PropertyGroup>
   </Target>
 
