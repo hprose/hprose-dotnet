@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Data;
 using System.IO;
+using System.Text;
 
 namespace Hprose.UnitTests.IO {
     [TestClass]
@@ -13,7 +14,7 @@ namespace Hprose.UnitTests.IO {
                 var dataSet = MakeDataSet();
                 writer.Serialize(dataSet);
                 writer.Serialize(dataSet);
-                Assert.AreEqual("a2{a3{c11\"ParentTable\"2{s2\"id\"s10\"parentItem\"}o0{0s12\"ParentItem 0\"}o0{1s12\"ParentItem 1\"}o0{2s12\"ParentItem 2\"}}a15{c10\"childTable\"3{s7\"childID\"s9\"childItem\"s8\"parentID\"}o1{0s6\"Item 0\"0}o1{1s6\"Item 1\"0}o1{2s6\"Item 2\"0}o1{3s6\"Item 3\"0}o1{4s6\"Item 4\"0}o1{5r15;1}o1{6r17;1}o1{7r19;1}o1{8r21;1}o1{9r23;1}o1{i10;r15;2}o1{i11;r17;2}o1{i12;r19;2}o1{i13;r21;2}o1{i14;r23;2}}}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+                Assert.AreEqual("a2{a3{c11\"ParentTable\"2{s2\"id\"s10\"parentItem\"}o0{0s12\"ParentItem 0\"}o0{1s12\"ParentItem 1\"}o0{2s12\"ParentItem 2\"}}a15{c10\"childTable\"3{s7\"childID\"s9\"childItem\"s8\"parentID\"}o1{0s6\"Item 0\"0}o1{1s6\"Item 1\"0}o1{2s6\"Item 2\"0}o1{3s6\"Item 3\"0}o1{4s6\"Item 4\"0}o1{5r15;1}o1{6r17;1}o1{7r19;1}o1{8r21;1}o1{9r23;1}o1{i10;r15;2}o1{i11;r17;2}o1{i12;r19;2}o1{i13;r21;2}o1{i14;r23;2}}}r0;", Encoding.UTF8.GetString(stream.ToArray()));
             }
         }
 

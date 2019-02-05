@@ -2,6 +2,7 @@
 using Hprose.RPC.Plugins.Log;
 using Hprose.RPC.Plugins.Push;
 using Hprose.RPC.Plugins.Reverse;
+using Hprose.RPC.Codec.JSONRPC;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Net;
@@ -58,7 +59,6 @@ namespace Hprose.UnitTests.RPC {
                    .Add<string>(OnewayCall)
                    .Bind(server, "http");
             var client = new Client("http://127.0.0.1:8081/");
-            ((ClientCodec)(client.Codec)).Simple = true;
             var log = new Log();
             client.Use(log.IOHandler).Use(log.InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
@@ -164,5 +164,31 @@ namespace Hprose.UnitTests.RPC {
             await provider.Close();
             server.Stop();
         }
+        [TestMethod]
+        public async Task Test6() {
+            HttpListener server = new HttpListener();
+            server.Prefixes.Add("http://127.0.0.1:8085/");
+            server.Start();
+            var service = new Service {
+                Codec = JsonRpcServiceCodec.Instance
+            };
+            service.AddMethod("Hello", this)
+                   .AddMethod("Sum", this)
+                   .Add<string>(OnewayCall)
+                   .Bind(server, "http");
+            var client = new Client("http://127.0.0.1:8085/") {
+                Codec = JsonRpcClientCodec.Instance
+            };
+            var log = new Log();
+            client.Use(log.IOHandler).Use(log.InvokeHandler);
+            var proxy = client.UseService<ITestInterface>();
+            var result = await proxy.Hello("world");
+            Assert.AreEqual("Hello world", result);
+            Assert.AreEqual(3, proxy.Sum(1, 2));
+            proxy.OnewayCall("Oneway Sync");
+            await proxy.OnewayCallAsync("Oneway Async");
+            server.Stop();
+        }
+
     }
 }

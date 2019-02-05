@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace Hprose.UnitTests.IO {
     [TestClass]
@@ -111,7 +112,7 @@ namespace Hprose.UnitTests.IO {
             using(var stream = new MemoryStream()) {
                 var writer = new Writer(stream);
                 writer.Serialize(obj);
-                return ValueWriter.UTF8.GetString(stream.ToArray());
+                return Encoding.UTF8.GetString(stream.ToArray());
             }
         }
         [TestMethod]

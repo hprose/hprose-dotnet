@@ -1,6 +1,7 @@
 ﻿using Hprose.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
+using System.Text;
 
 namespace Hprose.UnitTests.IO {
     [TestClass]
@@ -16,7 +17,7 @@ namespace Hprose.UnitTests.IO {
                 Formatter.Serialize('人', stream);
                 Formatter.Serialize((byte)123, stream);
                 Formatter.Serialize((sbyte)-123, stream);
-                Assert.AreEqual("ntfu0uAu人i123;i-123;", ValueWriter.UTF8.GetString(stream.ToArray()));
+                Assert.AreEqual("ntfu0uAu人i123;i-123;", Encoding.UTF8.GetString(stream.ToArray()));
             }
         }
     }

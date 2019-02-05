@@ -50,7 +50,7 @@ namespace Hprose.RPC.Plugins.Log {
                 return Encoding.UTF8.GetString(data);
             }
             catch {
-                return Encoding.ASCII.GetString(data);
+                return Encoding.Default.GetString(data);
             }
         }
         private static string Stringify(object obj) {

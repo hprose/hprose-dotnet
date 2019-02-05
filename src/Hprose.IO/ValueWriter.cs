@@ -56,7 +56,6 @@ namespace Hprose.IO {
         private static readonly ThreadLocal<byte[]> intBuf = new ThreadLocal<byte[]>(() => new byte[INT_SIZE]);
         private static readonly ThreadLocal<byte[]> longBuf = new ThreadLocal<byte[]>(() => new byte[LONG_SIZE]);
 #endif
-        public static readonly UTF8Encoding UTF8 = new UTF8Encoding();
 
 #if NETCOREAPP2_1 || NETCOREAPP2_2
         public static void WriteASCII(Stream stream, string s) {
@@ -334,7 +333,7 @@ namespace Hprose.IO {
                 WriteInt(stream, length);
             }
             stream.WriteByte(TagQuote);
-            byte[] buf = UTF8.GetBytes(s);
+            byte[] buf = Encoding.UTF8.GetBytes(s);
             stream.Write(buf, 0, buf.Length);
             stream.WriteByte(TagQuote);
         }
@@ -345,7 +344,7 @@ namespace Hprose.IO {
                 WriteInt(stream, length);
             }
             stream.WriteByte(TagQuote);
-            byte[] buf = UTF8.GetBytes(s);
+            byte[] buf = Encoding.UTF8.GetBytes(s);
             stream.Write(buf, 0, buf.Length);
             stream.WriteByte(TagQuote);
         }

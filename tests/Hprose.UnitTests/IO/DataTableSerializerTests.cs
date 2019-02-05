@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Data;
 using System.IO;
+using System.Text;
 
 namespace Hprose.UnitTests.IO {
     [TestClass]
@@ -13,7 +14,7 @@ namespace Hprose.UnitTests.IO {
                 var table = MakeTable();
                 writer.Serialize(table);
                 writer.Serialize(table);
-                Assert.AreEqual("a3{c9\"TestTable\"3{s2\"id\"s4\"name\"s3\"age\"}o0{0s5\"Mario\"i45;}o0{1s5\"Luigi\"i42;}o0{2s5\"Peach\"i28;}}r0;", ValueWriter.UTF8.GetString(stream.ToArray()));
+                Assert.AreEqual("a3{c9\"TestTable\"3{s2\"id\"s4\"name\"s3\"age\"}o0{0s5\"Mario\"i45;}o0{1s5\"Luigi\"i42;}o0{2s5\"Peach\"i28;}}r0;", Encoding.UTF8.GetString(stream.ToArray()));
             }
         }
 

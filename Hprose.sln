@@ -23,12 +23,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hprose.RPC", "proj\Hprose.R
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.RPC", "src\Hprose.RPC\Hprose.RPC.shproj", "{26AF48AD-8F09-4146-BC18-D35529AFA89E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hprose.RPC.Plugins", "proj\Hprose.RPC.Plugins\Hprose.RPC.Plugins.csproj", "{1E877639-172A-4916-B2BC-B81FA01228BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hprose.RPC.Plugins", "proj\Hprose.RPC.Plugins\Hprose.RPC.Plugins.csproj", "{1E877639-172A-4916-B2BC-B81FA01228BC}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.RPC.Plugins", "src\Hprose.RPC.Plugins\Hprose.RPC.Plugins.shproj", "{BD74ACF1-7335-44D8-AB5D-C71E56117C43}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.RPC.Codec.JSONRPC", "src\Hprose.RPC.Codec.JSONRPC\Hprose.RPC.Codec.JSONRPC.shproj", "{26786C33-EA3C-4F7C-B506-F01733805C06}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hprose.RPC.Codec.JSONRPC", "proj\Hprose.RPC.Codec.JSONRPC\Hprose.RPC.Codec.JSONRPC.csproj", "{D44EC6FF-F867-49DE-B130-1C3A911F3511}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\Hprose.RPC.Codec.JSONRPC\Hprose.RPC.Codec.JSONRPC.projitems*{26786c33-ea3c-4f7c-b506-f01733805c06}*SharedItemsImports = 13
 		src\Hprose.RPC\Hprose.RPC.projitems*{26af48ad-8f09-4146-bc18-d35529afa89e}*SharedItemsImports = 13
 		src\Hprose.IO\Hprose.IO.projitems*{3bbafd96-bce6-4d52-a2b4-8abd2250465f}*SharedItemsImports = 13
 		src\Hprose.Collections\Hprose.Collections.projitems*{645ef886-f73b-46a5-a484-7ebe81209303}*SharedItemsImports = 13
@@ -125,6 +130,22 @@ Global
 		{1E877639-172A-4916-B2BC-B81FA01228BC}.Release|x64.Build.0 = Release|Any CPU
 		{1E877639-172A-4916-B2BC-B81FA01228BC}.Release|x86.ActiveCfg = Release|Any CPU
 		{1E877639-172A-4916-B2BC-B81FA01228BC}.Release|x86.Build.0 = Release|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Debug|ARM.Build.0 = Debug|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Debug|x64.Build.0 = Debug|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Debug|x86.Build.0 = Debug|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Release|ARM.ActiveCfg = Release|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Release|ARM.Build.0 = Release|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Release|x64.ActiveCfg = Release|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Release|x64.Build.0 = Release|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Release|x86.ActiveCfg = Release|Any CPU
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -139,6 +160,8 @@ Global
 		{26AF48AD-8F09-4146-BC18-D35529AFA89E} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
 		{1E877639-172A-4916-B2BC-B81FA01228BC} = {133CF4A1-F478-4AD3-86BA-6F2D55A08A0A}
 		{BD74ACF1-7335-44D8-AB5D-C71E56117C43} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
+		{26786C33-EA3C-4F7C-B506-F01733805C06} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
+		{D44EC6FF-F867-49DE-B130-1C3A911F3511} = {133CF4A1-F478-4AD3-86BA-6F2D55A08A0A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2EEAB779-9719-4703-8BDF-9C5F995D8A68}
