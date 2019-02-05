@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpHandler class for C#.                               |
 |                                                          |
-|  LastModified: Feb 4, 2019                               |
+|  LastModified: Feb 5, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -32,6 +32,7 @@ namespace Hprose.RPC {
         private readonly string lastModified;
         private readonly string etag;
         private readonly Dictionary<string, bool> origins = new Dictionary<string, bool>();
+        public Action<Exception> OnError { get; set; } = null;
         public Service Service { get; private set; }
         public HttpHandler(Service service) {
             Service = service;
@@ -41,7 +42,12 @@ namespace Hprose.RPC {
         }
         public async Task Bind(HttpListener server) {
             while (server.IsListening) {
-                Handler(await server.GetContextAsync());
+                try {
+                    Handler(await server.GetContextAsync());
+                }
+                catch (Exception error) {
+                    OnError?.Invoke(error);
+                }
             }
         }
         public void AddAccessControlAllowOrigin(string origin) {
@@ -180,10 +186,12 @@ namespace Hprose.RPC {
                         catch (Exception e) {
                             response.StatusCode = 500;
                             response.StatusDescription = "Internal Server Error";
-                            var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
                             using (var outputStream = GetOutputStream(request, response)) {
+                                var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
                                 await outputStream.WriteAsync(stackTrace, 0, stackTrace.Length);
                             }
+                            response.Close();
+                            return;
                         }
                         break;
                 }
@@ -196,13 +204,6 @@ namespace Hprose.RPC {
                 }
             }
             response.Close();
-        }
-    }
-
-    public partial class Service {
-        public HttpHandler Http => (HttpHandler)this["http"];
-        static Service() {
-            Register<HttpHandler, HttpListener>("http");
         }
     }
 }
