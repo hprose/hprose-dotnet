@@ -93,7 +93,7 @@ namespace Hprose.RPC {
                 catch { }
             }
         }
-        public async Task<byte[]> ReadAsync(Stream stream, byte[] bytes, int offset, int length) {
+        private async Task<byte[]> ReadAsync(Stream stream, byte[] bytes, int offset, int length) {
             while (length > 0) {
                 int size = await stream.ReadAsync(bytes, offset, length);
                 offset += size;
@@ -101,7 +101,7 @@ namespace Hprose.RPC {
             }
             return bytes;
         }
-        public async void Receive(string uri, TcpClient tcpClient) {
+        private async void Receive(string uri, TcpClient tcpClient) {
             var sended = Sended[uri];
             var header = new byte[12];
             try {
@@ -139,7 +139,7 @@ namespace Hprose.RPC {
 #endif
             }
         }
-        public async void Send(string uri) {
+        private async void Send(string uri) {
             var requests = Requests[uri];
             var results = Results[uri];
             var sended = Sended.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<Stream>>());
@@ -206,25 +206,6 @@ namespace Hprose.RPC {
                 requests.TryDequeue(out request);
             }
         }
-        public async Task<Stream> Transport(Stream request, Context context) {
-            var clientContext = context as ClientContext;
-            var uri = clientContext.Uri;
-            var index = Interlocked.Increment(ref counter);
-            while (index < 0) {
-                Interlocked.Add(ref counter, Int32.MinValue);
-                index = Interlocked.Increment(ref counter);
-            }
-            var results = Results.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<Stream>>());
-            var result = new TaskCompletionSource<Stream>();
-            results[index] = result;
-            var requests = Requests.GetOrAdd(uri, (_) => new ConcurrentQueue<(int, Stream)>());
-            requests.Enqueue((index, request));
-            requests.TryPeek(out (int index, Stream stream) first);
-            if (first.index == index) {
-                Send(uri);
-            }
-            return await result.Task;
-        }
         private async Task<TcpClient> GetTcpClient(string uri) {
             int retried = 0;
             while(true) {
@@ -246,6 +227,25 @@ namespace Hprose.RPC {
                     }
                 }
             }
+        }
+        public async Task<Stream> Transport(Stream request, Context context) {
+            var clientContext = context as ClientContext;
+            var uri = clientContext.Uri;
+            var index = Interlocked.Increment(ref counter);
+            while (index < 0) {
+                Interlocked.Add(ref counter, Int32.MinValue);
+                index = Interlocked.Increment(ref counter);
+            }
+            var results = Results.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<Stream>>());
+            var result = new TaskCompletionSource<Stream>();
+            results[index] = result;
+            var requests = Requests.GetOrAdd(uri, (_) => new ConcurrentQueue<(int, Stream)>());
+            requests.Enqueue((index, request));
+            requests.TryPeek(out (int index, Stream stream) first);
+            if (first.index == index) {
+                Send(uri);
+            }
+            return await result.Task;
         }
     }
 }
