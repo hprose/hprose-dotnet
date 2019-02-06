@@ -48,7 +48,7 @@ namespace Hprose.RPC {
                 if (request.CanSeek) {
                     httpContext.Headers.ContentLength = request.Length;
                 }
-                HttpResponseMessage response = await httpClient.PostAsync(clientContext.Uri, httpContext);
+                HttpResponseMessage response = await httpClient.PostAsync(clientContext.Uri, httpContext).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode) {
                     clientContext.HttpResponseHeaders = response.Headers;
                     return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
