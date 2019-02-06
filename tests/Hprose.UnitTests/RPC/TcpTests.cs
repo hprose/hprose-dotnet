@@ -43,10 +43,10 @@ namespace Hprose.UnitTests.RPC {
                    .Add(() => { return "good"; }, "Good")
                    .Bind(server);
             var client = new Client("tcp://127.0.0.1:8412");
-            var result = client.Invoke<string>("hello", new object[] { "world" });
+            var result = await client.InvokeAsync<string>("hello", new object[] { "world" });
             Assert.AreEqual("Hello world", result);
-            Assert.AreEqual(3, client.Invoke<int>("sum", new object[] { 1, 2 }));
-            Assert.AreEqual("good", client.Invoke<string>("good"));
+            Assert.AreEqual(3, await client.InvokeAsync<int>("sum", new object[] { 1, 2 }));
+            Assert.AreEqual("good", await client.InvokeAsync<string>("good"));
             server.Stop();
         }
         public interface ITestInterface {
