@@ -187,6 +187,7 @@ namespace Hprose.RPC {
                     var netStream = tcpClient.GetStream();
                     await netStream.WriteAsync(header, 0, 12);
                     await stream.CopyToAsync(netStream);
+                    stream.Dispose();
                 }
                 catch (Exception e) {
                     foreach (var i in sended.Keys) {
