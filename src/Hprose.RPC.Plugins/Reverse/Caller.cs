@@ -22,7 +22,11 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.Reverse {
     public class Caller {
+#if NET40 || NET45 || NET451 || NET452
         private static readonly (int, string, object[])[] emptyCall = new (int, string, object[])[0];
+#else
+        private static readonly (int, string, object[])[] emptyCall = Array.Empty<(int, string, object[])>();
+#endif
         private volatile int counter = 0;
         private ConcurrentDictionary<string, ConcurrentQueue<(int, string, object[])>> Calls { get; } = new ConcurrentDictionary<string, ConcurrentQueue<(int, string, object[])>>();
         private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>> Results { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>>();

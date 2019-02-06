@@ -21,7 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.LoadBalance {
-    public class WeightedRandomLoadBalance : WeightedLoadBalance {
+    public class WeightedRandomLoadBalance : WeightedLoadBalance, IDisposable {
         private readonly Random random = new Random(Guid.NewGuid().GetHashCode());
         private readonly int[] effectiveWeights;
         private readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
@@ -61,7 +61,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
                 rwlock.ExitUpgradeableReadLock();
                 return response;
             }
-            catch (Exception e) {
+            catch {
                 rwlock.EnterUpgradeableReadLock();
                 if (effectiveWeights[index] > 0) {
                     rwlock.EnterWriteLock();
@@ -69,9 +69,20 @@ namespace Hprose.RPC.Plugins.LoadBalance {
                     rwlock.ExitWriteLock();
                 }
                 rwlock.ExitUpgradeableReadLock();
-                throw e;
+                throw;
             }
         }
+        private bool disposed = false;
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing) {
+            if (disposed) return;
+            if (disposing) {
+                rwlock.Dispose();
+            }
+            disposed = true;
+        }
     }
-
 }

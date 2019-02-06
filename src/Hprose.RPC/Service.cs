@@ -102,7 +102,7 @@ namespace Hprose.RPC {
             }
             return Codec.Encode(result, context as ServiceContext);
         }
-        public async Task<object> Execute(string fullname, object[] args, Context context) {
+        public static async Task<object> Execute(string fullname, object[] args, Context context) {
             var method = (context as ServiceContext).Method;
             var result = method.MethodInfo.Invoke(
                 method.Target,

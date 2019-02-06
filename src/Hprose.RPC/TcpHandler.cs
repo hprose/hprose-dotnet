@@ -59,7 +59,11 @@ namespace Hprose.RPC {
             return bytes;
         }
         private async void Send(TcpClient tcpClient, BlockingCollection<(int index, Stream stream)> responses) {
-            await Task.Factory.StartNew(async () => {
+#if NET40
+            await TaskEx.Run(async () => {
+#else
+            await Task.Run(async () => {
+#endif
                 try {
                     var header = new byte[12];
                     var netStream = tcpClient.GetStream();

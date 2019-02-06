@@ -73,7 +73,7 @@ namespace Hprose.RPC.Plugins.Log {
             }
             catch (Exception e) {
                 Trace.TraceError(e.StackTrace);
-                throw e;
+                throw;
             }
         }
         public static async Task<object> InvokeHandler(this Log log, string name, object[] args, Context context, NextInvokeHandler next) {
@@ -98,7 +98,7 @@ namespace Hprose.RPC.Plugins.Log {
             }
             catch (Exception e) {
                 Trace.TraceError(e.StackTrace);
-                throw e;
+                throw;
             }
         }
     }

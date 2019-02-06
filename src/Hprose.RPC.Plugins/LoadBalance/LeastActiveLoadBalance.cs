@@ -21,9 +21,13 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.LoadBalance {
-    public class LeastActiveLoadBalance {
+    public class LeastActiveLoadBalance : IDisposable {
         private readonly Random random = new Random(Guid.NewGuid().GetHashCode());
+#if NET40 || NET45 || NET451 || NET452
         private int[] actives = new int[0];
+#else
+        private int[] actives = Array.Empty<int>();
+#endif
         private readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
         public async Task<Stream> Handler(Stream request, Context context, NextIOHandler next) {
             var clientContext = context as ClientContext;
@@ -72,6 +76,18 @@ namespace Hprose.RPC.Plugins.LoadBalance {
                 rwlock.ExitWriteLock();
                 throw;
             }
+        }
+        private bool disposed = false;
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing) {
+            if (disposed) return;
+            if (disposing) {
+                rwlock.Dispose();
+            }
+            disposed = true;
         }
     }
 }

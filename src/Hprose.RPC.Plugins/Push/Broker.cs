@@ -109,14 +109,14 @@ namespace Hprose.RPC.Plugins.Push {
                 }
             }
         }
-        protected string Id(Context context) {
+        protected static string GetId(Context context) {
             if (((IDictionary<string, object>)context.RequestHeaders).TryGetValue("Id", out var id)) {
                 return id.ToString();
             }
             throw new KeyNotFoundException("client unique id not found");
         }
         protected bool Subscribe(string topic, Context context) {
-            var id = Id(context);
+            var id = GetId(context);
             var topics = Messages.GetOrAdd(id, (_) => new ConcurrentDictionary<string, BlockingCollection<Message>>());
             if (topics.TryGetValue(topic, out var messages)) {
                 if (messages != null) return false;
@@ -151,14 +151,14 @@ namespace Hprose.RPC.Plugins.Push {
             return false;
         }
         protected bool Unsubscribe(string topic, Context context) {
-            var id = Id(context);
+            var id = GetId(context);
             if (Messages.TryGetValue(id, out var topics)) {
                 return Offline(topics, id, topic, context);
             }
             return false;
         }
         protected async Task<Dictionary<string, Message[]>> Message(Context context) {
-            var id = Id(context);
+            var id = GetId(context);
             if (Responders.TryRemove(id, out var responder)) {
                 responder?.TrySetResult(null);
             }

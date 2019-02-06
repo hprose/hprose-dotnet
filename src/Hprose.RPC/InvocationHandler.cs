@@ -122,7 +122,7 @@ namespace Hprose.RPC {
                     context.Add(key, value);
                 }
             }
-            if (string.IsNullOrEmpty(ns)) {
+            if (!string.IsNullOrEmpty(ns)) {
                 name = ns + '_' + name;
             }
             if (typeof(Task).IsAssignableFrom(returnType)) {

@@ -65,7 +65,7 @@ namespace Hprose.RPC.Plugins.Cluster {
             for (int i = 0; i < n; ++i) {
                 var forkingContext = clientContext.Clone() as ClientContext;
                 forkingContext.Uri = uris[i];
-                next(name, args, forkingContext).ContinueWith((task) => {
+                Task result = next(name, args, forkingContext).ContinueWith((task) => {
                     if (task.Exception != null) {
                         if (Interlocked.Decrement(ref count) == 0) {
                             deferred.TrySetException(task.Exception);
@@ -74,7 +74,7 @@ namespace Hprose.RPC.Plugins.Cluster {
                     else {
                         deferred.TrySetResult(task.Result);
                     }
-                });
+                }, TaskScheduler.Current);
             }
             return await deferred.Task.ConfigureAwait(false);
         }
