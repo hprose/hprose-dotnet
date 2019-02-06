@@ -93,6 +93,7 @@ namespace Hprose.RPC {
                         header[3] = (byte)(crc32 & 0xFF);
                         await netStream.WriteAsync(header, 0, 12);
                         await stream.CopyToAsync(netStream);
+                        await netStream.FlushAsync();
                         stream.Dispose();
                     }
                 }
@@ -124,10 +125,10 @@ namespace Hprose.RPC {
         }
         public async void Handler(TcpClient tcpClient) {
             using (var responses = new BlockingCollection<(int index, Stream stream)>()) {
-                Send(tcpClient, responses);
                 try {
                     var header = new byte[12];
                     var netStream = tcpClient.GetStream();
+                    Send(tcpClient, responses);
                     while (true) {
                         await ReadAsync(netStream, header, 0, 12);
                         uint crc = (uint)((header[0] << 24) | (header[1] << 16) | (header[2] << 8) | header[3]);
@@ -135,7 +136,7 @@ namespace Hprose.RPC {
                             throw new IOException("invalid request");
                         }
                         int length = ((header[4] & 0x7F) << 24) | (header[5] << 16) | (header[6] << 8) | header[7];
-                        int index = (header[4] << 24) | (header[5] << 16) | (header[6] << 8) | header[7];
+                        int index = (header[8] << 24) | (header[9] << 16) | (header[10] << 8) | header[11];
                         if (length > Service.MaxRequestLength) {
                             responses.Add(((int)(index | 0x80000000), new MemoryStream(Encoding.UTF8.GetBytes("request too long"))));
                             responses.CompleteAdding();
