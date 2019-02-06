@@ -8,7 +8,7 @@
 |                                                          |
 |  Caller class for C#.                                    |
 |                                                          |
-|  LastModified: Feb 4, 2019                               |
+|  LastModified: Feb 6, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -24,7 +24,7 @@ namespace Hprose.RPC.Plugins.Reverse {
     public class Caller {
         private static readonly (int, string, object[])[] emptyCall = new (int, string, object[])[0];
         private volatile int counter = 0;
-        private ConcurrentDictionary<string, BlockingCollection<(int, string, object[])>> Calls { get; } = new ConcurrentDictionary<string, BlockingCollection<(int, string, object[])>>();
+        private ConcurrentDictionary<string, ConcurrentQueue<(int, string, object[])>> Calls { get; } = new ConcurrentDictionary<string, ConcurrentQueue<(int, string, object[])>>();
         private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>> Results { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>>();
         private ConcurrentDictionary<string, TaskCompletionSource<(int, string, object[])[]>> Responders { get; } = new ConcurrentDictionary<string, TaskCompletionSource<(int, string, object[])[]>>();
         private ConcurrentDictionary<string, TaskCompletionSource<bool>> Timers { get; } = new ConcurrentDictionary<string, TaskCompletionSource<bool>>();
@@ -48,16 +48,14 @@ namespace Hprose.RPC.Plugins.Reverse {
                 if (calls.Count == 0) {
                     return false;
                 }
-                var newcalls = new BlockingCollection<(int, string, object[])>();
+                var newcalls = new ConcurrentQueue<(int, string, object[])>();
                 Calls.AddOrUpdate(id, newcalls, (_, oldcalls) => {
                     if (oldcalls != null) {
-                        newcalls.Dispose();
                         return oldcalls;
                     }
                     return newcalls;
                 });
                 responder.TrySetResult(calls.ToArray());
-                calls.Dispose();
                 return true;
             }
             return false;
@@ -124,8 +122,8 @@ namespace Hprose.RPC.Plugins.Reverse {
                 index = Interlocked.Increment(ref counter);
             }
             var result = new TaskCompletionSource<object>();
-            var calls = Calls.GetOrAdd(id, (_) => new BlockingCollection<(int, string, object[])>());
-            calls.Add((index, fullname, args));
+            var calls = Calls.GetOrAdd(id, (_) => new ConcurrentQueue<(int, string, object[])>());
+            calls.Enqueue((index, fullname, args));
             var results = Results.GetOrAdd(id, (_) => new ConcurrentDictionary<int, TaskCompletionSource<object>>());
             results[index] = result;
             Response(id);
