@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Feb 5, 2019                               |
+|  LastModified: Feb 7, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -33,11 +33,13 @@ namespace Hprose.RPC {
             Service = service;
         }
         public async Task Bind(TcpListener server) {
+            var responses = new ConcurrentQueue<(TcpClient tcpClient, int index, Stream stream)>();
+            Send(responses);
             while (true) {
                 try {
                     TcpClient tcpClient = await server.AcceptTcpClientAsync().ConfigureAwait(false);
                     OnAccept?.Invoke(tcpClient);
-                    Handler(tcpClient);
+                    Handler(tcpClient, responses);
                 }
                 catch (InvalidOperationException) {
                     return;
@@ -58,63 +60,73 @@ namespace Hprose.RPC {
             }
             return bytes;
         }
-        private async void Send(TcpClient tcpClient, BlockingCollection<(int index, Stream stream)> responses) {
-#if NET40
-            await TaskEx.Run(async () => {
-#else
-            await Task.Run(async () => {
-#endif
+        private async void Send(ConcurrentQueue<(TcpClient tcpClient, int index, Stream stream)> responses) {
+            var header = new byte[12];
+            TcpClient tcpClient = null;
+            while (true) {
                 try {
-                    var header = new byte[12];
-                    var netStream = tcpClient.GetStream();
-                    while (true) {
-                        (int index, Stream stream) = responses.Take();
-                        try {
-                            if (!stream.CanSeek) {
-                                var memstream = new MemoryStream();
-                                await stream.CopyToAsync(memstream).ConfigureAwait(false);
-                                stream.Dispose();
-                                stream = memstream;
-                            }
-                        }
-                        catch (Exception e) {
-                            OnError?.Invoke(e);
-                            continue;
-                        }
-                        var n = (int)stream.Length;
-                        header[4] = (byte)(n >> 24 & 0xFF | 0x80);
-                        header[5] = (byte)(n >> 16 & 0xFF);
-                        header[6] = (byte)(n >> 8 & 0xFF);
-                        header[7] = (byte)(n & 0xFF);
-                        header[8] = (byte)(index >> 24 & 0xFF);
-                        header[9] = (byte)(index >> 16 & 0xFF);
-                        header[10] = (byte)(index >> 8 & 0xFF);
-                        header[11] = (byte)(index & 0xFF);
-                        var crc32 = CRC32.Compute(header, 4, 8);
-                        header[0] = (byte)(crc32 >> 24 & 0xFF);
-                        header[1] = (byte)(crc32 >> 16 & 0xFF);
-                        header[2] = (byte)(crc32 >> 8 & 0xFF);
-                        header[3] = (byte)(crc32 & 0xFF);
-                        await netStream.WriteAsync(header, 0, 12).ConfigureAwait(false);
-                        await stream.CopyToAsync(netStream).ConfigureAwait(false);
-                        await netStream.FlushAsync().ConfigureAwait(false);
-                        stream.Dispose();
+                    (TcpClient tcpClient, int index, Stream stream) response;
+                    while (!responses.TryDequeue(out response)) {
+#if NET40
+                        await TaskEx.Yield();
+#else
+                        await Task.Yield();
+#endif
                     }
+                    tcpClient = response.tcpClient;
+                    int index = response.index;
+                    Stream stream = response.stream;
+                    var netStream = tcpClient.GetStream();
+                    try {
+                        if (!stream.CanSeek) {
+                            var memstream = new MemoryStream();
+                            await stream.CopyToAsync(memstream).ConfigureAwait(false);
+                            stream.Dispose();
+                            stream = memstream;
+                        }
+                    }
+                    catch (Exception e) {
+                        OnError?.Invoke(e);
+                        continue;
+                    }
+                    var n = (int)stream.Length;
+                    header[4] = (byte)(n >> 24 & 0xFF | 0x80);
+                    header[5] = (byte)(n >> 16 & 0xFF);
+                    header[6] = (byte)(n >> 8 & 0xFF);
+                    header[7] = (byte)(n & 0xFF);
+                    header[8] = (byte)(index >> 24 & 0xFF);
+                    header[9] = (byte)(index >> 16 & 0xFF);
+                    header[10] = (byte)(index >> 8 & 0xFF);
+                    header[11] = (byte)(index & 0xFF);
+                    var crc32 = CRC32.Compute(header, 4, 8);
+                    header[0] = (byte)(crc32 >> 24 & 0xFF);
+                    header[1] = (byte)(crc32 >> 16 & 0xFF);
+                    header[2] = (byte)(crc32 >> 8 & 0xFF);
+                    header[3] = (byte)(crc32 & 0xFF);
+                    await netStream.WriteAsync(header, 0, 12).ConfigureAwait(false);
+                    await stream.CopyToAsync(netStream).ConfigureAwait(false);
+                    await netStream.FlushAsync().ConfigureAwait(false);
+                    if ((index & 0x80000000) != 0) {
+                        var message = Encoding.UTF8.GetString((stream as MemoryStream).ToArray());
+                        stream.Dispose();
+                        throw new Exception(message);
+                    }
+                    stream.Dispose();
                 }
                 catch (Exception e) {
+                    OnError?.Invoke(e);
+                    if (tcpClient != null) {
 #if NET40 || NET45 || NET451 || NET452
-                    tcpClient.Close();
+                        tcpClient.Close();
 #else
-                    tcpClient.Dispose();
+                        tcpClient.Dispose();
 #endif
-                    if (!(e is InvalidOperationException)) {
-                        OnError?.Invoke(e);
+                        OnClose?.Invoke(tcpClient);
                     }
-                    OnClose?.Invoke(tcpClient);
                 }
-            }).ConfigureAwait(false);
+            }
         }
-        private async void Run(BlockingCollection<(int index, Stream stream)> responses, int index, byte[] data, Context context) {
+        private async void Run(ConcurrentQueue<(TcpClient tcpClient, int index, Stream stream)> responses, TcpClient tcpClient, int index, byte[] data, Context context) {
             using (var request = new MemoryStream(data)) {
                 Stream response = null;
                 try {
@@ -124,45 +136,41 @@ namespace Hprose.RPC {
                     index = (int)(index | 0x80000000);
                     response = new MemoryStream(Encoding.UTF8.GetBytes(e.Message));
                 }
-                responses.Add((index, response));
+                responses.Enqueue((tcpClient, index, response));
             }
         }
-        public async void Handler(TcpClient tcpClient) {
-            using (var responses = new BlockingCollection<(int index, Stream stream)>()) {
-                try {
-                    var header = new byte[12];
-                    var netStream = tcpClient.GetStream();
-                    Send(tcpClient, responses);
-                    while (true) {
-                        await ReadAsync(netStream, header, 0, 12).ConfigureAwait(false);
-                        uint crc = (uint)((header[0] << 24) | (header[1] << 16) | (header[2] << 8) | header[3]);
-                        if (CRC32.Compute(header, 4, 8) != crc || (header[4] & 0x80) == 0 || (header[8] & 0x80) != 0) {
-                            throw new IOException("invalid request");
-                        }
-                        int length = ((header[4] & 0x7F) << 24) | (header[5] << 16) | (header[6] << 8) | header[7];
-                        int index = (header[8] << 24) | (header[9] << 16) | (header[10] << 8) | header[11];
-                        if (length > Service.MaxRequestLength) {
-                            responses.Add(((int)(index | 0x80000000), new MemoryStream(Encoding.UTF8.GetBytes("request too long"))));
-                            responses.CompleteAdding();
-                            return;
-                        }
-                        var data = await ReadAsync(netStream, new byte[length], 0, length).ConfigureAwait(false);
-                        dynamic context = new ServiceContext(Service);
-                        context.TcpClient = tcpClient;
-                        context.Socket = tcpClient.Client;
-                        context.Handler = this;
-                        Run(responses, index, data, context);
+        public async void Handler(TcpClient tcpClient, ConcurrentQueue<(TcpClient tcpClient, int index, Stream stream)> responses) {
+            try {
+                var header = new byte[12];
+                var netStream = tcpClient.GetStream();
+                while (true) {
+                    await ReadAsync(netStream, header, 0, 12).ConfigureAwait(false);
+                    uint crc = (uint)((header[0] << 24) | (header[1] << 16) | (header[2] << 8) | header[3]);
+                    if (CRC32.Compute(header, 4, 8) != crc || (header[4] & 0x80) == 0 || (header[8] & 0x80) != 0) {
+                        throw new IOException("invalid request");
                     }
+                    int length = ((header[4] & 0x7F) << 24) | (header[5] << 16) | (header[6] << 8) | header[7];
+                    int index = (header[8] << 24) | (header[9] << 16) | (header[10] << 8) | header[11];
+                    if (length > Service.MaxRequestLength) {
+                        responses.Enqueue((tcpClient, (int)(index | 0x80000000), new MemoryStream(Encoding.UTF8.GetBytes("request too long"))));
+                        return;
+                    }
+                    var data = await ReadAsync(netStream, new byte[length], 0, length).ConfigureAwait(false);
+                    dynamic context = new ServiceContext(Service);
+                    context.TcpClient = tcpClient;
+                    context.Socket = tcpClient.Client;
+                    context.Handler = this;
+                    Run(responses, tcpClient, index, data, context);
                 }
-                catch (Exception e) {
+            }
+            catch (Exception e) {
 #if NET40 || NET45 || NET451 || NET452
-                    tcpClient.Close();
+                tcpClient.Close();
 #else
-                    tcpClient.Dispose();
+                tcpClient.Dispose();
 #endif
-                    OnError?.Invoke(e);
-                    OnClose?.Invoke(tcpClient);
-                }
+                OnError?.Invoke(e);
+                OnClose?.Invoke(tcpClient);
             }
         }
     }
