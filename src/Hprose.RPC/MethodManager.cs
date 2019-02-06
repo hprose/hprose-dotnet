@@ -184,7 +184,7 @@ namespace Hprose.RPC {
 #else
             var methodInfos = target.GetType().GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Instance);
 #endif
-            if (fullname == null || fullname == "") {
+            if (string.IsNullOrEmpty(fullname)) {
                 fullname = name;
             }
             foreach (MethodInfo methodInfo in methodInfos) {
@@ -199,7 +199,7 @@ namespace Hprose.RPC {
 #else
             var methodInfos = type.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Static);
 #endif
-            if (fullname == null || fullname == "") {
+            if (string.IsNullOrEmpty(fullname)) {
                 fullname = name;
             }
             foreach (MethodInfo methodInfo in methodInfos) {
@@ -210,7 +210,7 @@ namespace Hprose.RPC {
         }
         public void AddMethods(string[] names, object target, string ns = "") {
             foreach (string name in names) {
-                if (ns == null || ns == "") {
+                if (string.IsNullOrEmpty(ns)) {
                     AddMethod(name, target, name);
                 }
                 else {
@@ -220,7 +220,7 @@ namespace Hprose.RPC {
         }
         public void AddMethods(string[] names, Type type, string ns = "") {
             foreach (string name in names) {
-                if (ns == null || ns == "") {
+                if (string.IsNullOrEmpty(ns)) {
                     AddMethod(name, type, name);
                 }
                 else {
@@ -237,7 +237,7 @@ namespace Hprose.RPC {
             foreach (MethodInfo methodInfo in methodInfos) {
                 if (Array.IndexOf(instanceMethodsOnObject, methodInfo.Name) != -1) {
                     var fullname = methodInfo.Name;
-                    if (ns == null || ns == "") {
+                    if (!string.IsNullOrEmpty(ns)) {
                         fullname = ns + "_" + fullname;
                     }
                     Add(methodInfo, fullname, target);
@@ -253,7 +253,7 @@ namespace Hprose.RPC {
             foreach (MethodInfo methodInfo in methodInfos) {
                 if (Array.IndexOf(staticMethodsOnObject, methodInfo.Name) != -1) {
                     var fullname = methodInfo.Name;
-                    if (ns == null || ns == "") {
+                    if (!string.IsNullOrEmpty(ns)) {
                         fullname = ns + "_" + fullname;
                     }
                     Add(methodInfo, fullname);
