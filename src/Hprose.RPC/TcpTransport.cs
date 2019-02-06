@@ -116,7 +116,7 @@ namespace Hprose.RPC {
                         throw new IOException("invalid response");
                     }
                     int length = ((header[4] & 0x7F) << 24) | (header[5] << 16) | (header[6] << 8) | header[7];
-                    int index = (header[4] << 24) | (header[5] << 16) | (header[6] << 8) | header[7];
+                    int index = (header[8] << 24) | (header[9] << 16) | (header[10] << 8) | header[11];
                     bool has_error = (index & 0x80000000) != 0;
                     index &= 0x7FFFFFFF;
                     var data = await ReadAsync(netStream, new byte[length], 0, length);
@@ -190,6 +190,7 @@ namespace Hprose.RPC {
                     var netStream = tcpClient.GetStream();
                     await netStream.WriteAsync(header, 0, 12);
                     await stream.CopyToAsync(netStream);
+                    await netStream.FlushAsync();
                     stream.Dispose();
                 }
                 catch (Exception e) {
