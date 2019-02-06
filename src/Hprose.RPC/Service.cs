@@ -29,10 +29,10 @@ namespace Hprose.RPC {
     }
     public class Service {
         private readonly static List<(string, Type)> handlerTypes = new List<(string, Type)>();
-        private readonly static ConcurrentDictionary<Type, List<string>> serverTypes = new ConcurrentDictionary<Type, List<string>>();
+        private readonly static ConcurrentDictionary<Type, HashSet<string>> serverTypes = new ConcurrentDictionary<Type, HashSet<string>>();
         public static void Register<HT, ST>(string name) where HT : IHandler<ST> {
             handlerTypes.Add((name, typeof(HT)));
-            serverTypes.GetOrAdd(typeof(ST), new List<string>()).Add(name);
+            serverTypes.GetOrAdd(typeof(ST), new HashSet<string>()).Add(name);
         }
         static Service() {
             Register<HttpHandler, HttpListener>("http");
