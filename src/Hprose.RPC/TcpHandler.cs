@@ -14,14 +14,11 @@
 \*________________________________________________________*/
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Net;
-using System.Threading.Tasks;
-using System.Text;
-using System.Net.Sockets;
 using System.Collections.Concurrent;
+using System.IO;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     public class TcpHandler : IHandler<TcpListener> {
@@ -136,7 +133,9 @@ namespace Hprose.RPC {
                     index = (int)(index | 0x80000000);
                     response = new MemoryStream(Encoding.UTF8.GetBytes(e.Message));
                 }
-                responses.Enqueue((tcpClient, index, response));
+                finally {
+                    responses.Enqueue((tcpClient, index, response));
+                }
             }
         }
         public async void Handler(TcpClient tcpClient, ConcurrentQueue<(TcpClient tcpClient, int index, Stream stream)> responses) {
