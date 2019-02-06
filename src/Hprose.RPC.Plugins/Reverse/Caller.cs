@@ -83,10 +83,10 @@ namespace Hprose.RPC.Plugins.Reverse {
                     using (CancellationTokenSource source = new CancellationTokenSource()) {
 #if NET40
                         var delay = TaskEx.Delay(Timeout, source.Token);
-                        var task = await TaskEx.WhenAny(responder.Task, delay);
+                        var task = await TaskEx.WhenAny(responder.Task, delay).ConfigureAwait(false);
 #else
                         var delay = Task.Delay(Timeout, source.Token);
-                        var task = await Task.WhenAny(responder.Task, delay);
+                        var task = await Task.WhenAny(responder.Task, delay).ConfigureAwait(false);
 #endif
                         source.Cancel();
                         if (task == delay) {
@@ -95,7 +95,7 @@ namespace Hprose.RPC.Plugins.Reverse {
                     }
                 }
             }
-            return await responder.Task;
+            return await responder.Task.ConfigureAwait(false);
         }
         private void End((int, object, string)[] results, Context context) {
             var id = Id(context);
@@ -122,13 +122,13 @@ namespace Hprose.RPC.Plugins.Reverse {
             var results = Results.GetOrAdd(id, (_) => new ConcurrentDictionary<int, TaskCompletionSource<object>>());
             results[index] = result;
             Response(id);
-            return await result.Task;
+            return await result.Task.ConfigureAwait(false);
         }
         public Task Invoke(string id, string fullname, in object[] args = null) {
             return InvokeAsync(id, fullname, args);
         }
         public async Task<T> Invoke<T>(string id, string fullname, object[] args = null) {
-            var value = await InvokeAsync(id, fullname, args);
+            var value = await InvokeAsync(id, fullname, args).ConfigureAwait(false);
             if (typeof(T).IsAssignableFrom(value.GetType())) {
                 return (T)value;
             }
@@ -148,7 +148,7 @@ namespace Hprose.RPC.Plugins.Reverse {
         }
         private async Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
             context = new CallerContext(this, context as ServiceContext);
-            return await next(name, args, context);
+            return await next(name, args, context).ConfigureAwait(false);
         }
     }
 }

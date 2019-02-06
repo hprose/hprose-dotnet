@@ -104,21 +104,26 @@ namespace Hprose.RPC {
             ioManager.Unuse(handlers);
             return this;
         }
-        public Task Invoke(string fullname, in object[] args = null, Settings settings = null) {
+        public void Invoke(string fullname, in object[] args = null, Settings settings = null) {
+            var context = new ClientContext(this, fullname, null, settings);
+            invokeManager.Handler(fullname, args, context).Wait();
+            return;
+        }
+        public T Invoke<T>(string fullname, in object[] args = null, Settings settings = null) {
+            return InvokeAsync<T>(fullname, args, settings).Result;
+        }
+        public Task InvokeAsync(string fullname, in object[] args = null, Settings settings = null) {
             var context = new ClientContext(this, fullname, null, settings);
             return invokeManager.Handler(fullname, args, context);
         }
-        public Task<T> Invoke<T>(string fullname, in object[] args = null, Settings settings = null) {
-            return InvokeAsync<T>(fullname, args, settings);
-        }
-        private async Task<T> InvokeAsync<T>(string fullname, object[] args = null, Settings settings = null) {
+        public async Task<T> InvokeAsync<T>(string fullname, object[] args = null, Settings settings = null) {
             Type type = typeof(T);
             bool isResultType = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Result<>);
             if (isResultType) {
                 type = type.GetGenericArguments()[0];
             }
             var context = new ClientContext(this, fullname, type, settings);
-            var result = await invokeManager.Handler(fullname, args, context);
+            var result = await invokeManager.Handler(fullname, args, context).ConfigureAwait(false);
             if (isResultType) {
                 return (T)Activator.CreateInstance(typeof(T), new object[] { result, context });
             }
@@ -126,14 +131,14 @@ namespace Hprose.RPC {
         }
         public async Task<object> Call(string fullname, object[] args, Context context) {
             var request = Codec.Encode(fullname, args, context as ClientContext);
-            var response = await ioManager.Handler(request, context);
-            return await Codec.Decode(response, context as ClientContext);
+            var response = await ioManager.Handler(request, context).ConfigureAwait(false);
+            return await Codec.Decode(response, context as ClientContext).ConfigureAwait(false);
         }
         public async Task<Stream> Transport(Stream request, Context context) {
             var uri = new Uri((context as ClientContext).Uri);
             var scheme = uri.Scheme;
             if (schemes.TryGetValue(scheme, out string name)) {
-                return await transports[name].Transport(request, context);
+                return await transports[name].Transport(request, context).ConfigureAwait(false);
             }
             throw new NotSupportedException("The protocol " + scheme + " is not supported.");
         }

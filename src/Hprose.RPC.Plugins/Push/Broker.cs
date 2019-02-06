@@ -93,17 +93,17 @@ namespace Hprose.RPC.Plugins.Push {
             using (CancellationTokenSource source = new CancellationTokenSource()) {
 #if NET40
                 var delay = TaskEx.Delay(HeartBeat, source.Token);
-                var task = await TaskEx.WhenAny(timer.Task, delay);
+                var task = await TaskEx.WhenAny(timer.Task, delay).ConfigureAwait(false);
 #else
                 var delay = Task.Delay(HeartBeat, source.Token);
-                var task = await Task.WhenAny(timer.Task, delay);
+                var task = await Task.WhenAny(timer.Task, delay).ConfigureAwait(false);
 #endif
                 source.Cancel();
                 if (task == delay) {
                     timer.TrySetResult(true);
                 }
             }
-            if (await timer.Task && Messages.TryGetValue(id, out var t)) {
+            if (await timer.Task.ConfigureAwait(false) && Messages.TryGetValue(id, out var t)) {
                 foreach (var topic in t.Keys) {
                     Offline(t, id, topic, new ServiceContext(Service));
                 }
@@ -175,10 +175,10 @@ namespace Hprose.RPC.Plugins.Push {
                     using (CancellationTokenSource source = new CancellationTokenSource()) {
 #if NET40
                         var delay = TaskEx.Delay(Timeout, source.Token);
-                        var task = await TaskEx.WhenAny(responder.Task, delay);
+                        var task = await TaskEx.WhenAny(responder.Task, delay).ConfigureAwait(false);
 #else
                         var delay = Task.Delay(Timeout, source.Token);
-                        var task = await Task.WhenAny(responder.Task, delay);
+                        var task = await Task.WhenAny(responder.Task, delay).ConfigureAwait(false);
 #endif
                         source.Cancel();
                         if (task == delay) {
@@ -187,7 +187,7 @@ namespace Hprose.RPC.Plugins.Push {
                     }
                 }
             }
-            return await responder.Task;
+            return await responder.Task.ConfigureAwait(false);
         }
         public bool Unicast(object data, string topic, string id, string from = "") {
             if (Messages.TryGetValue(id, out var topics)) {
@@ -283,7 +283,7 @@ namespace Hprose.RPC.Plugins.Push {
             }
             IProducer producer = new Producer(this, from);
             ((dynamic)context).Producer = producer;
-            return await next(name, args, context);
+            return await next(name, args, context).ConfigureAwait(false);
         }
         private class Producer : IProducer {
             private readonly Broker Broker;

@@ -53,7 +53,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
             }
                 (context as ClientContext).Uri = uris[index];
             try {
-                var response = await next(request, context);
+                var response = await next(request, context).ConfigureAwait(false);
                 lock (locker) {
                     if (effectiveWeights[index] < weights[index]) {
                         effectiveWeights[index]++;
@@ -61,13 +61,13 @@ namespace Hprose.RPC.Plugins.LoadBalance {
                 }
                 return response;
             }
-            catch (Exception e) {
+            catch {
                 lock (locker) {
                     if (effectiveWeights[index] > 0) {
                         effectiveWeights[index]--;
                     }
                 }
-                throw e;
+                throw;
             }
         }
     }

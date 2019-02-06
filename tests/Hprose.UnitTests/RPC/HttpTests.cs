@@ -34,10 +34,10 @@ namespace Hprose.UnitTests.RPC {
                    .Add(() => { return "good"; }, "Good")
                    .Bind(server);
             var client = new Client("http://127.0.0.1:8080/");
-            var result = await client.Invoke<string>("hello", new object[] { "world" });
+            var result = await client.InvokeAsync<string>("hello", new object[] { "world" });
             Assert.AreEqual("Hello world", result);
-            Assert.AreEqual(3, await client.Invoke<int>("sum", new object[] { 1, 2 }));
-            Assert.AreEqual("good", await client.Invoke<string>("good"));
+            Assert.AreEqual(3, await client.InvokeAsync<int>("sum", new object[] { 1, 2 }));
+            Assert.AreEqual("good", await client.InvokeAsync<string>("good"));
             server.Stop();
         }
         public interface ITestInterface {
@@ -121,9 +121,9 @@ namespace Hprose.UnitTests.RPC {
             var client = new Client("http://127.0.0.1:8083/");
             var log = new Log();
             client.Use(log.IOHandler).Use(log.InvokeHandler);
-            var result = await client.Invoke<string>("hello", new object[] { "world" });
+            var result = await client.InvokeAsync<string>("hello", new object[] { "world" });
             Assert.AreEqual("hello:1:127.0.0.1", result);
-            result = await client.Invoke<string>("sum", new object[] { 1, 2 });
+            result = await client.InvokeAsync<string>("sum", new object[] { 1, 2 });
             Assert.AreEqual("sum:2:127.0.0.1", result);
             server.Stop();
         }

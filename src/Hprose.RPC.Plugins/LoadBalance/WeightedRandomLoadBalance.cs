@@ -51,7 +51,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
             rwlock.ExitReadLock();
             (context as ClientContext).Uri = uris[index];
             try {
-                var response = await next(request, context);
+                var response = await next(request, context).ConfigureAwait(false);
                 rwlock.EnterUpgradeableReadLock();
                 if (effectiveWeights[index] < weights[index]) {
                     rwlock.EnterWriteLock();

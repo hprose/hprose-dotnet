@@ -26,7 +26,7 @@ namespace Hprose.RPC {
             get => Items[name];
             set => Items[name] = value;
         }
-        protected void Copy(IDictionary<string, object> src, IDictionary<string, object> dist) {
+        protected static void Copy(IDictionary<string, object> src, IDictionary<string, object> dist) {
             if (src != null) {
                 foreach (var p in src) dist[p.Key] = p.Value;
             }

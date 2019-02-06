@@ -36,10 +36,10 @@ namespace Hprose.RPC.Plugins.Limiter {
                 using (CancellationTokenSource source = new CancellationTokenSource()) {
 #if NET40
                     var timer = TaskEx.Delay(Timeout, source.Token);
-                    var task = await TaskEx.WhenAny(timer, deferred.Task);
+                    var task = await TaskEx.WhenAny(timer, deferred.Task).ConfigureAwait(false);
 #else
                     var timer = Task.Delay(Timeout, source.Token);
-                    var task = await Task.WhenAny(timer, deferred.Task);
+                    var task = await Task.WhenAny(timer, deferred.Task).ConfigureAwait(false);
 #endif
                     source.Cancel();
                     if (task == timer) {
@@ -47,7 +47,7 @@ namespace Hprose.RPC.Plugins.Limiter {
                     }
                 }
             }
-            await deferred.Task;
+            await deferred.Task.ConfigureAwait(false);
         }
         public void Release() {
             if (Interlocked.Decrement(ref counter) >= MaxConcurrentRequests) return;
@@ -56,10 +56,10 @@ namespace Hprose.RPC.Plugins.Limiter {
             }
         }
         public async Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
-            await Acquire();
+            await Acquire().ConfigureAwait(false);
             var result = next(name, args, context);
-            await result.ContinueWith((task) => Release());
-            return await result;
+            await result.ContinueWith((task) => Release()).ConfigureAwait(false);
+            return await result.ConfigureAwait(false);
         }
     }
 }

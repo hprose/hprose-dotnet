@@ -20,7 +20,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC {
-    public class HttpTransport : ITransport {
+    public class HttpTransport : ITransport, IDisposable {
         public static string[] Schemes { get; } = new string[] { "http", "https" };
         private readonly HttpClient httpClient = new HttpClient();
         public HttpRequestHeaders HttpRequestHeaders => httpClient.DefaultRequestHeaders;
@@ -50,12 +50,24 @@ namespace Hprose.RPC {
                 HttpResponseMessage response = await httpClient.PostAsync(clientContext.Uri, httpContext);
                 if (response.IsSuccessStatusCode) {
                     clientContext.HttpResponseHeaders = response.Headers;
-                    return await response.Content.ReadAsStreamAsync();
+                    return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 }
                 else {
                     throw new Exception(((int)response.StatusCode) + ":" + response.ReasonPhrase);
                 }
             }
+        }
+        private bool disposed = false;
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing) {
+            if (disposed) return;
+            if (disposing) {
+                httpClient.Dispose();
+            }
+            disposed = true;
         }
     }
 }

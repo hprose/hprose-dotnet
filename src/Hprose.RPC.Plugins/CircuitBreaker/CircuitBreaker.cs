@@ -42,25 +42,25 @@ namespace Hprose.RPC.Plugins.CircuitBreaker {
                 failCount = Threshold >> 1;
             }
             try {
-                var response = await next(request, context);
+                var response = await next(request, context).ConfigureAwait(false);
                 if (failCount > 0) failCount = 0;
                 return response;
             }
-            catch (Exception e) {
+            catch (Exception) {
                 Interlocked.Increment(ref failCount);
                 lastFailTime = DateTime.Now;
-                throw e;
+                throw;
             }
         }
         public async Task<object> InvokeHandler(string name, object[] args, Context context, NextInvokeHandler next) {
             if (MockService == null) {
-                return await next(name, args, context);
+                return await next(name, args, context).ConfigureAwait(false);
             }
             try {
-                return await next(name, args, context);
+                return await next(name, args, context).ConfigureAwait(false);
             }
             catch (BreakerException) {
-                return await MockService.Invoke(name, args, context);
+                return await MockService.Invoke(name, args, context).ConfigureAwait(false);
             }
         }
     }

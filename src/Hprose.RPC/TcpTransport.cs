@@ -78,7 +78,7 @@ namespace Hprose.RPC {
                                 }
                             }
                         }
-                        throw e;
+                        throw;
                     }
                 });
             };
@@ -86,7 +86,7 @@ namespace Hprose.RPC {
         public async void Abort() {
             foreach (var LazyTcpClient in TcpClients.Values) {
                 try {
-                    var tcpClient = await LazyTcpClient.Value;
+                    var tcpClient = await LazyTcpClient.Value.ConfigureAwait(false);
 #if NET40 || NET45 || NET451 || NET452
                     tcpClient.Close();
 #else
@@ -98,7 +98,7 @@ namespace Hprose.RPC {
         }
         private async Task<byte[]> ReadAsync(Stream stream, byte[] bytes, int offset, int length) {
             while (length > 0) {
-                int size = await stream.ReadAsync(bytes, offset, length);
+                int size = await stream.ReadAsync(bytes, offset, length).ConfigureAwait(false);
                 offset += size;
                 length -= size;
             }
@@ -110,7 +110,7 @@ namespace Hprose.RPC {
             try {
                 var netStream = tcpClient.GetStream();
                 while (true) {
-                    await ReadAsync(netStream, header, 0, 12);
+                    await ReadAsync(netStream, header, 0, 12).ConfigureAwait(false);
                     uint crc = (uint)((header[0] << 24) | (header[1] << 16) | (header[2] << 8) | header[3]);
                     if (CRC32.Compute(header, 4, 8) != crc || (header[4] & 0x80) == 0) {
                         throw new IOException("invalid response");
@@ -119,7 +119,7 @@ namespace Hprose.RPC {
                     int index = (header[8] << 24) | (header[9] << 16) | (header[10] << 8) | header[11];
                     bool has_error = (index & 0x80000000) != 0;
                     index &= 0x7FFFFFFF;
-                    var data = await ReadAsync(netStream, new byte[length], 0, length);
+                    var data = await ReadAsync(netStream, new byte[length], 0, length).ConfigureAwait(false);
                     if (sended.TryRemove(index, out var result)) {
                         if (has_error) {
                             result.TrySetException(new Exception(Encoding.UTF8.GetString(data)));
@@ -159,7 +159,7 @@ namespace Hprose.RPC {
                 try {
                     if (!stream.CanSeek) {
                         stream = new MemoryStream();
-                        await request.stream.CopyToAsync(stream);
+                        await request.stream.CopyToAsync(stream).ConfigureAwait(false);
                         request.stream.Dispose();
                     }
                 }
@@ -186,11 +186,11 @@ namespace Hprose.RPC {
                 header[3] = (byte)(crc32 & 0xFF);
                 TcpClient tcpClient = null;
                 try {
-                    tcpClient = await GetTcpClient(uri);
+                    tcpClient = await GetTcpClient(uri).ConfigureAwait(false);
                     var netStream = tcpClient.GetStream();
-                    await netStream.WriteAsync(header, 0, 12);
-                    await stream.CopyToAsync(netStream);
-                    await netStream.FlushAsync();
+                    await netStream.WriteAsync(header, 0, 12).ConfigureAwait(false);
+                    await stream.CopyToAsync(netStream).ConfigureAwait(false);
+                    await netStream.FlushAsync().ConfigureAwait(false);
                     stream.Dispose();
                 }
                 catch (Exception e) {
@@ -214,7 +214,7 @@ namespace Hprose.RPC {
             int retried = 0;
             while(true) {
                 var LazyTcpClient = TcpClients.GetOrAdd(uri, tcpClientFactory);
-                var tcpClient = await LazyTcpClient.Value;
+                var tcpClient = await LazyTcpClient.Value.ConfigureAwait(false);
                 try {
                     var available = tcpClient.Available;
                     return tcpClient;
@@ -227,12 +227,12 @@ namespace Hprose.RPC {
                     tcpClient.Dispose();
 #endif
                     if (++retried > 1) {
-                        throw e;
+                        throw;
                     }
                 }
             }
         }
-        public async Task<Stream> Transport(Stream request, Context context) {
+        public Task<Stream> Transport(Stream request, Context context) {
             var clientContext = context as ClientContext;
             var uri = clientContext.Uri;
             var index = Interlocked.Increment(ref counter);
@@ -249,7 +249,7 @@ namespace Hprose.RPC {
             if (first.index == index) {
                 Send(uri);
             }
-            return await result.Task;
+            return result.Task;
         }
     }
 }

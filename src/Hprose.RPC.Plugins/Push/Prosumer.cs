@@ -32,14 +32,17 @@ namespace Hprose.RPC.Plugins.Push {
         public Client Client { get; private set; }
         public string Id {
             get {
-                if (((IDictionary<string, object>)Client.RequestHeaders).ContainsKey("Id")) {
-                    return Client.RequestHeaders.Id.ToString();
-                }
-                throw new KeyNotFoundException("client unique id not found");
+                return GetId();
             }
             set {
                 Client.RequestHeaders.Id = value;
             }
+        }
+        private string GetId() {
+            if (((IDictionary<string, object>)Client.RequestHeaders).ContainsKey("Id")) {
+                return Client.RequestHeaders.Id.ToString();
+            }
+            throw new KeyNotFoundException("client unique id not found");
         }
         public Prosumer(Client client, string id = null) {
             Client = client;
@@ -66,12 +69,12 @@ namespace Hprose.RPC.Plugins.Push {
                         }
                     }
                 }
-            });
+            }).ConfigureAwait(false);
         }
         private async void Message() {
             while(!callbacks.IsEmpty) {
                 try {
-                    var topics = await Client.Invoke<Dictionary<string, Message[]>>("<");
+                    var topics = await Client.InvokeAsync<Dictionary<string, Message[]>>("<").ConfigureAwait(false);
                     if (topics == null) return;
                     Dispatch(topics);
                 }
@@ -83,7 +86,7 @@ namespace Hprose.RPC.Plugins.Push {
         public async Task<bool> Subscribe(string topic, Action<Message> callback) {
             if (Id != null && Id.Length > 0) {
                 callbacks[topic] = callback;
-                bool result = await Client.Invoke<bool>("+", new object[] { topic });
+                bool result = await Client.InvokeAsync<bool>("+", new object[] { topic }).ConfigureAwait(false);
                 Message();
                 OnSubscribe?.Invoke(topic);
                 return result;
@@ -91,14 +94,14 @@ namespace Hprose.RPC.Plugins.Push {
             return false;
         }
         public async Task<bool> Subscribe<T>(string topic, Action<T, string> callback) {
-            return await Subscribe(topic, (message) => callback(Converter<T>.Convert(message.Data), message.From));
+            return await Subscribe(topic, (message) => callback(Converter<T>.Convert(message.Data), message.From)).ConfigureAwait(false);
         }
         public async Task<bool> Subscribe<T>(string topic, Action<T> callback) {
-            return await Subscribe(topic, (message) => callback(Converter<T>.Convert(message.Data)));
+            return await Subscribe(topic, (message) => callback(Converter<T>.Convert(message.Data))).ConfigureAwait(false);
         }
         public async Task<bool> Unsubscribe(string topic) {
             if (Id != null && Id.Length > 0) {
-                bool result = await Client.Invoke<bool>("-", new object[] { topic });
+                bool result = await Client.InvokeAsync<bool>("-", new object[] { topic }).ConfigureAwait(false);
                 callbacks.TryRemove(topic, out var callback);
                 OnUnsubscribe?.Invoke(topic);
                 return result;
@@ -106,13 +109,13 @@ namespace Hprose.RPC.Plugins.Push {
             return false;
         }
         public Task<bool> Unicast(object data, string topic, string id) {
-            return Client.Invoke<bool>(">", new object[] { data, topic, id });
+            return Client.InvokeAsync<bool>(">", new object[] { data, topic, id });
         }
         public Task<IDictionary<string, bool>> Multicast(object data, string topic, IEnumerable<string> ids) {
-            return Client.Invoke<IDictionary<string, bool>>(">?", new object[] { data, topic, ids });
+            return Client.InvokeAsync<IDictionary<string, bool>>(">?", new object[] { data, topic, ids });
         }
         public Task<IDictionary<string, bool>> Broadcast(object data, string topic) {
-            return Client.Invoke<IDictionary<string, bool>>(">*", new object[] { data, topic });
+            return Client.InvokeAsync<IDictionary<string, bool>>(">*", new object[] { data, topic });
         }
         public Task<bool> Push(object data, string topic, string id) => Unicast(data, topic, id);
         public Task<IDictionary<string, bool>> Push(object data, string topic, IEnumerable<string> ids) => Multicast(data, topic, ids);
@@ -121,10 +124,10 @@ namespace Hprose.RPC.Plugins.Push {
             if (id == null || id.Length == 0) {
                 id = Id;
             }
-            return Client.Invoke<bool>("?", new object[] { topic, id });
+            return Client.InvokeAsync<bool>("?", new object[] { topic, id });
         }
         public Task<IList<string>> IdList(string topic) {
-            return Client.Invoke<IList<string>>("|", new object[] { topic });
+            return Client.InvokeAsync<IList<string>>("|", new object[] { topic });
         }
     }
 }

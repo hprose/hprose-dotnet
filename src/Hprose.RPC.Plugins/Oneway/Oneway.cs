@@ -22,7 +22,7 @@ namespace Hprose.RPC.Plugins.Oneway {
             if (context.Contains("Oneway")) {
                 return null;
             }
-            return await result;
+            return await result.ConfigureAwait(false);
         }
     }
 }

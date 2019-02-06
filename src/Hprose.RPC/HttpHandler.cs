@@ -20,6 +20,7 @@ using System.IO.Compression;
 using System.Net;
 using System.Threading.Tasks;
 using System.Text;
+using System.Globalization;
 
 namespace Hprose.RPC {
     public class HttpHandler : IHandler<HttpListener> {
@@ -37,13 +38,13 @@ namespace Hprose.RPC {
         public HttpHandler(Service service) {
             Service = service;
             var rand = new Random();
-            lastModified = DateTime.Now.ToString("R");
-            etag = '"' + rand.Next().ToString("x") + ":" + rand.Next().ToString("x") + '"';
+            lastModified = DateTime.Now.ToString("R", CultureInfo.InvariantCulture);
+            etag = '"' + rand.Next().ToString("x", CultureInfo.InvariantCulture) + ":" + rand.Next().ToString("x", CultureInfo.InvariantCulture) + '"';
         }
         public async Task Bind(HttpListener server) {
             while (server.IsListening) {
                 try {
-                    Handler(await server.GetContextAsync());
+                    Handler(await server.GetContextAsync().ConfigureAwait(false));
                 }
                 catch (Exception error) {
                     OnError?.Invoke(error);
@@ -61,7 +62,7 @@ namespace Hprose.RPC {
             if (Compress) {
                 string acceptEncoding = request.Headers["Accept-Encoding"];
                 if (acceptEncoding != null) {
-                    acceptEncoding = acceptEncoding.ToLower();
+                    acceptEncoding = acceptEncoding.ToLowerInvariant();
                     if (acceptEncoding.Contains("gzip")) {
                         response.AddHeader("Content-Encoding", "gzip");
                         ostream = new GZipStream(ostream, CompressionMode.Compress);
@@ -84,19 +85,17 @@ namespace Hprose.RPC {
             }
             if (CrossDomain) {
                 string origin = request.Headers["Origin"];
-                if (origin != null && origin != "" && origin != "null") {
-                    if (origins.Count == 0 || origins.ContainsKey(origin)) {
-                        response.AddHeader("Access-Control-Allow-Origin", origin);
-                        response.AddHeader("Access-Control-Allow-Credentials", "true");
-                    }
-                }
-                else {
+                if (string.IsNullOrEmpty(origin) || origin == "null") {
                     response.AddHeader("Access-Control-Allow-Origin", "*");
+                }
+                else if (origins.Count == 0 || origins.ContainsKey(origin)) {
+                    response.AddHeader("Access-Control-Allow-Origin", origin);
+                    response.AddHeader("Access-Control-Allow-Credentials", "true");
                 }
             }
         }
         private async Task<bool> CrossDomainXmlHandler(HttpListenerRequest request, HttpListenerResponse response) {
-            if (request.Url.AbsolutePath.ToLower() == "/crossdomain.xml") {
+            if (request.Url.AbsolutePath.ToLowerInvariant() == "/crossdomain.xml") {
                 if (request.Headers["If-Modified-Since"] == lastModified &&
                     request.Headers["If-None-Match"] == etag) {
                     response.StatusCode = 304;
@@ -107,7 +106,7 @@ namespace Hprose.RPC {
                     response.ContentType = "text/xml";
                     using (var fileStream = new FileStream(CrossDomainXmlFile, FileMode.Open, FileAccess.Read)) {
                         using (var outputStream = GetOutputStream(request, response)) {
-                            await fileStream.CopyToAsync(outputStream);
+                            await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
                         }
                     };
                 }
@@ -121,7 +120,7 @@ namespace Hprose.RPC {
         }
 
         private async Task<bool> ClientAccessPolicyXmlHandler(HttpListenerRequest request, HttpListenerResponse response) {
-            if (request.Url.AbsolutePath.ToLower() == "/clientaccesspolicy.xml") {
+            if (request.Url.AbsolutePath.ToLowerInvariant() == "/clientaccesspolicy.xml") {
                 if (request.Headers["If-Modified-Since"] == lastModified &&
                     request.Headers["If-None-Match"] == etag) {
                     response.StatusCode = 304;
@@ -132,7 +131,7 @@ namespace Hprose.RPC {
                     response.ContentType = "text/xml";
                     using (var fileStream = new FileStream(ClientAccessPolicyXmlFile, FileMode.Open, FileAccess.Read)) {
                         using (var outputStream = GetOutputStream(request, response)) {
-                            await fileStream.CopyToAsync(outputStream);
+                            await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
                         }
                     };
                 }
@@ -152,10 +151,10 @@ namespace Hprose.RPC {
             context.Handler = this;
             var request = httpContext.Request;
             var response = httpContext.Response;
-            if (await ClientAccessPolicyXmlHandler(request, response)) {
+            if (await ClientAccessPolicyXmlHandler(request, response).ConfigureAwait(false)) {
                 return;
             }
-            if (await CrossDomainXmlHandler(request, response)) {
+            if (await CrossDomainXmlHandler(request, response).ConfigureAwait(false)) {
                 return;
             }
             using (var instream = request.InputStream) {
@@ -188,7 +187,7 @@ namespace Hprose.RPC {
                             response.StatusDescription = "Internal Server Error";
                             using (var outputStream = GetOutputStream(request, response)) {
                                 var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
-                                await outputStream.WriteAsync(stackTrace, 0, stackTrace.Length);
+                                await outputStream.WriteAsync(stackTrace, 0, stackTrace.Length).ConfigureAwait(false);
                             }
                             response.Close();
                             return;
@@ -198,7 +197,7 @@ namespace Hprose.RPC {
                 SendHeader(request, response);
                 if (outstream != null) {
                     using (var outputStream = GetOutputStream(request, response)) {
-                        await outstream.CopyToAsync(outputStream);
+                        await outstream.CopyToAsync(outputStream).ConfigureAwait(false);
                     }
                     outstream.Dispose();
                 }

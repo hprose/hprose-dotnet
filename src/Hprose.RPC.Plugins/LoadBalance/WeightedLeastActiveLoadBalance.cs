@@ -73,7 +73,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
             actives[index]++;
             rwlock.ExitWriteLock();
             try {
-                var response = await next(request, context);
+                var response = await next(request, context).ConfigureAwait(false);
                 rwlock.EnterWriteLock();
                 actives[index]--;
                 rwlock.ExitWriteLock();

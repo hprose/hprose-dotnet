@@ -59,7 +59,7 @@ namespace Hprose.RPC {
             }
             else {
                 stream = new MemoryStream();
-                await response.CopyToAsync(stream);
+                await response.CopyToAsync(stream).ConfigureAwait(false);
                 response.Dispose();
             }
             stream.Position = 0;

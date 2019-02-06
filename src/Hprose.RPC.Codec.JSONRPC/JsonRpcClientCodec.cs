@@ -48,7 +48,7 @@ namespace Hprose.RPC.Codec.JSONRPC {
             }
             else {
                 stream = new MemoryStream();
-                await response.CopyToAsync(stream);
+                await response.CopyToAsync(stream).ConfigureAwait(false);
                 response.Dispose();
             }
             stream.Position = 0;

@@ -35,7 +35,7 @@ namespace Hprose.RPC {
         public async Task Bind(TcpListener server) {
             while (true) {
                 try {
-                    TcpClient tcpClient = await server.AcceptTcpClientAsync();
+                    TcpClient tcpClient = await server.AcceptTcpClientAsync().ConfigureAwait(false);
                     OnAccept?.Invoke(tcpClient);
                     Handler(tcpClient);
                 }
@@ -52,7 +52,7 @@ namespace Hprose.RPC {
         }
         private async Task<byte[]> ReadAsync(Stream stream, byte[] bytes, int offset, int length) {
             while (length > 0) {
-                int size = await stream.ReadAsync(bytes, offset, length);
+                int size = await stream.ReadAsync(bytes, offset, length).ConfigureAwait(false);
                 offset += size;
                 length -= size;
             }
@@ -68,7 +68,7 @@ namespace Hprose.RPC {
                         try {
                             if (!stream.CanSeek) {
                                 var memstream = new MemoryStream();
-                                await stream.CopyToAsync(memstream);
+                                await stream.CopyToAsync(memstream).ConfigureAwait(false);
                                 stream.Dispose();
                                 stream = memstream;
                             }
@@ -91,9 +91,9 @@ namespace Hprose.RPC {
                         header[1] = (byte)(crc32 >> 16 & 0xFF);
                         header[2] = (byte)(crc32 >> 8 & 0xFF);
                         header[3] = (byte)(crc32 & 0xFF);
-                        await netStream.WriteAsync(header, 0, 12);
-                        await stream.CopyToAsync(netStream);
-                        await netStream.FlushAsync();
+                        await netStream.WriteAsync(header, 0, 12).ConfigureAwait(false);
+                        await stream.CopyToAsync(netStream).ConfigureAwait(false);
+                        await netStream.FlushAsync().ConfigureAwait(false);
                         stream.Dispose();
                     }
                 }
@@ -108,13 +108,13 @@ namespace Hprose.RPC {
                     }
                     OnClose?.Invoke(tcpClient);
                 }
-            });
+            }).ConfigureAwait(false);
         }
         private async void Run(BlockingCollection<(int index, Stream stream)> responses, int index, byte[] data, Context context) {
             using (var request = new MemoryStream(data)) {
                 Stream response = null;
                 try {
-                    response = await Service.Handle(request, context);
+                    response = await Service.Handle(request, context).ConfigureAwait(false);
                 }
                 catch (Exception e) {
                     index = (int)(index | 0x80000000);
@@ -130,7 +130,7 @@ namespace Hprose.RPC {
                     var netStream = tcpClient.GetStream();
                     Send(tcpClient, responses);
                     while (true) {
-                        await ReadAsync(netStream, header, 0, 12);
+                        await ReadAsync(netStream, header, 0, 12).ConfigureAwait(false);
                         uint crc = (uint)((header[0] << 24) | (header[1] << 16) | (header[2] << 8) | header[3]);
                         if (CRC32.Compute(header, 4, 8) != crc || (header[4] & 0x80) == 0 || (header[8] & 0x80) != 0) {
                             throw new IOException("invalid request");
@@ -142,7 +142,7 @@ namespace Hprose.RPC {
                             responses.CompleteAdding();
                             return;
                         }
-                        var data = await ReadAsync(netStream, new byte[length], 0, length);
+                        var data = await ReadAsync(netStream, new byte[length], 0, length).ConfigureAwait(false);
                         dynamic context = new ServiceContext(Service);
                         context.TcpClient = tcpClient;
                         context.Socket = tcpClient.Client;

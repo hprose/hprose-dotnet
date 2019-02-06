@@ -45,26 +45,26 @@ namespace Hprose.RPC.Plugins.Limiter {
                 throw new TimeoutException();
             }
 #if NET40
-            await TaskEx.Delay(delay);
+            await TaskEx.Delay(delay).ConfigureAwait(false);
 #else
-            await Task.Delay(delay);
+            await Task.Delay(delay).ConfigureAwait(false);
 #endif
             return last;
         }
         public async Task<Stream> IOHandler(Stream request, Context context, NextIOHandler next) {
             if (!request.CanSeek) {
                 MemoryStream stream = new MemoryStream();
-                await request.CopyToAsync(stream);
+                await request.CopyToAsync(stream).ConfigureAwait(false);
                 stream.Position = 0;
                 request.Dispose();
                 request = stream;
             }
-            await Acquire(request.Length);
-            return await next(request, context);
+            await Acquire(request.Length).ConfigureAwait(false);
+            return await next(request, context).ConfigureAwait(false);
         }
         public async Task<object> InvokeHandler(string name, object[] args, Context context, NextInvokeHandler next) {
-            await Acquire();
-            return await next(name, args, context);
+            await Acquire().ConfigureAwait(false);
+            return await next(name, args, context).ConfigureAwait(false);
         }
     }
 }

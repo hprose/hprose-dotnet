@@ -36,7 +36,7 @@ namespace Hprose.RPC {
             this.settings = settings;
         }
         public object Invoke(object[] args) {
-            return client.Invoke<T>(name, args, settings).Result;
+            return client.Invoke<T>(name, args, settings);
         }
     }
 
@@ -50,7 +50,7 @@ namespace Hprose.RPC {
             this.settings = settings;
         }
         public object Invoke(object[] args) {
-            client.Invoke(name, args, settings).Wait();
+            client.Invoke(name, args, settings);
             return null;
         }
     }
@@ -65,7 +65,7 @@ namespace Hprose.RPC {
             this.settings = settings;
         }
         public object Invoke(object[] args) {
-            return client.Invoke<T>(name, args, settings);
+            return client.InvokeAsync<T>(name, args, settings);
         }
     }
 
@@ -79,7 +79,7 @@ namespace Hprose.RPC {
             this.settings = settings;
         }
         public object Invoke(object[] args) {
-            return client.Invoke(name, args, settings);
+            return client.InvokeAsync(name, args, settings);
         }
     }
 
@@ -122,7 +122,7 @@ namespace Hprose.RPC {
                     context.Add(key, value);
                 }
             }
-            if (ns != null && ns != "") {
+            if (string.IsNullOrEmpty(ns)) {
                 name = ns + '_' + name;
             }
             if (typeof(Task).IsAssignableFrom(returnType)) {

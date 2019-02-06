@@ -38,7 +38,7 @@ namespace Hprose.RPC.Plugins.Log {
     public static class LogExtensions {
         private static async Task<Stream> ToMemoryStream(Stream stream) {
             MemoryStream memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream);
+            await stream.CopyToAsync(memoryStream).ConfigureAwait(false);
             memoryStream.Position = 0;
             stream.Dispose();
             stream = memoryStream;
@@ -58,15 +58,15 @@ namespace Hprose.RPC.Plugins.Log {
         }
         public static async Task<Stream> IOHandler(this Log log, Stream request, Context context, NextIOHandler next) {
             bool enabled = context.Contains("Log") ? (context as dynamic).Log : log.Enabled;
-            if (!enabled) return await next(request, context);
+            if (!enabled) return await next(request, context).ConfigureAwait(false);
             if (!(request is MemoryStream)) {
-                request = await ToMemoryStream(request);
+                request = await ToMemoryStream(request).ConfigureAwait(false);
             }
             Trace.TraceInformation(ToString(request as MemoryStream));
             try {
-                var response = await next(request, context);
+                var response = await next(request, context).ConfigureAwait(false);
                 if (!(response is MemoryStream)) {
-                    response = await ToMemoryStream(response);
+                    response = await ToMemoryStream(response).ConfigureAwait(false);
                 }
                 Trace.TraceInformation(ToString(response as MemoryStream));
                 return response;
@@ -78,7 +78,7 @@ namespace Hprose.RPC.Plugins.Log {
         }
         public static async Task<object> InvokeHandler(this Log log, string name, object[] args, Context context, NextInvokeHandler next) {
             bool enabled = context.Contains("Log") ? (context as dynamic).Log : log.Enabled;
-            if (!enabled) return await next(name, args, context);
+            if (!enabled) return await next(name, args, context).ConfigureAwait(false);
             string a = "";
             try {
                 a = (args.Length > 0) && typeof(Context).IsAssignableFrom(args.Last().GetType()) ? Stringify(new List<object>(args.Take(args.Length - 1))) : Stringify(args);
@@ -87,7 +87,7 @@ namespace Hprose.RPC.Plugins.Log {
                 Trace.TraceError(e.StackTrace);
             }
             try {
-                var result = await next(name, args, context);
+                var result = await next(name, args, context).ConfigureAwait(false);
                 try {
                     Trace.TraceInformation(name + "(" + a.Substring(1, a.Length - 2) + ") = " + Stringify(result));
                 }

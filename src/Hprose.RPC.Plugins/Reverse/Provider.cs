@@ -30,14 +30,17 @@ namespace Hprose.RPC.Plugins.Reverse {
         public Client Client { get; private set; }
         public string Id {
             get {
-                if (((IDictionary<string, object>)Client.RequestHeaders).ContainsKey("Id")) {
-                    return Client.RequestHeaders.Id.ToString();
-                }
-                throw new KeyNotFoundException("client unique id not found");
+                return GetId();
             }
             set {
                 Client.RequestHeaders.Id = value;
             }
+        }
+        private string GetId() {
+            if (((IDictionary<string, object>)Client.RequestHeaders).ContainsKey("Id")) {
+                return Client.RequestHeaders.Id.ToString();
+            }
+            throw new KeyNotFoundException("client unique id not found");
         }
         public Provider(Client client, string id = null) {
             invokeManager = new InvokeManager(Execute);
@@ -47,7 +50,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             }
             Add(methodManager.GetNames, "~");
         }
-        public async Task<object> Execute(string fullname, object[] args, Context context) {
+        public static async Task<object> Execute(string fullname, object[] args, Context context) {
             var method = (context as ProviderContext).Method;
             var result = method.MethodInfo.Invoke(
                 method.Target,
@@ -58,7 +61,7 @@ namespace Hprose.RPC.Plugins.Reverse {
                 args
             );
             if (result is Task) {
-                return await TaskResult.Get((Task)result);
+                return await TaskResult.Get((Task)result).ConfigureAwait(false);
             }
             return result;
         }
@@ -97,7 +100,7 @@ namespace Hprose.RPC.Plugins.Reverse {
                     }
                     args = arguments;
                 }
-                var result = await invokeManager.Handler(name, args, context);
+                var result = await invokeManager.Handler(name, args, context).ConfigureAwait(false);
                 return new Tuple<int, object, string>(index, result, null);
             }
             catch (Exception e) {
@@ -113,9 +116,9 @@ namespace Hprose.RPC.Plugins.Reverse {
             }
             try {
 #if NET40
-                await Client.Invoke("=", new object[] { await TaskEx.WhenAll(results) });
+                await Client.InvokeAsync("=", new object[] { await TaskEx.WhenAll(results).ConfigureAwait(false) }).ConfigureAwait(false);
 #else
-                await Client.Invoke("=", new object[] { await Task.WhenAll(results) });
+                await Client.InvokeAsync("=", new object[] { await Task.WhenAll(results).ConfigureAwait(false) }).ConfigureAwait(false);
 #endif
             }
             catch (Exception e) {
@@ -126,7 +129,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             Interlocked.Exchange(ref closed, 0);
             while(closed == 0) {
                 try {
-                    var calls = await Client.Invoke<(int index, string name, object[] args)[]>("!");
+                    var calls = await Client.InvokeAsync<(int index, string name, object[] args)[]>("!").ConfigureAwait(false);
                     if (calls == null) return;
                     Dispatch(calls);
                 }
@@ -137,7 +140,7 @@ namespace Hprose.RPC.Plugins.Reverse {
         }
         public async Task Close() {
             Interlocked.Exchange(ref closed, 1);
-            await Client.Invoke("!!");
+            await Client.InvokeAsync("!!").ConfigureAwait(false);
         }
         public Provider Use(params InvokeHandler[] handlers) {
             invokeManager.Use(handlers);

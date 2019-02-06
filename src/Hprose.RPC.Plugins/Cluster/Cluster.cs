@@ -28,11 +28,11 @@ namespace Hprose.RPC.Plugins.Cluster {
         public Cluster() : this(FailoverConfig.Instance) { }
         public async Task<Stream> Handler(Stream request, Context context, NextIOHandler next) {
             try {
-                var response = await next(request, context);
+                var response = await next(request, context).ConfigureAwait(false);
                 Config.OnSuccess?.Invoke(context);
                 return response;
             }
-            catch (Exception e) {
+            catch (Exception) {
                 Config.OnFailure?.Invoke(context);
                 if (Config.OnRetry != null) {
                     dynamic clientContext = context;
@@ -45,15 +45,15 @@ namespace Hprose.RPC.Plugins.Cluster {
                         var interval = Config.OnRetry(context);
                         if (interval > TimeSpan.Zero) {
 #if NET40
-                            await TaskEx.Delay(interval);
+                            await TaskEx.Delay(interval).ConfigureAwait(false);
 #else
-                            await Task.Delay(interval);
+                            await Task.Delay(interval).ConfigureAwait(false);
 #endif
                         }
-                        return await Handler(request, context, next);
+                        return await Handler(request, context, next).ConfigureAwait(false);
                     }
                 }
-                throw e;
+                throw;
             }
         }
         public static async Task<object> Forking(string name, object[] args, Context context, NextInvokeHandler next) {
@@ -65,7 +65,7 @@ namespace Hprose.RPC.Plugins.Cluster {
             for (int i = 0; i < n; ++i) {
                 var forkingContext = clientContext.Clone() as ClientContext;
                 forkingContext.Uri = uris[i];
-                var result = next(name, args, forkingContext).ContinueWith((task) => {
+                next(name, args, forkingContext).ContinueWith((task) => {
                     if (task.Exception != null) {
                         if (Interlocked.Decrement(ref count) == 0) {
                             deferred.TrySetException(task.Exception);
@@ -76,7 +76,7 @@ namespace Hprose.RPC.Plugins.Cluster {
                     }
                 });
             }
-            return await deferred.Task;
+            return await deferred.Task.ConfigureAwait(false);
         }
         public static async Task<object> Broadcast(string name, object[] args, Context context, NextInvokeHandler next) {
             var clientContext = context as ClientContext;
@@ -89,9 +89,9 @@ namespace Hprose.RPC.Plugins.Cluster {
                 results[i] = next(name, args, forkingContext);
             }
 #if NET40
-            return await TaskEx.WhenAll(results);
+            return await TaskEx.WhenAll(results).ConfigureAwait(false);
 #else
-            return await Task.WhenAll(results);
+            return await Task.WhenAll(results).ConfigureAwait(false);
 #endif
         }
     }

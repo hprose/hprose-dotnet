@@ -30,9 +30,9 @@ namespace Hprose.RPC {
     public class Service {
         private readonly static List<(string, Type)> handlerTypes = new List<(string, Type)>();
         private readonly static ConcurrentDictionary<Type, HashSet<string>> serverTypes = new ConcurrentDictionary<Type, HashSet<string>>();
-        public static void Register<HT, ST>(string name) where HT : IHandler<ST> {
-            handlerTypes.Add((name, typeof(HT)));
-            serverTypes.GetOrAdd(typeof(ST), new HashSet<string>()).Add(name);
+        public static void Register<T, S>(string name) where T : IHandler<S> {
+            handlerTypes.Add((name, typeof(T)));
+            serverTypes.GetOrAdd(typeof(S), new HashSet<string>()).Add(name);
         }
         static Service() {
             Register<HttpHandler, HttpListener>("http");
@@ -78,10 +78,10 @@ namespace Hprose.RPC {
 
 #if NET40
                     var timer = TaskEx.Delay(Timeout, source.Token);
-                    var task = await TaskEx.WhenAny(result, timer);
+                    var task = await TaskEx.WhenAny(result, timer).ConfigureAwait(false);
 #else
                     var timer = Task.Delay(Timeout, source.Token);
-                    var task = await Task.WhenAny(result, timer);
+                    var task = await Task.WhenAny(result, timer).ConfigureAwait(false);
 #endif
                     source.Cancel();
                     if (task == timer) {
@@ -89,13 +89,13 @@ namespace Hprose.RPC {
                     }
                 }
             }
-            return await result;
+            return await result.ConfigureAwait(false);
         }
         public async Task<Stream> Process(Stream request, Context context) {
             object result;
             try {
-                var (fullname, args) = await Codec.Decode(request, context as ServiceContext);
-                result = await invokeManager.Handler(fullname, args, context);
+                var (fullname, args) = await Codec.Decode(request, context as ServiceContext).ConfigureAwait(false);
+                result = await invokeManager.Handler(fullname, args, context).ConfigureAwait(false);
             }
             catch (Exception e) {
                 result = e.InnerException ?? e;
@@ -113,7 +113,7 @@ namespace Hprose.RPC {
                 args
             );
             if (result is Task) {
-                return await TaskResult.Get((Task)result);
+                return await TaskResult.Get((Task)result).ConfigureAwait(false);
             }
             return result;
         }
