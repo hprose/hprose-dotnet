@@ -49,12 +49,7 @@ namespace Hprose.RPC.Plugins.Reverse {
                     return false;
                 }
                 var newcalls = new ConcurrentQueue<(int, string, object[])>();
-                Calls.AddOrUpdate(id, newcalls, (_, oldcalls) => {
-                    if (oldcalls != null) {
-                        return oldcalls;
-                    }
-                    return newcalls;
-                });
+                Calls.AddOrUpdate(id, newcalls, (_, oldcalls) => oldcalls ?? newcalls);
                 responder.TrySetResult(calls.ToArray());
                 return true;
             }
