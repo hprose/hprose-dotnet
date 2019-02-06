@@ -18,6 +18,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,8 +36,10 @@ namespace Hprose.RPC {
         }
         static Service() {
             Register<HttpHandler, HttpListener>("http");
+            Register<TcpHandler, TcpListener>("tcp");
         }
         public HttpHandler Http => (HttpHandler)this["http"];
+        public TcpHandler Tcp => (TcpHandler)this["tcp"];
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         public IServiceCodec Codec { get; set; } = ServiceCodec.Instance;
         public int MaxRequestLength { get; set; } = 0x7FFFFFFF;
