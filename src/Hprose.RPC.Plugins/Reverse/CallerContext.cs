@@ -25,11 +25,11 @@ namespace Hprose.RPC.Plugins.Reverse {
             Method = context.Method;
             Copy(context.Items, Items);
         }
-        public Task Invoke(string fullname, in object[] args = null) {
-            return Caller.Invoke(Caller.Id(this), fullname, args);
+        public Task InvokeAsync(string fullname, in object[] args = null) {
+            return Caller.InvokeAsync(Caller.Id(this), fullname, args);
         }
-        public Task<T> Invoke<T>(string fullname, in object[] args = null) {
-            return Caller.Invoke<T>(Caller.Id(this), fullname, args);
+        public Task<T> InvokeAsync<T>(string fullname, in object[] args = null) {
+            return Caller.InvokeAsync<T>(Caller.Id(this), fullname, args);
         }
     }
 }

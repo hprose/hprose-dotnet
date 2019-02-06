@@ -34,7 +34,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             this.id = id;
         }
         public object Invoke(object[] args) {
-            return caller.Invoke<T>(id, name, args).Result;
+            return caller.InvokeAsync<T>(id, name, args).Result;
         }
     }
 
@@ -48,7 +48,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             this.id = id;
         }
         public object Invoke(object[] args) {
-            caller.Invoke(id, name, args).Wait();
+            caller.InvokeAsync(id, name, args).Wait();
             return null;
         }
     }
@@ -63,7 +63,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             this.id = id;
         }
         public object Invoke(object[] args) {
-            return caller.Invoke<T>(id, name, args);
+            return caller.InvokeAsync<T>(id, name, args);
         }
     }
 
@@ -77,7 +77,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             this.id = id;
         }
         public object Invoke(object[] args) {
-            return caller.Invoke(id, name, args);
+            return caller.InvokeAsync(id, name, args);
         }
     }
 
@@ -105,7 +105,7 @@ namespace Hprose.RPC.Plugins.Reverse {
                     name = ((NameAttribute)attribute).Value;
                 }
             }
-            if (ns != null && ns != "") {
+            if (!string.IsNullOrEmpty(ns)) {
                 name = ns + '_' + name;
             }
             if (typeof(Task).IsAssignableFrom(returnType)) {

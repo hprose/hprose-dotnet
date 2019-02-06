@@ -114,7 +114,10 @@ namespace Hprose.RPC.Plugins.Reverse {
                 }
             }
         }
-        private async Task<object> InvokeAsync(string id, string fullname, object[] args = null) {
+        public Task InvokeAsync(string id, string fullname, in object[] args = null) {
+            return InvokeAsync<object>(id, fullname, args);
+        }
+        public async Task<T> InvokeAsync<T>(string id, string fullname, object[] args = null) {
             var index = Interlocked.Increment(ref counter);
             while (index < 0) {
                 Interlocked.Add(ref counter, Int32.MinValue);
@@ -126,13 +129,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             var results = Results.GetOrAdd(id, (_) => new ConcurrentDictionary<int, TaskCompletionSource<object>>());
             results[index] = result;
             Response(id);
-            return await result.Task.ConfigureAwait(false);
-        }
-        public Task Invoke(string id, string fullname, in object[] args = null) {
-            return InvokeAsync(id, fullname, args);
-        }
-        public async Task<T> Invoke<T>(string id, string fullname, object[] args = null) {
-            var value = await InvokeAsync(id, fullname, args).ConfigureAwait(false);
+            var value = await result.Task.ConfigureAwait(false);
             if (typeof(T).IsAssignableFrom(value.GetType())) {
                 return (T)value;
             }
@@ -150,9 +147,9 @@ namespace Hprose.RPC.Plugins.Reverse {
                 return (T)Proxy.NewInstance(type.GetInterfaces(), handler);
             }
         }
-        private async Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
+        private Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
             context = new CallerContext(this, context as ServiceContext);
-            return await next(name, args, context).ConfigureAwait(false);
+            return next(name, args, context);
         }
     }
 }
