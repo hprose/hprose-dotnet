@@ -59,9 +59,7 @@ namespace Hprose.RPC {
         public dynamic RequestHeaders { get; set; } = new ExpandoObject();
         public IClientCodec Codec { get; set; } = ClientCodec.Instance;
         private List<string> urilist = new List<string>();
-#pragma warning disable CA2227 // Collection properties should be read only
         public List<string> Uris {
-#pragma warning restore CA2227 // Collection properties should be read only
             get => urilist;
             set {
                 if (value.Count > 0) {
@@ -79,9 +77,7 @@ namespace Hprose.RPC {
                 transports[name] = (ITransport)Activator.CreateInstance(type);
             };
         }
-#pragma warning disable CA1054 // Uri parameters should not be strings
         public Client(string uri) : this() {
-#pragma warning restore CA1054 // Uri parameters should not be strings
             if (string.IsNullOrWhiteSpace(uri)) {
                 throw new ArgumentException("invalid uri", nameof(uri));
             }
@@ -120,15 +116,15 @@ namespace Hprose.RPC {
             return this;
         }
         public void Invoke(string fullname, in object[] args = null, Settings settings = null) {
-            var context = new ClientContext(this, fullname, null, settings);
-            invokeManager.Handler(fullname, args, context).Wait();
+            var context = new ClientContext(this, null, settings);
+            invokeManager.Handler(fullname, args, context).ConfigureAwait(false).GetAwaiter().GetResult();
             return;
         }
         public T Invoke<T>(string fullname, in object[] args = null, Settings settings = null) {
-            return InvokeAsync<T>(fullname, args, settings).Result;
+            return InvokeAsync<T>(fullname, args, settings).ConfigureAwait(false).GetAwaiter().GetResult();
         }
         public Task InvokeAsync(string fullname, in object[] args = null, Settings settings = null) {
-            var context = new ClientContext(this, fullname, null, settings);
+            var context = new ClientContext(this, null, settings);
             return invokeManager.Handler(fullname, args, context);
         }
         public async Task<T> InvokeAsync<T>(string fullname, object[] args = null, Settings settings = null) {
@@ -137,7 +133,7 @@ namespace Hprose.RPC {
             if (isResultType) {
                 type = type.GetGenericArguments()[0];
             }
-            var context = new ClientContext(this, fullname, type, settings);
+            var context = new ClientContext(this, type, settings);
             var result = await invokeManager.Handler(fullname, args, context).ConfigureAwait(false);
             if (isResultType) {
                 return (T)Activator.CreateInstance(typeof(T), new object[] { result, context });

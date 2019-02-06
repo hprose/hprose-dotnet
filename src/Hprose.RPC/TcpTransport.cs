@@ -97,7 +97,7 @@ namespace Hprose.RPC {
                 catch { }
             }
         }
-        private async Task<byte[]> ReadAsync(Stream stream, byte[] bytes, int offset, int length) {
+        private static async Task<byte[]> ReadAsync(Stream stream, byte[] bytes, int offset, int length) {
             while (length > 0) {
                 int size = await stream.ReadAsync(bytes, offset, length).ConfigureAwait(false);
                 offset += size;

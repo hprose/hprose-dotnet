@@ -61,7 +61,7 @@ namespace Hprose.RPC {
             stream.Position = 0;
             return stream;
         }
-        private Method DecodeMethod(string fullname, int paramCount, ServiceContext context) {
+        private static Method DecodeMethod(string fullname, int paramCount, ServiceContext context) {
             var service = context.Service;
             var method = service.Get(fullname, paramCount);
             context.Method = method ?? throw new Exception("Can't find this method " + fullname + "().");

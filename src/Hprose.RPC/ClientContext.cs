@@ -22,7 +22,7 @@ namespace Hprose.RPC {
         public Client Client { get; private set; }
         public string Uri { get; set; }
         public Type Type { get; set; }
-        public ClientContext(Client client, string fullname, Type type, Settings settings = null) {
+        public ClientContext(Client client, Type type, Settings settings = null) {
             Client = client;
             Uri = (client.Uris.Count > 0) ? client.Uris[0] : null;
             Type = settings?.Type;
