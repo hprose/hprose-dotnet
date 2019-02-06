@@ -51,25 +51,29 @@ namespace Hprose.RPC.Plugins.Push {
             }
         }
         private async void Dispatch(Dictionary<string, Message[]> topics) {
+            foreach (var topic in topics) {
 #if NET40
-            await TaskEx.Run(() => {
+                await TaskEx.Yield();
 #else
-            await Task.Run(() => {
+                await Task.Yield();
 #endif
-                foreach (var topic in topics) {
-                    if (callbacks.TryGetValue(topic.Key, out var callback)) {
-                        if (topic.Value == null) {
-                            callbacks.TryRemove(topic.Key, out callback);
-                            OnUnsubscribe?.Invoke(topic.Key);
-                        }
-                        else {
-                            foreach (var message in topic.Value) {
-                                callback(message);
-                            }
+                if (callbacks.TryGetValue(topic.Key, out var callback)) {
+                    if (topic.Value == null) {
+                        callbacks.TryRemove(topic.Key, out callback);
+                        OnUnsubscribe?.Invoke(topic.Key);
+                    }
+                    else {
+                        foreach (var message in topic.Value) {
+#if NET40
+                            await TaskEx.Yield();
+#else
+                            await Task.Yield();
+#endif
+                            callback(message);
                         }
                     }
                 }
-            }).ConfigureAwait(false);
+            }
         }
         private async void Message() {
             while(!callbacks.IsEmpty) {
