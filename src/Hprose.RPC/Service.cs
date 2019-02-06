@@ -27,7 +27,7 @@ namespace Hprose.RPC {
     public interface IHandler<T> {
         Task Bind(T server);
     }
-    public class Service {
+    public class Service : IDisposable {
         private readonly static List<(string, Type)> handlerTypes = new List<(string, Type)>();
         private readonly static ConcurrentDictionary<Type, HashSet<string>> serverTypes = new ConcurrentDictionary<Type, HashSet<string>>();
         public static void Register<T, S>(string name) where T : IHandler<S> {
@@ -321,6 +321,19 @@ namespace Hprose.RPC {
         public Service AddMissingMethod(Func<string, object[], Context, object> method) {
             methodManager.AddMissingMethod(method);
             return this;
+        }
+        private bool disposed = false;
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing) {
+            if (disposed) return;
+            if (disposing) {
+                invokeManager.Dispose();
+                ioManager.Dispose();
+            }
+            disposed = true;
         }
     }
 }

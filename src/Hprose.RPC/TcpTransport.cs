@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -24,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     public class TcpTransport : ITransport {
-        public static string[] Schemes { get; } = new string[] { "tcp", "tcp4", "tcp6", "tls", "tls4", "tls6", "ssl", "ssl4", "ssl6" };
+        public static ReadOnlyCollection<string> Schemes { get; } = new ReadOnlyCollection<string>(new string[] { "tcp", "tcp4", "tcp6", "tls", "tls4", "tls6", "ssl", "ssl4", "ssl6" });
         private volatile int counter = 0;
         private volatile int current = -1;
         public LingerOption LingerState { get; set; } = null;

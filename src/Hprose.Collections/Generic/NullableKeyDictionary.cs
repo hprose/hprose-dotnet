@@ -16,11 +16,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 
 namespace Hprose.Collections.Generic {
     [ComVisible(false)]
     [Serializable]
-    public class NullableKeyDictionary<TKey, TValue> : Dictionary<NullableKey<TKey>, TValue>,
+    public sealed class NullableKeyDictionary<TKey, TValue> : Dictionary<NullableKey<TKey>, TValue>,
         ICollection<KeyValuePair<TKey, TValue>>,
         IDictionary<TKey, TValue>,
 #if !NET40
@@ -41,6 +42,7 @@ namespace Hprose.Collections.Generic {
                 }
             }
         }
+        private NullableKeyDictionary(SerializationInfo serializationInfo, StreamingContext streamingContext) : base(serializationInfo, streamingContext) { }
 
         public new IEqualityComparer<TKey> Comparer => base.Comparer == null ? null : ((NullableKeyEqualityComparer<TKey>)(base.Comparer)).Comparer;
 
@@ -108,6 +110,7 @@ namespace Hprose.Collections.Generic {
 
         [Serializable]
         public new struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>, IDisposable, IEnumerator, IDictionaryEnumerator {
+            [NonSerialized]
             private Dictionary<NullableKey<TKey>, TValue>.Enumerator _enumerator;
 
             internal Enumerator(Dictionary<NullableKey<TKey>, TValue>.Enumerator enumerator) => _enumerator = enumerator;
@@ -151,13 +154,14 @@ namespace Hprose.Collections.Generic {
         }
 
         [Serializable]
-        public sealed new class KeyCollection : ICollection<TKey>,
+        public new sealed class KeyCollection : ICollection<TKey>,
 #if !NET40
             IReadOnlyCollection<TKey>,
 #endif
             IEnumerable<TKey>, IEnumerable, ICollection {
-
+            [NonSerialized]
             private Dictionary<NullableKey<TKey>, TValue> _dictionary;
+            [NonSerialized]
             private Dictionary<NullableKey<TKey>, TValue>.KeyCollection _keyCollection;
 
             public KeyCollection(NullableKeyDictionary<TKey, TValue> dictionary) {
@@ -233,5 +237,6 @@ namespace Hprose.Collections.Generic {
                 void IEnumerator.Reset() => _enumerator.Reset();
             }
         }
+
     }
 }

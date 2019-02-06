@@ -13,19 +13,20 @@
 |                                                          |
 \*________________________________________________________*/
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
 namespace Hprose.RPC {
-    public abstract class HandlerManager<HandlerType, NextHandlerType> {
-        private List<HandlerType> handlers = new List<HandlerType>();
+    public abstract class HandlerManager<THandler, TNextHandler> : IDisposable {
+        private List<THandler> handlers = new List<THandler>();
         private ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
-        private readonly NextHandlerType defaultHandler;
-        public NextHandlerType Handler { get; private set; }
-        public HandlerManager(NextHandlerType handler) {
+        private readonly TNextHandler defaultHandler;
+        public TNextHandler Handler { get; private set; }
+        public HandlerManager(TNextHandler handler) {
             Handler = defaultHandler = handler;
         }
-        protected abstract NextHandlerType GetNextHandler(HandlerType handler, NextHandlerType next);
+        protected abstract TNextHandler GetNextHandler(THandler handler, TNextHandler next);
         private void RebuildHandler() {
             var next = defaultHandler;
             rwlock.EnterReadLock();
@@ -36,13 +37,13 @@ namespace Hprose.RPC {
             rwlock.ExitReadLock();
             Handler = next;
         }
-        public void Use(params HandlerType[] handlers) {
+        public void Use(params THandler[] handlers) {
             rwlock.EnterWriteLock();
             this.handlers.AddRange(handlers);
             rwlock.ExitWriteLock();
             RebuildHandler();
         }
-        public void Unuse(params HandlerType[] handlers) {
+        public void Unuse(params THandler[] handlers) {
             bool rebuild = false;
             rwlock.EnterWriteLock();
             for (int i = 0, n = handlers.Length; i < n; ++i) {
@@ -50,6 +51,18 @@ namespace Hprose.RPC {
             }
             rwlock.ExitWriteLock();
             if (rebuild) RebuildHandler();
+        }
+        private bool disposed = false;
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing) {
+            if (disposed) return;
+            if (disposing) {
+                rwlock.Dispose();
+            }
+            disposed = true;
         }
     }
 }

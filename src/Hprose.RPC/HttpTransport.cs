@@ -14,6 +14,7 @@
 \*________________________________________________________*/
 
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -21,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     public class HttpTransport : ITransport, IDisposable {
-        public static string[] Schemes { get; } = new string[] { "http", "https" };
+        public static ReadOnlyCollection<string> Schemes { get; } = new ReadOnlyCollection<string>(new string[] { "http", "https" });
         private readonly HttpClient httpClient = new HttpClient();
         public HttpRequestHeaders HttpRequestHeaders => httpClient.DefaultRequestHeaders;
         public TimeSpan Timeout {

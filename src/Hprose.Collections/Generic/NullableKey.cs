@@ -8,7 +8,7 @@
 |                                                          |
 |  NullableKey class for C#.                               |
 |                                                          |
-|  LastModified: Mar 29, 2018                              |
+|  LastModified: Feb 7, 2019                               |
 |  Authors: Ma Bingyao <andot@hprose.com>                  |
 |                                                          |
 \*________________________________________________________*/
@@ -40,5 +40,17 @@ namespace Hprose.Collections.Generic {
         public static bool operator ==(NullableKey<T> x, NullableKey<T> y) => x.Equals(y);
 
         public static bool operator !=(NullableKey<T> x, NullableKey<T> y) => !x.Equals(y);
+
+        public static bool operator <(NullableKey<T> left, NullableKey<T> right) => left.CompareTo(right) < 0;
+
+        public static bool operator <=(NullableKey<T> left, NullableKey<T> right) => left.CompareTo(right) <= 0;
+
+        public static bool operator >(NullableKey<T> left, NullableKey<T> right) => left.CompareTo(right) > 0;
+
+        public static bool operator >=(NullableKey<T> left, NullableKey<T> right) => left.CompareTo(right) >= 0;
+
+        public T FromNullableKey(NullableKey<T> key) => key._value;
+
+        public NullableKey<T> ToNullableKey(T value) => new NullableKey<T>(value);
     }
 }

@@ -21,7 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.Reverse {
-    public class Provider {
+    public class Provider : IDisposable {
         private volatile int closed = 1;
         private readonly MethodManager methodManager = new MethodManager();
         private readonly InvokeManager invokeManager;
@@ -341,6 +341,17 @@ namespace Hprose.RPC.Plugins.Reverse {
             methodManager.AddMissingMethod(method);
             return this;
         }
-
+        private bool disposed = false;
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing) {
+            if (disposed) return;
+            if (disposing) {
+                invokeManager.Dispose();
+            }
+            disposed = true;
+        }
     }
 }

@@ -36,7 +36,7 @@ namespace Hprose.IO.Converters {
             Converter<DateTime, BigInteger>.convert = (value) => value.Ticks;
             Converter<TimeSpan, BigInteger>.convert = (value) => value.Ticks;
             Converter<string, BigInteger>.convert = (value) => BigInteger.Parse(value);
-            Converter<char[], BigInteger>.convert = (value) => BigInteger.Parse(new String(value));
+            Converter<char[], BigInteger>.convert = (value) => BigInteger.Parse(new string(value));
             Converter<StringBuilder, BigInteger>.convert = (value) => BigInteger.Parse(value.ToString());
             Converter<object, BigInteger>.convert = (value) => {
                 switch (value) {

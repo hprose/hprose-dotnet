@@ -22,7 +22,7 @@ namespace Hprose.IO {
         public static volatile Func<TInput, TOutput> convert;
     }
 
-    public class Converter<TOutput> {
+    public static class Converter<TOutput> {
         internal static System.ComponentModel.TypeConverter converter = System.ComponentModel.TypeDescriptor.GetConverter(typeof(TOutput));
 
         static Converter() {

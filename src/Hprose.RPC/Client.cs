@@ -15,11 +15,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     public interface ITransport {
@@ -34,15 +35,15 @@ namespace Hprose.RPC {
             Context = context;
         }
     }
-    public class Client {
+    public class Client : IDisposable {
         private static readonly Random random = new Random(Guid.NewGuid().GetHashCode());
         private static readonly List<ValueTuple<string, Type>> transTypes = new List<ValueTuple<string, Type>>();
         private static readonly Dictionary<string, string> schemes = new Dictionary<string, string>();
         public static void Register<T>(string name) where T : ITransport, new() {
             var type = typeof(T);
-            var schemes = type.GetProperty("Schemes", BindingFlags.Public | BindingFlags.Static).GetValue(type, null) as string[];
+            var schemes = type.GetProperty("Schemes", BindingFlags.Public | BindingFlags.Static).GetValue(type, null) as ReadOnlyCollection<string>;
             transTypes.Add((name, type));
-            for (int i = 0, n = schemes.Length; i < n; ++i) {
+            for (int i = 0, n = schemes.Count; i < n; ++i) {
                 var scheme = schemes[i];
                 Client.schemes[scheme] = name;
             }
@@ -160,6 +161,19 @@ namespace Hprose.RPC {
             foreach (var pair in transports) {
                 pair.Value.Abort();
             }
+        }
+        private bool disposed = false;
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing) {
+            if (disposed) return;
+            if (disposing) {
+                invokeManager.Dispose();
+                ioManager.Dispose();
+            }
+            disposed = true;
         }
     }
 }
