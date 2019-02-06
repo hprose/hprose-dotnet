@@ -58,7 +58,9 @@ namespace Hprose.RPC {
         public dynamic RequestHeaders { get; set; } = new ExpandoObject();
         public IClientCodec Codec { get; set; } = ClientCodec.Instance;
         private List<string> urilist = new List<string>();
+#pragma warning disable CA2227 // Collection properties should be read only
         public List<string> Uris {
+#pragma warning restore CA2227 // Collection properties should be read only
             get => urilist;
             set {
                 if (value.Count > 0) {
@@ -76,8 +78,20 @@ namespace Hprose.RPC {
                 transports[name] = (ITransport)Activator.CreateInstance(type);
             };
         }
-        public Client(string uri) : this() => urilist.Add(uri);
-        public Client(string[] uris) : this() => urilist.AddRange(uris);
+#pragma warning disable CA1054 // Uri parameters should not be strings
+        public Client(string uri) : this() {
+#pragma warning restore CA1054 // Uri parameters should not be strings
+            if (string.IsNullOrWhiteSpace(uri)) {
+                throw new ArgumentException("invalid uri", nameof(uri));
+            }
+            urilist.Add(uri);
+        }
+        public Client(string[] uris) : this() {
+            if (uris == null) {
+                throw new ArgumentNullException(nameof(uris));
+            }
+            urilist.AddRange(uris);
+        }
         public T UseService<T>(string ns = "") {
             Type type = typeof(T);
             InvocationHandler handler = new InvocationHandler(this, ns);

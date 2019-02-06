@@ -24,7 +24,7 @@ namespace Hprose.RPC {
         public Type Type { get; set; }
         public ClientContext(Client client, string fullname, Type type, Settings settings = null) {
             Client = client;
-            Uri = (client.Uris.Count > 0) ? client.Uris[0] : "";
+            Uri = (client.Uris.Count > 0) ? client.Uris[0] : null;
             Type = settings?.Type;
             if (type != null && !type.IsAssignableFrom(Type)) Type = type;
             Copy(client.RequestHeaders, RequestHeaders);

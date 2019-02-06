@@ -219,7 +219,7 @@ namespace Hprose.RPC {
                     var available = tcpClient.Available;
                     return tcpClient;
                 }
-                catch (Exception e) {
+                catch {
                     TcpClients.TryRemove(uri, out LazyTcpClient);
 #if NET40 || NET45 || NET451 || NET452
                     tcpClient.Close();
