@@ -50,11 +50,14 @@ namespace Hprose.RPC {
 #endif
                         var port = u.Port > 0 ? u.Port : 8412;
                         var client = new TcpClient(family) {
-                            LingerState = LingerState,
                             NoDelay = NoDelay,
                             ReceiveBufferSize = ReceiveBufferSize,
                             SendBufferSize = SendBufferSize
                         };
+                        if (LingerState != null) {
+                            client.LingerState = LingerState;
+                        }
+
                         await client.ConnectAsync(host, port);
                         Receive(uri, client);
                         return client;
