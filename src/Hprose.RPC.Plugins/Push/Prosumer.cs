@@ -64,11 +64,6 @@ namespace Hprose.RPC.Plugins.Push {
                     }
                     else {
                         foreach (var message in topic.Value) {
-#if NET40
-                            await TaskEx.Yield();
-#else
-                            await Task.Yield();
-#endif
                             callback(message);
                         }
                     }
