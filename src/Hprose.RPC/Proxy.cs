@@ -123,7 +123,7 @@ namespace Hprose.RPC {
         private static void SumUpInterfaces(List<Type> types, Type[] interfaces) {
             foreach (Type interfac in interfaces) {
                 if (!interfac.IsInterface) {
-                    throw new ArgumentException();
+                    throw new ArgumentException(nameof(interfaces));
                 }
                 if (!types.Contains(interfac)) {
                     types.Add(interfac);

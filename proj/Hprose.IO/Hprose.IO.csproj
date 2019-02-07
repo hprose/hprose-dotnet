@@ -14,7 +14,7 @@
     <Copyright>Copyright © http://www.hprose.com, All rights reserved.</Copyright>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
     <Product>Hprose.IO</Product>
-    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>http://www.hprose.com</PackageProjectUrl>
     <PackageIconUrl>http://hprose.com/apple-touch-icon-180x180.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/hprose/hprose-dotnet</RepositoryUrl>
@@ -55,6 +55,10 @@
 
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('xamarin')) ">
     <LanguageTargets>$(MSBuildExtensionsPath)\$(TargetFrameworkIdentifier.Replace('.', '\'))\$(TargetFrameworkIdentifier).CSharp.targets</LanguageTargets>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>1701;1702;CA1812</NoWarn>
   </PropertyGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">

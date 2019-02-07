@@ -5,6 +5,7 @@
     <IsPackable>false</IsPackable>
     <LangVersion>latest</LangVersion>
     <RootNamespace>Hprose.UnitTests</RootNamespace>
+    <NoWarn>CS0414</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

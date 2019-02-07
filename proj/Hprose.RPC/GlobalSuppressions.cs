@@ -11,3 +11,10 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1056:Uri properties should not be strings", Justification = "<挂起>", Scope = "member", Target = "~P:Hprose.RPC.ClientContext.Uri")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "<挂起>", Scope = "member", Target = "~P:Hprose.RPC.Settings.RequestHeaders")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "<挂起>", Scope = "member", Target = "~P:Hprose.RPC.Settings.Context")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "<挂起>", Scope = "member", Target = "~P:Hprose.RPC.Client.Uris")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "<挂起>", Scope = "member", Target = "~F:Hprose.RPC.Proxy.handler")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1066:Type {0} should implement IEquatable<T> because it overrides Equals", Justification = "<挂起>", Scope = "type", Target = "~T:Hprose.RPC.Proxy.ProxyKey")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "<挂起>", Scope = "member", Target = "~P:Hprose.RPC.Method.Parameters")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2208:Instantiate argument exceptions correctly", Justification = "<挂起>", Scope = "member", Target = "~M:Hprose.RPC.Proxy.SumUpInterfaces(System.Collections.Generic.List{System.Type},System.Type[])")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1054:Uri parameters should not be strings", Justification = "<挂起>", Scope = "member", Target = "~M:Hprose.RPC.Client.#ctor(System.String)")]
+

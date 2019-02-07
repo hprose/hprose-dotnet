@@ -41,7 +41,7 @@ namespace Hprose.RPC.Plugins.Reverse {
                    .Add<(int, object, string)[], Context>(End, "=")
                    .Use(Handler);
         }
-        internal string Id(Context context) {
+        internal static string GetId(Context context) {
             if (((IDictionary<string, object>)context.RequestHeaders).TryGetValue("Id", out var id)) {
                 return id.ToString();
             }
@@ -69,7 +69,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             }
         }
         private string Close(Context context) {
-            var id = Id(context);
+            var id = GetId(context);
             if (Responders.TryRemove(id, out var responder)) {
                 responder?.TrySetResult(null);
             }
@@ -102,7 +102,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             return await responder.Task.ConfigureAwait(false);
         }
         private void End((int, object, string)[] results, Context context) {
-            var id = Id(context);
+            var id = GetId(context);
             foreach (var (index, value, error) in results) {
                 if (Results.TryGetValue(id, out var result) && result.TryRemove(index, out var task)) {
                     if (error != null) {

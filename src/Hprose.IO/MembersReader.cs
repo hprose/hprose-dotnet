@@ -8,7 +8,7 @@
 |                                                          |
 |  MembersReader class for C#.                             |
 |                                                          |
-|  LastModified: Apr 29, 2018                              |
+|  LastModified: Feb 8, 2018                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -112,7 +112,7 @@ namespace Hprose.IO {
         private static readonly Func<string, Lazy<ReadAction<T>>> readActionFactory = (key) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(MembersAccessor<T>.Members, key.Split(' ')));
         private static readonly Func<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction<T>(MembersAccessor<T>.Members[name]));
         internal static void ReadAllMembers(Reader reader, string key, ref T obj) => readActions.GetOrAdd(key, readActionFactory).Value(reader, ref obj);
-        internal static void ReadMember(Reader reader, string name, ref T obj) => readActions.GetOrAdd(name, readMemberActionFactory).Value(reader, ref obj);
+        internal static void ReadMember(Reader reader, string name, ref T obj) => readMemberActions.GetOrAdd(name, readMemberActionFactory).Value(reader, ref obj);
     }
 
     internal static class FieldsReader<T> {
@@ -121,7 +121,7 @@ namespace Hprose.IO {
         private static readonly Func<string, Lazy<ReadAction<T>>> readActionFactory = (key) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(FieldsAccessor<T>.Fields, key.Split(' ')));
         private static readonly Func<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction<T>(FieldsAccessor<T>.Fields[name]));
         internal static void ReadAllMembers(Reader reader, string key, ref T obj) => readActions.GetOrAdd(key, readActionFactory).Value(reader, ref obj);
-        internal static void ReadMember(Reader reader, string name, ref T obj) => readActions.GetOrAdd(name, readMemberActionFactory).Value(reader, ref obj);
+        internal static void ReadMember(Reader reader, string name, ref T obj) => readMemberActions.GetOrAdd(name, readMemberActionFactory).Value(reader, ref obj);
     }
 
     internal static class PropertiesReader<T> {
@@ -130,6 +130,6 @@ namespace Hprose.IO {
         private static readonly Func<string, Lazy<ReadAction<T>>> readActionFactory = (key) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(PropertiesAccessor<T>.Properties, key.Split(' ')));
         private static readonly Func<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction<T>(PropertiesAccessor<T>.Properties[name]));
         internal static void ReadAllMembers(Reader reader, string key, ref T obj) => readActions.GetOrAdd(key, readActionFactory).Value(reader, ref obj);
-        internal static void ReadMember(Reader reader, string name, ref T obj) => readActions.GetOrAdd(name, readMemberActionFactory).Value(reader, ref obj);
+        internal static void ReadMember(Reader reader, string name, ref T obj) => readMemberActions.GetOrAdd(name, readMemberActionFactory).Value(reader, ref obj);
     }
 }

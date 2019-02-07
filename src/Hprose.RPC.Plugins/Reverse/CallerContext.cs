@@ -26,17 +26,17 @@ namespace Hprose.RPC.Plugins.Reverse {
             Copy(context.Items, Items);
         }
         public void Invoke(string fullname, in object[] args = null) {
-            Caller.InvokeAsync<object>(Caller.Id(this), fullname, args).Wait();
+            Caller.InvokeAsync<object>(Caller.GetId(this), fullname, args).Wait();
             return;
         }
         public T Invoke<T>(string fullname, in object[] args = null) {
-            return Caller.InvokeAsync<T>(Caller.Id(this), fullname, args).Result;
+            return Caller.InvokeAsync<T>(Caller.GetId(this), fullname, args).Result;
         }
         public Task InvokeAsync(string fullname, object[] args = null) {
-            return Caller.InvokeAsync(Caller.Id(this), fullname, args);
+            return Caller.InvokeAsync(Caller.GetId(this), fullname, args);
         }
         public Task<T> InvokeAsync<T>(string fullname, object[] args = null) {
-            return Caller.InvokeAsync<T>(Caller.Id(this), fullname, args);
+            return Caller.InvokeAsync<T>(Caller.GetId(this), fullname, args);
         }
     }
 }
