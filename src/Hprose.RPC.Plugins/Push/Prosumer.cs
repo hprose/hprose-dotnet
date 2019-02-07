@@ -8,7 +8,7 @@
 |                                                          |
 |  Prosumer plugin for C#.                                 |
 |                                                          |
-|  LastModified: Feb 3, 2019                               |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -71,7 +71,7 @@ namespace Hprose.RPC.Plugins.Push {
             }
         }
         private async void Message() {
-            while(!callbacks.IsEmpty) {
+            while(true) {
                 try {
                     var topics = await Client.InvokeAsync<Dictionary<string, Message[]>>("<").ConfigureAwait(false);
                     if (topics == null) return;
