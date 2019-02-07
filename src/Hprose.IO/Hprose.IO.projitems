@@ -35,6 +35,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Serializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\ArraySegmentSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Serializers\ExpandoObjectSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Serializers\ExceptionSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tags.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeManager.cs" />

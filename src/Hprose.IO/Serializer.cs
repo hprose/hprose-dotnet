@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Serializer class for C#.                         |
 |                                                          |
-|  LastModified: Jan 19, 2019                              |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -76,6 +76,7 @@ namespace Hprose.IO {
             Register(() => new ValueTupleSerializer());
             Register(() => new BitArraySerializer());
             Register(() => new ExpandoObjectSerializer());
+            Register(() => new ExceptionSerializer<Exception>());
         }
 
         public static void Initialize() { }
@@ -176,6 +177,9 @@ namespace Hprose.IO {
             }
             if (typeof(DataSet).IsAssignableFrom(type)) {
                 return typeof(DataSetSerializer<>).MakeGenericType(type);
+            }
+            if (typeof(Exception).IsAssignableFrom(type)) {
+                return typeof(ExceptionSerializer<>).MakeGenericType(type);
             }
             return typeof(ObjectSerializer<>).MakeGenericType(type);
         }

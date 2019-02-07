@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Deserializer class for C#.                       |
 |                                                          |
-|  LastModified: Jan 19, 2019                              |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -339,6 +339,8 @@ namespace Hprose.IO {
                         default:
                             return DictionaryDeserializer<NullableKeyDictionary<object, object>, object, object>.Read(reader);
                     }
+                case TagError:
+                    return new Exception(reader.Deserialize<string>());
                 default:
                     return base.Read(reader, tag);
             }

@@ -108,11 +108,15 @@ namespace Hprose.UnitTests.RPC {
             await prosumer1.Subscribe<string>("test2", (data) => {
                 Assert.AreEqual("world", data);
             });
+            await prosumer1.Subscribe<Exception>("test3", (data) => {
+                Assert.AreEqual(new Exception("error"), data);
+            });
             var r1 = prosumer2.Push("hello", "test", "1");
             var r2 = prosumer2.Push("hello", "test", "1");
             var r3 = prosumer2.Push("world", "test2", "1");
             var r4 = prosumer2.Push("world", "test2", "1");
-            await Task.WhenAll(r1, r2, r3, r4);
+            var r5 = prosumer2.Push(new Exception("error"), "test3", "1");
+            await Task.WhenAll(r1, r2, r3, r4, r5);
             await Task.Delay(10);
             await prosumer1.Unsubscribe("test");
             await prosumer1.Unsubscribe("test2");
