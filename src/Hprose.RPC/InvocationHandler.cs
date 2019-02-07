@@ -8,7 +8,7 @@
 |                                                          |
 |  InvocationHandler class for C#.                         |
 |                                                          |
-|  LastModified: Feb 4, 2019                               |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -101,24 +101,28 @@ namespace Hprose.RPC {
             var attributes = Attribute.GetCustomAttributes(method, true);
             var settings = new Settings();
             foreach (var attribute in attributes) {
-                if (attribute is NameAttribute) {
-                    name = ((NameAttribute)attribute).Value;
-                }
-                else if (attribute is HeaderAttribute) {
-                    if (settings.RequestHeaders == null) {
-                        settings.RequestHeaders = new ExpandoObject();
-                    }
-                    IDictionary<string, object> headers = settings.RequestHeaders;
-                    var (key, value) = ((HeaderAttribute)attribute).Value;
-                    headers.Add(key, value);
-                }
-                else if (attribute is ContextAttribute) {
-                    if (settings.Context == null) {
-                        settings.Context = new Dictionary<string, object>();
-                    }
-                    IDictionary<string, object> context = settings.Context;
-                    var (key, value) = ((ContextAttribute)attribute).Value;
-                    context.Add(key, value);
+                switch (attribute) {
+                    case NameAttribute nameAttr:
+                        name = nameAttr.Value;
+                        break;
+                    case HeaderAttribute headerAttr: {
+                            if (settings.RequestHeaders == null) {
+                                settings.RequestHeaders = new ExpandoObject();
+                            }
+                            IDictionary<string, object> headers = settings.RequestHeaders;
+                            var (key, value) = headerAttr.Value;
+                            headers.Add(key, value);
+                        }
+                        break;
+                    case ContextAttribute contextAttr: {
+                            if (settings.Context == null) {
+                                settings.Context = new Dictionary<string, object>();
+                            }
+                            IDictionary<string, object> context = settings.Context;
+                            var (key, value) = contextAttr.Value;
+                            context.Add(key, value);
+                        }
+                        break;
                 }
             }
             if (!string.IsNullOrEmpty(ns)) {
