@@ -214,7 +214,7 @@ namespace Hprose.UnitTests.RPC {
                    .Bind(server);
             var client = new Client("tcp4://127.0.0.1:8412");
             var log = new Log();
-            client.Use(new Limiter(64).Handler).Use(new RateLimiter(50000).InvokeHandler);
+            client.Use(new ConcurrentLimiter(64).Handler).Use(new RateLimiter(50000).InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
             var n = 10000;
             var tasks = new Task<string>[n];
