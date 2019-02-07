@@ -35,7 +35,6 @@ namespace Hprose.RPC.Plugins.Limiter {
             var now = DateTime.Now.Ticks;
             long last = Interlocked.Read(ref next);
             double permits = (now - last) / interval - tokens;
-            Console.WriteLine(permits);
             if (permits > MaxPermits) {
                 permits = MaxPermits;
             }
