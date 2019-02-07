@@ -117,15 +117,16 @@ namespace Hprose.RPC {
         }
         public void Invoke(string fullname, in object[] args = null, Settings settings = null) {
             var context = new ClientContext(this, null, settings);
-            invokeManager.Handler(fullname, args, context).ConfigureAwait(false).GetAwaiter().GetResult();
+            invokeManager.Handler(fullname, args, context).Wait();
             return;
         }
         public T Invoke<T>(string fullname, in object[] args = null, Settings settings = null) {
-            return InvokeAsync<T>(fullname, args, settings).ConfigureAwait(false).GetAwaiter().GetResult();
+            return InvokeAsync<T>(fullname, args, settings).Result;
         }
-        public Task InvokeAsync(string fullname, in object[] args = null, Settings settings = null) {
+        public async Task InvokeAsync(string fullname, object[] args = null, Settings settings = null) {
             var context = new ClientContext(this, null, settings);
-            return invokeManager.Handler(fullname, args, context);
+            await invokeManager.Handler(fullname, args, context).ContinueWith((_) => { }, TaskScheduler.Current).ConfigureAwait(false);
+            return;
         }
         public async Task<T> InvokeAsync<T>(string fullname, object[] args = null, Settings settings = null) {
             Type type = typeof(T);
@@ -134,7 +135,9 @@ namespace Hprose.RPC {
                 type = type.GetGenericArguments()[0];
             }
             var context = new ClientContext(this, type, settings);
-            var result = await invokeManager.Handler(fullname, args, context).ConfigureAwait(false);
+            var task = invokeManager.Handler(fullname, args, context);
+            await task.ContinueWith((_) => { }, TaskScheduler.Current).ConfigureAwait(false);
+            var result = await task.ConfigureAwait(false);
             if (isResultType) {
                 return (T)Activator.CreateInstance(typeof(T), new object[] { result, context });
             }
