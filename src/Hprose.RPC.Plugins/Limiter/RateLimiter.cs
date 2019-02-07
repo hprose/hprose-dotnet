@@ -21,24 +21,25 @@ using System.Threading.Tasks;
 namespace Hprose.RPC.Plugins.Limiter {
     public class RateLimiter {
         private long next = DateTime.Now.Ticks;
-        private readonly long interval;
+        private readonly double interval;
         public long PermitsPerSecond { get; private set; }
         public long MaxPermits { get; private set; }
         public TimeSpan Timeout { get; private set; }
-        public RateLimiter(long permitsPerSecond, long maxPermits, TimeSpan timeout = default) {
+        public RateLimiter(long permitsPerSecond, long maxPermits = long.MaxValue, TimeSpan timeout = default) {
             PermitsPerSecond = permitsPerSecond;
             MaxPermits = maxPermits;
             Timeout = timeout;
-            interval = new TimeSpan(0, 0, 1).Ticks / permitsPerSecond;
+            interval = (double)(new TimeSpan(0, 0, 1).Ticks) / permitsPerSecond;
         }
         public async Task<long> Acquire(long tokens = 1) {
             var now = DateTime.Now.Ticks;
             long last = Interlocked.Read(ref next);
-            var permits = (now - last) / interval - tokens;
+            double permits = (now - last) / interval - tokens;
+            Console.WriteLine(permits);
             if (permits > MaxPermits) {
                 permits = MaxPermits;
             }
-            Interlocked.Exchange(ref next, now - permits * interval);
+            Interlocked.Exchange(ref next, now - (long)(permits * interval));
             var delay = new TimeSpan(last - now);
             if (delay <= TimeSpan.Zero) return last;
             if (Timeout > TimeSpan.Zero && delay > Timeout) {
