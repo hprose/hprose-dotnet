@@ -1,4 +1,5 @@
 ﻿using Hprose.RPC;
+using Hprose.RPC.Plugins.Limiter;
 using Hprose.RPC.Plugins.Log;
 using Hprose.RPC.Plugins.Push;
 using Hprose.RPC.Plugins.Reverse;
@@ -189,6 +190,30 @@ namespace Hprose.UnitTests.RPC {
             await proxy.OnewayCallAsync("Oneway Async");
             server.Stop();
         }
-
+        [TestMethod]
+        public async Task Test7() {
+            HttpListener server = new HttpListener();
+            server.Prefixes.Add("http://127.0.0.1:8086/");
+            server.Start();
+            var service = new Service();
+            service.AddMethod("Hello", this)
+                   .AddMethod("Sum", this)
+                   .Add<string>(OnewayCall)
+                   .Bind(server);
+            var client = new Client("http://127.0.0.1:8086/");
+            var log = new Log();
+            client.Use(new Limiter(64).Handler).Use(new RateLimiter(50000).InvokeHandler);
+            var proxy = client.UseService<ITestInterface>();
+            var n = 10000;
+            var tasks = new Task<string>[n];
+            for (int i = 0; i < n; ++i) {
+                tasks[i] = proxy.Hello("world" + i);
+            }
+            var results = await Task.WhenAll(tasks);
+            for (int i = 0; i < n; ++i) {
+                Assert.AreEqual(results[i], "Hello world" + i);
+            }
+            server.Stop();
+        }
     }
 }
