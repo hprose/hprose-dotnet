@@ -21,12 +21,11 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC {
-
-    interface IInvoker {
+    internal interface IInvoker {
         object Invoke(object[] args);
     }
 
-    class SyncInvoker<T> : IInvoker {
+    internal class SyncInvoker<T> : IInvoker {
         private readonly Client client;
         private readonly string name;
         private readonly Settings settings;
@@ -40,7 +39,7 @@ namespace Hprose.RPC {
         }
     }
 
-    class SyncInvoker : IInvoker {
+    internal class SyncInvoker : IInvoker {
         private readonly Client client;
         private readonly string name;
         private readonly Settings settings;
@@ -55,7 +54,7 @@ namespace Hprose.RPC {
         }
     }
 
-    class AsyncInvoker<T> : IInvoker {
+    internal class AsyncInvoker<T> : IInvoker {
         private readonly Client client;
         private readonly string name;
         private readonly Settings settings;
@@ -69,7 +68,7 @@ namespace Hprose.RPC {
         }
     }
 
-    class AsyncInvoker : IInvoker {
+    internal class AsyncInvoker : IInvoker {
         private readonly Client client;
         private readonly string name;
         private readonly Settings settings;
@@ -83,7 +82,7 @@ namespace Hprose.RPC {
         }
     }
 
-    class InvocationHandler : IInvocationHandler {
+    internal class InvocationHandler : IInvocationHandler {
         private readonly ConcurrentDictionary<MethodInfo, Lazy<IInvoker>> invokers = new ConcurrentDictionary<MethodInfo, Lazy<IInvoker>>();
         private readonly string ns;
         private readonly Client client;

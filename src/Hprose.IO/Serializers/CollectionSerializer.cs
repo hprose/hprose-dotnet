@@ -18,7 +18,7 @@ using System.Collections.Generic;
 namespace Hprose.IO.Serializers {
     using static Tags;
 
-    class CollectionSerializer<T, V> : ReferenceSerializer<T> where T : ICollection<V> {
+    internal class CollectionSerializer<T, V> : ReferenceSerializer<T> where T : ICollection<V> {
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;

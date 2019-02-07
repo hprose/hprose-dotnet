@@ -19,12 +19,11 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.Reverse {
-
-    interface IInvoker {
+    internal interface IInvoker {
         object Invoke(object[] args);
     }
 
-    class SyncInvoker<T> : IInvoker {
+    internal class SyncInvoker<T> : IInvoker {
         private readonly Caller caller;
         private readonly string name;
         private readonly string id;
@@ -38,7 +37,7 @@ namespace Hprose.RPC.Plugins.Reverse {
         }
     }
 
-    class SyncInvoker : IInvoker {
+    internal class SyncInvoker : IInvoker {
         private readonly Caller caller;
         private readonly string name;
         private readonly string id;
@@ -53,7 +52,7 @@ namespace Hprose.RPC.Plugins.Reverse {
         }
     }
 
-    class AsyncInvoker<T> : IInvoker {
+    internal class AsyncInvoker<T> : IInvoker {
         private readonly Caller caller;
         private readonly string name;
         private readonly string id;
@@ -67,7 +66,7 @@ namespace Hprose.RPC.Plugins.Reverse {
         }
     }
 
-    class AsyncInvoker : IInvoker {
+    internal class AsyncInvoker : IInvoker {
         private readonly Caller caller;
         private readonly string name;
         private readonly string id;
@@ -81,7 +80,7 @@ namespace Hprose.RPC.Plugins.Reverse {
         }
     }
 
-    class CallerHandler : IInvocationHandler {
+    internal class CallerHandler : IInvocationHandler {
         private readonly ConcurrentDictionary<MethodInfo, Lazy<IInvoker>> invokers = new ConcurrentDictionary<MethodInfo, Lazy<IInvoker>>();
         private readonly string id;
         private readonly string ns;

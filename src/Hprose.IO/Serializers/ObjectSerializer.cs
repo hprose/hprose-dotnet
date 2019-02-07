@@ -18,7 +18,7 @@ using System;
 namespace Hprose.IO.Serializers {
     using static Tags;
 
-    class ObjectSerializer<T> : ReferenceSerializer<T> {
+    internal class ObjectSerializer<T> : ReferenceSerializer<T> {
         public override void Write(Writer writer, T obj) {
             MembersWriter membersWriter = MembersWriter.GetMembersWriter<T>(writer.Mode);
             int count = membersWriter.count;

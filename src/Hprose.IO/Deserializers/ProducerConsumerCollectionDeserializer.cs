@@ -19,7 +19,7 @@ using System.IO;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class ProducerConsumerCollectionDeserializer<T, E> : Deserializer<T> where T : IProducerConsumerCollection<E> {
+    internal class ProducerConsumerCollectionDeserializer<T, E> : Deserializer<T> where T : IProducerConsumerCollection<E> {
         public static T Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);

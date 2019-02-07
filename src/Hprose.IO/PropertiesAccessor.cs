@@ -8,7 +8,7 @@
 |                                                          |
 |  PropertiesAccessor class for C#.                        |
 |                                                          |
-|  LastModified: Apr 25, 2018                              |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -51,7 +51,6 @@ namespace Hprose.IO {
         }
     }
     public static class PropertiesAccessor<T> {
-        private static readonly Dictionary<string, MemberInfo> properties = PropertiesAccessor.GetProperties(typeof(T));
-        public static Dictionary<string, MemberInfo> Properties => properties;
+        public static Dictionary<string, MemberInfo> Properties { get; } = PropertiesAccessor.GetProperties(typeof(T));
     }
 }

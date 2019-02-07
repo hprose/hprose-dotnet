@@ -17,7 +17,7 @@ using System;
 using System.Numerics;
 
 namespace Hprose.IO.Converters {
-    static class UInt32Converter {
+    internal static class UInt32Converter {
         static UInt32Converter() {
             Converter<bool, uint>.convert = Convert.ToUInt32;
             Converter<char, uint>.convert = Convert.ToUInt32;

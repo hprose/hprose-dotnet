@@ -18,7 +18,7 @@ using System;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class GuidDeserializer : Deserializer<Guid> {
+    internal class GuidDeserializer : Deserializer<Guid> {
         public override Guid Read(Reader reader, int tag) {
             switch (tag) {
                 case TagGuid:

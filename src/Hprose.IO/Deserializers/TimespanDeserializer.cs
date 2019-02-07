@@ -18,7 +18,7 @@ using System;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class TimeSpanDeserializer : Deserializer<TimeSpan> {
+    internal class TimeSpanDeserializer : Deserializer<TimeSpan> {
         public override TimeSpan Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {

@@ -19,7 +19,7 @@ using System.IO;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class StringObjectDictionaryDeserializer<I, T> : DictionaryDeserializer<I, T, string, object> where T : I, ICollection<KeyValuePair<string, object>> {
+    internal class StringObjectDictionaryDeserializer<I, T> : DictionaryDeserializer<I, T, string, object> where T : I, ICollection<KeyValuePair<string, object>> {
         public static I ReadObjectAsMap(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
@@ -59,5 +59,6 @@ namespace Hprose.IO.Deserializers {
             }
         }
     }
-    class StringObjectDictionaryDeserializer<T> : StringObjectDictionaryDeserializer<T, T> where T : ICollection<KeyValuePair<string, object>> { }
+
+    internal class StringObjectDictionaryDeserializer<T> : StringObjectDictionaryDeserializer<T, T> where T : ICollection<KeyValuePair<string, object>> { }
 }

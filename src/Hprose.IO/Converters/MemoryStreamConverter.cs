@@ -18,7 +18,7 @@ using System.IO;
 using System.Text;
 
 namespace Hprose.IO.Converters {
-    static class MemoryStreamConverter {
+    internal static class MemoryStreamConverter {
         static MemoryStreamConverter() {
             Converter<string, MemoryStream>.convert = (value) => {
                 var bytes = Encoding.UTF8.GetBytes(value);

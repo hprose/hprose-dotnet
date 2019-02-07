@@ -17,7 +17,7 @@ using System;
 using System.Numerics;
 
 namespace Hprose.IO.Converters {
-    static class DecimalConverter {
+    internal static class DecimalConverter {
         static DecimalConverter() {
             Converter<bool, decimal>.convert = Convert.ToDecimal;
             Converter<char, decimal>.convert = Convert.ToDecimal;

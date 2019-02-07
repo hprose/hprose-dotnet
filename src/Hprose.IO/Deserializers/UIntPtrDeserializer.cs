@@ -16,7 +16,7 @@
 using System;
 
 namespace Hprose.IO.Deserializers {
-    class UIntPtrDeserializer : Deserializer<UIntPtr> {
+    internal class UIntPtrDeserializer : Deserializer<UIntPtr> {
         public override UIntPtr Read(Reader reader, int tag) {
             if (UIntPtr.Size == 4) {
                 return (UIntPtr)Deserializer<uint>.Instance.Read(reader, tag);

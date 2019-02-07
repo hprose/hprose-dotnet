@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace Hprose.IO {
-    sealed class ReaderRefer {
+    internal sealed class ReaderRefer {
         private readonly List<object> @ref = new List<object>();
         public int LastIndex => @ref.Count - 1;
         public void Add(object obj) => @ref.Add(obj);
@@ -52,7 +52,7 @@ namespace Hprose.IO {
                 refer = value ? null : new ReaderRefer();
             }
         }
-        public TypeInfo GetTypeInfo(int index) => @ref[index];
+        internal TypeInfo GetTypeInfo(int index) => @ref[index];
 
         public Reader(Stream stream, Mode mode = Mode.MemberMode) {
             Stream = stream;

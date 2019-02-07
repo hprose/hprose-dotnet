@@ -19,7 +19,7 @@ using System.Collections.Generic;
 namespace Hprose.IO.Serializers {
     using static Tags;
 
-    class DictionarySerializer<T, K, V> : ReferenceSerializer<T> where T : ICollection<KeyValuePair<K, V>> {
+    internal class DictionarySerializer<T, K, V> : ReferenceSerializer<T> where T : ICollection<KeyValuePair<K, V>> {
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;
@@ -38,7 +38,8 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagClosebrace);
         }
     }
-    class DictionarySerializer<T> : ReferenceSerializer<T> where T : IDictionary {
+
+    internal class DictionarySerializer<T> : ReferenceSerializer<T> where T : IDictionary {
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;

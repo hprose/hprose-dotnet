@@ -17,7 +17,7 @@ using System;
 using System.Text;
 
 namespace Hprose.IO.Converters {
-    static class GuidConverter {
+    internal static class GuidConverter {
         static GuidConverter() {
             Converter<byte[], Guid>.convert = (value) => new Guid(value);
             Converter<string, Guid>.convert = (value) => new Guid(value);

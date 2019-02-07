@@ -16,7 +16,7 @@
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class ByteDeserializer : Deserializer<byte> {
+    internal class ByteDeserializer : Deserializer<byte> {
         public override byte Read(Reader reader, int tag) {
             if (tag >= '0' && tag <= '9') {
                 return (byte)(tag - '0');

@@ -17,7 +17,7 @@ using System;
 using System.Numerics;
 
 namespace Hprose.IO.Converters {
-    static class UInt16Converter {
+    internal static class UInt16Converter {
         static UInt16Converter() {
             Converter<bool, ushort>.convert = Convert.ToUInt16;
             Converter<char, ushort>.convert = Convert.ToUInt16;

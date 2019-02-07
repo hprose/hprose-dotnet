@@ -18,7 +18,7 @@ using System.IO;
 using System.Text;
 
 namespace Hprose.IO.Converters {
-    static class StreamConverter {
+    internal static class StreamConverter {
         static StreamConverter() {
             Converter<string, Stream>.convert = Converter<string, MemoryStream>.convert;
             Converter<StringBuilder, Stream>.convert = Converter<StringBuilder, MemoryStream>.convert;

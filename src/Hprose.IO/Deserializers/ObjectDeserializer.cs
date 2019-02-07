@@ -18,11 +18,11 @@ using System.IO;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    interface IObjectDeserializer {
+    internal interface IObjectDeserializer {
         object ReadObject(Reader reader, string key);
     }
 
-    class ObjectDeserializer<T> : Deserializer<T>, IObjectDeserializer where T : class {
+    internal class ObjectDeserializer<T> : Deserializer<T>, IObjectDeserializer where T : class {
         private static T Read(Reader reader, string key) {
             Stream stream = reader.Stream;
             T obj = Factory<T>.New();
@@ -63,7 +63,8 @@ namespace Hprose.IO.Deserializers {
         }
         public object ReadObject(Reader reader, string key) => Read(reader, key);
     }
-    class StructDeserializer<T> : Deserializer<T>, IObjectDeserializer where T : struct {
+
+    internal class StructDeserializer<T> : Deserializer<T>, IObjectDeserializer where T : struct {
         private static T Read(Reader reader, string key) {
             Stream stream = reader.Stream;
             T obj = Factory<T>.New();

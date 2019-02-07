@@ -24,7 +24,7 @@ namespace Hprose.IO {
 
     internal delegate void ReadAction<T>(Reader reader, ref T obj);
 
-    static class MembersReader {
+    internal static class MembersReader {
         private const BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.Public;
 
         private static BlockExpression CreateReadBlock(Dictionary<string, MemberInfo> members, string[] names, ParameterExpression reader, ParameterExpression obj) {
@@ -106,7 +106,7 @@ namespace Hprose.IO {
         }
     }
 
-    static class MembersReader<T> {
+    internal static class MembersReader<T> {
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readMemberActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
         private static readonly Func<string, Lazy<ReadAction<T>>> readActionFactory = (key) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(MembersAccessor<T>.Members, key.Split(' ')));
@@ -115,7 +115,7 @@ namespace Hprose.IO {
         internal static void ReadMember(Reader reader, string name, ref T obj) => readActions.GetOrAdd(name, readMemberActionFactory).Value(reader, ref obj);
     }
 
-    static class FieldsReader<T> {
+    internal static class FieldsReader<T> {
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readMemberActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
         private static readonly Func<string, Lazy<ReadAction<T>>> readActionFactory = (key) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(FieldsAccessor<T>.Fields, key.Split(' ')));
@@ -124,7 +124,7 @@ namespace Hprose.IO {
         internal static void ReadMember(Reader reader, string name, ref T obj) => readActions.GetOrAdd(name, readMemberActionFactory).Value(reader, ref obj);
     }
 
-    static class PropertiesReader<T> {
+    internal static class PropertiesReader<T> {
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readMemberActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
         private static readonly Func<string, Lazy<ReadAction<T>>> readActionFactory = (key) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(PropertiesAccessor<T>.Properties, key.Split(' ')));

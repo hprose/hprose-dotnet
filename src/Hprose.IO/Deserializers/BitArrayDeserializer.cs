@@ -19,7 +19,7 @@ using System.Collections;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class BitArrayDeserializer : Deserializer<BitArray> {
+    internal class BitArrayDeserializer : Deserializer<BitArray> {
         public static BitArray Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);

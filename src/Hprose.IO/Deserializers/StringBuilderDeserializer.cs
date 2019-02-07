@@ -18,7 +18,7 @@ using System.Text;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class StringBuilderDeserializer : Deserializer<StringBuilder> {
+    internal class StringBuilderDeserializer : Deserializer<StringBuilder> {
         public override StringBuilder Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {

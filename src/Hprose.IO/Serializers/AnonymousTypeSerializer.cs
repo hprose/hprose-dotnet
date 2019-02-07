@@ -21,7 +21,7 @@ using System.Reflection;
 namespace Hprose.IO.Serializers {
     using static Tags;
 
-    class AnonymousTypeSerializer<T> : ReferenceSerializer<T> {
+    internal class AnonymousTypeSerializer<T> : ReferenceSerializer<T> {
         private static readonly Action<Writer, T> write;
         private static readonly int length;
         static AnonymousTypeSerializer() {

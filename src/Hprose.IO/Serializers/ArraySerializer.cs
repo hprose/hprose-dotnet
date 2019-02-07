@@ -16,7 +16,7 @@
 namespace Hprose.IO.Serializers {
     using static Tags;
 
-    class ArraySerializer<T> : ReferenceSerializer<T[]> {
+    internal class ArraySerializer<T> : ReferenceSerializer<T[]> {
         public override void Write(Writer writer, T[] obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;
@@ -33,7 +33,8 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagClosebrace);
         }
     }
-    class Array2Serializer<T> : ReferenceSerializer<T[,]> {
+
+    internal class Array2Serializer<T> : ReferenceSerializer<T[,]> {
         public override void Write(Writer writer, T[,] obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;

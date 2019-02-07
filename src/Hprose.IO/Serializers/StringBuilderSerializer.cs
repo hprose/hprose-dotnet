@@ -18,7 +18,7 @@ using System.Text;
 namespace Hprose.IO.Serializers {
     using static Tags;
 
-    class StringBuilderSerializer : ReferenceSerializer<StringBuilder> {
+    internal class StringBuilderSerializer : ReferenceSerializer<StringBuilder> {
         public override void Write(Writer writer, StringBuilder obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;

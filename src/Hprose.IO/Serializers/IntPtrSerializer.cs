@@ -16,7 +16,7 @@
 using System;
 
 namespace Hprose.IO.Serializers {
-    class IntPtrSerializer : Serializer<IntPtr> {
+    internal class IntPtrSerializer : Serializer<IntPtr> {
         public override void Write(Writer writer, IntPtr obj) => ValueWriter.Write(writer.Stream, obj);
     }
 }

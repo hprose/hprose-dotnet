@@ -18,7 +18,7 @@ using System;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class EnumDeserializer<T> : Deserializer<T> where T : struct, IComparable, IConvertible, IFormattable {
+    internal class EnumDeserializer<T> : Deserializer<T> where T : struct, IComparable, IConvertible, IFormattable {
         public override T Read(Reader reader, int tag) {
             Type type = typeof(T);
             if (tag >= '0' && tag <= '9') {

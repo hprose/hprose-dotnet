@@ -18,7 +18,7 @@ using System.Numerics;
 using System.Text;
 
 namespace Hprose.IO.Converters {
-    static class BigIntegerConverter {
+    internal static class BigIntegerConverter {
         static BigIntegerConverter() {
             Converter<bool, BigInteger>.convert = (value) => value ? BigInteger.One : BigInteger.Zero;
             Converter<char, BigInteger>.convert = (value) => value;

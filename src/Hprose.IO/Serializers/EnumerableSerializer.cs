@@ -19,7 +19,7 @@ using System.Collections.Generic;
 namespace Hprose.IO.Serializers {
     using static Tags;
 
-    class FastEnumerableSerializer<T, V> : ReferenceSerializer<T> where T : IEnumerable<V>, ICollection {
+    internal class FastEnumerableSerializer<T, V> : ReferenceSerializer<T> where T : IEnumerable<V>, ICollection {
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;
@@ -36,7 +36,8 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagClosebrace);
         }
     }
-    class EnumerableSerializer<T, V> : ReferenceSerializer<T> where T : IEnumerable<V> {
+
+    internal class EnumerableSerializer<T, V> : ReferenceSerializer<T> where T : IEnumerable<V> {
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;
@@ -54,7 +55,8 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagClosebrace);
         }
     }
-    class FastEnumerableSerializer<T, K, V> : ReferenceSerializer<T> where T : IEnumerable<KeyValuePair<K, V>>, ICollection {
+
+    internal class FastEnumerableSerializer<T, K, V> : ReferenceSerializer<T> where T : IEnumerable<KeyValuePair<K, V>>, ICollection {
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;
@@ -73,7 +75,8 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagClosebrace);
         }
     }
-    class EnumerableSerializer<T, K, V> : ReferenceSerializer<T> where T : IEnumerable<KeyValuePair<K, V>> {
+
+    internal class EnumerableSerializer<T, K, V> : ReferenceSerializer<T> where T : IEnumerable<KeyValuePair<K, V>> {
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;
@@ -93,7 +96,8 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagClosebrace);
         }
     }
-    class EnumerableSerializer<T> : ReferenceSerializer<T> where T : IEnumerable {
+
+    internal class EnumerableSerializer<T> : ReferenceSerializer<T> where T : IEnumerable {
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;

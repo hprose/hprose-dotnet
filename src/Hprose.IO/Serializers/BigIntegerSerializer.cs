@@ -16,7 +16,7 @@
 using System.Numerics;
 
 namespace Hprose.IO.Serializers {
-    class BigIntegerSerializer : Serializer<BigInteger> {
+    internal class BigIntegerSerializer : Serializer<BigInteger> {
         public override void Write(Writer writer, BigInteger obj) => ValueWriter.Write(writer.Stream, obj);
     }
 }

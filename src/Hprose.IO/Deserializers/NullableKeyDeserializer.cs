@@ -18,7 +18,7 @@ using Hprose.Collections.Generic;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class NullableKeyDeserializer<T> : Deserializer<NullableKey<T>> {
+    internal class NullableKeyDeserializer<T> : Deserializer<NullableKey<T>> {
         public override NullableKey<T> Read(Reader reader, int tag) {
             if (tag == TagNull) {
                 return default;

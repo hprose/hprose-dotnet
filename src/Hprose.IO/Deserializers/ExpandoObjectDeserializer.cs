@@ -21,7 +21,7 @@ using System.IO;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class ExpandoObjectDeserializer : Deserializer<ExpandoObject> {
+    internal class ExpandoObjectDeserializer : Deserializer<ExpandoObject> {
         public static ExpandoObject Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);

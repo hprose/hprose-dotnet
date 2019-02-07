@@ -17,7 +17,7 @@ using System;
 using System.Numerics;
 
 namespace Hprose.IO.Converters {
-    static class Int16Converter {
+    internal static class Int16Converter {
         static Int16Converter() {
             Converter<bool, short>.convert = Convert.ToInt16;
             Converter<char, short>.convert = Convert.ToInt16;

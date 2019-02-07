@@ -17,7 +17,7 @@ using System;
 using System.Numerics;
 
 namespace Hprose.IO.Converters {
-    static class CharConverter {
+    internal static class CharConverter {
         static CharConverter() {
             Converter<bool, char>.convert = Convert.ToChar;
             Converter<sbyte, char>.convert = Convert.ToChar;

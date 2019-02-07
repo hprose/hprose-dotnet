@@ -18,7 +18,7 @@ using System;
 namespace Hprose.IO.Serializers {
     using static Tags;
 
-    static class ValueTupleHelper<T> {
+    internal static class ValueTupleHelper<T> {
         public static volatile int length;
         public static volatile Action<Writer, T> write;
         static ValueTupleHelper() {
@@ -36,7 +36,7 @@ namespace Hprose.IO.Serializers {
         }
     }
 
-    static class ValueTupleHelper {
+    internal static class ValueTupleHelper {
         public static void Initialize1<T1>() {
             ValueTupleHelper<ValueTuple<T1>>.length = 1;
             ValueTupleHelper<ValueTuple<T1>>.write = (writer, obj) => {
@@ -115,7 +115,7 @@ namespace Hprose.IO.Serializers {
         }
     }
 
-    class ValueTupleSerializer : ReferenceSerializer<ValueTuple> {
+    internal class ValueTupleSerializer : ReferenceSerializer<ValueTuple> {
         public override void Write(Writer writer, ValueTuple obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;
@@ -125,7 +125,7 @@ namespace Hprose.IO.Serializers {
         }
     }
 
-    class ValueTupleSerializer<T> : ReferenceSerializer<T> {
+    internal class ValueTupleSerializer<T> : ReferenceSerializer<T> {
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;

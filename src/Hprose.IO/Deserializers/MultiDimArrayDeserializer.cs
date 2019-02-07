@@ -19,7 +19,7 @@ using System.IO;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class MultiDimArrayDeserializer<T, E> : Deserializer<T> {
+    internal class MultiDimArrayDeserializer<T, E> : Deserializer<T> {
         private static readonly T empty = (T)(object)(Array.CreateInstance(typeof(E), new int[typeof(T).GetArrayRank()]));
         private static T Read(Reader reader) {
             Stream stream = reader.Stream;

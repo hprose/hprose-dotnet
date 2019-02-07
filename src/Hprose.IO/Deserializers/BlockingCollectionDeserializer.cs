@@ -19,7 +19,7 @@ using System.Collections.Concurrent;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class BlockingCollectionDeserializer<T> : Deserializer<BlockingCollection<T>> {
+    internal class BlockingCollectionDeserializer<T> : Deserializer<BlockingCollection<T>> {
         public static BlockingCollection<T> Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);

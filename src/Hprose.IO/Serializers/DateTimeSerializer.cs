@@ -16,7 +16,7 @@
 using System;
 
 namespace Hprose.IO.Serializers {
-    class DateTimeSerializer : ReferenceSerializer<DateTime> {
+    internal class DateTimeSerializer : ReferenceSerializer<DateTime> {
         public override void Write(Writer writer, DateTime obj) {
             base.Write(writer, obj);
             ValueWriter.Write(writer.Stream, obj);

@@ -19,7 +19,7 @@ using System.IO;
 namespace Hprose.IO.Serializers {
     using static Tags;
 
-    class GuidSerializer : ReferenceSerializer<Guid> {
+    internal class GuidSerializer : ReferenceSerializer<Guid> {
         public override void Write(Writer writer, Guid obj) {
             base.Write(writer, obj);
             Stream stream = writer.Stream;

@@ -17,7 +17,7 @@ using System;
 using System.Numerics;
 
 namespace Hprose.IO.Converters {
-    static class BoolConverter {
+    internal static class BoolConverter {
         static BoolConverter() {
             Converter<char, bool>.convert = Convert.ToBoolean;
             Converter<sbyte, bool>.convert = Convert.ToBoolean;

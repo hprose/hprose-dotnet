@@ -16,7 +16,7 @@
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class NullableDeserializer<T> : Deserializer<T?> where T : struct {
+    internal class NullableDeserializer<T> : Deserializer<T?> where T : struct {
         public override T? Read(Reader reader, int tag) {
             if (tag == TagNull) {
                 return null;

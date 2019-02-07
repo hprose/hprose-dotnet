@@ -19,8 +19,8 @@ using System.IO;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class ArrayDeserializer<T> : Deserializer<T[]> {
-        private static readonly T[] empty = new T[0] { };
+    internal class ArrayDeserializer<T> : Deserializer<T[]> {
+        private static readonly T[] empty = new T[0];
         public override T[] Read(Reader reader, int tag) {
             switch (tag) {
                 case TagList:
@@ -33,8 +33,8 @@ namespace Hprose.IO.Deserializers {
         }
     }
 
-    class Array2Deserializer<T> : Deserializer<T[,]> {
-        private static readonly T[,] empty = new T[0, 0] { };
+    internal class Array2Deserializer<T> : Deserializer<T[,]> {
+        private static readonly T[,] empty = new T[0, 0];
         private static T[,] Read(Reader reader) {
             Stream stream = reader.Stream;
             int count1 = ValueReader.ReadCount(stream);

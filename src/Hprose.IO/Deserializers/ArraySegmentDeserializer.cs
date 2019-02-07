@@ -8,19 +8,18 @@
 |                                                          |
 |  ArraySegmentDeserializer class for C#.                  |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
 using System;
-using System.IO;
 
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class ArraySegmentDeserializer<T> : Deserializer<ArraySegment<T>> {
-        private static readonly T[] empty = new T[0] { };
+    internal class ArraySegmentDeserializer<T> : Deserializer<ArraySegment<T>> {
+        private static readonly T[] empty = new T[0];
         public override ArraySegment<T> Read(Reader reader, int tag) {
             switch (tag) {
                 case TagList:

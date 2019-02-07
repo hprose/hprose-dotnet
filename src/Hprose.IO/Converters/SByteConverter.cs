@@ -17,7 +17,7 @@ using System;
 using System.Numerics;
 
 namespace Hprose.IO.Converters {
-    static class SByteConverter {
+    internal static class SByteConverter {
         static SByteConverter() {
             Converter<bool, sbyte>.convert = Convert.ToSByte;
             Converter<char, sbyte>.convert = Convert.ToSByte;

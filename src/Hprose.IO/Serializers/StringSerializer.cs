@@ -16,7 +16,7 @@
 namespace Hprose.IO.Serializers {
     using static Tags;
 
-    class StringSerializer : ReferenceSerializer<string> {
+    internal class StringSerializer : ReferenceSerializer<string> {
         public override void Write(Writer writer, string obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;

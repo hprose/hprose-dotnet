@@ -16,7 +16,7 @@
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class UInt16Deserializer : Deserializer<ushort> {
+    internal class UInt16Deserializer : Deserializer<ushort> {
         public override ushort Read(Reader reader, int tag) {
             if (tag >= '0' && tag <= '9') {
                 return (ushort)(tag - '0');

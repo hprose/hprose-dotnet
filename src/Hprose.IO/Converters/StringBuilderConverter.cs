@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Hprose.IO.Converters {
-    static class StringBuilderConverter {
+    internal static class StringBuilderConverter {
         internal static StringBuilder Convert<TInput>(TInput value) => new StringBuilder(value.ToString());
         static StringBuilderConverter() {
             Converter<string, StringBuilder>.convert = (value) => new StringBuilder(value);

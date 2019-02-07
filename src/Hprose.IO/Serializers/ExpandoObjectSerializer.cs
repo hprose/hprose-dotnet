@@ -19,7 +19,7 @@ using System.Dynamic;
 namespace Hprose.IO.Serializers {
     using static Tags;
 
-    class ExpandoObjectSerializer : ReferenceSerializer<ExpandoObject> {
+    internal class ExpandoObjectSerializer : ReferenceSerializer<ExpandoObject> {
         public override void Write(Writer writer, ExpandoObject obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;

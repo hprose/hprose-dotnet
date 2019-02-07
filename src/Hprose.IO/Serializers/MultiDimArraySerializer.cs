@@ -18,7 +18,7 @@ using System;
 namespace Hprose.IO.Serializers {
     using static Tags;
 
-    class MultiDimArraySerializer<T> : ReferenceSerializer<T> {
+    internal class MultiDimArraySerializer<T> : ReferenceSerializer<T> {
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);
             Array array = (Array)(object)obj;

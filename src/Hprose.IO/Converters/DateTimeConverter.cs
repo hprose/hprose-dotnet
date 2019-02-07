@@ -17,7 +17,7 @@ using System;
 using System.Text;
 
 namespace Hprose.IO.Converters {
-    static class DateTimeConverter {
+    internal static class DateTimeConverter {
         static DateTimeConverter() {
             Converter<bool, DateTime>.convert = Convert.ToDateTime;
             Converter<char, DateTime>.convert = Convert.ToDateTime;

@@ -20,7 +20,7 @@ using System.IO;
 namespace Hprose.IO {
     using static Tags;
 
-    sealed class WriterRefer {
+    internal sealed class WriterRefer {
         private readonly Dictionary<object, int> @ref = new Dictionary<object, int>();
         private int last = 0;
         public void AddCount(int count) => last += count;

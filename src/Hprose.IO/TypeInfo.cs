@@ -8,14 +8,14 @@
 |                                                          |
 |  TypeInfo class for C#.                                  |
 |                                                          |
-|  LastModified: Jan 10, 2019                              |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 using System;
 
 namespace Hprose.IO {
-    public class TypeInfo {
+    internal class TypeInfo {
         public readonly string name;
         public readonly string[] names;
         public readonly Type type;

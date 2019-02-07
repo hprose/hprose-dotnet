@@ -17,7 +17,7 @@ using System;
 using System.Numerics;
 
 namespace Hprose.IO.Converters {
-    static class SingleConverter {
+    internal static class SingleConverter {
         static SingleConverter() {
             Converter<bool, float>.convert = Convert.ToSingle;
             Converter<char, float>.convert = Convert.ToSingle;

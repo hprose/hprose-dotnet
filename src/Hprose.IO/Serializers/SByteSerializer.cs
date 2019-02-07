@@ -14,7 +14,7 @@
 \*________________________________________________________*/
 
 namespace Hprose.IO.Serializers {
-    class SByteSerializer : Serializer<sbyte> {
+    internal class SByteSerializer : Serializer<sbyte> {
         public override void Write(Writer writer, sbyte obj) => ValueWriter.Write(writer.Stream, obj);
     }
 }

@@ -20,7 +20,7 @@ using System.IO;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class DictionaryDeserializer<I, T, K, V> : Deserializer<I> where T : I, ICollection<KeyValuePair<K, V>> {
+    internal class DictionaryDeserializer<I, T, K, V> : Deserializer<I> where T : I, ICollection<KeyValuePair<K, V>> {
         public static I Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
@@ -61,9 +61,10 @@ namespace Hprose.IO.Deserializers {
             }
         }
     }
-    class DictionaryDeserializer<T, K, V> : DictionaryDeserializer<T, T, K, V> where T : ICollection<KeyValuePair<K, V>> { }
 
-    class DictionaryDeserializer<I, T> : Deserializer<I> where T : I, IDictionary {
+    internal class DictionaryDeserializer<T, K, V> : DictionaryDeserializer<T, T, K, V> where T : ICollection<KeyValuePair<K, V>> { }
+
+    internal class DictionaryDeserializer<I, T> : Deserializer<I> where T : I, IDictionary {
         public static I Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
@@ -136,5 +137,5 @@ namespace Hprose.IO.Deserializers {
         }
     }
 
-    class DictionaryDeserializer<T> : DictionaryDeserializer<T, T> where T : IDictionary { }
+    internal class DictionaryDeserializer<T> : DictionaryDeserializer<T, T> where T : IDictionary { }
 }

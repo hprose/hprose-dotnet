@@ -16,7 +16,7 @@
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class DecimalDeserializer : Deserializer<decimal> {
+    internal class DecimalDeserializer : Deserializer<decimal> {
         public override decimal Read(Reader reader, int tag) {
             var stream = reader.Stream;
             if (tag >= '0' && tag <= '9') {

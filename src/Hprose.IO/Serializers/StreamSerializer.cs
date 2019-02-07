@@ -18,7 +18,7 @@ using System.IO;
 namespace Hprose.IO.Serializers {
     using static Tags;
 
-    class StreamSerializer<T> : ReferenceSerializer<T> where T : Stream {
+    internal class StreamSerializer<T> : ReferenceSerializer<T> where T : Stream {
         public override void Write(Writer writer, T obj) {
             if (!obj.CanRead) {
                 throw new IOException("This stream can't support serialize.");

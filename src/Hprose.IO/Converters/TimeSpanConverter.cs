@@ -17,7 +17,7 @@ using System;
 using System.Text;
 
 namespace Hprose.IO.Converters {
-    static class TimeSpanConverter {
+    internal static class TimeSpanConverter {
         static TimeSpanConverter() {
             Converter<long, TimeSpan>.convert = (value) => new TimeSpan(value);
             Converter<DateTime, TimeSpan>.convert = (value) => new TimeSpan(value.Ticks);

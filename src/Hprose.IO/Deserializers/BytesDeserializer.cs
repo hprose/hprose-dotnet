@@ -8,7 +8,7 @@
 |                                                          |
 |  BytesDeserializer class for C#.                         |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -16,8 +16,8 @@
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class BytesDeserializer : Deserializer<byte[]> {
-        private static readonly byte[] empty = new byte[0] { };
+    internal class BytesDeserializer : Deserializer<byte[]> {
+        private static readonly byte[] empty = new byte[0];
         public override byte[] Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {

@@ -16,7 +16,7 @@
 using System;
 
 namespace Hprose.IO.Serializers {
-    class EnumSerializer<T> : Serializer<T> where T : struct, IComparable, IConvertible, IFormattable {
+    internal class EnumSerializer<T> : Serializer<T> where T : struct, IComparable, IConvertible, IFormattable {
         public override void Write(Writer writer, T obj) {
             switch (obj.GetTypeCode()) {
                 case TypeCode.Int32:

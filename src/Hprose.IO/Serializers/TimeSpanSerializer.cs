@@ -16,7 +16,7 @@
 using System;
 
 namespace Hprose.IO.Serializers {
-    class TimeSpanSerializer : Serializer<TimeSpan> {
+    internal class TimeSpanSerializer : Serializer<TimeSpan> {
         public override void Write(Writer writer, TimeSpan obj) => ValueWriter.Write(writer.Stream, obj.Ticks);
     }
 }

@@ -18,7 +18,7 @@ using System;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class DateTimeDeserializer : Deserializer<DateTime> {
+    internal class DateTimeDeserializer : Deserializer<DateTime> {
         public override DateTime Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {

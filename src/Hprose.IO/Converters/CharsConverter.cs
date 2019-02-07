@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Hprose.IO.Converters {
-    static class CharsConverter {
+    internal static class CharsConverter {
         internal static char[] Convert<TInput>(TInput value) => value.ToString().ToCharArray();
         static CharsConverter() {
             Converter<string, char[]>.convert = (value) => value.ToCharArray();

@@ -16,7 +16,7 @@
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class CharDeserializer : Deserializer<char> {
+    internal class CharDeserializer : Deserializer<char> {
         public override char Read(Reader reader, int tag) {
             var stream = reader.Stream;
             switch (tag) {

@@ -14,7 +14,7 @@
 \*________________________________________________________*/
 
 namespace Hprose.IO.Serializers {
-    class BooleanSerializer : Serializer<bool> {
+    internal class BooleanSerializer : Serializer<bool> {
         public override void Write(Writer writer, bool obj) => ValueWriter.Write(writer.Stream, obj);
     }
 }

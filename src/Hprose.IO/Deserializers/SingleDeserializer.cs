@@ -16,7 +16,7 @@
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class SingleDeserializer : Deserializer<float> {
+    internal class SingleDeserializer : Deserializer<float> {
         public override float Read(Reader reader, int tag) {
             var stream = reader.Stream;
             if (tag >= '0' && tag <= '9') {

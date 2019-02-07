@@ -18,7 +18,7 @@ using System.Data;
 namespace Hprose.IO.Serializers {
     using static Tags;
 
-    class DataTableSerializer<T> : ReferenceSerializer<T> where T : DataTable {
+    internal class DataTableSerializer<T> : ReferenceSerializer<T> where T : DataTable {
         public override void Write(Writer writer, T obj) {
             base.Write(writer, obj);
             var rows = obj.Rows;

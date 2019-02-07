@@ -18,7 +18,7 @@ using System.Collections;
 namespace Hprose.IO.Serializers {
     using static Tags;
 
-    class BitArraySerializer : ReferenceSerializer<BitArray> {
+    internal class BitArraySerializer : ReferenceSerializer<BitArray> {
         public override void Write(Writer writer, BitArray obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;

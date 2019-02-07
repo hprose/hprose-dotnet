@@ -17,7 +17,7 @@ using System;
 using System.Numerics;
 
 namespace Hprose.IO.Converters {
-    static class Int64Converter {
+    internal static class Int64Converter {
         static Int64Converter() {
             Converter<bool, long>.convert = Convert.ToInt64;
             Converter<char, long>.convert = Convert.ToInt64;

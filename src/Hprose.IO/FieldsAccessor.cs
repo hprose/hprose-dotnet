@@ -8,7 +8,7 @@
 |                                                          |
 |  FieldsAccessor class for C#.                            |
 |                                                          |
-|  LastModified: Apr 25, 2018                              |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -53,7 +53,6 @@ namespace Hprose.IO {
         }
     }
     public static class FieldsAccessor<T> {
-        private static readonly Dictionary<string, MemberInfo> fields = FieldsAccessor.GetFields(typeof(T));
-        public static Dictionary<string, MemberInfo> Fields => fields;
+        public static Dictionary<string, MemberInfo> Fields { get; } = FieldsAccessor.GetFields(typeof(T));
     }
 }

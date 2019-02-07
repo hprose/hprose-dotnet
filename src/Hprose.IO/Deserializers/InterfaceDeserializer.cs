@@ -19,7 +19,7 @@ using System.IO;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class InterfaceDeserializer<I> : Deserializer<I> where I : class {
+    internal class InterfaceDeserializer<I> : Deserializer<I> where I : class {
         private static I Read(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);

@@ -19,7 +19,7 @@ using System.IO;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class ListDeserializer<I, T> : Deserializer<I> where T : I, IList {
+    internal class ListDeserializer<I, T> : Deserializer<I> where T : I, IList {
         public static I Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
@@ -43,5 +43,6 @@ namespace Hprose.IO.Deserializers {
             }
         }
     }
-    class ListDeserializer<T> : ListDeserializer<T, T> where T : IList { }
+
+    internal class ListDeserializer<T> : ListDeserializer<T, T> where T : IList { }
 }

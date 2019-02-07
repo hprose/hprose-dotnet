@@ -14,7 +14,7 @@
 \*________________________________________________________*/
 
 namespace Hprose.IO.Serializers {
-    class Int64Serializer : Serializer<long> {
+    internal class Int64Serializer : Serializer<long> {
         public override void Write(Writer writer, long obj) => ValueWriter.Write(writer.Stream, obj);
     }
 }

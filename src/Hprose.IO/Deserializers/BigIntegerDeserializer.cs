@@ -18,7 +18,7 @@ using System.Numerics;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class BigIntegerDeserializer : Deserializer<BigInteger> {
+    internal class BigIntegerDeserializer : Deserializer<BigInteger> {
         public override BigInteger Read(Reader reader, int tag) {
             if (tag >= '0' && tag <= '9') {
                 return (tag - '0');

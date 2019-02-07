@@ -18,7 +18,7 @@ using System;
 using System.Text;
 
 namespace Hprose.IO {
-    class Converter<TInput, TOutput> {
+    internal class Converter<TInput, TOutput> {
         public static volatile Func<TInput, TOutput> convert;
     }
 

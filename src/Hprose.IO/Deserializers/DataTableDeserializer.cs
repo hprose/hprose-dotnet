@@ -20,7 +20,7 @@ using System.IO;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class DataTableDeserializer : Deserializer<DataTable> {
+    internal class DataTableDeserializer : Deserializer<DataTable> {
         private static IDeserializer[] ReadMapAsFirstRow(Reader reader, DataTable table, Deserializer<string> strDeserializer) {
             var columns = table.Columns;
             var row = table.NewRow();

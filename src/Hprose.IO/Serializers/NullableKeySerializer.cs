@@ -16,7 +16,7 @@
 using Hprose.Collections.Generic;
 
 namespace Hprose.IO.Serializers {
-    class NullableKeySerializer<T> : Serializer<NullableKey<T>> {
+    internal class NullableKeySerializer<T> : Serializer<NullableKey<T>> {
         public override void Write(Writer writer, NullableKey<T> obj) => Serializer<T>.Instance.Serialize(writer, obj.Value);
     }
 }

@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose BytesConverter class for C#.                     |
 |                                                          |
-|  LastModified: Apr 25, 2018                              |
+|  LastModified: Feb 8, 2018                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -19,13 +19,12 @@ using System.Numerics;
 using System.Text;
 
 namespace Hprose.IO.Converters {
-    static class BytesConverter {
-        private static readonly UTF8Encoding UTF8 = new UTF8Encoding();
+    internal static class BytesConverter {
         static BytesConverter() {
-            Converter<string, byte[]>.convert = (value) => UTF8.GetBytes(value);
-            Converter<StringBuilder, byte[]>.convert = (value) => UTF8.GetBytes(value.ToString());
-            Converter<char[], byte[]>.convert = (value) => UTF8.GetBytes(value);
-            Converter<List<char>, byte[]>.convert = (value) => UTF8.GetBytes(value.ToArray());
+            Converter<string, byte[]>.convert = (value) => Encoding.UTF8.GetBytes(value);
+            Converter<StringBuilder, byte[]>.convert = (value) => Encoding.UTF8.GetBytes(value.ToString());
+            Converter<char[], byte[]>.convert = (value) => Encoding.UTF8.GetBytes(value);
+            Converter<List<char>, byte[]>.convert = (value) => Encoding.UTF8.GetBytes(value.ToArray());
             Converter<List<byte>, byte[]>.convert = (value) => value.ToArray();
             Converter<Guid, byte[]>.convert = (value) => value.ToByteArray();
             Converter<BigInteger, byte[]>.convert = (value) => value.ToByteArray();
@@ -34,13 +33,13 @@ namespace Hprose.IO.Converters {
                     case byte[] bytes:
                         return bytes;
                     case string s:
-                        return UTF8.GetBytes(s);
+                        return Encoding.UTF8.GetBytes(s);
                     case StringBuilder sb:
-                        return UTF8.GetBytes(sb.ToString());
+                        return Encoding.UTF8.GetBytes(sb.ToString());
                     case char[] chars:
-                        return UTF8.GetBytes(chars);
+                        return Encoding.UTF8.GetBytes(chars);
                     case List<char> charList:
-                        return UTF8.GetBytes(charList.ToArray());
+                        return Encoding.UTF8.GetBytes(charList.ToArray());
                     case List<byte> byteList:
                         return byteList.ToArray();
                     case Guid guid:

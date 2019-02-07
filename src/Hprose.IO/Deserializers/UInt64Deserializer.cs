@@ -16,7 +16,7 @@
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class UInt64Deserializer : Deserializer<ulong> {
+    internal class UInt64Deserializer : Deserializer<ulong> {
         public override ulong Read(Reader reader, int tag) {
             if (tag >= '0' && tag <= '9') {
                 return (ulong)(tag - '0');

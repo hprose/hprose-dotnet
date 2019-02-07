@@ -19,7 +19,7 @@ using System.IO;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    class QueueDeserializer<T> : Deserializer<Queue<T>> {
+    internal class QueueDeserializer<T> : Deserializer<Queue<T>> {
         public static Queue<T> Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);

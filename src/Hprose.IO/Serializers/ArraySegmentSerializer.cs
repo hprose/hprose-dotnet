@@ -17,7 +17,7 @@ namespace Hprose.IO.Serializers {
     using System;
     using static Tags;
 
-    class ArraySegmentSerializer<T> : ReferenceSerializer<ArraySegment<T>> {
+    internal class ArraySegmentSerializer<T> : ReferenceSerializer<ArraySegment<T>> {
         public override void Write(Writer writer, ArraySegment<T> obj) {
             base.Write(writer, obj);
             var stream = writer.Stream;

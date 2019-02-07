@@ -23,7 +23,7 @@ namespace Hprose.IO {
     using static Mode;
     using static Tags;
 
-    class MembersWriter {
+    internal class MembersWriter {
         public Delegate write;
         public int count;
         public ArraySegment<byte> data;
@@ -75,7 +75,7 @@ namespace Hprose.IO {
         }
     }
 
-    class MembersWriter<T> : MembersWriter {
+    internal class MembersWriter<T> : MembersWriter {
         public static readonly MembersWriter Instance = new MembersWriter<T>();
         private MembersWriter() {
             var members = MembersAccessor<T>.Members;
@@ -85,7 +85,7 @@ namespace Hprose.IO {
         }
     }
 
-    class FieldsWriter<T> : MembersWriter {
+    internal class FieldsWriter<T> : MembersWriter {
         public static readonly MembersWriter Instance = new FieldsWriter<T>();
         private FieldsWriter() {
             var fields = FieldsAccessor<T>.Fields;
@@ -95,7 +95,7 @@ namespace Hprose.IO {
         }
     }
 
-    class PropertiesWriter<T> : MembersWriter {
+    internal class PropertiesWriter<T> : MembersWriter {
         public static readonly MembersWriter Instance = new PropertiesWriter<T>();
         private PropertiesWriter() {
             var properties = PropertiesAccessor<T>.Properties;

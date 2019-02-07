@@ -17,7 +17,7 @@ using System;
 using System.Numerics;
 
 namespace Hprose.IO.Converters {
-    static class DoubleConverter {
+    internal static class DoubleConverter {
         static DoubleConverter() {
             Converter<bool, double>.convert = Convert.ToDouble;
             Converter<char, double>.convert = Convert.ToDouble;

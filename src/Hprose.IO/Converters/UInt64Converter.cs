@@ -17,7 +17,7 @@ using System;
 using System.Numerics;
 
 namespace Hprose.IO.Converters {
-    static class UInt64Converter {
+    internal static class UInt64Converter {
         static UInt64Converter() {
             Converter<bool, ulong>.convert = Convert.ToUInt64;
             Converter<char, ulong>.convert = Convert.ToUInt64;

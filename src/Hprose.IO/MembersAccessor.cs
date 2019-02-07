@@ -8,7 +8,7 @@
 |                                                          |
 |  MembersAccessor class for C#.                           |
 |                                                          |
-|  LastModified: Apr 25, 2018                              |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -63,7 +63,6 @@ namespace Hprose.IO {
         }
     }
     public static class MembersAccessor<T> {
-        private static readonly Dictionary<string, MemberInfo> members = MembersAccessor.GetMembers(typeof(T));
-        public static Dictionary<string, MemberInfo> Members => members;
+        public static Dictionary<string, MemberInfo> Members { get; } = MembersAccessor.GetMembers(typeof(T));
     }
 }

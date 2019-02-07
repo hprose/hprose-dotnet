@@ -19,7 +19,7 @@ using System.IO;
 namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    static class TupleHelper<T> {
+    internal static class TupleHelper<T> {
         public static volatile Func<Reader, int, T> read;
         static TupleHelper() {
             Type type = typeof(T);
@@ -41,7 +41,7 @@ namespace Hprose.IO.Deserializers {
         }
     }
 
-    static class TupleHelper {
+    internal static class TupleHelper {
         public static void Initialize1<T1>() {
             TupleHelper<Tuple<T1>>.read = (reader, count) => {
                 var result = new Tuple<T1>(
@@ -156,7 +156,7 @@ namespace Hprose.IO.Deserializers {
         }
     }
 
-    class TupleDeserializer<T> : Deserializer<T> {
+    internal class TupleDeserializer<T> : Deserializer<T> {
         public static T Read(Reader reader) {
             Stream stream = reader.Stream;
             int count = ValueReader.ReadCount(stream);
