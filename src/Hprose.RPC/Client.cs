@@ -125,7 +125,8 @@ namespace Hprose.RPC {
         }
         public async Task InvokeAsync(string fullname, object[] args = null, Settings settings = null) {
             var context = new ClientContext(this, null, settings);
-            await invokeManager.Handler(fullname, args, context).ContinueWith((_) => { }, TaskScheduler.Current).ConfigureAwait(false);
+            var task = invokeManager.Handler(fullname, args, context);
+            await task.ContinueWith((_) => { }, TaskScheduler.Current).ConfigureAwait(false);
             return;
         }
         public async Task<T> InvokeAsync<T>(string fullname, object[] args = null, Settings settings = null) {
