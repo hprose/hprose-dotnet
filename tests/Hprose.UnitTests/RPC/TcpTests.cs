@@ -1,14 +1,15 @@
 ﻿using Hprose.RPC;
+using Hprose.RPC.Codec.JSONRPC;
+using Hprose.RPC.Plugins.Limiter;
 using Hprose.RPC.Plugins.Log;
 using Hprose.RPC.Plugins.Push;
 using Hprose.RPC.Plugins.Reverse;
-using Hprose.RPC.Codec.JSONRPC;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Net;
-using System.Threading.Tasks;
-using System.Text;
 using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Hprose.UnitTests.RPC {
     [TestClass]
@@ -196,6 +197,31 @@ namespace Hprose.UnitTests.RPC {
            // Assert.AreEqual(3, proxy.Sum(1, 2));
             //proxy.OnewayCall("Oneway Sync");
             await proxy.OnewayCallAsync("Oneway Async");
+            server.Stop();
+        }
+        [TestMethod]
+        public async Task Test7() {
+            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
+            TcpListener server = new TcpListener(iPAddress, 8412);
+            server.Start();
+            var service = new Service();
+            service.AddMethod("Hello", this)
+                   .AddMethod("Sum", this)
+                   .Add<string>(OnewayCall)
+                   .Bind(server);
+            var client = new Client("tcp4://127.0.0.1:8412");
+            var log = new Log();
+            client.Use(new Limiter(64).Handler).Use(new RateLimiter(50000).InvokeHandler);
+            var proxy = client.UseService<ITestInterface>();
+            var n = 100000;
+            var tasks = new Task<string>[n];
+            for (int i = 0; i < n; ++i) {
+                tasks[i] = proxy.Hello("world" + i);
+            }
+            var results = await Task.WhenAll(tasks);
+            for (int i = 0; i < n; ++i) {
+                Assert.AreEqual(results[i], "Hello world" + i);
+            }
             server.Stop();
         }
     }
