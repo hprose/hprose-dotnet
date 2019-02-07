@@ -148,8 +148,8 @@ namespace Hprose.RPC {
                     DecodeMethod("~", 0, context);
                     return ("~", emptyArgs);
                 default:
-                    stream.Position = 0;
-                    throw new Exception("Invalid request:\r\n" + Encoding.UTF8.GetString(stream.ToArray()));
+                    var data = stream.GetArraySegment();
+                    throw new Exception("Invalid request:\r\n" + Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
             }
         }
 

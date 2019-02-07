@@ -13,6 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
+using Hprose.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -67,7 +68,8 @@ namespace Hprose.RPC.Codec.JSONRPC {
             else {
                 response["result"] = new JValue(result);
             }
-            return new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
+            var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response));
+            return new MemoryStream(data, 0, data.Length, false, true);
         }
         public async Task<(string, object[])> Decode(Stream request, ServiceContext context) {
             MemoryStream stream;
@@ -82,7 +84,8 @@ namespace Hprose.RPC.Codec.JSONRPC {
             stream.Position = 0;
             JObject call = null;
             try {
-                call = JsonConvert.DeserializeObject<JObject>(Encoding.UTF8.GetString(stream.ToArray()));
+                var data = stream.GetArraySegment();
+                call = JsonConvert.DeserializeObject<JObject>(Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
             }
             catch {
                 throw new Exception("Parse error");

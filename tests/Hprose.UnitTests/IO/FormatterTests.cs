@@ -17,7 +17,8 @@ namespace Hprose.UnitTests.IO {
                 Formatter.Serialize('人', stream);
                 Formatter.Serialize((byte)123, stream);
                 Formatter.Serialize((sbyte)-123, stream);
-                Assert.AreEqual("ntfu0uAu人i123;i-123;", Encoding.UTF8.GetString(stream.ToArray()));
+                var data = stream.GetArraySegment();
+                Assert.AreEqual("ntfu0uAu人i123;i-123;", Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
             }
         }
     }

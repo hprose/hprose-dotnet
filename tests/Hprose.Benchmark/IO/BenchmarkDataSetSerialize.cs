@@ -129,11 +129,11 @@ namespace Hprose.Benchmark.IO {
             dataSet.Tables["ChildTable"].ParentRelations.Add(relation);
         }
 
-        private static DataSet dataSet = MakeDataSet();
+        private readonly static DataSet dataSet = MakeDataSet();
 
-        private static byte[] hproseData;
-        private static byte[] dcData;
-        private static string newtonData;
+        private readonly static ArraySegment<byte> hproseData;
+        private readonly static byte[] dcData;
+        private readonly static string newtonData;
 
         static BenchmarkDataSetSerialize() {
             hproseData = Formatter.Serialize(dataSet);

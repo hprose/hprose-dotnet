@@ -92,7 +92,8 @@ namespace Hprose.RPC {
                 case Tags.TagEnd:
                     return null;
                 default:
-                    throw new Exception("Invalid response\r\n" + Encoding.UTF8.GetString(stream.ToArray()));
+                    var data = stream.GetArraySegment();
+                    throw new Exception("Invalid response\r\n" + Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
             }
         }
     }

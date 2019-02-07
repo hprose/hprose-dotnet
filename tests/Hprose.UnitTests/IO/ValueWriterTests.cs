@@ -9,25 +9,29 @@ namespace Hprose.UnitTests.IO {
         private string WriteInt(int i) {
             using (var stream = new MemoryStream()) {
                 ValueWriter.WriteInt(stream, i);
-                return Encoding.ASCII.GetString(stream.ToArray());
+                var data = stream.GetArraySegment();
+                return Encoding.ASCII.GetString(data.Array, data.Offset, data.Count);
             }
         }
         private string WriteInt(uint i) {
             using (var stream = new MemoryStream()) {
                 ValueWriter.WriteInt(stream, i);
-                return Encoding.ASCII.GetString(stream.ToArray());
+                var data = stream.GetArraySegment();
+                return Encoding.ASCII.GetString(data.Array, data.Offset, data.Count);
             }
         }
         private string WriteInt(long i) {
             using (var stream = new MemoryStream()) {
                 ValueWriter.WriteInt(stream, i);
-                return Encoding.ASCII.GetString(stream.ToArray());
+                var data = stream.GetArraySegment();
+                return Encoding.ASCII.GetString(data.Array, data.Offset, data.Count);
             }
         }
         private string WriteInt(ulong i) {
             using (var stream = new MemoryStream()) {
                 ValueWriter.WriteInt(stream, i);
-                return Encoding.ASCII.GetString(stream.ToArray());
+                var data = stream.GetArraySegment();
+                return Encoding.ASCII.GetString(data.Array, data.Offset, data.Count);
             }
         }
         [TestMethod]

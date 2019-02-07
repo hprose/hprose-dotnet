@@ -13,6 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
+using Hprose.IO;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -78,6 +79,7 @@ namespace Hprose.RPC {
                         if (!stream.CanSeek) {
                             var memstream = new MemoryStream();
                             await stream.CopyToAsync(memstream).ConfigureAwait(false);
+                            memstream.Position = 0;
                             stream.Dispose();
                             stream = memstream;
                         }
@@ -104,7 +106,8 @@ namespace Hprose.RPC {
                     await stream.CopyToAsync(netStream).ConfigureAwait(false);
                     await netStream.FlushAsync().ConfigureAwait(false);
                     if ((index & 0x80000000) != 0) {
-                        var message = Encoding.UTF8.GetString((stream as MemoryStream).ToArray());
+                        var data = (stream as MemoryStream).GetArraySegment();
+                        var message = Encoding.UTF8.GetString(data.Array, data.Offset, data.Count);
                         stream.Dispose();
                         throw new Exception(message);
                     }
@@ -124,14 +127,15 @@ namespace Hprose.RPC {
             }
         }
         private async void Run(ConcurrentQueue<(TcpClient tcpClient, int index, Stream stream)> responses, TcpClient tcpClient, int index, byte[] data, Context context) {
-            using (var request = new MemoryStream(data)) {
+            using (var request = new MemoryStream(data, 0, data.Length, false, true)) {
                 Stream response = null;
                 try {
                     response = await Service.Handle(request, context).ConfigureAwait(false);
                 }
                 catch (Exception e) {
                     index = (int)(index | 0x80000000);
-                    response = new MemoryStream(Encoding.UTF8.GetBytes(e.Message));
+                    var bytes = Encoding.UTF8.GetBytes(e.Message);
+                    response = new MemoryStream(bytes, 0, bytes.Length, false, true);
                 }
                 finally {
                     responses.Enqueue((tcpClient, index, response));
@@ -151,7 +155,8 @@ namespace Hprose.RPC {
                     int length = ((header[4] & 0x7F) << 24) | (header[5] << 16) | (header[6] << 8) | header[7];
                     int index = (header[8] << 24) | (header[9] << 16) | (header[10] << 8) | header[11];
                     if (length > Service.MaxRequestLength) {
-                        responses.Enqueue((tcpClient, (int)(index | 0x80000000), new MemoryStream(Encoding.UTF8.GetBytes("request too long"))));
+                        var bytes = Encoding.UTF8.GetBytes("request too long");
+                        responses.Enqueue((tcpClient, (int)(index | 0x80000000), new MemoryStream(bytes, 0, bytes.Length, false, true)));
                         return;
                     }
                     var data = await ReadAsync(netStream, new byte[length], 0, length).ConfigureAwait(false);

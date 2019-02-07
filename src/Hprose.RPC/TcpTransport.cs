@@ -125,7 +125,7 @@ namespace Hprose.RPC {
                             result.TrySetException(new Exception(Encoding.UTF8.GetString(data)));
                             throw new IOException("connection closed");
                         }
-                        result.TrySetResult(new MemoryStream(data));
+                        result.TrySetResult(new MemoryStream(data, 0, data.Length, false, true));
                     }
                 }
             }
@@ -168,6 +168,7 @@ namespace Hprose.RPC {
                     if (!stream.CanSeek) {
                         stream = new MemoryStream();
                         await request.stream.CopyToAsync(stream).ConfigureAwait(false);
+                        stream.Position = 0;
                         request.stream.Dispose();
                     }
                 }

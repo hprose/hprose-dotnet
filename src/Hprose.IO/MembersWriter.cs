@@ -26,8 +26,8 @@ namespace Hprose.IO {
     class MembersWriter {
         public Delegate write;
         public int count;
-        public byte[] data;
-        public static byte[] GetMetaData(string typeName, IEnumerable<string> memberNames, int count) {
+        public ArraySegment<byte> data;
+        public static ArraySegment<byte> GetMetaData(string typeName, IEnumerable<string> memberNames, int count) {
             using (var stream = new MemoryStream()) {
                 stream.WriteByte(TagClass);
                 ValueWriter.Write(stream, typeName);
@@ -40,7 +40,7 @@ namespace Hprose.IO {
                     ValueWriter.Write(stream, name);
                 }
                 stream.WriteByte(TagClosebrace);
-                return stream.ToArray();
+                return stream.GetArraySegment();
             }
         }
         public static Action<Writer, T> CreateWriteAction<T>(IEnumerable<MemberInfo> members) {

@@ -213,7 +213,7 @@ namespace Hprose.UnitTests.RPC {
             var log = new Log();
             client.Use(new Limiter(64).Handler).Use(new RateLimiter(50000).InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
-            var n = 100000;
+            var n = 10000;
             var tasks = new Task<string>[n];
             for (int i = 0; i < n; ++i) {
                 tasks[i] = proxy.Hello("world" + i);

@@ -13,6 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
+using Hprose.IO;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -45,12 +46,12 @@ namespace Hprose.RPC.Plugins.Log {
             return stream;
         }
         private static string ToString(MemoryStream stream) {
-            byte[] data = stream.ToArray();
+            var data = stream.GetArraySegment();
             try {
-                return Encoding.UTF8.GetString(data);
+                return Encoding.UTF8.GetString(data.Array, data.Offset, data.Count);
             }
             catch {
-                return Encoding.Default.GetString(data);
+                return Encoding.Default.GetString(data.Array, data.Offset, data.Count);
             }
         }
         private static string Stringify(object obj) {

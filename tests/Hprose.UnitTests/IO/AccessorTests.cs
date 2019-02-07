@@ -112,7 +112,8 @@ namespace Hprose.UnitTests.IO {
             using(var stream = new MemoryStream()) {
                 var writer = new Writer(stream);
                 writer.Serialize(obj);
-                return Encoding.UTF8.GetString(stream.ToArray());
+                var data = stream.GetArraySegment();
+                return Encoding.UTF8.GetString(data.Array, data.Offset, data.Count);
             }
         }
         [TestMethod]

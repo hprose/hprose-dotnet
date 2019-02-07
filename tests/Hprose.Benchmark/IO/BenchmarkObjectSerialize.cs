@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 
@@ -36,7 +37,7 @@ namespace Hprose.Benchmark.IO {
                Age = 53
            }
         };
-        private static readonly byte[] hproseData;
+        private static readonly ArraySegment<byte> hproseData;
         private static readonly byte[] dcData;
         private static readonly string newtonData;
         private static readonly string sstextData;
