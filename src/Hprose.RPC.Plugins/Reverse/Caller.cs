@@ -8,7 +8,7 @@
 |                                                          |
 |  Caller class for C#.                                    |
 |                                                          |
-|  LastModified: Feb 6, 2019                               |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -114,7 +114,14 @@ namespace Hprose.RPC.Plugins.Reverse {
                 }
             }
         }
-        public Task InvokeAsync(string id, string fullname, in object[] args = null) {
+        public void Invoke(string id, string fullname, in object[] args = null) {
+            InvokeAsync<object>(id, fullname, args).Wait();
+            return;
+        }
+        public T Invoke<T>(string id, string fullname, in object[] args = null) {
+            return InvokeAsync<T>(id, fullname, args).Result;
+        }
+        public Task InvokeAsync(string id, string fullname, object[] args = null) {
             return InvokeAsync<object>(id, fullname, args);
         }
         public async Task<T> InvokeAsync<T>(string id, string fullname, object[] args = null) {
@@ -129,6 +136,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             var results = Results.GetOrAdd(id, (_) => new ConcurrentDictionary<int, TaskCompletionSource<object>>());
             results[index] = result;
             Response(id);
+            await result.Task.ContinueWith((_) => { }, TaskScheduler.Current).ConfigureAwait(false);
             var value = await result.Task.ConfigureAwait(false);
             if (typeof(T).IsAssignableFrom(value.GetType())) {
                 return (T)value;

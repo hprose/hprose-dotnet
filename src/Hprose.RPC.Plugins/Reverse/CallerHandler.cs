@@ -8,7 +8,7 @@
 |                                                          |
 |  CallerHandler class for C#.                             |
 |                                                          |
-|  LastModified: Feb 4, 2019                               |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -34,7 +34,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             this.id = id;
         }
         public object Invoke(object[] args) {
-            return caller.InvokeAsync<T>(id, name, args).Result;
+            return caller.Invoke<T>(id, name, args);
         }
     }
 
@@ -48,7 +48,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             this.id = id;
         }
         public object Invoke(object[] args) {
-            caller.InvokeAsync(id, name, args).Wait();
+            caller.Invoke(id, name, args);
             return null;
         }
     }

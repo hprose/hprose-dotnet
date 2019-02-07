@@ -152,12 +152,15 @@ namespace Hprose.UnitTests.RPC {
                    .Listen();
 
             var proxy = caller.UseService<ITestInterface>("1");
-            //var result1 = caller.Invoke<string>("1", "hello", new object[] { "world1" });
-            //var result2 = caller.Invoke<string>("1", "hello", new object[] { "world2" });
-            //var result3 = caller.Invoke<string>("1", "hello", new object[] { "world3" });
             var result1 = proxy.Hello("world1");
             var result2 = proxy.Hello("world2");
             var result3 = proxy.Hello("world3");
+            var r1 = caller.Invoke<string>("1", "hello", new object[] { "world1" });
+            var r2 = caller.Invoke<string>("1", "hello", new object[] { "world2" });
+            var r3 = caller.Invoke<string>("1", "hello", new object[] { "world3" });
+            Assert.AreEqual(r1, "Hello world1");
+            Assert.AreEqual(r2, "Hello world2");
+            Assert.AreEqual(r3, "Hello world3");
             var results = await Task.WhenAll(result1, result2, result3);
             Assert.AreEqual(results[0], "Hello world1");
             Assert.AreEqual(results[1], "Hello world2");
