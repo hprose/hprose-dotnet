@@ -34,11 +34,11 @@ namespace Hprose.RPC.Plugins.LoadBalance {
                 uris[i] = pair.Key;
                 weights[i] = pair.Value;
                 if (weights[i] <= 0) {
-                    throw new ArgumentOutOfRangeException("Weight must be great than 0");
+                    throw new ArgumentOutOfRangeException(nameof(uriList), "weight must be great than 0");
                 }
             }
             if (uris.Length == 0) {
-                throw new ArgumentException("uriList cannot be empty");
+                throw new ArgumentException("cannot be empty", nameof(uriList));
             }
         }
         public abstract Task<Stream> Handler(Stream request, Context context, NextIOHandler next);
