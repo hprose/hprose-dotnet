@@ -33,8 +33,8 @@ namespace Hprose.RPC.Plugins.Push {
         public int MessageQueueMaxLength { get; set; } = 10;
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 2, 0);
         public TimeSpan HeartBeat { get; set; } = new TimeSpan(0, 0, 10);
-        public Action<string, string, Context> OnSubscribe { get; set; } = null;
-        public Action<string, string, Message[], Context> OnUnsubscribe { get; set; } = null;
+        public Action<string, string, ServiceContext> OnSubscribe { get; set; } = null;
+        public Action<string, string, Message[], ServiceContext> OnUnsubscribe { get; set; } = null;
         public Broker(Service service) {
             Service = service;
             Service.Add<string, ServiceContext, bool>(Subscribe, "+")
@@ -141,7 +141,7 @@ namespace Hprose.RPC.Plugins.Push {
                 }
             }
         }
-        protected bool Offline(ConcurrentDictionary<string, BlockingCollection<Message>> topics, string id, string topic, Context context) {
+        protected bool Offline(ConcurrentDictionary<string, BlockingCollection<Message>> topics, string id, string topic, ServiceContext context) {
             if (topics.TryRemove(topic, out var messages)) {
                 OnUnsubscribe?.Invoke(id, topic, messages?.ToArray(), context);
                 messages?.Dispose();
