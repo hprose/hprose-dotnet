@@ -8,7 +8,7 @@
 |                                                          |
 |  Broker plugin for C#.                                   |
 |                                                          |
-|  LastModified: Feb 4, 2019                               |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -37,9 +37,9 @@ namespace Hprose.RPC.Plugins.Push {
         public Action<string, string, Message[], Context> OnUnsubscribe { get; set; } = null;
         public Broker(Service service) {
             Service = service;
-            Service.Add<string, Context, bool>(Subscribe, "+")
-                   .Add<string, Context, bool>(Unsubscribe, "-")
-                   .Add<Context, Task<Dictionary<string, Message[]>>>(Message, "<")
+            Service.Add<string, ServiceContext, bool>(Subscribe, "+")
+                   .Add<string, ServiceContext, bool>(Unsubscribe, "-")
+                   .Add<ServiceContext, Task<Dictionary<string, Message[]>>>(Message, "<")
                    .Add<object, string, string, string, bool>(Unicast, ">")
                    .Add<object, string, IEnumerable<string>, string, IDictionary<string, bool>>(Multicast, ">?")
                    .Add<object, string, string, IDictionary<string, bool>>(Broadcast, ">*")
@@ -109,13 +109,13 @@ namespace Hprose.RPC.Plugins.Push {
                 }
             }
         }
-        protected static string GetId(Context context) {
+        protected static string GetId(ServiceContext context) {
             if (((IDictionary<string, object>)context.RequestHeaders).TryGetValue("Id", out var id)) {
                 return id.ToString();
             }
             throw new KeyNotFoundException("client unique id not found");
         }
-        protected bool Subscribe(string topic, Context context) {
+        protected bool Subscribe(string topic, ServiceContext context) {
             var id = GetId(context);
             var topics = Messages.GetOrAdd(id, (_) => new ConcurrentDictionary<string, BlockingCollection<Message>>());
             if (topics.TryGetValue(topic, out var messages)) {
@@ -150,14 +150,14 @@ namespace Hprose.RPC.Plugins.Push {
             }
             return false;
         }
-        protected bool Unsubscribe(string topic, Context context) {
+        protected bool Unsubscribe(string topic, ServiceContext context) {
             var id = GetId(context);
             if (Messages.TryGetValue(id, out var topics)) {
                 return Offline(topics, id, topic, context);
             }
             return false;
         }
-        protected async Task<Dictionary<string, Message[]>> Message(Context context) {
+        protected async Task<Dictionary<string, Message[]>> Message(ServiceContext context) {
             var id = GetId(context);
             if (Responders.TryRemove(id, out var responder)) {
                 responder?.TrySetResult(null);
@@ -269,7 +269,7 @@ namespace Hprose.RPC.Plugins.Push {
         }
         protected async Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
             var from = "";
-            if (((IDictionary<string, object>)context.RequestHeaders).TryGetValue("Id", out var id)) {
+            if (((IDictionary<string, object>)(context as ServiceContext).RequestHeaders).TryGetValue("Id", out var id)) {
                 from = id.ToString();
             }
             switch (name) {

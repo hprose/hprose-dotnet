@@ -36,12 +36,12 @@ namespace Hprose.RPC.Plugins.Reverse {
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 2, 0);
         public Caller(Service service) {
             Service = service;
-            Service.Add<Context, string>(Close, "!!")
-                   .Add<Context, Task<(int, string, object[])[]>>(Begin, "!")
-                   .Add<(int, object, string)[], Context>(End, "=")
+            Service.Add<ServiceContext, string>(Close, "!!")
+                   .Add<ServiceContext, Task<(int, string, object[])[]>>(Begin, "!")
+                   .Add<(int, object, string)[], ServiceContext>(End, "=")
                    .Use(Handler);
         }
-        internal static string GetId(Context context) {
+        internal static string GetId(ServiceContext context) {
             if (((IDictionary<string, object>)context.RequestHeaders).TryGetValue("Id", out var id)) {
                 return id.ToString();
             }
@@ -68,14 +68,14 @@ namespace Hprose.RPC.Plugins.Reverse {
                 }
             }
         }
-        private string Close(Context context) {
+        private string Close(ServiceContext context) {
             var id = GetId(context);
             if (Responders.TryRemove(id, out var responder)) {
                 responder?.TrySetResult(null);
             }
             return id;
         }
-        private async Task<(int, string, object[])[]> Begin(Context context) {
+        private async Task<(int, string, object[])[]> Begin(ServiceContext context) {
             var id = Close(context);
             var responder = new TaskCompletionSource<(int, string, object[])[]>();
             if (!Send(id, responder)) {
@@ -101,7 +101,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             }
             return await responder.Task.ConfigureAwait(false);
         }
-        private void End((int, object, string)[] results, Context context) {
+        private void End((int, object, string)[] results, ServiceContext context) {
             var id = GetId(context);
             foreach (var (index, value, error) in results) {
                 if (Results.TryGetValue(id, out var result) && result.TryRemove(index, out var task)) {

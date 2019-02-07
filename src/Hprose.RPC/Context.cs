@@ -8,7 +8,7 @@
 |                                                          |
 |  Context class for C#.                                   |
 |                                                          |
-|  LastModified: Feb 4, 2019                               |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -19,8 +19,6 @@ using System.Dynamic;
 
 namespace Hprose.RPC {
     public class Context : DynamicObject, ICloneable {
-        public dynamic RequestHeaders { get; } = new ExpandoObject();
-        public dynamic ResponseHeaders { get; } = new ExpandoObject();
         public Dictionary<string, object> Items { get; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
         public dynamic this[string name] {
             get => Items[name];

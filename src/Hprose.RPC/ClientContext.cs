@@ -8,20 +8,21 @@
 |                                                          |
 |  ClientContext class for C#.                             |
 |                                                          |
-|  LastModified: Feb 4, 2019                               |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
-using Hprose.IO;
 using System;
-using System.Collections.Generic;
+using System.Dynamic;
 
 namespace Hprose.RPC {
     public class ClientContext : Context {
         public Client Client { get; private set; }
         public string Uri { get; set; }
         public Type Type { get; set; }
+        public dynamic RequestHeaders { get; } = new ExpandoObject();
+        public dynamic ResponseHeaders { get; } = new ExpandoObject();
         public ClientContext(Client client, Type type, Settings settings = null) {
             Client = client;
             Uri = (client.Uris.Count > 0) ? client.Uris[0] : null;
