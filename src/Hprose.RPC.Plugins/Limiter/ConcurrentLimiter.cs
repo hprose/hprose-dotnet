@@ -4,11 +4,11 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-|  Limiter.cs                                              |
+|  ConcurrentLimiter.cs                                    |
 |                                                          |
-|  Limiter plugin for C#.                                  |
+|  ConcurrentLimiter plugin for C#.                        |
 |                                                          |
-|  LastModified: Feb 2, 2019                               |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -19,12 +19,12 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.Limiter {
-    public class Limiter {
+    public class ConcurrentLimiter {
         private volatile int counter = 0;
         private ConcurrentQueue<TaskCompletionSource<bool>> tasks = new ConcurrentQueue<TaskCompletionSource<bool>>();
         public int MaxConcurrentRequests { get; private set; }
         public TimeSpan Timeout { get; private set; }
-        public Limiter(int maxConcurrentRequests, TimeSpan timeout = default) {
+        public ConcurrentLimiter(int maxConcurrentRequests, TimeSpan timeout = default) {
             MaxConcurrentRequests = maxConcurrentRequests;
             Timeout = timeout;
         }
