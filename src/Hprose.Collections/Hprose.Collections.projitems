@@ -12,6 +12,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Generic\NullableKeyComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic\NullableKeyDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Generic\NullableKeyEqualityComparer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)\Generic\NullableKey.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Generic\NullableKey.cs" />
   </ItemGroup>
 </Project>
