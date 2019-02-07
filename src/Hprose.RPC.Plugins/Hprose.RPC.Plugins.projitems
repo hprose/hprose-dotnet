@@ -32,7 +32,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Oneway\OnewayAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Oneway\Oneway.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Limiter\RateLimiter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Limiter\Limiter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Limiter\ConcurrentLimiter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Push\Prosumer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Push\Message.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Push\Broker.cs" />
