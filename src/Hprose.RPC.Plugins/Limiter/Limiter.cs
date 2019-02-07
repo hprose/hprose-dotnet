@@ -24,7 +24,7 @@ namespace Hprose.RPC.Plugins.Limiter {
         private ConcurrentQueue<TaskCompletionSource<bool>> tasks = new ConcurrentQueue<TaskCompletionSource<bool>>();
         public int MaxConcurrentRequests { get; private set; }
         public TimeSpan Timeout { get; private set; }
-        public Limiter(int maxConcurrentRequests, TimeSpan timeout) {
+        public Limiter(int maxConcurrentRequests, TimeSpan timeout = default) {
             MaxConcurrentRequests = maxConcurrentRequests;
             Timeout = timeout;
         }
