@@ -29,7 +29,7 @@ namespace Hprose.RPC.Plugins.Limiter {
             Timeout = timeout;
         }
         public async Task Acquire() {
-            if (Interlocked.Increment(ref counter) < MaxConcurrentRequests) return;
+            if (Interlocked.Increment(ref counter) <= MaxConcurrentRequests) return;
             var deferred = new TaskCompletionSource<bool>();
             tasks.Enqueue(deferred);
             if (Timeout > TimeSpan.Zero) {
@@ -50,7 +50,7 @@ namespace Hprose.RPC.Plugins.Limiter {
             await deferred.Task.ConfigureAwait(false);
         }
         public void Release() {
-            if (Interlocked.Decrement(ref counter) >= MaxConcurrentRequests) return;
+            Interlocked.Decrement(ref counter);
             if(tasks.TryDequeue(out var task)) {
                 task.TrySetResult(true);
             }
