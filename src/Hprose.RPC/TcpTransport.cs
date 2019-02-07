@@ -27,7 +27,6 @@ namespace Hprose.RPC {
     public class TcpTransport : ITransport {
         public static ReadOnlyCollection<string> Schemes { get; } = new ReadOnlyCollection<string>(new string[] { "tcp", "tcp4", "tcp6", "tls", "tls4", "tls6", "ssl", "ssl4", "ssl6" });
         private volatile int counter = 0;
-        private volatile int current = -1;
         public LingerOption LingerState { get; set; } = null;
         public bool NoDelay { get; set; } = true;
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
@@ -151,10 +150,18 @@ namespace Hprose.RPC {
             while (!requests.IsEmpty) {
                 requests.TryPeek(out (int index, Stream stream) request);
                 var index = request.index;
-                if (Interlocked.Exchange(ref current, index) == index) return;
                 if (results.TryGetValue(index, out var result)) {
-                    sended[index] = result;
-                    results.TryRemove(index, out result);
+                    if (!(sended.TryAdd(index, result) && results.TryRemove(index, out result))) {
+#if NET40
+                        await TaskEx.Yield();
+#else
+                        await Task.Yield();
+#endif
+                        continue;
+                    }
+                }
+                else {
+                    return;
                 }
                 var stream = request.stream;
                 try {
