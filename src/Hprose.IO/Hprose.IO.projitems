@@ -25,6 +25,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)MembersAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MembersReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MembersWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MemoryStreamExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Mode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertiesAccessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RawReader.cs" />
