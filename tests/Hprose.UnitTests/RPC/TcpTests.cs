@@ -194,8 +194,8 @@ namespace Hprose.UnitTests.RPC {
             var proxy = client.UseService<ITestInterface>();
             var result = await proxy.Hello("world");
             Assert.AreEqual("Hello world", result);
-           // Assert.AreEqual(3, proxy.Sum(1, 2));
-            //proxy.OnewayCall("Oneway Sync");
+            Assert.AreEqual(3, proxy.Sum(1, 2));
+            proxy.OnewayCall("Oneway Sync");
             await proxy.OnewayCallAsync("Oneway Async");
             server.Stop();
         }
