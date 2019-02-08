@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     public class HttpTransport : ITransport, IDisposable {
-        public static ReadOnlyCollection<string> Schemes { get; } = new ReadOnlyCollection<string>(new string[] { "http", "https" });
+        public static string[] Schemes { get; } = new string[] { "http", "https" };
         private readonly HttpClient httpClient = new HttpClient();
         public HttpRequestHeaders HttpRequestHeaders => httpClient.DefaultRequestHeaders;
         public TimeSpan Timeout {
