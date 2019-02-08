@@ -57,7 +57,7 @@ namespace Hprose.RPC {
             }
             Add(methodManager.GetNames, "~");
         }
-        public void Bind<T>(T server, string name = null) {
+        public Service Bind<T>(T server, string name = null) {
             if (serverTypes.TryGetValue(typeof(T), out var names)) {
                 foreach (var n in names) {
                     if (name == null || name == n) {
@@ -70,6 +70,7 @@ namespace Hprose.RPC {
             else {
                 throw new NotSupportedException("This type server is not supported.");
             }
+            return this;
         }
         public async Task<Stream> Handle(Stream request, Context context) {
             var result = ioManager.Handler(request, context);
