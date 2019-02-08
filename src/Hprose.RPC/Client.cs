@@ -15,7 +15,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
@@ -41,9 +40,9 @@ namespace Hprose.RPC {
         private static readonly Dictionary<string, string> schemes = new Dictionary<string, string>();
         public static void Register<T>(string name) where T : ITransport, new() {
             var type = typeof(T);
-            var schemes = type.GetProperty("Schemes", BindingFlags.Public | BindingFlags.Static).GetValue(type, null) as ReadOnlyCollection<string>;
+            var schemes = type.GetProperty("Schemes", BindingFlags.Public | BindingFlags.Static).GetValue(type, null) as string[];
             transTypes.Add((name, type));
-            for (int i = 0, n = schemes.Count; i < n; ++i) {
+            for (int i = 0, n = schemes.Length; i < n; ++i) {
                 var scheme = schemes[i];
                 Client.schemes[scheme] = name;
             }
