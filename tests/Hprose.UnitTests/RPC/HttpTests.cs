@@ -8,6 +8,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Hprose.RPC.Plugins.LoadBalance;
+using System.Collections.Generic;
 
 namespace Hprose.UnitTests.RPC {
     [TestClass]
@@ -197,15 +199,23 @@ namespace Hprose.UnitTests.RPC {
         public async Task Test7() {
             HttpListener server = new HttpListener();
             server.Prefixes.Add("http://127.0.0.1:8086/");
+            server.Prefixes.Add("http://127.0.0.1:8087/");
+            server.Prefixes.Add("http://127.0.0.1:8088/");
+            server.Prefixes.Add("http://127.0.0.1:8089/");
             server.Start();
             var service = new Service();
             service.AddMethod("Hello", this)
                    .AddMethod("Sum", this)
                    .Add<string>(OnewayCall)
                    .Bind(server);
-            var client = new Client("http://127.0.0.1:8086/");
-            var log = new Log();
-            client.Use(new ConcurrentLimiter(64).Handler).Use(new RateLimiter(50000).InvokeHandler);
+            var client = new Client(/* "http://127.0.0.1:8086/" */);
+            var lb = new WeightedRoundRobinLoadBalance(new Dictionary<string, int>() {
+                { "http://127.0.0.1:8086/", 1 },
+                { "http://127.0.0.1:8087/", 2 },
+                { "http://127.0.0.1:8088/", 3 },
+                { "http://127.0.0.1:8089/", 4 }
+            });
+            client.Use(lb.Handler).Use(new ConcurrentLimiter(64).Handler).Use(new RateLimiter(50000).InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
             var n = 10000;
             var tasks = new Task<string>[n];
