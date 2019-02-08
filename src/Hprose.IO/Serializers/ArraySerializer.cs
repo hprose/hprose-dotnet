@@ -47,7 +47,7 @@ namespace Hprose.IO.Serializers {
             stream.WriteByte(TagOpenbrace);
             var serializer = Serializer<T>.Instance;
             for (int i = 0; i < length; ++i) {
-                writer.SetReference(new object());
+                writer.AddReferenceCount(1);
                 stream.WriteByte(TagList);
                 if (length2 > 0) {
                     ValueWriter.WriteInt(stream, length2);
