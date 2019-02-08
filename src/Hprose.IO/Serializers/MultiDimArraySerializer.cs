@@ -57,7 +57,7 @@ namespace Hprose.IO.Serializers {
                     }
                 }
                 for (i = rank - n; i < rank; ++i) {
-                    writer.SetReference(new object());
+                    writer.AddReferenceCount(1);
                     stream.WriteByte(TagList);
                     if (len[i] > 0) ValueWriter.WriteInt(stream, len[i]);
                     stream.WriteByte(TagOpenbrace);
