@@ -8,7 +8,7 @@
 |                                                          |
 |  Nginx RoundRobin LoadBalance plugin for C#.             |
 |                                                          |
-|  LastModified: Feb 1, 2019                               |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -17,11 +17,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.LoadBalance {
     public class NginxRoundRobinLoadBalance : WeightedLoadBalance {
-        private readonly object locker = new object();
+        private SpinLock spanlock = new SpinLock();
         private readonly Random random = new Random(Guid.NewGuid().GetHashCode());
         private readonly int[] effectiveWeights;
         private readonly int[] currentWeights;
@@ -34,7 +35,9 @@ namespace Hprose.RPC.Plugins.LoadBalance {
         public override async Task<Stream> Handler(Stream request, Context context, NextIOHandler next) {
             int n = uris.Length;
             int index = -1;
-            lock (locker) {
+            bool gotlock = false;
+            try {
+                spanlock.Enter(ref gotlock);
                 var totalWeight = effectiveWeights.Sum();
                 if (totalWeight > 0) {
                     int currentWeight = int.MinValue;
@@ -51,21 +54,34 @@ namespace Hprose.RPC.Plugins.LoadBalance {
                     index = random.Next(n);
                 }
             }
-                (context as ClientContext).Uri = uris[index];
+            finally {
+                if (gotlock) spanlock.Exit();
+            }
+            (context as ClientContext).Uri = uris[index];
             try {
                 var response = await next(request, context).ConfigureAwait(false);
-                lock (locker) {
+                gotlock = false;
+                try {
+                    spanlock.Enter(ref gotlock);
                     if (effectiveWeights[index] < weights[index]) {
                         effectiveWeights[index]++;
                     }
                 }
+                finally {
+                    if (gotlock) spanlock.Exit();
+                }
                 return response;
             }
             catch {
-                lock (locker) {
+                gotlock = false;
+                try {
+                    spanlock.Enter(ref gotlock);
                     if (effectiveWeights[index] > 0) {
                         effectiveWeights[index]--;
                     }
+                }
+                finally {
+                    if (gotlock) spanlock.Exit();
                 }
                 throw;
             }
