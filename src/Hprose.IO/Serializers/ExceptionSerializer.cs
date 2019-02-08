@@ -21,7 +21,7 @@ namespace Hprose.IO.Serializers {
     internal class ExceptionSerializer<T> : ReferenceSerializer<T> where T : Exception {
         public override void Write(Writer writer, T obj) {
             // No reference to exception
-            writer.SetReference(new object());
+            writer.AddReferenceCount(1);
             var stream = writer.Stream;
             stream.WriteByte(TagError);
             stream.WriteByte(TagString);
