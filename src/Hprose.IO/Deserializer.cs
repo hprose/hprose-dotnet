@@ -101,6 +101,7 @@ namespace Hprose.IO {
             Register(() => new DataSetDeserializer());
             Register(() => new StreamDeserializer<Stream>());
             Register(() => new StreamDeserializer<MemoryStream>());
+            Register(() => new ExceptionDeserializer<Exception>());
         }
 
         public static void Initialize() { }
@@ -236,6 +237,9 @@ namespace Hprose.IO {
                 if (typeof(IList).IsAssignableFrom(type)) {
                     return typeof(ListDeserializer<>).MakeGenericType(type);
                 }
+            }
+            if (typeof(Exception).IsAssignableFrom(type)) {
+                return typeof(ExceptionDeserializer<>).MakeGenericType(type);
             }
             if (type.IsValueType) {
                 return typeof(StructDeserializer<>).MakeGenericType(type);

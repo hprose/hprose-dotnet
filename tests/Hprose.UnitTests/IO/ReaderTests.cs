@@ -1608,5 +1608,20 @@ namespace Hprose.UnitTests.IO {
                 Assert.AreEqual(o6.Name, "Anonymous");
             }
         }
+        [TestMethod]
+        public void TestDeserializeException() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                Exception e = new Exception("error");
+                writer.Serialize(e);
+                writer.Serialize(e);
+                stream.Position = 0;
+                Reader reader = new Reader(stream);
+                Exception e1 = reader.Deserialize<Exception>();
+                Exception e2 = reader.Deserialize<Exception>();
+                Assert.AreEqual(e.Message, e1.Message);
+                Assert.AreEqual(e.Message, e2.Message);
+            }
+        }
     }
 }

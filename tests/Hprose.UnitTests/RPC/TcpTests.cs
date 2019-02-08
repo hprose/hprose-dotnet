@@ -45,7 +45,7 @@ namespace Hprose.UnitTests.RPC {
                    .Add<int, int, Task<int>>(Sum)
                    .Add(() => { return "good"; }, "Good")
                    .Bind(server);
-            var client = new Client("tcp://127.0.0.1:8412");
+            var client = new Client("tcp://127.0.0.1");
             var result = await client.InvokeAsync<string>("hello", new object[] { "world" });
             Assert.AreEqual("Hello world", result);
             Assert.AreEqual(3, await client.InvokeAsync<int>("sum", new object[] { 1, 2 }));
@@ -63,14 +63,14 @@ namespace Hprose.UnitTests.RPC {
         [TestMethod]
         public async Task Test2() {
             IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
-            TcpListener server = new TcpListener(iPAddress, 8412);
+            TcpListener server = new TcpListener(iPAddress, 8413);
             server.Start();
             var service = new Service();
             service.AddMethod("Hello", this)
                    .AddMethod("Sum", this)
                    .Add<string>(OnewayCall)
                    .Bind(server);
-            var client = new Client("tcp4://127.0.0.1:8412");
+            var client = new Client("tcp4://127.0.0.1:8413");
             var log = new Log();
             client.Use(log.IOHandler).Use(log.InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
@@ -84,7 +84,7 @@ namespace Hprose.UnitTests.RPC {
         [TestMethod]
         public async Task Test3() {
             IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
-            TcpListener server = new TcpListener(iPAddress, 8412);
+            TcpListener server = new TcpListener(iPAddress, 8414);
             server.Start();
             var service = new Broker(new Service()).Service;
             ServiceCodec.Instance.Debug = true;
@@ -92,7 +92,7 @@ namespace Hprose.UnitTests.RPC {
                    .Use(Log.InvokeHandler)
                    .Bind(server);
 
-            var client1 = new Client("tcp4://127.0.0.1:8412");
+            var client1 = new Client("tcp4://127.0.0.1:8414");
             var prosumer1 = new Prosumer(client1, "1") {
                 OnSubscribe = (topic) => {
                     Console.WriteLine(topic + " is subscribed.");
@@ -101,27 +101,33 @@ namespace Hprose.UnitTests.RPC {
                     Console.WriteLine(topic + " is unsubscribed.");
                 }
             };
-            var client2 = new Client("tcp4://127.0.0.1:8412");
+            var client2 = new Client("tcp4://127.0.0.1:8414");
             var prosumer2 = new Prosumer(client2, "2");
             await prosumer1.Subscribe<string>("test", (data, from) => {
+                System.Console.WriteLine(data);
                 Assert.AreEqual("hello", data);
+                System.Console.WriteLine(from);
                 Assert.AreEqual("2", from);
             });
             await prosumer1.Subscribe<string>("test2", (data) => {
+                System.Console.WriteLine(data);
                 Assert.AreEqual("world", data);
             });
             await prosumer1.Subscribe<Exception>("test3", (data) => {
-                Assert.AreEqual(new Exception("error"), data);
+                System.Console.WriteLine(data);
+                Assert.AreEqual("error", data.Message);
             });
             var r1 = prosumer2.Push("hello", "test", "1");
             var r2 = prosumer2.Push("hello", "test", "1");
             var r3 = prosumer2.Push("world", "test2", "1");
             var r4 = prosumer2.Push("world", "test2", "1");
             var r5 = prosumer2.Push(new Exception("error"), "test3", "1");
-            await Task.WhenAll(r1, r2, r3, r4, r5);
+            var r6 = prosumer2.Push(new Exception("error"), "test3", "1");
+            await Task.WhenAll(r1, r2, r3, r4, r5, r6);
             await Task.Delay(10);
             await prosumer1.Unsubscribe("test");
             await prosumer1.Unsubscribe("test2");
+            await prosumer1.Unsubscribe("test3");
             server.Stop();
         }
         public object Missing(string name, object[] args, Context context) {
@@ -130,11 +136,11 @@ namespace Hprose.UnitTests.RPC {
         [TestMethod]
         public async Task Test4() {
             IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
-            TcpListener server = new TcpListener(iPAddress, 8412);
+            TcpListener server = new TcpListener(iPAddress, 8415);
             server.Start();
             var service = new Service();
             service.AddMissingMethod(Missing).Bind(server);
-            var client = new Client("tcp://127.0.0.1:8412");
+            var client = new Client("tcp://127.0.0.1:8415");
             var log = new Log();
             client.Use(log.IOHandler).Use(log.InvokeHandler);
             var result = client.Invoke<string>("hello", new object[] { "world" });
@@ -146,7 +152,7 @@ namespace Hprose.UnitTests.RPC {
         [TestMethod]
         public async Task Test5() {
             IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
-            TcpListener server = new TcpListener(iPAddress, 8412);
+            TcpListener server = new TcpListener(iPAddress, 8416);
             server.Start();
             var log = new Log();
             ServiceCodec.Instance.Debug = true;
@@ -157,7 +163,7 @@ namespace Hprose.UnitTests.RPC {
             var caller = new Caller(service);
             service.Bind(server);
 
-            var client = new Client("tcp://127.0.0.1:8412");
+            var client = new Client("tcp://127.0.0.1:8416");
             var provider = new Provider(client, "1") {
                 Debug = true
             };
@@ -186,7 +192,7 @@ namespace Hprose.UnitTests.RPC {
         [TestMethod]
         public async Task Test6() {
             IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
-            TcpListener server = new TcpListener(iPAddress, 8413);
+            TcpListener server = new TcpListener(iPAddress, 8417);
             server.Start();
             var service = new Service {
                 Codec = JsonRpcServiceCodec.Instance
@@ -195,7 +201,7 @@ namespace Hprose.UnitTests.RPC {
                    .AddMethod("Sum", this)
                    .Add<string>(OnewayCall)
                    .Bind(server, "tcp");
-            var client = new Client("tcp://127.0.0.1:8413") {
+            var client = new Client("tcp://127.0.0.1:8417") {
                 Codec = JsonRpcClientCodec.Instance
             };
             var log = new Log();
@@ -211,13 +217,13 @@ namespace Hprose.UnitTests.RPC {
         [TestMethod]
         public async Task Test7() {
             IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
-            TcpListener server1 = new TcpListener(iPAddress, 8412);
+            TcpListener server1 = new TcpListener(iPAddress, 8418);
             server1.Start();
-            TcpListener server2 = new TcpListener(iPAddress, 8413);
+            TcpListener server2 = new TcpListener(iPAddress, 8419);
             server2.Start();
-            TcpListener server3 = new TcpListener(iPAddress, 8414);
+            TcpListener server3 = new TcpListener(iPAddress, 8420);
             server3.Start();
-            TcpListener server4 = new TcpListener(iPAddress, 8415);
+            TcpListener server4 = new TcpListener(iPAddress, 8421);
             server4.Start();
             var service = new Service();
             service.AddMethod("Hello", this)
@@ -227,16 +233,16 @@ namespace Hprose.UnitTests.RPC {
                    .Bind(server2)
                    .Bind(server3)
                    .Bind(server4);
-            var client = new Client(/* "tcp4://127.0.0.1:8412" */);
+            var client = new Client(/* "tcp4://127.0.0.1:8418" */);
             var lb = new NginxRoundRobinLoadBalance(new Dictionary<string, int>() {
-                { "tcp4://127.0.0.1:8412", 1 },
-                { "tcp4://127.0.0.1:8413", 2 },
-                { "tcp4://127.0.0.1:8414", 3 },
-                { "tcp4://127.0.0.1:8415", 4 }
+                { "tcp4://127.0.0.1:8418", 1 },
+                { "tcp4://127.0.0.1:8419", 2 },
+                { "tcp4://127.0.0.1:8420", 3 },
+                { "tcp4://127.0.0.1:8421", 4 }
             });
             client.Use(lb.Handler).Use(new ConcurrentLimiter(64).Handler).Use(new RateLimiter(50000).InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
-            var n = 100000;
+            var n = 10000;
             var tasks = new Task<string>[n];
             for (int i = 0; i < n; ++i) {
                 tasks[i] = proxy.Hello("world" + i);

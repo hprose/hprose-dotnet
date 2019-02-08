@@ -458,5 +458,16 @@ namespace Hprose.UnitTests.IO {
                 Assert.AreEqual("m2{s2\"id\"1s4\"name\"s4\"Test\"}r0;", Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
             }
         }
+        [TestMethod]
+        public void TestSerializeException() {
+            using (MemoryStream stream = new MemoryStream()) {
+                Writer writer = new Writer(stream);
+                Exception e = new Exception("error");
+                writer.Serialize(e);
+                writer.Serialize(e);
+                var data = stream.GetArraySegment();
+                Assert.AreEqual("Es5\"error\"Es5\"error\"", Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
+            }
+        }
     }
 }

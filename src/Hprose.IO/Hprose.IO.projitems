@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ArraySegmentDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ExpandoObjectDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Deserializers\InterfaceDeserializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Deserializers\ExceptionDeserializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DictType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Factory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FieldsAccessor.cs" />

@@ -4,9 +4,9 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-|  ExceptionSerializer.cs                                  |
+|  ExceptionDeserializer.cs                                |
 |                                                          |
-|  ExceptionSerializer class for C#.                       |
+|  ExceptionDeserializer class for C#.                     |
 |                                                          |
 |  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
@@ -15,17 +15,18 @@
 
 using System;
 
-namespace Hprose.IO.Serializers {
+namespace Hprose.IO.Deserializers {
     using static Tags;
 
-    internal class ExceptionSerializer<T> : ReferenceSerializer<T> where T : Exception {
-        public override void Write(Writer writer, T obj) {
-            // No reference to exception
-            writer.SetReference(new object());
-            var stream = writer.Stream;
-            stream.WriteByte(TagError);
-            stream.WriteByte(TagString);
-            ValueWriter.Write(stream, obj.Message);
+    internal class ExceptionDeserializer<T> : Deserializer<T> where T : Exception {
+        public override T Read(Reader reader, int tag) {
+            var stream = reader.Stream;
+            switch (tag) {
+                case TagError:
+                    return (T)Activator.CreateInstance(typeof(T), new object[] { reader.Deserialize<string>() });
+                default:
+                    return base.Read(reader, tag);
+            }
         }
     }
 }
