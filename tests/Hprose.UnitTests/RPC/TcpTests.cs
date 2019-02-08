@@ -10,6 +10,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Hprose.RPC.Plugins.LoadBalance;
+using System.Collections.Generic;
 
 namespace Hprose.UnitTests.RPC {
     [TestClass]
@@ -209,18 +211,32 @@ namespace Hprose.UnitTests.RPC {
         [TestMethod]
         public async Task Test7() {
             IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
-            TcpListener server = new TcpListener(iPAddress, 8412);
-            server.Start();
+            TcpListener server1 = new TcpListener(iPAddress, 8412);
+            server1.Start();
+            TcpListener server2 = new TcpListener(iPAddress, 8413);
+            server2.Start();
+            TcpListener server3 = new TcpListener(iPAddress, 8414);
+            server3.Start();
+            TcpListener server4 = new TcpListener(iPAddress, 8415);
+            server4.Start();
             var service = new Service();
             service.AddMethod("Hello", this)
                    .AddMethod("Sum", this)
                    .Add<string>(OnewayCall)
-                   .Bind(server);
-            var client = new Client("tcp4://127.0.0.1:8412");
-            var log = new Log();
-            client.Use(new ConcurrentLimiter(64).Handler).Use(new RateLimiter(50000).InvokeHandler);
+                   .Bind(server1)
+                   .Bind(server2)
+                   .Bind(server3)
+                   .Bind(server4);
+            var client = new Client(/* "tcp4://127.0.0.1:8412" */);
+            var lb = new NginxRoundRobinLoadBalance(new Dictionary<string, int>() {
+                { "tcp4://127.0.0.1:8412", 1 },
+                { "tcp4://127.0.0.1:8413", 2 },
+                { "tcp4://127.0.0.1:8414", 3 },
+                { "tcp4://127.0.0.1:8415", 4 }
+            });
+            client.Use(lb.Handler).Use(new ConcurrentLimiter(64).Handler).Use(new RateLimiter(50000).InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
-            var n = 10000;
+            var n = 100000;
             var tasks = new Task<string>[n];
             for (int i = 0; i < n; ++i) {
                 tasks[i] = proxy.Hello("world" + i);
@@ -229,7 +245,10 @@ namespace Hprose.UnitTests.RPC {
             for (int i = 0; i < n; ++i) {
                 Assert.AreEqual(results[i], "Hello world" + i);
             }
-            server.Stop();
+            server1.Stop();
+            server2.Stop();
+            server3.Stop();
+            server4.Stop();
         }
     }
 }
