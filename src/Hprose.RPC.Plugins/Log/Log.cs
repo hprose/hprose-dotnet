@@ -8,7 +8,7 @@
 |                                                          |
 |  Log plugin for C#.                                      |
 |                                                          |
-|  LastModified: Feb 4, 2019                               |
+|  LastModified: Feb 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -37,14 +37,6 @@ namespace Hprose.RPC.Plugins.Log {
         }
     }
     public static class LogExtensions {
-        private static async Task<Stream> ToMemoryStream(Stream stream) {
-            MemoryStream memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream).ConfigureAwait(false);
-            memoryStream.Position = 0;
-            stream.Dispose();
-            stream = memoryStream;
-            return stream;
-        }
         private static string ToString(MemoryStream stream) {
             var data = stream.GetArraySegment();
             try {
@@ -60,17 +52,13 @@ namespace Hprose.RPC.Plugins.Log {
         public static async Task<Stream> IOHandler(this Log log, Stream request, Context context, NextIOHandler next) {
             bool enabled = context.Contains("Log") ? (context as dynamic).Log : log.Enabled;
             if (!enabled) return await next(request, context).ConfigureAwait(false);
-            if (!(request is MemoryStream)) {
-                request = await ToMemoryStream(request).ConfigureAwait(false);
-            }
-            Trace.TraceInformation(ToString(request as MemoryStream));
+            var stream = await request.ToMemoryStream().ConfigureAwait(false);
+            Trace.TraceInformation(ToString(stream));
             try {
-                var response = await next(request, context).ConfigureAwait(false);
-                if (!(response is MemoryStream)) {
-                    response = await ToMemoryStream(response).ConfigureAwait(false);
-                }
-                Trace.TraceInformation(ToString(response as MemoryStream));
-                return response;
+                var response = await next(stream, context).ConfigureAwait(false);
+                stream = await response.ToMemoryStream().ConfigureAwait(false);
+                Trace.TraceInformation(ToString(stream));
+                return stream;
             }
             catch (Exception e) {
                 Trace.TraceError(e.StackTrace);
