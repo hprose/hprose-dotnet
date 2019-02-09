@@ -126,13 +126,13 @@ namespace Hprose.RPC {
             }
         }
         private async void Send(string uri, (int index, Stream stream) request) {
-            var sended = Sended[uri];
             var index = request.index;
             MemoryStream stream;
             try {
                 stream = await request.stream.ToMemoryStream().ConfigureAwait(false);
             }
             catch (Exception e) {
+                var sended = Sended[uri];
                 if (sended.TryRemove(index, out var value)) {
                     value.TrySetException(e);
                 }
@@ -158,6 +158,7 @@ namespace Hprose.RPC {
                 await udpClient.SendAsync(buffer, buffer.Length).ConfigureAwait(false);
             }
             catch (Exception e) {
+                var sended = Sended[uri];
                 foreach (var i in sended.Keys) {
                     if (sended.TryRemove(i, out var value)) {
                         value.TrySetException(e);
