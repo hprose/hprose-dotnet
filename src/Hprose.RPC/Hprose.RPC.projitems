@@ -13,8 +13,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)CRC32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HandlerManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StreamExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UdpTransport.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UdpClientExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UdpTransport.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UdpHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TcpHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TcpTransport.cs" />
