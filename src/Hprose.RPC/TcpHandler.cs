@@ -79,7 +79,7 @@ namespace Hprose.RPC {
                 }
                 catch (Exception e) {
                     OnError?.Invoke(e);
-                    return;
+                    continue;
                 }
                 var n = (int)stream.Length;
                 header[4] = (byte)(n >> 24 & 0xFF | 0x80);
@@ -153,11 +153,8 @@ namespace Hprose.RPC {
             var receive = Receive(tcpClient, responses);
             var send = Send(tcpClient, responses);
             try {
-#if NET40
-                await TaskEx.WhenAny(receive, send).ConfigureAwait(false);
-#else
-                await Task.WhenAny(receive, send).ConfigureAwait(false);
-#endif
+                await receive.ConfigureAwait(false);
+                await send.ConfigureAwait(false);
             }
             catch (Exception e) {
                 OnError?.Invoke(e);
