@@ -8,7 +8,7 @@
 |                                                          |
 |  Weighted Random LoadBalance plugin for C#.              |
 |                                                          |
-|  LastModified: Feb 1, 2019                               |
+|  LastModified: Feb 10, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.LoadBalance {
     public class WeightedRandomLoadBalance : WeightedLoadBalance, IDisposable {
-        private readonly Random random = new Random(Guid.NewGuid().GetHashCode());
+        private readonly ThreadLocal<Random> random = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
         private readonly int[] effectiveWeights;
         private readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
         public WeightedRandomLoadBalance(IDictionary<string, int> uriList) : base(uriList) {
@@ -36,7 +36,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
             rwlock.EnterReadLock();
             var totalWeight = effectiveWeights.Sum();
             if (totalWeight > 0) {
-                var currentWeight = random.Next(totalWeight);
+                var currentWeight = random.Value.Next(totalWeight);
                 for (int i = 0; i < n; ++i) {
                     currentWeight -= effectiveWeights[i];
                     if (currentWeight < 0) {
@@ -46,7 +46,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
                 }
             }
             else {
-                index = random.Next(n);
+                index = random.Value.Next(n);
             }
             rwlock.ExitReadLock();
             (context as ClientContext).Uri = uris[index];
@@ -80,6 +80,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
         protected virtual void Dispose(bool disposing) {
             if (disposed) return;
             if (disposing) {
+                random.Dispose();
                 rwlock.Dispose();
             }
             disposed = true;
