@@ -8,12 +8,11 @@
 |                                                          |
 |  UdpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Feb 9, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
-#if !NET40
-using Hprose.IO;
+
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -36,7 +35,11 @@ namespace Hprose.RPC {
             while (true) {
                 UdpReceiveResult response;
                 while (!responses.TryDequeue(out response)) {
+#if NET40
+                    await TaskEx.Yield();
+#else
                     await Task.Yield();
+#endif
                 }
                 await udpClient.SendAsync(
                     response.Buffer,
@@ -111,7 +114,7 @@ namespace Hprose.RPC {
             }
             catch (Exception e) {
                 OnError?.Invoke(e);
-#if NET45 || NET451 || NET452
+#if NET40 || NET45 || NET451 || NET452
                 udpClient.Close();
 #else
                 udpClient.Dispose();
@@ -121,4 +124,3 @@ namespace Hprose.RPC {
         }
     }
 }
-#endif

@@ -19,4 +19,5 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1054:Uri parameters should not be strings", Justification = "<挂起>", Scope = "member", Target = "~M:Hprose.RPC.Client.#ctor(System.String)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "<挂起>", Scope = "member", Target = "~P:Hprose.RPC.HttpTransport.Schemes")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "<挂起>", Scope = "member", Target = "~P:Hprose.RPC.TcpTransport.Schemes")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "<挂起>", Scope = "member", Target = "~P:Hprose.RPC.UdpReceiveResult.Buffer")]
 
