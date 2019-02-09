@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpTransport class for C#.                              |
 |                                                          |
-|  LastModified: Feb 6, 2019                               |
+|  LastModified: Feb 10, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -196,7 +196,6 @@ namespace Hprose.RPC {
                     await netStream.WriteAsync(header, 0, 12).ConfigureAwait(false);
                     await stream.CopyToAsync(netStream).ConfigureAwait(false);
                     await netStream.FlushAsync().ConfigureAwait(false);
-                    stream.Dispose();
                 }
                 catch (Exception e) {
                     foreach (var i in sended.Keys) {
@@ -212,7 +211,10 @@ namespace Hprose.RPC {
 #endif
                     }
                 }
-                requests.TryDequeue(out request);
+                finally {
+                    stream.Dispose();
+                    requests.TryDequeue(out request);
+                }
             }
         }
         private async Task<TcpClient> GetTcpClient(string uri) {
