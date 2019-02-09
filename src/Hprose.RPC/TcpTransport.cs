@@ -141,11 +141,67 @@ namespace Hprose.RPC {
 #endif
             }
         }
+        private async Task Send(string uri, (int index, Stream stream) request) {
+            var header = new byte[12];
+            var index = request.index;
+            Stream stream = request.stream;
+            try {
+                if (!stream.CanSeek) {
+                    stream = await stream.ToMemoryStream().ConfigureAwait(false);
+                }
+            }
+            catch (Exception e) {
+                var sended = Sended[uri];
+                if (sended.TryRemove(index, out var value)) {
+                    value.TrySetException(e);
+                }
+                return;
+            }
+            var n = (int)stream.Length;
+            header[4] = (byte)(n >> 24 & 0xFF | 0x80);
+            header[5] = (byte)(n >> 16 & 0xFF);
+            header[6] = (byte)(n >> 8 & 0xFF);
+            header[7] = (byte)(n & 0xFF);
+            header[8] = (byte)(index >> 24 & 0xFF);
+            header[9] = (byte)(index >> 16 & 0xFF);
+            header[10] = (byte)(index >> 8 & 0xFF);
+            header[11] = (byte)(index & 0xFF);
+            var crc32 = CRC32.Compute(header, 4, 8);
+            header[0] = (byte)(crc32 >> 24 & 0xFF);
+            header[1] = (byte)(crc32 >> 16 & 0xFF);
+            header[2] = (byte)(crc32 >> 8 & 0xFF);
+            header[3] = (byte)(crc32 & 0xFF);
+            TcpClient tcpClient = null;
+            try {
+                tcpClient = await GetTcpClient(uri).ConfigureAwait(false);
+                var netStream = tcpClient.GetStream();
+                await netStream.WriteAsync(header, 0, 12).ConfigureAwait(false);
+                await stream.CopyToAsync(netStream).ConfigureAwait(false);
+                await netStream.FlushAsync().ConfigureAwait(false);
+            }
+            catch (Exception e) {
+                var sended = Sended[uri];
+                foreach (var i in sended.Keys) {
+                    if (sended.TryRemove(i, out var value)) {
+                        value.TrySetException(e);
+                    }
+                }
+                if (tcpClient != null) {
+#if NET40 || NET45 || NET451 || NET452
+                    tcpClient.Close();
+#else
+                    tcpClient.Dispose();
+#endif
+                }
+            }
+            finally {
+                stream.Dispose();
+            }
+        }
         private async void Send(string uri) {
             var requests = Requests[uri];
             var results = Results[uri];
             var sended = Sended.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<Stream>>());
-            var header = new byte[12];
             while (!requests.IsEmpty) {
                 requests.TryPeek(out (int index, Stream stream) request);
                 var index = request.index;
@@ -162,59 +218,8 @@ namespace Hprose.RPC {
                 else {
                     return;
                 }
-                Stream stream = request.stream;
-                try {
-                    if (!stream.CanSeek) {
-                        stream = await stream.ToMemoryStream().ConfigureAwait(false);
-                    }
-                }
-                catch (Exception e) {
-                    if (sended.TryRemove(index, out var value)) {
-                        value.TrySetException(e);
-                    }
-                    requests.TryDequeue(out request);
-                    continue;
-                }
-                var n = (int)stream.Length;
-                header[4] = (byte)(n >> 24 & 0xFF | 0x80);
-                header[5] = (byte)(n >> 16 & 0xFF);
-                header[6] = (byte)(n >> 8 & 0xFF);
-                header[7] = (byte)(n & 0xFF);
-                header[8] = (byte)(index >> 24 & 0xFF);
-                header[9] = (byte)(index >> 16 & 0xFF);
-                header[10] = (byte)(index >> 8 & 0xFF);
-                header[11] = (byte)(index & 0xFF);
-                var crc32 = CRC32.Compute(header, 4, 8);
-                header[0] = (byte)(crc32 >> 24 & 0xFF);
-                header[1] = (byte)(crc32 >> 16 & 0xFF);
-                header[2] = (byte)(crc32 >> 8 & 0xFF);
-                header[3] = (byte)(crc32 & 0xFF);
-                TcpClient tcpClient = null;
-                try {
-                    tcpClient = await GetTcpClient(uri).ConfigureAwait(false);
-                    var netStream = tcpClient.GetStream();
-                    await netStream.WriteAsync(header, 0, 12).ConfigureAwait(false);
-                    await stream.CopyToAsync(netStream).ConfigureAwait(false);
-                    await netStream.FlushAsync().ConfigureAwait(false);
-                }
-                catch (Exception e) {
-                    foreach (var i in sended.Keys) {
-                        if (sended.TryRemove(i, out var value)) {
-                            value.TrySetException(e);
-                        }
-                    }
-                    if (tcpClient != null) {
-#if NET40 || NET45 || NET451 || NET452
-                        tcpClient.Close();
-#else
-                        tcpClient.Dispose();
-#endif
-                    }
-                }
-                finally {
-                    stream.Dispose();
-                    requests.TryDequeue(out request);
-                }
+                await Send(uri, request).ConfigureAwait(false);
+                requests.TryDequeue(out request);
             }
         }
         private async Task<TcpClient> GetTcpClient(string uri) {
