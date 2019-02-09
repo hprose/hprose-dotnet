@@ -8,7 +8,7 @@
 |                                                          |
 |  Service class for C#.                                   |
 |                                                          |
-|  LastModified: Feb 5, 2019                               |
+|  LastModified: Feb 9, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -37,9 +37,11 @@ namespace Hprose.RPC {
         static Service() {
             Register<HttpHandler, HttpListener>("http");
             Register<TcpHandler, TcpListener>("tcp");
+            Register<UdpHandler, UdpClient>("udp");
         }
         public HttpHandler Http => (HttpHandler)this["http"];
         public TcpHandler Tcp => (TcpHandler)this["tcp"];
+        public UdpHandler Udp => (UdpHandler)this["udp"];
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         public IServiceCodec Codec { get; set; } = ServiceCodec.Instance;
         public int MaxRequestLength { get; set; } = 0x7FFFFFFF;
