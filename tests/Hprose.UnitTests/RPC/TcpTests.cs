@@ -131,7 +131,7 @@ namespace Hprose.UnitTests.RPC {
             server.Stop();
         }
         public object Missing(string name, object[] args, Context context) {
-            return name + ":" + args.Length + ":" + (context as dynamic).Socket.RemoteEndPoint.Address;
+            return name + ":" + args.Length + ":" + (context as dynamic).RemoteEndPoint.Address;
         }
         [TestMethod]
         public async Task Test4() {
@@ -200,7 +200,7 @@ namespace Hprose.UnitTests.RPC {
             service.AddMethod("Hello", this)
                    .AddMethod("Sum", this)
                    .Add<string>(OnewayCall)
-                   .Bind(server, "tcp");
+                   .Bind(server);
             var client = new Client("tcp://127.0.0.1:8417") {
                 Codec = JsonRpcClientCodec.Instance
             };
@@ -242,7 +242,7 @@ namespace Hprose.UnitTests.RPC {
             });
             client.Use(lb.Handler).Use(new ConcurrentLimiter(64).Handler).Use(new RateLimiter(50000).InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
-            var n = 10000;
+            var n = 1000;
             var tasks = new Task<string>[n];
             for (int i = 0; i < n; ++i) {
                 tasks[i] = proxy.Hello("world" + i);
