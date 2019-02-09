@@ -125,6 +125,53 @@ namespace Hprose.RPC {
 #endif
             }
         }
+        private async void Send(string uri, (int index, Stream stream) request) {
+            var sended = Sended[uri];
+            var index = request.index;
+            MemoryStream stream;
+            try {
+                stream = await request.stream.ToMemoryStream().ConfigureAwait(false);
+            }
+            catch (Exception e) {
+                if (sended.TryRemove(index, out var value)) {
+                    value.TrySetException(e);
+                }
+                return;
+            }
+            var data = stream.GetArraySegment();
+            var n = data.Count;
+            var buffer = new byte[n + 8];
+            buffer[4] = (byte)(n >> 8 & 0xFF);
+            buffer[5] = (byte)(n & 0xFF);
+            buffer[6] = (byte)(index >> 8 & 0xFF);
+            buffer[7] = (byte)(index & 0xFF);
+            var crc32 = CRC32.Compute(buffer, 4, 4);
+            buffer[0] = (byte)(crc32 >> 24 & 0xFF);
+            buffer[1] = (byte)(crc32 >> 16 & 0xFF);
+            buffer[2] = (byte)(crc32 >> 8 & 0xFF);
+            buffer[3] = (byte)(crc32 & 0xFF);
+            Buffer.BlockCopy(data.Array, data.Offset, buffer, 8, n);
+            stream.Dispose();
+            UdpClient udpClient = null;
+            try {
+                udpClient = GetUdpClient(uri);
+                await udpClient.SendAsync(buffer, buffer.Length).ConfigureAwait(false);
+            }
+            catch (Exception e) {
+                foreach (var i in sended.Keys) {
+                    if (sended.TryRemove(i, out var value)) {
+                        value.TrySetException(e);
+                    }
+                }
+                if (udpClient != null) {
+#if NET40 || NET45 || NET451 || NET452
+                    udpClient.Close();
+#else
+                    udpClient.Dispose();
+#endif
+                }
+            }
+        }
         private async void Send(string uri) {
             var requests = Requests[uri];
             var results = Results[uri];
@@ -145,53 +192,8 @@ namespace Hprose.RPC {
                 else {
                     return;
                 }
-                MemoryStream stream;
-                try {
-                    stream = await request.stream.ToMemoryStream().ConfigureAwait(false);
-                }
-                catch (Exception e) {
-                    if (sended.TryRemove(index, out var value)) {
-                        value.TrySetException(e);
-                    }
-                    requests.TryDequeue(out request);
-                    continue;
-                }
-                var data = stream.GetArraySegment();
-                var n = data.Count;
-                var buffer = new byte[n + 8];
-                buffer[4] = (byte)(n >> 8 & 0xFF);
-                buffer[5] = (byte)(n & 0xFF);
-                buffer[6] = (byte)(index >> 8 & 0xFF);
-                buffer[7] = (byte)(index & 0xFF);
-                var crc32 = CRC32.Compute(buffer, 4, 4);
-                buffer[0] = (byte)(crc32 >> 24 & 0xFF);
-                buffer[1] = (byte)(crc32 >> 16 & 0xFF);
-                buffer[2] = (byte)(crc32 >> 8 & 0xFF);
-                buffer[3] = (byte)(crc32 & 0xFF);
-                Buffer.BlockCopy(data.Array, data.Offset, buffer, 8, n);
-                UdpClient udpClient = null;
-                try {
-                    udpClient = GetUdpClient(uri);
-                    await udpClient.SendAsync(buffer, buffer.Length).ConfigureAwait(false);
-                }
-                catch (Exception e) {
-                    foreach (var i in sended.Keys) {
-                        if (sended.TryRemove(i, out var value)) {
-                            value.TrySetException(e);
-                        }
-                    }
-                    if (udpClient != null) {
-#if NET40 || NET45 || NET451 || NET452
-                        udpClient.Close();
-#else
-                        udpClient.Dispose();
-#endif
-                    }
-                }
-                finally {
-                    stream.Dispose();
-                    requests.TryDequeue(out request);
-                }
+                Send(uri, request);
+                requests.TryDequeue(out request);
             }
         }
         private UdpClient GetUdpClient(string uri) {
