@@ -240,11 +240,7 @@ namespace Hprose.RPC {
         public Task<Stream> Transport(Stream request, Context context) {
             var clientContext = context as ClientContext;
             var uri = clientContext.Uri;
-            var index = Interlocked.Increment(ref counter);
-            while (index < 0) {
-                Interlocked.Add(ref counter, Int32.MinValue);
-                index = Interlocked.Increment(ref counter);
-            }
+            var index = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
             var results = Results.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<Stream>>());
             var result = new TaskCompletionSource<Stream>();
             results[index] = result;
