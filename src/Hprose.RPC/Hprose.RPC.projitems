@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ContextAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CRC32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HandlerManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UdpHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TcpHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TcpTransport.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IOManager.cs" />
