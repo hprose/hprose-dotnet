@@ -20,4 +20,5 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "<挂起>", Scope = "member", Target = "~P:Hprose.RPC.HttpTransport.Schemes")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "<挂起>", Scope = "member", Target = "~P:Hprose.RPC.TcpTransport.Schemes")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "<挂起>", Scope = "member", Target = "~P:Hprose.RPC.UdpReceiveResult.Buffer")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "<挂起>", Scope = "member", Target = "~P:Hprose.RPC.UdpTransport.Schemes")]
 
