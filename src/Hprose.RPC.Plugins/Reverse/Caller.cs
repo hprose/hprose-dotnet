@@ -125,11 +125,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             return InvokeAsync<object>(id, fullname, args);
         }
         public async Task<T> InvokeAsync<T>(string id, string fullname, object[] args = null) {
-            var index = Interlocked.Increment(ref counter);
-            while (index < 0) {
-                Interlocked.Add(ref counter, Int32.MinValue);
-                index = Interlocked.Increment(ref counter);
-            }
+            var index = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
             var result = new TaskCompletionSource<object>();
             var calls = Calls.GetOrAdd(id, (_) => new ConcurrentQueue<(int, string, object[])>());
             calls.Enqueue((index, fullname, args));
