@@ -131,7 +131,7 @@ namespace Hprose.Benchmark.IO {
 
         private readonly static DataSet dataSet = MakeDataSet();
 
-        private readonly static ArraySegment<byte> hproseData;
+        private readonly static byte[] hproseData;
         private readonly static byte[] dcData;
         private readonly static string newtonData;
 

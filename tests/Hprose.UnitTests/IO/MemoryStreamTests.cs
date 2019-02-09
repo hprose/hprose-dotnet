@@ -1,4 +1,4 @@
-﻿using Hprose.IO;
+﻿using Hprose.RPC;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Text;

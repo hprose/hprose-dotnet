@@ -26,7 +26,7 @@ namespace Hprose.IO.Serializers {
             var type = typeof(T);
             int r = writer.WriteClass(type, () => {
                 var data = membersWriter.data;
-                stream.Write(data.Array, data.Offset, data.Count);
+                stream.Write(data, 0, data.Length);
                 writer.AddReferenceCount(count);
             });
             base.Write(writer, obj);

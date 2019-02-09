@@ -17,7 +17,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Hprose.IO {
+namespace Hprose.RPC {
     public static class StreamExtensions {
 #if NET40 || NET45 || NET451 || NET452
         public static ArraySegment<byte> GetArraySegment(this MemoryStream stream) {

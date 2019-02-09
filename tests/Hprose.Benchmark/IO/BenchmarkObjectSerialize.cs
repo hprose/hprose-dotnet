@@ -37,7 +37,7 @@ namespace Hprose.Benchmark.IO {
                Age = 53
            }
         };
-        private static readonly ArraySegment<byte> hproseData;
+        private static readonly byte[] hproseData;
         private static readonly byte[] dcData;
         private static readonly string newtonData;
         private static readonly string sstextData;
