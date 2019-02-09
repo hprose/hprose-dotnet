@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Feb 9, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -70,11 +70,7 @@ namespace Hprose.RPC {
                 Stream stream = response.stream;
                 try {
                     if (!stream.CanSeek) {
-                        var memstream = new MemoryStream();
-                        await stream.CopyToAsync(memstream).ConfigureAwait(false);
-                        memstream.Position = 0;
-                        stream.Dispose();
-                        stream = memstream;
+                        stream = await stream.ToMemoryStream().ConfigureAwait(false);
                     }
                 }
                 catch (Exception e) {
