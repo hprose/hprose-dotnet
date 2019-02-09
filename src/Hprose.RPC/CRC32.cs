@@ -1,6 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿/*--------------------------------------------------------*\
+|                                                          |
+|                          hprose                          |
+|                                                          |
+| Official WebSite: https://hprose.com                     |
+|                                                          |
+|  CRC32.cs                                                |
+|                                                          |
+|  CRC32 class for C#.                                     |
+|                                                          |
+|  LastModified: Feb 10, 2019                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
 
 namespace Hprose.RPC {
     public static class CRC32 {
