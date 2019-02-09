@@ -13,7 +13,6 @@
 |                                                          |
 \*________________________________________________________*/
 
-using Hprose.IO;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
