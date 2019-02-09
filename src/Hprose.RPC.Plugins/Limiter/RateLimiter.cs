@@ -13,6 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
+using Hprose.IO;
 using System;
 using System.IO;
 using System.Threading;
@@ -53,11 +54,7 @@ namespace Hprose.RPC.Plugins.Limiter {
         }
         public async Task<Stream> IOHandler(Stream request, Context context, NextIOHandler next) {
             if (!request.CanSeek) {
-                MemoryStream stream = new MemoryStream();
-                await request.CopyToAsync(stream).ConfigureAwait(false);
-                stream.Position = 0;
-                request.Dispose();
-                request = stream;
+                request = await request.ToMemoryStream().ConfigureAwait(false);
             }
             await Acquire(request.Length).ConfigureAwait(false);
             return await next(request, context).ConfigureAwait(false);
