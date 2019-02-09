@@ -8,7 +8,7 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Feb 5, 2019                               |
+|  LastModified: Feb 10, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -50,9 +50,11 @@ namespace Hprose.RPC {
         static Client() {
             Register<HttpTransport>("http");
             Register<TcpTransport>("tcp");
+            Register<UdpTransport>("udp");
         }
         public HttpTransport Http => (HttpTransport)this["http"];
         public TcpTransport Tcp => (TcpTransport)this["tcp"];
+        public UdpTransport Udp => (UdpTransport)this["udp"];
         private readonly Dictionary<string, ITransport> transports = new Dictionary<string, ITransport>();
         public ITransport this[string name] => transports[name];
         public dynamic RequestHeaders { get; set; } = new ExpandoObject();
