@@ -31,6 +31,13 @@ namespace Hprose.RPC {
         public async Task Bind(UdpClient server) {
             await Handler(server).ConfigureAwait(false);
         }
+        private static async void Send(UdpClient udpClient, UdpReceiveResult response) {
+            await udpClient.SendAsync(
+                response.Buffer,
+                response.Buffer.Length,
+                response.RemoteEndPoint
+            ).ConfigureAwait(false);
+        }
         private static async Task Send(UdpClient udpClient, ConcurrentQueue<UdpReceiveResult> responses) {
             while (true) {
                 UdpReceiveResult response;
@@ -41,11 +48,7 @@ namespace Hprose.RPC {
                     await Task.Yield();
 #endif
                 }
-                await udpClient.SendAsync(
-                    response.Buffer,
-                    response.Buffer.Length,
-                    response.RemoteEndPoint
-                ).ConfigureAwait(false);
+                Send(udpClient, response);
             }
         }
         public static byte[] Encode(int index, ArraySegment<byte> data) {
