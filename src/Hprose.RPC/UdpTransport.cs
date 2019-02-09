@@ -28,9 +28,9 @@ namespace Hprose.RPC {
         private volatile int counter = 0;
         public bool EnableBroadcast { get; set; } = true;
         public short Ttl { get; set; } = 0;
-        private ConcurrentDictionary<string, ConcurrentQueue<(int, Stream)>> Requests { get; } = new ConcurrentDictionary<string, ConcurrentQueue<(int, Stream)>>();
-        private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<Stream>>> Results { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<Stream>>>();
-        private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<Stream>>> Sended { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<Stream>>>();
+        private ConcurrentDictionary<string, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<string, ConcurrentQueue<(int, MemoryStream)>>();
+        private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
+        private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Sended { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
         private ConcurrentDictionary<string, Lazy<UdpClient>> UdpClients { get; } = new ConcurrentDictionary<string, Lazy<UdpClient>>();
         private readonly Func<string, Lazy<UdpClient>> udpClientFactory;
         public UdpTransport() {
@@ -61,7 +61,7 @@ namespace Hprose.RPC {
                         var results = Results[uri];
                         if (requests != null) {
                             while (!requests.IsEmpty) {
-                                if (requests.TryDequeue(out (int index, Stream stream) request)) {
+                                if (requests.TryDequeue(out (int index, MemoryStream stream) request)) {
                                     if (sended.TryRemove(request.index, out var result)) {
                                         result.TrySetException(e);
                                     }
@@ -125,19 +125,7 @@ namespace Hprose.RPC {
 #endif
             }
         }
-        private async void Send(string uri, (int index, Stream stream) request) {
-            var index = request.index;
-            MemoryStream stream;
-            try {
-                stream = await request.stream.ToMemoryStream().ConfigureAwait(false);
-            }
-            catch (Exception e) {
-                var sended = Sended[uri];
-                if (sended.TryRemove(index, out var value)) {
-                    value.TrySetException(e);
-                }
-                return;
-            }
+        private async void Send(string uri, int index, MemoryStream stream) {
             var data = stream.GetArraySegment();
             var n = data.Count;
             var buffer = new byte[n + 8];
@@ -176,9 +164,9 @@ namespace Hprose.RPC {
         private async void Send(string uri) {
             var requests = Requests[uri];
             var results = Results[uri];
-            var sended = Sended.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<Stream>>());
+            var sended = Sended.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());
             while (!requests.IsEmpty) {
-                requests.TryPeek(out (int index, Stream stream) request);
+                requests.TryPeek(out (int index, MemoryStream stream) request);
                 var index = request.index;
                 if (results.TryGetValue(index, out var result)) {
                     if (!(sended.TryAdd(index, result) && results.TryRemove(index, out result))) {
@@ -193,7 +181,7 @@ namespace Hprose.RPC {
                 else {
                     return;
                 }
-                Send(uri, request);
+                Send(uri, index, request.stream);
                 requests.TryDequeue(out request);
             }
         }
@@ -219,20 +207,24 @@ namespace Hprose.RPC {
                 }
             }
         }
-        public Task<Stream> Transport(Stream request, Context context) {
+        public async Task<Stream> Transport(Stream request, Context context) {
+            MemoryStream stream = await request.ToMemoryStream().ConfigureAwait(false);
+            if (stream.Length > 65499) {
+                throw new Exception("request too large");
+            }
             var clientContext = context as ClientContext;
             var uri = clientContext.Uri;
             var index = Interlocked.Increment(ref counter) & 0x7FFF;
-            var results = Results.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<Stream>>());
-            var result = new TaskCompletionSource<Stream>();
+            var results = Results.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());
+            var result = new TaskCompletionSource<MemoryStream>();
             results[index] = result;
-            var requests = Requests.GetOrAdd(uri, (_) => new ConcurrentQueue<(int, Stream)>());
-            requests.Enqueue((index, request));
-            requests.TryPeek(out (int index, Stream stream) first);
+            var requests = Requests.GetOrAdd(uri, (_) => new ConcurrentQueue<(int, MemoryStream)>());
+            requests.Enqueue((index, stream));
+            requests.TryPeek(out (int index, MemoryStream stream) first);
             if (first.index == index) {
                 Send(uri);
             }
-            return result.Task;
+            return await result.Task.ConfigureAwait(false);
         }
     }
 }
