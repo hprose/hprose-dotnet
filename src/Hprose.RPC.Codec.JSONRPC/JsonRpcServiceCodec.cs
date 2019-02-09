@@ -72,16 +72,7 @@ namespace Hprose.RPC.Codec.JSONRPC {
             return new MemoryStream(data, 0, data.Length, false, true);
         }
         public async Task<(string, object[])> Decode(Stream request, ServiceContext context) {
-            MemoryStream stream;
-            if (request is MemoryStream) {
-                stream = (MemoryStream)request;
-            }
-            else {
-                stream = new MemoryStream();
-                await request.CopyToAsync(stream).ConfigureAwait(false);
-                request.Dispose();
-            }
-            stream.Position = 0;
+            MemoryStream stream = await request.ToMemoryStream().ConfigureAwait(false);
             JObject call = null;
             try {
                 var data = stream.GetArraySegment();
