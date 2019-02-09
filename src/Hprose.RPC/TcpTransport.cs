@@ -13,6 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
+using Hprose.IO;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -162,13 +163,10 @@ namespace Hprose.RPC {
                 else {
                     return;
                 }
-                var stream = request.stream;
+                Stream stream = request.stream;
                 try {
                     if (!stream.CanSeek) {
-                        stream = new MemoryStream();
-                        await request.stream.CopyToAsync(stream).ConfigureAwait(false);
-                        stream.Position = 0;
-                        request.stream.Dispose();
+                        stream = await stream.ToMemoryStream().ConfigureAwait(false);
                     }
                 }
                 catch (Exception e) {
