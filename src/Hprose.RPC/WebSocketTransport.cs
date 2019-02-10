@@ -101,17 +101,27 @@ namespace Hprose.RPC {
                 catch { }
             }
         }
-        private async Task<MemoryStream> ReadAsync(ClientWebSocket webSocket) {
+        private async Task<(int, MemoryStream)> ReadAsync(ClientWebSocket webSocket) {
             MemoryStream stream = new MemoryStream();
             var buffer = ArrayPool<byte>.Shared.Rent(ReceiveBufferSize);
+            var index = -1;
             try {
                 while (true) {
                     var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None).ConfigureAwait(false);
                     if (result.CloseStatus != null) {
                         throw new WebSocketException((int)result.CloseStatus, result.CloseStatusDescription);
                     }
-                    stream.Write(buffer, 0, result.Count);
-                    if (result.EndOfMessage) return stream;
+                    if (index < 0) {
+                        index = (buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3];
+                        stream.Write(buffer, 4, result.Count - 4);
+                    }
+                    else {
+                        stream.Write(buffer, 0, result.Count);
+                    }
+                    if (result.EndOfMessage) {
+                        stream.Position = 0;
+                        return (index, stream);
+                    }
                 }
             }
             finally {
@@ -122,23 +132,17 @@ namespace Hprose.RPC {
             var sended = Sended[uri];
             try {
                 while (true) {
-                    MemoryStream stream = await ReadAsync(webSocket).ConfigureAwait(false);
-                    var buffer = stream.GetArraySegment();
-                    int index = (buffer.Array[buffer.Offset] << 24) |
-                                (buffer.Array[buffer.Offset + 1] << 16) |
-                                (buffer.Array[buffer.Offset + 2] << 8) |
-                                buffer.Array[buffer.Offset + 3];
+                    var (index, response) = await ReadAsync(webSocket).ConfigureAwait(false);
                     bool has_error = (index & 0x80000000) != 0;
                     index &= 0x7FFFFFFF;
                     if (sended.TryRemove(index, out var result)) {
                         if (has_error) {
-                            result.TrySetException(new Exception(Encoding.UTF8.GetString(buffer.Array, buffer.Offset + 4, buffer.Count - 4)));
+                            var buffer = response.GetArraySegment();
+                            result.TrySetException(new Exception(Encoding.UTF8.GetString(buffer.Array, buffer.Offset, buffer.Count)));
                             throw new WebSocketException(WebSocketError.Faulted);
                         }
-                        var response = new MemoryStream(buffer.Array, buffer.Offset + 4, buffer.Count - 4, false, true);
                         result.TrySetResult(response);
                     }
-                    stream.Dispose();
                 }
             }
             catch (Exception e) {
@@ -152,16 +156,17 @@ namespace Hprose.RPC {
             }
         }
         private async Task Send(string uri, int index, MemoryStream stream) {
-            var header = new byte[4];
-            header[0] = (byte)(index >> 24 & 0xFF);
-            header[1] = (byte)(index >> 16 & 0xFF);
-            header[2] = (byte)(index >> 8 & 0xFF);
-            header[3] = (byte)(index & 0xFF);
+            int n = (int)stream.Length;
+            var buffer = ArrayPool<byte>.Shared.Rent(4 + n);
             ClientWebSocket webSocket = null;
             try {
                 webSocket = await GetWebSocket(uri).ConfigureAwait(false);
-                await webSocket.SendAsync(new ArraySegment<byte>(header), WebSocketMessageType.Binary, false, CancellationToken.None).ConfigureAwait(false);
-                await webSocket.SendAsync(stream.GetArraySegment(), WebSocketMessageType.Binary, true, CancellationToken.None).ConfigureAwait(false);
+                buffer[0] = (byte)(index >> 24 & 0xFF);
+                buffer[1] = (byte)(index >> 16 & 0xFF);
+                buffer[2] = (byte)(index >> 8 & 0xFF);
+                buffer[3] = (byte)(index & 0xFF);
+                stream.Read(buffer, 4, n);
+                await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, 4 + n), WebSocketMessageType.Binary, true, CancellationToken.None).ConfigureAwait(false);
             }
             catch (Exception e) {
                 var sended = Sended[uri];
@@ -177,6 +182,7 @@ namespace Hprose.RPC {
             }
             finally {
                 stream.Dispose();
+                ArrayPool<byte>.Shared.Return(buffer);
             }
         }
         private async void Send(string uri) {
