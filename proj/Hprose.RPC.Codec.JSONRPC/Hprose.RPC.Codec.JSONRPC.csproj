@@ -82,8 +82,6 @@
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net40')) ">
-    <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.21" />
-    <PackageReference Include="Microsoft.Bcl" Version="1.1.10" />
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" />
   </ItemGroup>
 
@@ -98,6 +96,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <ProjectReference Include="..\Hprose.IO\Hprose.IO.csproj" />
     <ProjectReference Include="..\Hprose.RPC\Hprose.RPC.csproj" />
   </ItemGroup>
 
