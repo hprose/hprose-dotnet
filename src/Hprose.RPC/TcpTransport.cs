@@ -86,11 +86,7 @@ namespace Hprose.RPC {
             foreach (var LazyTcpClient in TcpClients.Values) {
                 try {
                     var tcpClient = await LazyTcpClient.Value.ConfigureAwait(false);
-#if NET40 || NET45 || NET451 || NET452
                     tcpClient.Close();
-#else
-                    tcpClient.Dispose();
-#endif
                 }
                 catch { }
             }
@@ -134,11 +130,7 @@ namespace Hprose.RPC {
                         result.TrySetException(e);
                     }
                 }
-#if NET40 || NET45 || NET451 || NET452
                 tcpClient.Close();
-#else
-                tcpClient.Dispose();
-#endif
             }
         }
         private async Task Send(string uri, int index, MemoryStream stream) {
@@ -173,11 +165,7 @@ namespace Hprose.RPC {
                     }
                 }
                 if (tcpClient != null) {
-#if NET40 || NET45 || NET451 || NET452
                     tcpClient.Close();
-#else
-                    tcpClient.Dispose();
-#endif
                 }
             }
             finally {
@@ -219,11 +207,7 @@ namespace Hprose.RPC {
                 }
                 catch {
                     TcpClients.TryRemove(uri, out LazyTcpClient);
-#if NET40 || NET45 || NET451 || NET452
                     tcpClient.Close();
-#else
-                    tcpClient.Dispose();
-#endif
                     if (++retried > 1) {
                         throw;
                     }
