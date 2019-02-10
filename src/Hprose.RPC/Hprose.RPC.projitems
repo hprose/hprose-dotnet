@@ -12,8 +12,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)ContextAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CRC32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HandlerManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WebSocketHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StreamExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SocketTransport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WebSocketTransport.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UdpClientExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SocketHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UdpTransport.cs" />

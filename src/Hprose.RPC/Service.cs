@@ -28,21 +28,29 @@ namespace Hprose.RPC {
         Task Bind(T server);
     }
     public class Service : IDisposable {
-        private readonly static List<(string, Type)> handlerTypes = new List<(string, Type)>();
-        private readonly static ConcurrentDictionary<Type, HashSet<string>> serverTypes = new ConcurrentDictionary<Type, HashSet<string>>();
+        private readonly static ConcurrentDictionary<string, Type> handlerTypes = new ConcurrentDictionary<string, Type>();
+        private readonly static ConcurrentDictionary<Type, string> serverTypes = new ConcurrentDictionary<Type, string>();
         public static void Register<T, S>(string name) where T : IHandler<S> {
-            handlerTypes.Add((name, typeof(T)));
-            serverTypes.GetOrAdd(typeof(S), new HashSet<string>()).Add(name);
+            handlerTypes[name] = typeof(T);
+            serverTypes[typeof(S)] = name;
         }
         static Service() {
-            Register<HttpHandler, HttpListener>("http");
             Register<TcpHandler, TcpListener>("tcp");
             Register<UdpHandler, UdpClient>("udp");
 #if !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
             Register<SocketHandler, Socket>("socket");
 #endif
+#if !NET40
+            Register<WebSocketHandler, HttpListener>("http");
+#else
+            Register<HttpHandler, HttpListener>("http");
+#endif
         }
+#if !NET40
+        public WebSocketHandler Http => (WebSocketHandler)this["http"];
+#else
         public HttpHandler Http => (HttpHandler)this["http"];
+#endif
         public TcpHandler Tcp => (TcpHandler)this["tcp"];
         public UdpHandler Udp => (UdpHandler)this["udp"];
 #if !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
@@ -59,21 +67,17 @@ namespace Hprose.RPC {
         public Service() {
             invokeManager = new InvokeManager(Execute);
             ioManager = new IOManager(Process);
-            foreach (var (name, type) in handlerTypes) {
-                var handler = Activator.CreateInstance(type, new object[] { this });
-                handlers[name] = handler;
+            foreach (var pair in handlerTypes) {
+                var handler = Activator.CreateInstance(pair.Value, new object[] { this });
+                handlers[pair.Key] = handler;
             }
             Add(methodManager.GetNames, "~");
         }
-        public Service Bind<T>(T server, string name = null) {
-            if (serverTypes.TryGetValue(typeof(T), out var names)) {
-                foreach (var n in names) {
-                    if (name == null || name == n) {
-                        var handler = handlers[n];
-                        var bindMethod = handler.GetType().GetMethod("Bind");
-                        bindMethod.Invoke(handler, new object[] { server });
-                    }
-                }
+        public Service Bind<T>(T server) {
+            if (serverTypes.TryGetValue(typeof(T), out var name)) {
+                var handler = handlers[name];
+                var bindMethod = handler.GetType().GetMethod("Bind");
+                bindMethod.Invoke(handler, new object[] { server });
             }
             else {
                 throw new NotSupportedException("This type server is not supported.");

@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 namespace Hprose.UnitTests.RPC {
     [TestClass]
-    public class HttpTest {
+    public class WebSocketTest {
         public Task<int> Sum(int x, int y) {
             return Task<int>.Factory.StartNew(() => x + y);
         }
@@ -36,7 +36,7 @@ namespace Hprose.UnitTests.RPC {
                    .Add<int, int, Task<int>>(Sum)
                    .Add(() => { return "good"; }, "Good")
                    .Bind(server);
-            var client = new Client("http://127.0.0.1:8080/");
+            var client = new Client("ws://127.0.0.1:8080/");
             var result = await client.InvokeAsync<string>("hello", new object[] { "world" });
             Assert.AreEqual("Hello world", result);
             Assert.AreEqual(3, await client.InvokeAsync<int>("sum", new object[] { 1, 2 }));
@@ -61,7 +61,7 @@ namespace Hprose.UnitTests.RPC {
                    .AddMethod("Sum", this)
                    .Add<string>(OnewayCall)
                    .Bind(server);
-            var client = new Client("http://127.0.0.1:8081/");
+            var client = new Client("ws://127.0.0.1:8081/");
             var log = new Log();
             client.Use(log.IOHandler).Use(log.InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
@@ -83,7 +83,7 @@ namespace Hprose.UnitTests.RPC {
                    .Use(Log.InvokeHandler)
                    .Bind(server);
 
-            var client1 = new Client("http://127.0.0.1:8082/");
+            var client1 = new Client("ws://127.0.0.1:8082/");
             var prosumer1 = new Prosumer(client1, "1") {
                 OnSubscribe = (topic) => {
                     Console.WriteLine(topic + " is subscribed.");
@@ -92,7 +92,7 @@ namespace Hprose.UnitTests.RPC {
                     Console.WriteLine(topic + " is unsubscribed.");
                 }
             };
-            var client2 = new Client("http://127.0.0.1:8082/");
+            var client2 = new Client("ws://127.0.0.1:8082/");
             var prosumer2 = new Prosumer(client2, "2");
             await prosumer1.Subscribe<string>("test", (data, from) => {
                 Assert.AreEqual("hello", data);
@@ -121,7 +121,7 @@ namespace Hprose.UnitTests.RPC {
             server.Start();
             var service = new Service();
             service.AddMissingMethod(Missing).Bind(server);
-            var client = new Client("http://127.0.0.1:8083/");
+            var client = new Client("ws://127.0.0.1:8083/");
             var log = new Log();
             client.Use(log.IOHandler).Use(log.InvokeHandler);
             var result = await client.InvokeAsync<string>("hello", new object[] { "world" });
@@ -144,7 +144,7 @@ namespace Hprose.UnitTests.RPC {
             var caller = new Caller(service);
             service.Bind(server);
 
-            var client = new Client("http://127.0.0.1:8084/");
+            var client = new Client("ws://127.0.0.1:8084/");
             var provider = new Provider(client, "1") {
                 Debug = true
             };
@@ -182,7 +182,7 @@ namespace Hprose.UnitTests.RPC {
                    .AddMethod("Sum", this)
                    .Add<string>(OnewayCall)
                    .Bind(server);
-            var client = new Client("http://127.0.0.1:8085/") {
+            var client = new Client("ws://127.0.0.1:8085/") {
                 Codec = JsonRpcClientCodec.Instance
             };
             var log = new Log();
@@ -208,12 +208,12 @@ namespace Hprose.UnitTests.RPC {
                    .AddMethod("Sum", this)
                    .Add<string>(OnewayCall)
                    .Bind(server);
-            var client = new Client(/* "http://127.0.0.1:8086/" */);
+            var client = new Client(/* "ws://127.0.0.1:8086/" */);
             var lb = new WeightedRoundRobinLoadBalance(new Dictionary<string, int>() {
-                { "http://127.0.0.1:8086/", 1 },
-                { "http://127.0.0.1:8087/", 2 },
-                { "http://127.0.0.1:8088/", 3 },
-                { "http://127.0.0.1:8089/", 4 }
+                { "ws://127.0.0.1:8086/", 1 },
+                { "ws://127.0.0.1:8087/", 2 },
+                { "ws://127.0.0.1:8088/", 3 },
+                { "ws://127.0.0.1:8089/", 4 }
             });
             client.Use(lb.Handler).Use(new ConcurrentLimiter(64).Handler).Use(new RateLimiter(50000).InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
