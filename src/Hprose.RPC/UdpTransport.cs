@@ -80,11 +80,7 @@ namespace Hprose.RPC {
             foreach (var LazyUdpClient in UdpClients.Values) {
                 try {
                     var udpClient = LazyUdpClient.Value;
-#if NET40 || NET45 || NET451 || NET452
                     udpClient.Close();
-#else
-                    udpClient.Dispose();
-#endif
                 }
                 catch { }
             }
@@ -118,11 +114,7 @@ namespace Hprose.RPC {
                         result.TrySetException(e);
                     }
                 }
-#if NET40 || NET45 || NET451 || NET452
                 udpClient.Close();
-#else
-                udpClient.Dispose();
-#endif
             }
         }
         private async void Send(string uri, int index, MemoryStream stream) {
@@ -153,11 +145,7 @@ namespace Hprose.RPC {
                     }
                 }
                 if (udpClient != null) {
-#if NET40 || NET45 || NET451 || NET452
                     udpClient.Close();
-#else
-                    udpClient.Dispose();
-#endif
                 }
             }
         }
@@ -196,11 +184,7 @@ namespace Hprose.RPC {
                 }
                 catch {
                     UdpClients.TryRemove(uri, out LazyUdpClient);
-#if NET40 || NET45 || NET451 || NET452
                     udpClient.Close();
-#else
-                    udpClient.Dispose();
-#endif
                     if (++retried > 1) {
                         throw;
                     }
