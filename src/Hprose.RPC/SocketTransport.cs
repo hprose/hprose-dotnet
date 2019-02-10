@@ -42,23 +42,12 @@ namespace Hprose.RPC {
                     try {
                         var u = new Uri(uri);
                         var family = u.Scheme.Last() == '6' ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
+                        var protocol = ProtocolType.Tcp;
                         if (u.Scheme == "unix") {
                             family = AddressFamily.Unix;
+                            protocol = ProtocolType.Unspecified;
                         }
-#if NET40 || NET45 || NET451 || NET452
-                        var host = u.DnsSafeHost;
-#else
-                        var host = u.IdnHost;
-#endif
-                        var port = u.Port > 0 ? u.Port : 8412;
-                        var socket = new Socket(family, SocketType.Stream, ProtocolType.Tcp) {
-                            NoDelay = NoDelay,
-                            ReceiveBufferSize = ReceiveBufferSize,
-                            SendBufferSize = SendBufferSize
-                        };
-                        if (LingerState != null) {
-                            socket.LingerState = LingerState;
-                        }
+                        var socket = new Socket(family, SocketType.Stream, protocol);
                         if (family == AddressFamily.Unix) {
 #if NETCOREAPP2_1 || NETCOREAPP2_2
                             await socket.ConnectAsync(new UnixDomainSocketEndPoint(u.AbsolutePath));
@@ -67,6 +56,14 @@ namespace Hprose.RPC {
 #endif
                         }
                         else {
+                            var host = u.IdnHost;
+                            var port = u.Port > 0 ? u.Port : 8412;
+                            socket.NoDelay = NoDelay;
+                            socket.ReceiveBufferSize = ReceiveBufferSize;
+                            socket.SendBufferSize = SendBufferSize;
+                            if (LingerState != null) {
+                                socket.LingerState = LingerState;
+                            }
                             await socket.ConnectAsync(host, port);
                         }
                         Receive(uri, socket);
@@ -192,11 +189,7 @@ namespace Hprose.RPC {
                 var index = request.index;
                 if (results.TryGetValue(index, out var result)) {
                     if (!(sended.TryAdd(index, result) && results.TryRemove(index, out result))) {
-#if NET40
-                        await TaskEx.Yield();
-#else
                         await Task.Yield();
-#endif
                         continue;
                     }
                 }
