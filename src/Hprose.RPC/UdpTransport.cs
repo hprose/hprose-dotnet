@@ -8,7 +8,7 @@
 |                                                          |
 |  UdpTransport class for C#.                              |
 |                                                          |
-|  LastModified: Feb 10, 2019                              |
+|  LastModified: Feb 11, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -118,24 +118,26 @@ namespace Hprose.RPC {
             }
         }
         private async void Send(string uri, int index, MemoryStream stream) {
-            var data = stream.GetArraySegment();
-            var n = data.Count;
+            var n = (int)stream.Length;
+#if NET40
             var buffer = new byte[n + 8];
-            buffer[4] = (byte)(n >> 8 & 0xFF);
-            buffer[5] = (byte)(n & 0xFF);
-            buffer[6] = (byte)(index >> 8 & 0xFF);
-            buffer[7] = (byte)(index & 0xFF);
-            var crc32 = CRC32.Compute(buffer, 4, 4);
-            buffer[0] = (byte)(crc32 >> 24 & 0xFF);
-            buffer[1] = (byte)(crc32 >> 16 & 0xFF);
-            buffer[2] = (byte)(crc32 >> 8 & 0xFF);
-            buffer[3] = (byte)(crc32 & 0xFF);
-            Buffer.BlockCopy(data.Array, data.Offset, buffer, 8, n);
-            stream.Dispose();
+#else
+            var buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(n + 8);
+#endif
             UdpClient udpClient = null;
             try {
+                buffer[4] = (byte)(n >> 8 & 0xFF);
+                buffer[5] = (byte)(n & 0xFF);
+                buffer[6] = (byte)(index >> 8 & 0xFF);
+                buffer[7] = (byte)(index & 0xFF);
+                var crc32 = CRC32.Compute(buffer, 4, 4);
+                buffer[0] = (byte)(crc32 >> 24 & 0xFF);
+                buffer[1] = (byte)(crc32 >> 16 & 0xFF);
+                buffer[2] = (byte)(crc32 >> 8 & 0xFF);
+                buffer[3] = (byte)(crc32 & 0xFF);
+                stream.Read(buffer, 8, n);
                 udpClient = GetUdpClient(uri);
-                await udpClient.SendAsync(buffer, buffer.Length).ConfigureAwait(false);
+                await udpClient.SendAsync(buffer, n + 8).ConfigureAwait(false);
             }
             catch (Exception e) {
                 var sended = Sended[uri];
@@ -147,6 +149,12 @@ namespace Hprose.RPC {
                 if (udpClient != null) {
                     udpClient.Close();
                 }
+            }
+            finally {
+                stream.Dispose();
+#if !NET40
+                System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
+#endif
             }
         }
         private async void Send(string uri) {
