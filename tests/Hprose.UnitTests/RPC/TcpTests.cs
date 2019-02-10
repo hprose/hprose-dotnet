@@ -256,5 +256,51 @@ namespace Hprose.UnitTests.RPC {
             server3.Stop();
             server4.Stop();
         }
+        [TestMethod]
+        public async Task Test8() {
+            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
+            Socket server1 = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            server1.Bind(new IPEndPoint(iPAddress, 8422));
+            server1.Listen(128);
+            Socket server2 = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            server2.Bind(new IPEndPoint(iPAddress, 8423));
+            server2.Listen(128);
+            Socket server3 = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            server3.Bind(new IPEndPoint(iPAddress, 8424));
+            server3.Listen(128);
+            Socket server4 = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            server4.Bind(new IPEndPoint(iPAddress, 8425));
+            server4.Listen(128);
+            var service = new Service();
+            service.AddMethod("Hello", this)
+                   .AddMethod("Sum", this)
+                   .Add<string>(OnewayCall)
+                   .Bind(server1)
+                   .Bind(server2)
+                   .Bind(server3)
+                   .Bind(server4);
+            var client = new Client(/* "tcp4://127.0.0.1:8422" */);
+            var lb = new NginxRoundRobinLoadBalance(new Dictionary<string, int>() {
+                { "tcp4://127.0.0.1:8422", 1 },
+                { "tcp4://127.0.0.1:8423", 2 },
+                { "tcp4://127.0.0.1:8424", 3 },
+                { "tcp4://127.0.0.1:8425", 4 }
+            });
+            client.Use(lb.Handler).Use(new ConcurrentLimiter(64).Handler).Use(new RateLimiter(50000).InvokeHandler);
+            var proxy = client.UseService<ITestInterface>();
+            var n = 100000;
+            var tasks = new Task<string>[n];
+            for (int i = 0; i < n; ++i) {
+                tasks[i] = proxy.Hello("world" + i);
+            }
+            var results = await Task.WhenAll(tasks);
+            for (int i = 0; i < n; ++i) {
+                Assert.AreEqual(results[i], "Hello world" + i);
+            }
+            server1.Close();
+            server2.Close();
+            server3.Close();
+            server4.Close();
+        }
     }
 }
