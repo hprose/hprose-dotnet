@@ -154,11 +154,7 @@ namespace Hprose.RPC {
             }
             catch (Exception e) {
                 OnError?.Invoke(e);
-#if NET40 || NET45 || NET451 || NET452
                 tcpClient.Close();
-#else
-                tcpClient.Dispose();
-#endif
                 OnClose?.Invoke(tcpClient);
             }
         }
