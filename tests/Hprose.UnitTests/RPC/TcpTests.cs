@@ -1,17 +1,18 @@
 ﻿using Hprose.RPC;
 using Hprose.RPC.Codec.JSONRPC;
 using Hprose.RPC.Plugins.Limiter;
+using Hprose.RPC.Plugins.LoadBalance;
 using Hprose.RPC.Plugins.Log;
 using Hprose.RPC.Plugins.Push;
 using Hprose.RPC.Plugins.Reverse;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Hprose.RPC.Plugins.LoadBalance;
-using System.Collections.Generic;
 
 namespace Hprose.UnitTests.RPC {
     [TestClass]
@@ -288,7 +289,7 @@ namespace Hprose.UnitTests.RPC {
             });
             client.Use(lb.Handler).Use(new ConcurrentLimiter(64).Handler).Use(new RateLimiter(50000).InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
-            var n = 100000;
+            var n = 1000;
             var tasks = new Task<string>[n];
             for (int i = 0; i < n; ++i) {
                 tasks[i] = proxy.Hello("world" + i);
@@ -302,5 +303,32 @@ namespace Hprose.UnitTests.RPC {
             server3.Close();
             server4.Close();
         }
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+        [TestMethod]
+        public async Task Test9() {
+            if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                Socket server = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+                server.Bind(new UnixDomainSocketEndPoint("/tmp/test"));
+                server.Listen(128);
+                var service = new Service();
+                service.AddMethod("Hello", this)
+                       .AddMethod("Sum", this)
+                       .Add<string>(OnewayCall)
+                       .Bind(server);
+                var client = new Client("unix:///tmp/test");
+                var proxy = client.UseService<ITestInterface>();
+                var n = 100000;
+                var tasks = new Task<string>[n];
+                for (int i = 0; i < n; ++i) {
+                    tasks[i] = proxy.Hello("world" + i);
+                }
+                var results = await Task.WhenAll(tasks);
+                for (int i = 0; i < n; ++i) {
+                    Assert.AreEqual(results[i], "Hello world" + i);
+                }
+                server.Close();
+            }
+        }
+#endif
     }
 }
