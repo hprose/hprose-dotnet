@@ -51,10 +51,16 @@ namespace Hprose.RPC {
             Register<HttpTransport>("http");
             Register<TcpTransport>("tcp");
             Register<UdpTransport>("udp");
+#if !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
+            Register<SocketTransport>("socket");
+#endif
         }
         public HttpTransport Http => (HttpTransport)this["http"];
         public TcpTransport Tcp => (TcpTransport)this["tcp"];
         public UdpTransport Udp => (UdpTransport)this["udp"];
+#if !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
+        public SocketTransport Socket => (SocketTransport)this["socket"];
+#endif
         private readonly Dictionary<string, ITransport> transports = new Dictionary<string, ITransport>();
         public ITransport this[string name] => transports[name];
         public dynamic RequestHeaders { get; set; } = new ExpandoObject();
