@@ -38,10 +38,16 @@ namespace Hprose.RPC {
             Register<HttpHandler, HttpListener>("http");
             Register<TcpHandler, TcpListener>("tcp");
             Register<UdpHandler, UdpClient>("udp");
+#if !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
+            Register<TcpSocketHandler, Socket>("tcpsocket");
+#endif
         }
         public HttpHandler Http => (HttpHandler)this["http"];
         public TcpHandler Tcp => (TcpHandler)this["tcp"];
         public UdpHandler Udp => (UdpHandler)this["udp"];
+#if !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
+        public TcpSocketHandler TcpSocket => (TcpSocketHandler)this["tcpsocket"];
+#endif
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         public IServiceCodec Codec { get; set; } = ServiceCodec.Instance;
         public int MaxRequestLength { get; set; } = 0x7FFFFFFF;
