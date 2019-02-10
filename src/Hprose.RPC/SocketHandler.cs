@@ -59,11 +59,7 @@ namespace Hprose.RPC {
             while (true) {
                 (int index, MemoryStream stream) response;
                 while (!responses.TryDequeue(out response)) {
-#if NET40
-                    await TaskEx.Yield();
-#else
                     await Task.Yield();
-#endif
                 }
                 int index = response.index;
                 MemoryStream stream = response.stream;
