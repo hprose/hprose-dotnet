@@ -29,7 +29,6 @@ namespace Hprose.RPC {
         public Action<WebSocket> OnClose { get; set; } = null;
         public WebSocketHandler(Service service) : base(service) { }
         private static async Task Send(WebSocket webSocket, ConcurrentQueue<(int index, MemoryStream stream)> responses) {
-            var header = new byte[4];
             while (true) {
                 (int index, MemoryStream stream) response;
                 while (!responses.TryDequeue(out response)) {
@@ -37,21 +36,24 @@ namespace Hprose.RPC {
                 }
                 int index = response.index;
                 MemoryStream stream = response.stream;
+                int n = (int)stream.Length;
+                var buffer = ArrayPool<byte>.Shared.Rent(4 + n);
                 try {
-                    header[0] = (byte)(index >> 24 & 0xFF);
-                    header[1] = (byte)(index >> 16 & 0xFF);
-                    header[2] = (byte)(index >> 8 & 0xFF);
-                    header[3] = (byte)(index & 0xFF);
-                    await webSocket.SendAsync(new ArraySegment<byte>(header), WebSocketMessageType.Binary, false, CancellationToken.None).ConfigureAwait(false);
-                    await webSocket.SendAsync(stream.GetArraySegment(), WebSocketMessageType.Binary, true, CancellationToken.None).ConfigureAwait(false);
+                    buffer[0] = (byte)(index >> 24 & 0xFF);
+                    buffer[1] = (byte)(index >> 16 & 0xFF);
+                    buffer[2] = (byte)(index >> 8 & 0xFF);
+                    buffer[3] = (byte)(index & 0xFF);
+                    stream.Read(buffer, 4, n);
+                    await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, 4 + n), WebSocketMessageType.Binary, true, CancellationToken.None).ConfigureAwait(false);
                     if ((index & 0x80000000) != 0) {
-                        var data = (stream as MemoryStream).GetArraySegment();
+                        var data = stream.GetArraySegment();
                         var message = Encoding.UTF8.GetString(data.Array, data.Offset, data.Count);
                         throw new Exception(message);
                     }
                 }
                 finally {
                     stream.Dispose();
+                    ArrayPool<byte>.Shared.Return(buffer);
                 }
             }
         }
@@ -94,6 +96,9 @@ namespace Hprose.RPC {
                         return (index, null);
                     }
                     if (result.EndOfMessage) {
+                        if (index < 0) {
+                            throw new IOException("invalid request");
+                        }
                         stream.Position = 0;
                         return (index, stream);
                     }
