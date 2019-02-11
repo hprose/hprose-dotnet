@@ -14,11 +14,13 @@
 \*________________________________________________________*/
 
 using System.Dynamic;
+using System.Net;
 
 namespace Hprose.RPC {
     public class ServiceContext : Context {
         public Service Service { get; private set; }
         public Method Method { get; set; } = null;
+        public EndPoint RemoteEndPoint { get; set; } = null;
         public dynamic RequestHeaders { get; } = new ExpandoObject();
         public dynamic ResponseHeaders { get; } = new ExpandoObject();
         public ServiceContext(Service service) {
