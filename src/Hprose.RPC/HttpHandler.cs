@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpHandler class for C#.                               |
 |                                                          |
-|  LastModified: Feb 11, 2019                              |
+|  LastModified: Feb 12, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -181,7 +181,7 @@ namespace Hprose.RPC {
                         goto case "POST";
                     case "POST":
                         try {
-                            outstream = await Service.Handle(instream, context);
+                            outstream = await Service.Handle(instream, context).ConfigureAwait(false);
                         }
                         catch (Exception e) {
                             response.StatusCode = 500;
