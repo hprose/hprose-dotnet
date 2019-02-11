@@ -84,31 +84,28 @@ namespace Hprose.RPC {
             }
             return this;
         }
-        public async Task<Stream> Handle(Stream request, Context context) {
-            var result = ioManager.Handler(request, context);
-            if (Timeout > TimeSpan.Zero) {
-                using (CancellationTokenSource source = new CancellationTokenSource()) {
-
-#if NET40
-                    var timer = TaskEx.Delay(Timeout, source.Token);
-                    var task = await TaskEx.WhenAny(result, timer).ConfigureAwait(false);
-#else
-                    var timer = Task.Delay(Timeout, source.Token);
-                    var task = await Task.WhenAny(result, timer).ConfigureAwait(false);
-#endif
-                    source.Cancel();
-                    if (task == timer) {
-                        throw new TimeoutException();
-                    }
-                }
-            }
-            return await result.ConfigureAwait(false);
-        }
+        public Task<Stream> Handle(Stream request, Context context) => ioManager.Handler(request, context);
         public async Task<Stream> Process(Stream request, Context context) {
             object result;
             try {
                 var (fullname, args) = await Codec.Decode(request, context as ServiceContext).ConfigureAwait(false);
-                result = await invokeManager.Handler(fullname, args, context).ConfigureAwait(false);
+                var resultTask = invokeManager.Handler(fullname, args, context);
+                if (Timeout > TimeSpan.Zero) {
+                    using (CancellationTokenSource source = new CancellationTokenSource()) {
+#if NET40
+                        var timer = TaskEx.Delay(Timeout, source.Token);
+                        var task = await TaskEx.WhenAny(resultTask, timer).ConfigureAwait(false);
+#else
+                        var timer = Task.Delay(Timeout, source.Token);
+                        var task = await Task.WhenAny(resultTask, timer).ConfigureAwait(false);
+#endif
+                        source.Cancel();
+                        if (task == timer) {
+                            throw new TimeoutException();
+                        }
+                    }
+                }
+                result = await resultTask.ConfigureAwait(false);
             }
             catch (Exception e) {
                 result = e.InnerException ?? e;
