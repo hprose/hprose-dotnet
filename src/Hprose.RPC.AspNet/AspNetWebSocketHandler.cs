@@ -8,7 +8,7 @@
 |                                                          |
 |  AspNetWebSocketHandler class for C#.                    |
 |                                                          |
-|  LastModified: Feb 11, 2019                              |
+|  LastModified: Feb 12, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
