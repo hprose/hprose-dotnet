@@ -124,6 +124,7 @@ namespace Hprose.RPC {
             var webSocketContext = await httpContext.AcceptWebSocketAsync("hprose").ConfigureAwait(false);
             WebSocket webSocket = webSocketContext.WebSocket;
             dynamic context = new ServiceContext(Service);
+            context.HttpContext = httpContext;
             context.WebSocketContext = webSocketContext;
             context.Request = request;
             context.Response = httpContext.Response;
