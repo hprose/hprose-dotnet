@@ -134,7 +134,7 @@ namespace Hprose.RPC.AspNet {
             }
             return false;
         }
-        public static string GetIP(HttpRequest request) {
+        public static IPEndPoint GetIPEndPoint(HttpRequest request) {
             string result = request.ServerVariables["HTTP_X_FORWARDED_FOR"];
             if (string.IsNullOrEmpty(result)) {
                 result = request.ServerVariables["REMOTE_ADDR"];
@@ -145,7 +145,7 @@ namespace Hprose.RPC.AspNet {
             if (string.IsNullOrEmpty(result)) {
                 result = "0.0.0.0";
             }
-            return result;
+            return new IPEndPoint(IPAddress.Parse(result), 0);
         }
         public virtual async Task Handler(HttpContext httpContext) {
             var request = httpContext.Request;
@@ -155,7 +155,7 @@ namespace Hprose.RPC.AspNet {
             context.Request = request;
             context.Response = response;
             context.User = httpContext.User;
-            context.RemoteEndPoint = new IPEndPoint(IPAddress.Parse(GetIP(request)), 0);
+            context.RemoteEndPoint = GetIPEndPoint(request);
             context.Handler = this;
             if (await ClientAccessPolicyXmlHandler(request, response).ConfigureAwait(false)) {
                 return;
