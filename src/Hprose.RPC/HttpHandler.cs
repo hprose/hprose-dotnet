@@ -145,6 +145,7 @@ namespace Hprose.RPC {
         }
         public virtual async void Handler(HttpListenerContext httpContext) {
             dynamic context = new ServiceContext(Service);
+            context.HttpContext = httpContext;
             context.Request = httpContext.Request;
             context.Response = httpContext.Response;
             context.User = httpContext.User;
