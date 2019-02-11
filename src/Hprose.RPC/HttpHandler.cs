@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpHandler class for C#.                               |
 |                                                          |
-|  LastModified: Feb 10, 2019                              |
+|  LastModified: Feb 11, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -101,8 +101,8 @@ namespace Hprose.RPC {
                     response.StatusCode = 304;
                 }
                 else if (CrossDomainXmlFile != null) {
-                    response.AppendHeader("Last-Modified", lastModified);
-                    response.AppendHeader("Etag", etag);
+                    response.AddHeader("Last-Modified", lastModified);
+                    response.AddHeader("Etag", etag);
                     response.ContentType = "text/xml";
                     using (var fileStream = new FileStream(CrossDomainXmlFile, FileMode.Open, FileAccess.Read)) {
                         using (var outputStream = GetOutputStream(request, response)) {
@@ -126,8 +126,8 @@ namespace Hprose.RPC {
                     response.StatusCode = 304;
                 }
                 else if (ClientAccessPolicyXmlFile != null) {
-                    response.AppendHeader("Last-Modified", lastModified);
-                    response.AppendHeader("Etag", etag);
+                    response.AddHeader("Last-Modified", lastModified);
+                    response.AddHeader("Etag", etag);
                     response.ContentType = "text/xml";
                     using (var fileStream = new FileStream(ClientAccessPolicyXmlFile, FileMode.Open, FileAccess.Read)) {
                         using (var outputStream = GetOutputStream(request, response)) {
