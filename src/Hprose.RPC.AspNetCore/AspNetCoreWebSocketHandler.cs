@@ -12,7 +12,7 @@
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
-#if !NET40
+
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Buffers;
@@ -144,4 +144,3 @@ namespace Hprose.RPC.AspNetCore {
         }
     }
 }
-#endif
