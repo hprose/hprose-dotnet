@@ -33,7 +33,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hprose.RPC.Codec.JSONRPC", 
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.RPC.AspNet", "src\Hprose.RPC.AspNet\Hprose.RPC.AspNet.shproj", "{74B6DCED-32B7-4859-925F-1B33C2B4FDD9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hprose.RPC.AspNet", "proj\Hprose.RPC.AspNet\Hprose.RPC.AspNet.csproj", "{0077FC95-0788-4887-BD09-75BDC5608736}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hprose.RPC.AspNet", "proj\Hprose.RPC.AspNet\Hprose.RPC.AspNet.csproj", "{0077FC95-0788-4887-BD09-75BDC5608736}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -41,6 +41,7 @@ Global
 		src\Hprose.RPC\Hprose.RPC.projitems*{26af48ad-8f09-4146-bc18-d35529afa89e}*SharedItemsImports = 13
 		src\Hprose.IO\Hprose.IO.projitems*{3bbafd96-bce6-4d52-a2b4-8abd2250465f}*SharedItemsImports = 13
 		src\Hprose.Collections\Hprose.Collections.projitems*{645ef886-f73b-46a5-a484-7ebe81209303}*SharedItemsImports = 13
+		src\Hprose.RPC.AspNet\Hprose.RPC.AspNet.projitems*{74b6dced-32b7-4859-925f-1b33c2b4fdd9}*SharedItemsImports = 13
 		src\Hprose.RPC.Plugins\Hprose.RPC.Plugins.projitems*{bd74acf1-7335-44d8-ab5d-c71e56117c43}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
