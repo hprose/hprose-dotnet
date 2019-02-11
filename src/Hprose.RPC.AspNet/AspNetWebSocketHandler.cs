@@ -22,6 +22,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.WebSockets;
 
 namespace Hprose.RPC.AspNet {
     public class AspNetWebSocketHandler : AspNetHttpHandler {
@@ -143,7 +144,7 @@ namespace Hprose.RPC.AspNet {
                     webSocket.Abort();
                     OnClose?.Invoke(webSocket);
                 }
-            });
+            }, new AspNetWebSocketOptions { SubProtocol = "hprose" });
         }
     }
 }
