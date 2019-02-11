@@ -9,6 +9,7 @@
     <Import_RootNamespace>Hprose.RPC.AspNet</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AspNetWebSocketHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AspNetHttpHandler.cs" />
   </ItemGroup>
 </Project>
