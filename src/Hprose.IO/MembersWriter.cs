@@ -20,28 +20,30 @@ using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Hprose.IO {
+    using System.Threading;
     using static Mode;
     using static Tags;
 
     internal class MembersWriter {
+        private static readonly ThreadLocal<MemoryStream> memoryStream = new ThreadLocal<MemoryStream>(() => new MemoryStream());
         public Delegate write;
         public int count;
         public byte[] data;
         public static byte[] GetMetaData(string typeName, IEnumerable<string> memberNames, int count) {
-            using (var stream = new MemoryStream()) {
-                stream.WriteByte(TagClass);
-                ValueWriter.Write(stream, typeName);
-                if (count > 0) {
-                    ValueWriter.WriteInt(stream, count);
-                }
-                stream.WriteByte(TagOpenbrace);
-                foreach (string name in memberNames) {
-                    stream.WriteByte(TagString);
-                    ValueWriter.Write(stream, name);
-                }
-                stream.WriteByte(TagClosebrace);
-                return stream.ToArray();
+            var stream = memoryStream.Value;
+            stream.SetLength(0);
+            stream.WriteByte(TagClass);
+            ValueWriter.Write(stream, typeName);
+            if (count > 0) {
+                ValueWriter.WriteInt(stream, count);
             }
+            stream.WriteByte(TagOpenbrace);
+            foreach (string name in memberNames) {
+                stream.WriteByte(TagString);
+                ValueWriter.Write(stream, name);
+            }
+            stream.WriteByte(TagClosebrace);
+            return stream.ToArray();
         }
         public static Action<Writer, T> CreateWriteAction<T>(IEnumerable<MemberInfo> members) {
             var writer = Expression.Variable(typeof(Writer), "writer");
