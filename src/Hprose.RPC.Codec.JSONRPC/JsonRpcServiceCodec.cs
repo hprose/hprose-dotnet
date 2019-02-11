@@ -8,7 +8,7 @@
 |                                                          |
 |  JsonRpcServiceCodec class for C#.                       |
 |                                                          |
-|  LastModified: Feb 5, 2019                               |
+|  LastModified: Feb 12, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -24,10 +24,15 @@ namespace Hprose.RPC.Codec.JSONRPC {
     public class JsonRpcServiceCodec : IServiceCodec {
         public static JsonRpcServiceCodec Instance { get; } = new JsonRpcServiceCodec();
         public Stream Encode(object result, ServiceContext context) {
+            if (!context.Contains("jsonrpc") || !context["jsonrpc"]) {
+                return ServiceCodec.Instance.Encode(result, context);
+            }
             JObject response = new JObject {
-                { "jsonrpc", "2.0" },
-                { "id", context["jsonrpc.id"] }
+                { "jsonrpc", "2.0" }
             };
+            if (context.Contains("jsonrpc.id")) {
+                response["id"] = context["jsonrpc.id"];
+            } 
             if (result is Exception) {
                 var error = result as Exception;
                 switch (error.Message) {
@@ -72,6 +77,12 @@ namespace Hprose.RPC.Codec.JSONRPC {
         }
         public async Task<(string, object[])> Decode(Stream request, ServiceContext context) {
             MemoryStream stream = await request.ToMemoryStream().ConfigureAwait(false);
+            var tag = stream.ReadByte();
+            stream.Position = 0;
+            context["jsonrpc"] = (tag == '{');
+            if (!context["jsonrpc"]) {
+                return await ServiceCodec.Instance.Decode(stream, context).ConfigureAwait(false);
+            }
             JObject call = null;
             try {
                 var data = stream.GetArraySegment();
