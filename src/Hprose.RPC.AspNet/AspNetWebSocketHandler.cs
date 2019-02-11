@@ -125,6 +125,7 @@ namespace Hprose.RPC.AspNet {
             httpContext.AcceptWebSocketRequest(async (webSocketContext) => {
                 WebSocket webSocket = webSocketContext.WebSocket;
                 dynamic context = new ServiceContext(Service);
+                context.HttpContext = httpContext;
                 context.WebSocketContext = webSocketContext;
                 context.Request = httpContext.Request;
                 context.Response = httpContext.Response;
