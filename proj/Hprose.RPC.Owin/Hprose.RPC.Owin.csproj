@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;net451;net452;net46;net461;net462;net47;net471;net472</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;net40;net45;net451;net452;net46;net461;net462;net47;net471;net472;monoandroid44;monoandroid50;monoandroid51;monoandroid60;monoandroid70;monoandroid71;monoandroid80;monoandroid81;xamarinmac20;xamarinios10;xamarintvos10;xamarinwatchos10</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
@@ -99,7 +99,6 @@
 
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <PackageReference Include="Microsoft.Owin" Version="4.0.1" />
     <ProjectReference Include="..\Hprose.IO\Hprose.IO.csproj" />
     <ProjectReference Include="..\Hprose.RPC\Hprose.RPC.csproj" />
   </ItemGroup>
