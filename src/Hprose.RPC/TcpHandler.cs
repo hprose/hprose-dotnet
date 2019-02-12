@@ -66,7 +66,7 @@ namespace Hprose.RPC {
             }
             return bytes;
         }
-        private async Task Send(TcpClient tcpClient, Stream netStream, ConcurrentQueue<(int index, Stream stream)> responses) {
+        private async Task Send(Stream netStream, ConcurrentQueue<(int index, Stream stream)> responses) {
             var header = new byte[12];
             while (true) {
                 (int index, Stream stream) response;
@@ -169,7 +169,7 @@ namespace Hprose.RPC {
                     stream = sslStream;
                 }
                 var receive = Receive(tcpClient, stream, responses);
-                var send = Send(tcpClient, stream, responses);
+                var send = Send(stream, responses);
                 await receive.ConfigureAwait(false);
                 await send.ConfigureAwait(false);
             }
