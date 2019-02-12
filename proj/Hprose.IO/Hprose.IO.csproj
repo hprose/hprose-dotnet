@@ -14,6 +14,7 @@
     <Copyright>Copyright © http://www.hprose.com, All rights reserved.</Copyright>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
     <Product>Hprose.IO</Product>
+    <Title>Hprose.IO</Title>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>http://www.hprose.com</PackageProjectUrl>
     <PackageIconUrl>http://hprose.com/apple-touch-icon-180x180.png</PackageIconUrl>
