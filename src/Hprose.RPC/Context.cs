@@ -19,7 +19,7 @@ using System.Dynamic;
 
 namespace Hprose.RPC {
     public class Context : DynamicObject, ICloneable {
-        public Dictionary<string, object> Items { get; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, object> Items { get; private set; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
         public dynamic this[string name] {
             get => Items[name];
             set => Items[name] = value;
@@ -51,7 +51,12 @@ namespace Hprose.RPC {
         }
 
         public object Clone() {
-            return MemberwiseClone();
+            Context context = MemberwiseClone() as Context;
+            context.Items = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            foreach (var pair in Items) {
+                context.Items[pair.Key] = pair.Value;
+            }
+            return context;
         }
     }
 }
