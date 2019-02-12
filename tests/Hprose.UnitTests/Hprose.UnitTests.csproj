@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;net45;net451;net452;net46;net461;net462;net47;net471;net472</TargetFrameworks>
+    <IsPackable>false</IsPackable>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>Hprose.UnitTests</RootNamespace>
+    <NoWarn>CS0414</NoWarn>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('net45')) Or  $(TargetFramework.StartsWith('net46')) ">
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\proj\Hprose.IO\Hprose.IO.csproj" />
+    <ProjectReference Include="..\..\proj\Hprose.RPC\Hprose.RPC.csproj" />
+    <ProjectReference Include="..\..\proj\Hprose.RPC.Plugins\Hprose.RPC.Plugins.csproj" />
+    <ProjectReference Include="..\..\proj\Hprose.RPC.Codec.JSONRPC\Hprose.RPC.Codec.JSONRPC.csproj" />
+  </ItemGroup>
+
+</Project>

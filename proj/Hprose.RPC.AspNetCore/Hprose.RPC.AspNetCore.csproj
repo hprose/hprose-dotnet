@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp2.2;netcoreapp2.1;netcoreapp2.0</TargetFrameworks>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
+    <Version>3.0.0</Version>
+    <OutputType>Library</OutputType>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Ma Bingyao&lt;andot@hprose.com&gt;</Authors>
+    <Company>hprose.com</Company>
+    <Copyright>Copyright © http://www.hprose.com, All rights reserved.</Copyright>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <Product>Hprose.RPC.AspNetCore</Product>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>http://www.hprose.com</PackageProjectUrl>
+    <PackageIconUrl>http://hprose.com/apple-touch-icon-180x180.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/hprose/hprose-dotnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>1701;1702;CA1724;CA1812</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('netcoreapp2.2')) ">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
+    <ProjectReference Include="..\Hprose.IO\Hprose.IO.csproj" />
+    <ProjectReference Include="..\Hprose.RPC\Hprose.RPC.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\src\Hprose.RPC.AspNetCore\Hprose.RPC.AspNetCore.projitems" Label="Shared" />
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <PropertyGroup Condition=" '$(TargetFrameworkIdentifier)' != '' ">
+      <Product>Hprose.RPC.AspNetCore for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion)</Product>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(TargetFrameworkProfile)' != '' ">
+      <Product>Hprose.RPC.AspNetCore for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion) $(TargetFrameworkProfile) Profile</Product>
+    </PropertyGroup>
+  </Target>
+
+</Project>

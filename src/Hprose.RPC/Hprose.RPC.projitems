@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>26af48ad-8f09-4146-bc18-d35529afa89e</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Hprose.RPC</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ContextAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CRC32.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HandlerManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WebSocketHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StreamExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SocketTransport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WebSocketTransport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UdpClientExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SocketHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UdpTransport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UdpHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TcpHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TcpTransport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IOManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HttpHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HttpTransport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Client.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ClientContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ClientCodec.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Context.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InvokeManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IClientCodec.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IInvocationHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InvocationHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HeaderAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MethodManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Method.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Service.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IServiceCodec.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceCodec.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NameAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Proxy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TaskResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UdpReceiveResult.cs" />
+  </ItemGroup>
+</Project>

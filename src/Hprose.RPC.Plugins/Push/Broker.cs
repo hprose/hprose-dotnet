@@ -1,0 +1,306 @@
+﻿/*--------------------------------------------------------*\
+|                                                          |
+|                          hprose                          |
+|                                                          |
+| Official WebSite: https://hprose.com                     |
+|                                                          |
+|  Broker.cs                                               |
+|                                                          |
+|  Broker plugin for C#.                                   |
+|                                                          |
+|  LastModified: Feb 8, 2019                               |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
+|                                                          |
+\*________________________________________________________*/
+
+using Hprose.IO;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Hprose.RPC.Plugins.Push {
+    public class Broker {
+        static Broker() {
+            TypeManager.Register<Message>("@");
+        }
+        private static readonly Dictionary<string, Message[]> emptyMessage = new Dictionary<string, Message[]>(0);
+        protected ConcurrentDictionary<string, ConcurrentDictionary<string, BlockingCollection<Message>>> Messages { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<string, BlockingCollection<Message>>>();
+        protected ConcurrentDictionary<string, TaskCompletionSource<Dictionary<string, Message[]>>> Responders { get; } = new ConcurrentDictionary<string, TaskCompletionSource<Dictionary<string, Message[]>>>();
+        protected ConcurrentDictionary<string, TaskCompletionSource<bool>> Timers { get; } = new ConcurrentDictionary<string, TaskCompletionSource<bool>>();
+        public Service Service { get; private set; }
+        public int MessageQueueMaxLength { get; set; } = 10;
+        public TimeSpan Timeout { get; set; } = new TimeSpan(0, 2, 0);
+        public TimeSpan HeartBeat { get; set; } = new TimeSpan(0, 0, 10);
+        public Action<string, string, ServiceContext> OnSubscribe { get; set; } = null;
+        public Action<string, string, Message[], ServiceContext> OnUnsubscribe { get; set; } = null;
+        public Broker(Service service) {
+            Service = service;
+            Service.Add<string, ServiceContext, bool>(Subscribe, "+")
+                   .Add<string, ServiceContext, bool>(Unsubscribe, "-")
+                   .Add<ServiceContext, Task<Dictionary<string, Message[]>>>(Message, "<")
+                   .Add<object, string, string, string, bool>(Unicast, ">")
+                   .Add<object, string, IEnumerable<string>, string, IDictionary<string, bool>>(Multicast, ">?")
+                   .Add<object, string, string, IDictionary<string, bool>>(Broadcast, ">*")
+                   .Add<string, string, bool>(Exists, "?")
+                   .Add<string, IList<string>>(IdList, "|")
+                   .Use(Handler);
+        }
+        protected bool Send(string id, TaskCompletionSource<Dictionary<string, Message[]>> responders) {
+            if (!Messages.TryGetValue(id, out var topics)) {
+                responders.TrySetResult(null);
+                return true;
+            }
+            if (topics.IsEmpty) {
+                responders.TrySetResult(null);
+                return true;
+            }
+            var result = new Dictionary<string, Message[]>();
+            int count = 0;
+            foreach (var topic in topics) {
+                var name = topic.Key;
+                var messages = topic.Value;
+                if (messages == null || messages.Count > 0) {
+                    ++count;
+                    result.Add(name, messages?.ToArray());
+                    if (messages == null) {
+                        topics.TryRemove(name, out var temp);
+                        temp?.Dispose();
+                    }
+                    else {
+                        var newmessages = new BlockingCollection<Message>(MessageQueueMaxLength);
+                        if (!topics.TryUpdate(name, newmessages, messages)) {
+                            newmessages.Dispose();
+                        }
+                        messages.Dispose();
+                    }
+                }
+            }
+            if (count == 0) return false;
+            responders.TrySetResult(result);
+            if (HeartBeat > TimeSpan.Zero) {
+                DoHeartBeat(id);
+            }
+            return true;
+        }
+        protected async void DoHeartBeat(string id) {
+            var timer = new TaskCompletionSource<bool>();
+            Timers.AddOrUpdate(id, timer, (_, oldtimer) => {
+                oldtimer.TrySetResult(false);
+                return timer;
+            });
+            using (CancellationTokenSource source = new CancellationTokenSource()) {
+#if NET40
+                var delay = TaskEx.Delay(HeartBeat, source.Token);
+                var task = await TaskEx.WhenAny(timer.Task, delay).ConfigureAwait(false);
+#else
+                var delay = Task.Delay(HeartBeat, source.Token);
+                var task = await Task.WhenAny(timer.Task, delay).ConfigureAwait(false);
+#endif
+                source.Cancel();
+                if (task == delay) {
+                    timer.TrySetResult(true);
+                }
+            }
+            if (await timer.Task.ConfigureAwait(false) && Messages.TryGetValue(id, out var t)) {
+                foreach (var topic in t.Keys) {
+                    Offline(t, id, topic, new ServiceContext(Service));
+                }
+            }
+        }
+        protected static string GetId(ServiceContext context) {
+            if (((IDictionary<string, object>)context.RequestHeaders).TryGetValue("Id", out var id)) {
+                return id.ToString();
+            }
+            throw new KeyNotFoundException("client unique id not found");
+        }
+        protected bool Subscribe(string topic, ServiceContext context) {
+            var id = GetId(context);
+            var topics = Messages.GetOrAdd(id, (_) => new ConcurrentDictionary<string, BlockingCollection<Message>>());
+            if (topics.TryGetValue(topic, out var messages)) {
+                if (messages != null) return false;
+            }
+            messages = new BlockingCollection<Message>(MessageQueueMaxLength);
+            topics.AddOrUpdate(topic, messages, (_, oldmessages) => {
+                if (oldmessages != null) {
+                    messages.Dispose();
+                    return oldmessages;
+                }
+                return messages;
+            });
+            OnSubscribe?.Invoke(id, topic, context);
+            return true;
+        }
+        protected void Response(string id) {
+            if (Responders.TryGetValue(id, out var responder)) {
+                if (responder != null) {
+                    if (Send(id, responder)) {
+                        Responders.TryUpdate(id, null, responder);
+                    }
+                }
+            }
+        }
+        protected bool Offline(ConcurrentDictionary<string, BlockingCollection<Message>> topics, string id, string topic, ServiceContext context) {
+            if (topics.TryRemove(topic, out var messages)) {
+                OnUnsubscribe?.Invoke(id, topic, messages?.ToArray(), context);
+                messages?.Dispose();
+                Response(id);
+                return true;
+            }
+            return false;
+        }
+        protected bool Unsubscribe(string topic, ServiceContext context) {
+            var id = GetId(context);
+            if (Messages.TryGetValue(id, out var topics)) {
+                return Offline(topics, id, topic, context);
+            }
+            return false;
+        }
+        protected async Task<Dictionary<string, Message[]>> Message(ServiceContext context) {
+            var id = GetId(context);
+            if (Responders.TryRemove(id, out var responder)) {
+                responder?.TrySetResult(null);
+            }
+            if (Timers.TryRemove(id, out var timer)) {
+                timer.TrySetResult(false);
+            }
+            responder = new TaskCompletionSource<Dictionary<string, Message[]>>();
+            if (!Send(id, responder)) {
+                Responders.AddOrUpdate(id, responder, (_, oldResponder) => {
+                    oldResponder?.TrySetResult(null);
+                    return responder;
+                });
+                if (Timeout > TimeSpan.Zero) {
+                    using (CancellationTokenSource source = new CancellationTokenSource()) {
+#if NET40
+                        var delay = TaskEx.Delay(Timeout, source.Token);
+                        var task = await TaskEx.WhenAny(responder.Task, delay).ConfigureAwait(false);
+#else
+                        var delay = Task.Delay(Timeout, source.Token);
+                        var task = await Task.WhenAny(responder.Task, delay).ConfigureAwait(false);
+#endif
+                        source.Cancel();
+                        if (task == delay) {
+                            responder.TrySetResult(emptyMessage);
+                        }
+                    }
+                }
+            }
+            return await responder.Task.ConfigureAwait(false);
+        }
+        public bool Unicast(object data, string topic, string id, string from = "") {
+            if (Messages.TryGetValue(id, out var topics)) {
+                if (topics.TryGetValue(topic, out var messages)) {
+                    if (messages.TryAdd(new Message() { Data = data, From = from })) {
+                        Response(id);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        public IDictionary<string, bool> Multicast(object data, string topic, IEnumerable<string> ids, string from = "") {
+            var result = new Dictionary<string, bool>();
+            foreach (var id in ids) {
+                result.Add(id, Unicast(data, topic, id, from));
+            }
+            return result;
+        }
+        public IDictionary<string, bool> Broadcast(object data, string topic, string from = "") {
+            var result = new Dictionary<string, bool>();
+            foreach (var topics in Messages) {
+                if (topics.Value.TryGetValue(topic, out var messages)) {
+                    var id = topics.Key;
+                    if (messages.TryAdd(new Message() { Data = data, From = from })) {
+                        Response(id);
+                        result.Add(id, true);
+                    }
+                    else {
+                        result.Add(id, false);
+                    }
+                }
+            }
+            return result;
+        }
+        public bool Push(object data, string topic, string id, string from = "") {
+            return Unicast(data, topic, id, from);
+        }
+        public IDictionary<string, bool> Push(object data, string topic, IEnumerable<string> ids, string from = "") {
+            return Multicast(data, topic, ids, from);
+        }
+        public IDictionary<string, bool> Push(object data, string topic, string from = "") {
+            return Broadcast(data, topic, from);
+        }
+        public void Deny(string id, string topic = null) {
+            if (Messages.TryGetValue(id, out var topics)) {
+                if (topic != null && topic.Length > 0) {
+                    if (topics.TryGetValue(topic, out var messages)) {
+                        topics.TryUpdate(topic, null, messages);
+                        messages.Dispose();
+                    }
+                }
+                else {
+                    foreach (var pair in topics) {
+                        topics.TryUpdate(pair.Key, null, pair.Value);
+                        pair.Value.Dispose();
+                    }
+                }
+                Response(id);
+            }
+        }
+        public bool Exists(string topic, string id) {
+            if (Messages.TryGetValue(id, out var topics)) {
+                if (topics.TryGetValue(topic, out var messages)) {
+                    return messages != null;
+                }
+            }
+            return false;
+        }
+        public IList<string> IdList(string topic) {
+            var idlist = new List<string>(Messages.Count);
+            foreach (var topics in Messages) {
+                var id = topics.Key;
+                if (topics.Value.TryGetValue(topic, out var messages) && messages != null) {
+                    idlist.Add(id);
+                }
+            }
+            return idlist;
+        }
+        protected async Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
+            var from = "";
+            if (((IDictionary<string, object>)(context as ServiceContext).RequestHeaders).TryGetValue("Id", out var id)) {
+                from = id.ToString();
+            }
+            switch (name) {
+                case ">":
+                case ">?":
+                    args[3] = from;
+                    break;
+                case ">*":
+                    args[2] = from;
+                    break;
+            }
+            IProducer producer = new Producer(this, from);
+            ((dynamic)context).Producer = producer;
+            return await next(name, args, context).ConfigureAwait(false);
+        }
+        private class Producer : IProducer {
+            private readonly Broker Broker;
+            public string From { get; private set; }
+            public Producer(Broker broker, string from) {
+                Broker = broker;
+                From = from;
+            }
+            public bool Unicast(object data, string topic, string id) => Broker.Unicast(data, topic, id, From);
+            public IDictionary<string, bool> Multicast(object data, string topic, IEnumerable<string> ids) => Broker.Multicast(data, topic, ids, From);
+            public IDictionary<string, bool> Broadcast(object data, string topic) => Broker.Broadcast(data, topic, From);
+            public bool Push(object data, string topic, string id) => Broker.Push(data, topic, id, From);
+            public IDictionary<string, bool> Push(object data, string topic, IEnumerable<string> ids) => Broker.Push(data, topic, ids, From);
+            public IDictionary<string, bool> Push(object data, string topic) => Broker.Push(data, topic, From);
+            public void Deny(string id = null, string topic = null) => Broker.Deny(id ?? From, topic);
+            public bool Exists(string topic, string id = null) => Broker.Exists(topic, id ?? From);
+            public IList<string> IdList(string topic) => Broker.IdList(topic);
+        }
+    }
+}

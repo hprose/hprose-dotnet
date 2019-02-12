@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net40;net45;net451;net452;net46;net461;net462;net47;net471;net472</TargetFrameworks>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
+    <Version>3.0.0</Version>
+    <OutputType>Library</OutputType>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Ma Bingyao&lt;andot@hprose.com&gt;</Authors>
+    <Company>hprose.com</Company>
+    <Copyright>Copyright © http://www.hprose.com, All rights reserved.</Copyright>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <Product>Hprose.RPC.AspNet</Product>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>http://www.hprose.com</PackageProjectUrl>
+    <PackageIconUrl>http://hprose.com/apple-touch-icon-180x180.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/hprose/hprose-dotnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>1701;1702;CA1724;CA1812</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('net40')) Or $(TargetFramework.StartsWith('net45')) Or $(TargetFramework.StartsWith('net46')) ">
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('net40')) ">
+    <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('net472')) ">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web" />
+    <ProjectReference Include="..\Hprose.IO\Hprose.IO.csproj" />
+    <ProjectReference Include="..\Hprose.RPC\Hprose.RPC.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\src\Hprose.RPC.AspNet\Hprose.RPC.AspNet.projitems" Label="Shared" />
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <PropertyGroup Condition=" '$(TargetFrameworkIdentifier)' != '' ">
+      <Product>Hprose.RPC.AspNet for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion)</Product>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(TargetFrameworkProfile)' != '' ">
+      <Product>Hprose.RPC.AspNet for $(TargetFrameworkIdentifier) $(TargetFrameworkVersion) $(TargetFrameworkProfile) Profile</Product>
+    </PropertyGroup>
+  </Target>
+
+</Project>

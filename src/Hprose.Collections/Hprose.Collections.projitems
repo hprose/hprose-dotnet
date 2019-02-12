@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>645ef886-f73b-46a5-a484-7ebe81209303</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Hprose.Collections</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Generic\NullableKeyComparer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Generic\NullableKeyDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Generic\NullableKeyEqualityComparer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Generic\NullableKey.cs" />
+  </ItemGroup>
+</Project>
