@@ -21,8 +21,8 @@ namespace Hprose.RPC {
         public Client Client { get; private set; }
         public string Uri { get; set; }
         public Type Type { get; set; }
-        public dynamic RequestHeaders { get; } = new ExpandoObject();
-        public dynamic ResponseHeaders { get; } = new ExpandoObject();
+        public dynamic RequestHeaders { get; private set; } = new ExpandoObject();
+        public dynamic ResponseHeaders { get; private set; } = new ExpandoObject();
         public ClientContext(Client client, Type type, Settings settings = null) {
             Client = client;
             Uri = (client.Uris.Count > 0) ? client.Uris[0] : null;
@@ -31,6 +31,14 @@ namespace Hprose.RPC {
             Copy(client.RequestHeaders, RequestHeaders);
             Copy(settings?.RequestHeaders, RequestHeaders);
             Copy(settings?.Context, Items);
+        }
+        public override object Clone() {
+            ClientContext context = base.Clone() as ClientContext;
+            context.RequestHeaders = new ExpandoObject();
+            context.ResponseHeaders = new ExpandoObject();
+            Copy(RequestHeaders, context.RequestHeaders);
+            Copy(ResponseHeaders, context.ResponseHeaders);
+            return context;
         }
     }
 }
