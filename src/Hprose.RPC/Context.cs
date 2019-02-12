@@ -50,12 +50,10 @@ namespace Hprose.RPC {
             return Items.ContainsKey(name);
         }
 
-        public object Clone() {
+        public virtual object Clone() {
             Context context = MemberwiseClone() as Context;
             context.Items = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-            foreach (var pair in Items) {
-                context.Items[pair.Key] = pair.Value;
-            }
+            Copy(Items, context.Items);
             return context;
         }
     }
