@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Feb 10, 2019                              |
+|  LastModified: Feb 12, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,10 @@
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,6 +28,16 @@ namespace Hprose.RPC {
         public Action<TcpClient> OnAccept { get; set; } = null;
         public Action<TcpClient> OnClose { get; set; } = null;
         public Action<Exception> OnError { get; set; } = null;
+        public X509Certificate ServerCertificate { get; set; } = null;
+#if !NET40
+        public bool ClientCertificateRequired { get; set; } = false;
+        public bool CheckCertificateRevocation { get; set; } = false;
+#if !NETCOREAPP2_0 && !NETCOREAPP2_1 && !NETCOREAPP2_2
+        public SslProtocols EnabledSslProtocols { get; set; } = SslProtocols.Default | SslProtocols.Tls11 | SslProtocols.Tls12;
+#else
+        public SslProtocols EnabledSslProtocols { get; set; } = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
+#endif
+#endif
         public Service Service { get; private set; }
         public TcpHandler(Service service) {
             Service = service;
@@ -53,9 +66,8 @@ namespace Hprose.RPC {
             }
             return bytes;
         }
-        private async Task Send(TcpClient tcpClient, ConcurrentQueue<(int index, Stream stream)> responses) {
+        private async Task Send(TcpClient tcpClient, Stream netStream, ConcurrentQueue<(int index, Stream stream)> responses) {
             var header = new byte[12];
-            var netStream = tcpClient.GetStream();
             while (true) {
                 (int index, Stream stream) response;
                 while (!responses.TryDequeue(out response)) {
@@ -118,9 +130,8 @@ namespace Hprose.RPC {
                 }
             }
         }
-        public async Task Receive(TcpClient tcpClient, ConcurrentQueue<(int index, Stream stream)> responses) {
+        public async Task Receive(TcpClient tcpClient, Stream netStream, ConcurrentQueue<(int index, Stream stream)> responses) {
             var header = new byte[12];
-            var netStream = tcpClient.GetStream();
             while (true) {
                 await ReadAsync(netStream, header, 0, 12).ConfigureAwait(false);
                 uint crc = (uint)((header[0] << 24) | (header[1] << 16) | (header[2] << 8) | header[3]);
@@ -146,13 +157,26 @@ namespace Hprose.RPC {
         private async void Handler(TcpClient tcpClient) {
             var responses = new ConcurrentQueue<(int index, Stream stream)>();
             OnAccept?.Invoke(tcpClient);
-            var receive = Receive(tcpClient, responses);
-            var send = Send(tcpClient, responses);
             try {
+                Stream stream = tcpClient.GetStream();
+                if (ServerCertificate != null) {
+                    SslStream sslStream = new SslStream(stream, false);
+#if NET40
+                    await sslStream.AuthenticateAsServerAsync(ServerCertificate);
+#else
+                    await sslStream.AuthenticateAsServerAsync(ServerCertificate, ClientCertificateRequired, EnabledSslProtocols, CheckCertificateRevocation).ConfigureAwait(false);
+#endif
+                    stream = sslStream;
+                }
+                var receive = Receive(tcpClient, stream, responses);
+                var send = Send(tcpClient, stream, responses);
                 await receive.ConfigureAwait(false);
                 await send.ConfigureAwait(false);
             }
             catch (Exception e) {
+                if (e.InnerException != null) {
+                    e = e.InnerException;
+                }
                 OnError?.Invoke(e);
                 tcpClient.Close();
                 OnClose?.Invoke(tcpClient);
