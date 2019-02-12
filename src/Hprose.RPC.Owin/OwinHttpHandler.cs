@@ -21,10 +21,9 @@ using System.IO.Compression;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Owin;
 
 namespace Hprose.RPC.Owin {
-    public class OwinHttpHandler : IHandler<IOwinContext> {
+    public class OwinHttpHandler : IHandler<IDictionary<string, object>> {
         public bool CrossDomain { get; set; } = true;
         public bool P3P { get; set; } = true;
         public bool Get { get; set; } = true;
@@ -42,8 +41,8 @@ namespace Hprose.RPC.Owin {
             lastModified = DateTime.Now.ToString("R", CultureInfo.InvariantCulture);
             etag = '"' + rand.Next().ToString("x", CultureInfo.InvariantCulture) + ":" + rand.Next().ToString("x", CultureInfo.InvariantCulture) + '"';
         }
-        public Task Bind(IOwinContext server) {
-            return Handler(server);
+        public Task Bind(IDictionary<string, object> environment) {
+            return Handler(environment);
         }
         public void AddAccessControlAllowOrigin(string origin) {
             origins[origin] = true;
@@ -51,122 +50,129 @@ namespace Hprose.RPC.Owin {
         public void RemoveAccessControlAllowOrigin(string origin) {
             origins.Remove(origin);
         }
-        private Stream GetOutputStream(IOwinRequest request, IOwinResponse response) {
-            Stream ostream = new BufferedStream(response.Body);
+        private Stream GetOutputStream(IDictionary<string, object> environment) {
+            Stream ostream = new BufferedStream(environment["owin.ResponseBody"] as Stream);
             if (Compress) {
-                string acceptEncoding = request.Headers["Accept-Encoding"];
+                var requestHeaders = environment["owin.RequestHeaders"] as IDictionary<string, string[]>;
+                var responseHeaders = environment["owin.ResponseHeaders"] as IDictionary<string, string[]>;
+                var acceptEncoding = requestHeaders["Accept-Encoding"]?[0];
                 if (acceptEncoding != null) {
                     acceptEncoding = acceptEncoding.ToLowerInvariant();
                     if (acceptEncoding.Contains("gzip")) {
-                        response.Headers.Append("Content-Encoding", "gzip");
+                        responseHeaders.Add("Content-Encoding", new string[] { "gzip" });
                         ostream = new GZipStream(ostream, CompressionMode.Compress);
                     }
                     else if (acceptEncoding.Contains("deflate")) {
-                        response.Headers.Append("Content-Encoding", "deflate");
+                        responseHeaders.Add("Content-Encoding", new string[] { "deflate" });
                         ostream = new DeflateStream(ostream, CompressionMode.Compress);
                     }
                 }
             }
             return ostream;
         }
-        private void SendHeader(IOwinRequest request, IOwinResponse response) {
-            response.ContentType = "text/plain";
+        private void SendHeader(IDictionary<string, object> environment) {
+            var requestHeaders = environment["owin.RequestHeaders"] as IDictionary<string, string[]>;
+            var responseHeaders = environment["owin.ResponseHeaders"] as IDictionary<string, string[]>;
+            responseHeaders.Add("Content-Type", new string[] { "text/plain" });
             if (P3P) {
-                response.Headers.Append("P3P",
+                responseHeaders.Add("P3P", new string[] {
                     "CP=\"CAO DSP COR CUR ADM DEV TAI PSA PSD IVAi IVDi " +
                     "CONi TELo OTPi OUR DELi SAMi OTRi UNRi PUBi IND PHY ONL " +
-                    "UNI PUR FIN COM NAV INT DEM CNT STA POL HEA PRE GOV\"");
+                    "UNI PUR FIN COM NAV INT DEM CNT STA POL HEA PRE GOV\"" });
             }
             if (CrossDomain) {
-                string origin = request.Headers["Origin"];
+                string origin = requestHeaders["Origin"]?[0];
                 if (string.IsNullOrEmpty(origin) || origin == "null") {
-                    response.Headers.Append("Access-Control-Allow-Origin", "*");
+                    responseHeaders.Add("Access-Control-Allow-Origin", new string[] { "*" });
                 }
                 else if (origins.Count == 0 || origins.ContainsKey(origin)) {
-                    response.Headers.Append("Access-Control-Allow-Origin", origin);
-                    response.Headers.Append("Access-Control-Allow-Credentials", "true");
+                    responseHeaders.Add("Access-Control-Allow-Origin", new string[] { origin });
+                    responseHeaders.Add("Access-Control-Allow-Credentials", new string[] { "true" });
                 }
             }
         }
-        private async Task<bool> CrossDomainXmlHandler(IOwinRequest request, IOwinResponse response) {
-            if (request.Path.Value.ToLowerInvariant() == "/crossdomain.xml") {
-                if (request.Headers["If-Modified-Since"] == lastModified &&
-                    request.Headers["If-None-Match"] == etag) {
-                    response.StatusCode = 304;
+        private async Task<bool> CrossDomainXmlHandler(IDictionary<string, object> environment) {
+            if ((environment["owin.RequestPath"] as string)?.ToLowerInvariant() == "/crossdomain.xml") {
+                var requestHeaders = environment["owin.RequestHeaders"] as IDictionary<string, string[]>;
+                var responseHeaders = environment["owin.ResponseHeaders"] as IDictionary<string, string[]>;
+                if (requestHeaders["If-Modified-Since"]?[0] == lastModified &&
+                    requestHeaders["If-None-Match"]?[0] == etag) {
+                    environment["owin.ResponseStatusCode"] = 304;
                 }
                 else if (CrossDomainXmlFile != null) {
-                    response.Headers.Append("Last-Modified", lastModified);
-                    response.ETag = etag;
-                    response.ContentType = "text/xml";
+                    responseHeaders.Add("Last-Modified", new string[] { lastModified });
+                    responseHeaders.Add("Etag", new string[] { etag });
+                    responseHeaders.Add("Content-Type", new string[] { "text/xml" });
                     using (var fileStream = new FileStream(CrossDomainXmlFile, FileMode.Open, FileAccess.Read)) {
-                        using (var outputStream = GetOutputStream(request, response)) {
+                        using (var outputStream = GetOutputStream(environment)) {
                             await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
                         }
                     };
                 }
                 else {
-                    response.StatusCode = 404;
+                    environment["owin.ResponseStatusCode"] = 404;
                 }
                 return true;
             }
             return false;
         }
-        private async Task<bool> ClientAccessPolicyXmlHandler(IOwinRequest request, IOwinResponse response) {
-            if (request.Path.Value.ToLowerInvariant() == "/clientaccesspolicy.xml") {
-                if (request.Headers["If-Modified-Since"] == lastModified &&
-                    request.Headers["If-None-Match"] == etag) {
-                    response.StatusCode = 304;
+        private async Task<bool> ClientAccessPolicyXmlHandler(IDictionary<string, object> environment) {
+            if ((environment["owin.RequestPath"] as string)?.ToLowerInvariant() == "/clientaccesspolicy.xml") {
+                var requestHeaders = environment["owin.RequestHeaders"] as IDictionary<string, string[]>;
+                var responseHeaders = environment["owin.ResponseHeaders"] as IDictionary<string, string[]>;
+                if (requestHeaders["If-Modified-Since"]?[0] == lastModified &&
+                    requestHeaders["If-None-Match"]?[0] == etag) {
+                    environment["owin.ResponseStatusCode"] = 304;
                 }
                 else if (ClientAccessPolicyXmlFile != null) {
-                    response.Headers.Append("Last-Modified", lastModified);
-                    response.ETag = etag;
-                    response.ContentType = "text/xml";
+                    responseHeaders.Add("Last-Modified", new string[] { lastModified });
+                    responseHeaders.Add("Etag", new string[] { etag });
+                    responseHeaders.Add("Content-Type", new string[] { "text/xml" });
                     using (var fileStream = new FileStream(ClientAccessPolicyXmlFile, FileMode.Open, FileAccess.Read)) {
-                        using (var outputStream = GetOutputStream(request, response)) {
+                        using (var outputStream = GetOutputStream(environment)) {
                             await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
                         }
                     };
                 }
                 else {
-                    response.StatusCode = 404;
+                    environment["owin.ResponseStatusCode"] = 404;
                 }
                 return true;
             }
             return false;
         }
-        public static IPEndPoint GetIPEndPoint(IOwinRequest request) {
-            var ip = IPAddress.Parse(request.RemoteIpAddress);
-            var port = request.RemotePort ?? 0;
-            return new IPEndPoint(ip, port);
+        public static IPEndPoint GetIPEndPoint(IDictionary<string, object> environment) {
+            var ip = IPAddress.Parse(environment["server.RemoteIpAddress"] as string);
+            if (int.TryParse(environment["server.RemotePort"] as string, out int port)) {
+                return new IPEndPoint(ip, port);
+            }
+            return new IPEndPoint(ip, 0);
         }
-        public virtual async Task Handler(IOwinContext owinContext) {
-            var request = owinContext.Request;
-            var response = owinContext.Response;
+        public virtual async Task Handler(IDictionary<string, object> environment) {
             dynamic context = new ServiceContext(Service);
-            context.OwinContext = owinContext;
-            context.Request = request;
-            context.Response = response;
-            context.User = request.User;
-            context.RemoteEndPoint = GetIPEndPoint(request);
+            context.Owin = environment;
+            context.RemoteEndPoint = GetIPEndPoint(environment);
             context.Handler = this;
-            if (await ClientAccessPolicyXmlHandler(request, response).ConfigureAwait(false)) {
+            if (await ClientAccessPolicyXmlHandler(environment).ConfigureAwait(false)) {
                 return;
             }
-            if (await CrossDomainXmlHandler(request, response).ConfigureAwait(false)) {
+            if (await CrossDomainXmlHandler(environment).ConfigureAwait(false)) {
                 return;
             }
-            using (var instream = request.Body) {
+            using (var instream = (environment["owin.RequestBody"] as Stream) ?? Stream.Null) {
                 if (instream.Length > Service.MaxRequestLength) {
                     instream.Dispose();
-                    response.StatusCode = 413;
+                    environment["owin.ResponseStatusCode"] = 413;
+                    environment["owin.ResponseReasonPhrase"] = "Request Entity Too Large";
                     return;
                 }
-                string method = request.Method;
+                string method = environment["owin.RequestMethod"] as string;
                 Stream outstream = null;
                 switch (method) {
                     case "GET":
                         if (!Get) {
-                            response.StatusCode = 403;
+                            environment["owin.ResponseStatusCode"] = 403;
+                            environment["owin.ResponseReasonPhrase"] = "Forbidden";
                             break;
                         }
                         goto case "POST";
@@ -175,8 +181,8 @@ namespace Hprose.RPC.Owin {
                             outstream = await Service.Handle(instream, context).ConfigureAwait(false);
                         }
                         catch (Exception e) {
-                            response.StatusCode = 500;
-                            using (var outputStream = GetOutputStream(request, response)) {
+                            environment["owin.ResponseStatusCode"] = 500;
+                            using (var outputStream = GetOutputStream(environment)) {
                                 var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
                                 await outputStream.WriteAsync(stackTrace, 0, stackTrace.Length).ConfigureAwait(false);
                             }
@@ -184,9 +190,9 @@ namespace Hprose.RPC.Owin {
                         }
                         break;
                 }
-                SendHeader(request, response);
+                SendHeader(environment);
                 if (outstream != null) {
-                    using (var outputStream = GetOutputStream(request, response)) {
+                    using (var outputStream = GetOutputStream(environment)) {
                         await outstream.CopyToAsync(outputStream).ConfigureAwait(false);
                     }
                     outstream.Dispose();
