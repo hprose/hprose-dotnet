@@ -63,20 +63,17 @@ namespace Hprose.RPC {
                         }
 
                         await client.ConnectAsync(host, port);
-                        Stream stream;
-                        switch(u.Scheme) {
+                        Stream stream = client.GetStream();
+                        switch (u.Scheme) {
                             case "tls":
                             case "tls4":
                             case "tls6":
                             case "ssl":
                             case "ssl4":
                             case "ssl6":
-                                SslStream sslstream = new SslStream(client.GetStream(), false, ValidateServerCertificate, CertificateSelection, EncryptionPolicy);
-                                await sslstream.AuthenticateAsClientAsync(ServerCertificateName ?? u.Host);
+                                SslStream sslstream = new SslStream(stream, false, ValidateServerCertificate, CertificateSelection, EncryptionPolicy);
+                                await sslstream.AuthenticateAsClientAsync(ServerCertificateName ?? u.Host).ConfigureAwait(false);
                                 stream = sslstream;
-                                break;
-                            default:
-                                stream = client.GetStream();
                                 break;
                         }
                         Receive(uri, client, stream);
