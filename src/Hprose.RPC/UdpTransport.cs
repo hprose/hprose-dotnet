@@ -200,7 +200,7 @@ namespace Hprose.RPC {
             }
         }
         public async Task<Stream> Transport(Stream request, Context context) {
-            MemoryStream stream = await request.ToMemoryStream().ConfigureAwait(false);
+            var stream = await request.ToMemoryStream().ConfigureAwait(false);
             if (stream.Length > 65499) {
                 throw new Exception("request too large");
             }

@@ -49,7 +49,7 @@ namespace Hprose.RPC.Plugins.Log {
             return Newtonsoft.Json.JsonConvert.SerializeObject(obj);
         }
         public static async Task<Stream> IOHandler(this Log log, Stream request, Context context, NextIOHandler next) {
-            bool enabled = context.Contains("Log") ? (context as dynamic).Log : log.Enabled;
+            bool enabled = context.Contains("log") ? (bool)context["log"] : log.Enabled;
             if (!enabled) return await next(request, context).ConfigureAwait(false);
             var stream = await request.ToMemoryStream().ConfigureAwait(false);
             Trace.TraceInformation(ToString(stream));
@@ -65,7 +65,7 @@ namespace Hprose.RPC.Plugins.Log {
             }
         }
         public static async Task<object> InvokeHandler(this Log log, string name, object[] args, Context context, NextInvokeHandler next) {
-            bool enabled = context.Contains("Log") ? (context as dynamic).Log : log.Enabled;
+            bool enabled = context.Contains("log") ? (bool)context["log"] : log.Enabled;
             if (!enabled) return await next(name, args, context).ConfigureAwait(false);
             string a = "";
             try {

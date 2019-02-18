@@ -8,12 +8,13 @@
 |                                                          |
 |  ServiceContext class for C#.                            |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
-using System.Dynamic;
+using System;
+using System.Collections.Generic;
 using System.Net;
 
 namespace Hprose.RPC {
@@ -21,15 +22,16 @@ namespace Hprose.RPC {
         public Service Service { get; private set; }
         public Method Method { get; set; } = null;
         public EndPoint RemoteEndPoint { get; set; } = null;
-        public dynamic RequestHeaders { get; private set; } = new ExpandoObject();
-        public dynamic ResponseHeaders { get; private set; } = new ExpandoObject();
+        public object Handler { get; set; } = null;
+        public IDictionary<string, object> RequestHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+        public IDictionary<string, object> ResponseHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public ServiceContext(Service service) {
             Service = service;
         }
         public override object Clone() {
-            ServiceContext context = base.Clone() as ServiceContext;
-            context.RequestHeaders = new ExpandoObject();
-            context.ResponseHeaders = new ExpandoObject();
+            var context = base.Clone() as ServiceContext;
+            context.RequestHeaders = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+            context.ResponseHeaders = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
             Copy(RequestHeaders, context.RequestHeaders);
             Copy(ResponseHeaders, context.ResponseHeaders);
             return context;

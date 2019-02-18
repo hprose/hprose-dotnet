@@ -8,7 +8,7 @@
 |                                                          |
 |  InvocationHandler class for C#.                         |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -107,18 +106,18 @@ namespace Hprose.RPC {
                         break;
                     case HeaderAttribute headerAttr: {
                             if (settings.RequestHeaders == null) {
-                                settings.RequestHeaders = new ExpandoObject();
+                                settings.RequestHeaders = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
                             }
-                            IDictionary<string, object> headers = settings.RequestHeaders;
+                            var headers = settings.RequestHeaders;
                             var (key, value) = headerAttr.Value;
                             headers.Add(key, value);
                         }
                         break;
                     case ContextAttribute contextAttr: {
                             if (settings.Context == null) {
-                                settings.Context = new Dictionary<string, object>();
+                                settings.Context = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
                             }
-                            IDictionary<string, object> context = settings.Context;
+                            var context = settings.Context;
                             var (key, value) = contextAttr.Value;
                             context.Add(key, value);
                         }

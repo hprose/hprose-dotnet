@@ -86,9 +86,9 @@ namespace Hprose.RPC {
                 responses.Enqueue((index | 0x8000, new MemoryStream(bytes), ipEndPoint));
                 return;
             }
-            dynamic context = new ServiceContext(Service);
-            context.UdpClient = udpClient;
-            context.Socket = udpClient.Client;
+            var context = new ServiceContext(Service);
+            context["udpClient"] = udpClient;
+            context["socket"] = udpClient.Client;
             context.RemoteEndPoint = ipEndPoint;
             context.Handler = this;
             using (var request = new MemoryStream(buffer, 8, length, false, true)) {

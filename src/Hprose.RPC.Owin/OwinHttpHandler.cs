@@ -149,8 +149,8 @@ namespace Hprose.RPC.Owin {
             return new IPEndPoint(ip, 0);
         }
         public virtual async Task Handler(IDictionary<string, object> environment) {
-            dynamic context = new ServiceContext(Service);
-            context.Owin = environment;
+            var context = new ServiceContext(Service);
+            context["owin"] = environment;
             context.RemoteEndPoint = GetIPEndPoint(environment);
             context.Handler = this;
             if (await ClientAccessPolicyXmlHandler(environment).ConfigureAwait(false)) {

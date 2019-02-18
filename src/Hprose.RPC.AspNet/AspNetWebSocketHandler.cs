@@ -8,7 +8,7 @@
 |                                                          |
 |  AspNetWebSocketHandler class for C#.                    |
 |                                                          |
-|  LastModified: Feb 12, 2019                              |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -124,12 +124,12 @@ namespace Hprose.RPC.AspNet {
             }
             httpContext.AcceptWebSocketRequest(async (webSocketContext) => {
                 WebSocket webSocket = webSocketContext.WebSocket;
-                dynamic context = new ServiceContext(Service);
-                context.HttpContext = httpContext;
-                context.WebSocketContext = webSocketContext;
-                context.Request = httpContext.Request;
-                context.Response = httpContext.Response;
-                context.User = httpContext.User;
+                var context = new ServiceContext(Service);
+                context["httpContext"] = httpContext;
+                context["webSocketContext"] = webSocketContext;
+                context["request"] = httpContext.Request;
+                context["response"] = httpContext.Response;
+                context["user"] = httpContext.User;
                 context.RemoteEndPoint = GetIPEndPoint(request);
                 context.Handler = this;
                 var responses = new ConcurrentQueue<(int index, MemoryStream stream)>();

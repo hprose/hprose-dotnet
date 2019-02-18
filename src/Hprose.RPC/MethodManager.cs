@@ -8,7 +8,7 @@
 |                                                          |
 |  MethodManager class for C#.                             |
 |                                                          |
-|  LastModified: Jan 27, 2019                              |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -186,7 +186,7 @@ namespace Hprose.RPC {
             if (string.IsNullOrEmpty(fullname)) {
                 fullname = name;
             }
-            foreach (MethodInfo methodInfo in methodInfos) {
+            foreach (var methodInfo in methodInfos) {
                 if (methodInfo.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) {
                     Add(methodInfo, fullname, target);
                 }
@@ -201,14 +201,14 @@ namespace Hprose.RPC {
             if (string.IsNullOrEmpty(fullname)) {
                 fullname = name;
             }
-            foreach (MethodInfo methodInfo in methodInfos) {
+            foreach (var methodInfo in methodInfos) {
                 if (methodInfo.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) {
                     Add(methodInfo, fullname);
                 }
             }
         }
         public void AddMethods(string[] names, object target, string ns = "") {
-            foreach (string name in names) {
+            foreach (var name in names) {
                 if (string.IsNullOrEmpty(ns)) {
                     AddMethod(name, target, name);
                 }
@@ -218,7 +218,7 @@ namespace Hprose.RPC {
             }
         }
         public void AddMethods(string[] names, Type type, string ns = "") {
-            foreach (string name in names) {
+            foreach (var name in names) {
                 if (string.IsNullOrEmpty(ns)) {
                     AddMethod(name, type, name);
                 }
@@ -233,7 +233,7 @@ namespace Hprose.RPC {
 #else
             var methodInfos = target.GetType().GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Instance);
 #endif
-            foreach (MethodInfo methodInfo in methodInfos) {
+            foreach (var methodInfo in methodInfos) {
                 if (Array.IndexOf(instanceMethodsOnObject, methodInfo.Name) != -1) {
                     var fullname = methodInfo.Name;
                     if (!string.IsNullOrEmpty(ns)) {
@@ -249,7 +249,7 @@ namespace Hprose.RPC {
 #else
             var methodInfos = type.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Static);
 #endif
-            foreach (MethodInfo methodInfo in methodInfos) {
+            foreach (var methodInfo in methodInfos) {
                 if (Array.IndexOf(staticMethodsOnObject, methodInfo.Name) != -1) {
                     var fullname = methodInfo.Name;
                     if (!string.IsNullOrEmpty(ns)) {

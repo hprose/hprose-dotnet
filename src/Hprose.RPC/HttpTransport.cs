@@ -8,13 +8,12 @@
 |                                                          |
 |  HttpTransport class for C#.                             |
 |                                                          |
-|  LastModified: Feb 5, 2019                               |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
 using System;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -37,10 +36,10 @@ namespace Hprose.RPC {
             httpClient.CancelPendingRequests();
         }
         public async Task<Stream> Transport(Stream request, Context context) {
-            dynamic clientContext = context;
-            using (HttpContent httpContext = new StreamContent(request)) {
-                if (context.Contains("HttpRequestHeaders")) {
-                    HttpContentHeaders headers = clientContext.HttpRequestHeaders;
+            var clientContext = context as ClientContext;
+            using (var httpContext = new StreamContent(request)) {
+                if (context.Contains("httpRequestHeaders")) {
+                    var headers = context["httpRequestHeaders"] as HttpContentHeaders;
                     foreach (var pair in headers) {
                         httpContext.Headers.Add(pair.Key, pair.Value);
                     }
@@ -48,9 +47,9 @@ namespace Hprose.RPC {
                 if (request.CanSeek) {
                     httpContext.Headers.ContentLength = request.Length;
                 }
-                HttpResponseMessage response = await httpClient.PostAsync(clientContext.Uri, httpContext).ConfigureAwait(false);
+                var response = await httpClient.PostAsync(clientContext.Uri, httpContext).ConfigureAwait(false);
                 if (response.IsSuccessStatusCode) {
-                    clientContext.HttpResponseHeaders = response.Headers;
+                    context["httpResponseHeaders"] = response.Headers;
                     return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 }
                 else {

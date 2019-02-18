@@ -18,6 +18,6 @@ using System;
 namespace Hprose.RPC.Plugins.Cluster {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public class RetryAttribute : ContextAttribute {
-        public RetryAttribute(int value) : base("Retry", value) { }
+        public RetryAttribute(int value) : base("retry", value) { }
     }
 }

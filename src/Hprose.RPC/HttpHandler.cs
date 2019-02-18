@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpHandler class for C#.                               |
 |                                                          |
-|  LastModified: Feb 12, 2019                              |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -58,7 +58,7 @@ namespace Hprose.RPC {
             origins.Remove(origin);
         }
         private Stream GetOutputStream(HttpListenerRequest request, HttpListenerResponse response) {
-            Stream ostream = response.OutputStream;
+            var ostream = response.OutputStream;
             if (Compress) {
                 string acceptEncoding = request.Headers["Accept-Encoding"];
                 if (acceptEncoding != null) {
@@ -144,11 +144,11 @@ namespace Hprose.RPC {
             return false;
         }
         public virtual async void Handler(HttpListenerContext httpContext) {
-            dynamic context = new ServiceContext(Service);
-            context.HttpContext = httpContext;
-            context.Request = httpContext.Request;
-            context.Response = httpContext.Response;
-            context.User = httpContext.User;
+            var context = new ServiceContext(Service);
+            context["httpContext"] = httpContext;
+            context["request"] = httpContext.Request;
+            context["response"] = httpContext.Response;
+            context["user"] = httpContext.User;
             context.RemoteEndPoint = httpContext.Request.RemoteEndPoint;
             context.Handler = this;
             var request = httpContext.Request;

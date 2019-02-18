@@ -269,7 +269,7 @@ namespace Hprose.RPC.Plugins.Push {
         }
         protected async Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
             var from = "";
-            if (((IDictionary<string, object>)(context as ServiceContext).RequestHeaders).TryGetValue("Id", out var id)) {
+            if (((context as ServiceContext).RequestHeaders).TryGetValue("id", out var id)) {
                 from = id.ToString();
             }
             switch (name) {
@@ -282,7 +282,7 @@ namespace Hprose.RPC.Plugins.Push {
                     break;
             }
             IProducer producer = new Producer(this, from);
-            ((dynamic)context).Producer = producer;
+            context["producer"] = producer;
             return await next(name, args, context).ConfigureAwait(false);
         }
         private class Producer : IProducer {

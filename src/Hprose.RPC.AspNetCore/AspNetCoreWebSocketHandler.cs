@@ -120,12 +120,12 @@ namespace Hprose.RPC.AspNetCore {
                 await base.Handler(httpContext).ConfigureAwait(false);
                 return;
             }
-            WebSocket webSocket = await httpContext.WebSockets.AcceptWebSocketAsync("hprose").ConfigureAwait(false);
-            dynamic context = new ServiceContext(Service);
-            context.HttpContext = httpContext;
-            context.Request = httpContext.Request;
-            context.Response = httpContext.Response;
-            context.User = httpContext.User;
+            var webSocket = await httpContext.WebSockets.AcceptWebSocketAsync("hprose").ConfigureAwait(false);
+            var context = new ServiceContext(Service);
+            context["httpContext"] = httpContext;
+            context["request"] = httpContext.Request;
+            context["response"] = httpContext.Response;
+            context["user"] = httpContext.User;
             context.RemoteEndPoint = GetIPEndPoint(httpContext);
             context.Handler = this;
             var responses = new ConcurrentQueue<(int index, MemoryStream stream)>();

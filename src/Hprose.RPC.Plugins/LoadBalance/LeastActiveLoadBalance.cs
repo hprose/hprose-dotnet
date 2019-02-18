@@ -8,7 +8,7 @@
 |                                                          |
 |  LeastActive LoadBalance plugin for C#.                  |
 |                                                          |
-|  LastModified: Feb 1, 2019                               |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -58,7 +58,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
                 index = leastActiveIndexes[random.Next(count)];
             }
 
-            (context as ClientContext).Uri = uris[index];
+            clientContext.Uri = uris[index];
 
             rwlock.EnterWriteLock();
             actives[index]++;

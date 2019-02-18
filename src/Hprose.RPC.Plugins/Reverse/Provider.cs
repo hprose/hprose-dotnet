@@ -8,7 +8,7 @@
 |                                                          |
 |  Provider class for C#.                                  |
 |                                                          |
-|  LastModified: Feb 4, 2019                               |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -33,12 +33,12 @@ namespace Hprose.RPC.Plugins.Reverse {
                 return GetId();
             }
             set {
-                Client.RequestHeaders.Id = value;
+                Client.RequestHeaders["id"] = value;
             }
         }
         private string GetId() {
-            if (((IDictionary<string, object>)Client.RequestHeaders).ContainsKey("Id")) {
-                return Client.RequestHeaders.Id.ToString();
+            if (Client.RequestHeaders.ContainsKey("id")) {
+                return Client.RequestHeaders["id"].ToString();
             }
             throw new KeyNotFoundException("client unique id not found");
         }

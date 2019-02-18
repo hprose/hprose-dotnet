@@ -8,7 +8,7 @@
 |                                                          |
 |  JsonRpcServiceCodec class for C#.                       |
 |                                                          |
-|  LastModified: Feb 12, 2019                              |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -24,14 +24,14 @@ namespace Hprose.RPC.Codec.JSONRPC {
     public class JsonRpcServiceCodec : IServiceCodec {
         public static JsonRpcServiceCodec Instance { get; } = new JsonRpcServiceCodec();
         public Stream Encode(object result, ServiceContext context) {
-            if (!context.Contains("jsonrpc") || !context["jsonrpc"]) {
+            if (!context.Contains("jsonrpc") || !(bool)context["jsonrpc"]) {
                 return ServiceCodec.Instance.Encode(result, context);
             }
             JObject response = new JObject {
                 { "jsonrpc", "2.0" }
             };
             if (context.Contains("jsonrpc.id")) {
-                response["id"] = context["jsonrpc.id"];
+                response["id"] = (JToken)context["jsonrpc.id"];
             } 
             if (result is Exception) {
                 var error = result as Exception;
@@ -80,7 +80,7 @@ namespace Hprose.RPC.Codec.JSONRPC {
             var tag = stream.ReadByte();
             stream.Position = 0;
             context["jsonrpc"] = (tag == '{');
-            if (!context["jsonrpc"]) {
+            if (!(bool)context["jsonrpc"]) {
                 return await ServiceCodec.Instance.Decode(stream, context).ConfigureAwait(false);
             }
             JObject call = null;

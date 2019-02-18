@@ -8,14 +8,13 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Feb 10, 2019                              |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -69,7 +68,7 @@ namespace Hprose.RPC {
 #endif
         private readonly Dictionary<string, ITransport> transports = new Dictionary<string, ITransport>();
         public ITransport this[string name] => transports[name];
-        public dynamic RequestHeaders { get; set; } = new ExpandoObject();
+        public IDictionary<string, object> RequestHeaders { get; set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public IClientCodec Codec { get; set; } = ClientCodec.Instance;
         private List<string> urilist = new List<string>();
         public List<string> Uris {
@@ -103,8 +102,8 @@ namespace Hprose.RPC {
             urilist.AddRange(uris);
         }
         public T UseService<T>(string ns = "") {
-            Type type = typeof(T);
-            InvocationHandler handler = new InvocationHandler(this, ns);
+            var type = typeof(T);
+            var handler = new InvocationHandler(this, ns);
             if (type.IsInterface) {
                 return (T)Proxy.NewInstance(new Type[] { type }, handler);
             }
@@ -143,7 +142,7 @@ namespace Hprose.RPC {
             return;
         }
         public async Task<T> InvokeAsync<T>(string fullname, object[] args = null, Settings settings = null) {
-            Type type = typeof(T);
+            var type = typeof(T);
             bool isResultType = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Result<>);
             if (isResultType) {
                 type = type.GetGenericArguments()[0];

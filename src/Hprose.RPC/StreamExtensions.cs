@@ -8,7 +8,7 @@
 |                                                          |
 |  Stream Extensions for C#.                               |
 |                                                          |
-|  LastModified: Feb 9, 2019                               |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -35,7 +35,7 @@ namespace Hprose.RPC {
 #endif
         public static async Task<MemoryStream> ToMemoryStream(this Stream stream) {
             if (stream is MemoryStream) return stream as MemoryStream;
-            MemoryStream memoryStream = new MemoryStream();
+            var memoryStream = new MemoryStream();
             await stream.CopyToAsync(memoryStream).ConfigureAwait(false);
             memoryStream.Position = 0;
             stream.Dispose();

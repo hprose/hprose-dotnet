@@ -8,7 +8,7 @@
 |                                                          |
 |  ServiceCodec class for C#.                              |
 |                                                          |
-|  LastModified: Feb 7, 2019                               |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,6 @@
 using Hprose.IO;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,9 +40,9 @@ namespace Hprose.RPC {
             var stream = new MemoryStream();
             var writer = new Writer(stream, Simple, Mode);
             if (Simple) {
-                context.RequestHeaders.Simple = true;
+                context.RequestHeaders["simple"] = true;
             }
-            if ((context.ResponseHeaders as IDictionary<string, object>).Count > 0) {
+            if (context.ResponseHeaders.Count > 0) {
                 stream.WriteByte(Tags.TagHeader);
                 writer.Serialize(context.ResponseHeaders);
                 writer.Reset();
@@ -77,7 +76,7 @@ namespace Hprose.RPC {
                 count = ValueReader.ReadCount(stream);
                 reader.AddReference(null);
             }
-            Method method = DecodeMethod(fullname, count, context);
+            var method = DecodeMethod(fullname, count, context);
             if (method.Missing) {
                 args = new object[count];
                 for (int i = 0; i < count; i++) {
@@ -104,7 +103,7 @@ namespace Hprose.RPC {
             return args;
         }
         public async Task<(string, object[])> Decode(Stream request, ServiceContext context) {
-            MemoryStream stream = await request.ToMemoryStream().ConfigureAwait(false);
+            var stream = await request.ToMemoryStream().ConfigureAwait(false);
             if (stream.Length == 0) {
                 DecodeMethod("~", 0, context);
                 return ("~", emptyArgs);
@@ -117,9 +116,9 @@ namespace Hprose.RPC {
                 DictType = DictType
             };
             var tag = stream.ReadByte();
+            var requestHeaders = context.RequestHeaders;
             if (tag == Tags.TagHeader) {
-                IDictionary<string, object> headers = reader.Deserialize<ExpandoObject>();
-                IDictionary<string, object> requestHeaders = context.RequestHeaders;
+                var headers = reader.Deserialize<Dictionary<string, object>>();
                 foreach (var pair in headers) {
                     requestHeaders[pair.Key] = pair.Value;
                 }
@@ -128,8 +127,7 @@ namespace Hprose.RPC {
             }
             switch (tag) {
                 case Tags.TagCall:
-                    if (((IDictionary<string, object>)context.RequestHeaders).ContainsKey("Simple")
-                        && context.RequestHeaders.Simple) {
+                    if (requestHeaders.ContainsKey("simple") && (bool)requestHeaders["simple"]) {
                         reader.Simple = true;
                     }
                     var fullname = reader.Deserialize<string>();
@@ -143,6 +141,5 @@ namespace Hprose.RPC {
                     throw new Exception("Invalid request:\r\n" + Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
             }
         }
-
     }
 }

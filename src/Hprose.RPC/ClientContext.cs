@@ -8,21 +8,21 @@
 |                                                          |
 |  ClientContext class for C#.                             |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
 using System;
-using System.Dynamic;
+using System.Collections.Generic;
 
 namespace Hprose.RPC {
     public class ClientContext : Context {
         public Client Client { get; private set; }
         public string Uri { get; set; }
         public Type Type { get; set; }
-        public dynamic RequestHeaders { get; private set; } = new ExpandoObject();
-        public dynamic ResponseHeaders { get; private set; } = new ExpandoObject();
+        public IDictionary<string, object> RequestHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+        public IDictionary<string, object> ResponseHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public ClientContext(Client client, Type type, Settings settings = null) {
             Client = client;
             Uri = (client.Uris.Count > 0) ? client.Uris[0] : null;
@@ -33,9 +33,9 @@ namespace Hprose.RPC {
             Copy(settings?.Context, Items);
         }
         public override object Clone() {
-            ClientContext context = base.Clone() as ClientContext;
-            context.RequestHeaders = new ExpandoObject();
-            context.ResponseHeaders = new ExpandoObject();
+            var context = base.Clone() as ClientContext;
+            context.RequestHeaders = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+            context.ResponseHeaders = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
             Copy(RequestHeaders, context.RequestHeaders);
             Copy(ResponseHeaders, context.ResponseHeaders);
             return context;

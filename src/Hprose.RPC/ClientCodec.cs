@@ -8,7 +8,7 @@
 |                                                          |
 |  ClientCodec class for C#.                               |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,6 @@
 using Hprose.IO;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,9 +34,9 @@ namespace Hprose.RPC {
             var stream = new MemoryStream();
             var writer = new Writer(stream, Simple, Mode);
             if (Simple) {
-                context.RequestHeaders.Simple = true;
+                context.RequestHeaders["simple"] = true;
             }
-            if ((context.RequestHeaders as IDictionary<string, object>).Count > 0) {
+            if (context.RequestHeaders.Count > 0) {
                 stream.WriteByte(Tags.TagHeader);
                 writer.Serialize(context.RequestHeaders);
                 writer.Reset();
@@ -53,7 +52,7 @@ namespace Hprose.RPC {
             return stream;
         }
         public async Task<object> Decode(Stream response, ClientContext context) {
-            MemoryStream stream = await response.ToMemoryStream().ConfigureAwait(false);
+            var stream = await response.ToMemoryStream().ConfigureAwait(false);
             var reader = new Reader(stream, false, Mode) {
                 LongType = LongType,
                 RealType = RealType,
@@ -62,9 +61,9 @@ namespace Hprose.RPC {
                 DictType = DictType
             };
             var tag = stream.ReadByte();
+            var responseHeaders = context.ResponseHeaders;
             if (tag == Tags.TagHeader) {
-                IDictionary<string, object> headers = reader.Deserialize<ExpandoObject>();
-                IDictionary<string, object> responseHeaders = context.ResponseHeaders;
+                var headers = reader.Deserialize<Dictionary<string, object>>();
                 foreach (var pair in headers) {
                     responseHeaders[pair.Key] = pair.Value;
                 }
@@ -73,8 +72,7 @@ namespace Hprose.RPC {
             }
             switch (tag) {
                 case Tags.TagResult:
-                    if (((IDictionary<string, object>)context.ResponseHeaders).ContainsKey("Simple")
-                        && context.ResponseHeaders.Simple) {
+                    if (responseHeaders.ContainsKey("simple") && (bool)responseHeaders["simple"]) {
                         reader.Simple = true;
                     }
                     return reader.Deserialize(context.Type);

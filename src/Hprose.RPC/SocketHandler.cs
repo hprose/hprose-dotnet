@@ -8,7 +8,7 @@
 |                                                          |
 |  SocketHandler class for C#.                             |
 |                                                          |
-|  LastModified: Feb 10, 2019                              |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -62,7 +62,7 @@ namespace Hprose.RPC {
                     await Task.Yield();
                 }
                 int index = response.index;
-                MemoryStream stream = response.stream;
+                var stream = response.stream;
                 var n = (int)stream.Length;
                 header[4] = (byte)(n >> 24 & 0xFF | 0x80);
                 header[5] = (byte)(n >> 16 & 0xFF);
@@ -119,8 +119,8 @@ namespace Hprose.RPC {
                     return;
                 }
                 var data = await ReadAsync(socket, new byte[length], 0, length).ConfigureAwait(false);
-                dynamic context = new ServiceContext(Service);
-                context.Socket = socket;
+                var context = new ServiceContext(Service);
+                context["socket"] = socket;
                 context.RemoteEndPoint = socket.RemoteEndPoint;
                 context.Handler = this;
                 Run(responses, index, data, context);

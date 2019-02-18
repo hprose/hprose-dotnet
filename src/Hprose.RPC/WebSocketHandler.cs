@@ -8,7 +8,7 @@
 |                                                          |
 |  WebSocketHandler class for C#.                          |
 |                                                          |
-|  LastModified: Feb 11, 2019                              |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -35,7 +35,7 @@ namespace Hprose.RPC {
                     await Task.Yield();
                 }
                 int index = response.index;
-                MemoryStream stream = response.stream;
+                var stream = response.stream;
                 int n = (int)stream.Length;
                 var buffer = ArrayPool<byte>.Shared.Rent(4 + n);
                 try {
@@ -73,7 +73,7 @@ namespace Hprose.RPC {
             }
         }
         private async Task<(int, MemoryStream)> ReadAsync(WebSocket webSocket, ConcurrentQueue<(int index, MemoryStream stream)> responses) {
-            MemoryStream stream = new MemoryStream();
+            var stream = new MemoryStream();
             var buffer = ArrayPool<byte>.Shared.Rent(16384);
             var index = -1;
             try {
@@ -122,13 +122,13 @@ namespace Hprose.RPC {
                 return;
             }
             var webSocketContext = await httpContext.AcceptWebSocketAsync("hprose").ConfigureAwait(false);
-            WebSocket webSocket = webSocketContext.WebSocket;
-            dynamic context = new ServiceContext(Service);
-            context.HttpContext = httpContext;
-            context.WebSocketContext = webSocketContext;
-            context.Request = request;
-            context.Response = httpContext.Response;
-            context.User = httpContext.User;
+            var webSocket = webSocketContext.WebSocket;
+            var context = new ServiceContext(Service);
+            context["httpContext"] = httpContext;
+            context["webSocketContext"] = webSocketContext;
+            context["request"] = request;
+            context["response"] = httpContext.Response;
+            context["user"] = httpContext.User;
             context.RemoteEndPoint = request.RemoteEndPoint;
             context.Handler = this;
             var responses = new ConcurrentQueue<(int index, MemoryStream stream)>();

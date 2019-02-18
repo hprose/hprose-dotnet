@@ -8,7 +8,7 @@
 |                                                          |
 |  FailoverConfig class for C#.                            |
 |                                                          |
-|  LastModified: Feb 1, 2019                               |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -36,9 +36,10 @@ namespace Hprose.RPC.Plugins.Cluster {
                 }
             };
             OnRetry = (context) => {
-                dynamic clientContext = context;
-                clientContext.Retried++;
-                TimeSpan interval = (clientContext.Retried - clientContext.Client.Uris.Count) * minInterval;
+                var clientContext = context as ClientContext;
+                int retried = (int)context["retried"];
+                context["retried"] = ++retried;
+                TimeSpan interval = new TimeSpan(minInterval.Ticks * (retried - clientContext.Client.Uris.Count));
                 if (interval > maxInterval) {
                     interval = maxInterval;
                 }

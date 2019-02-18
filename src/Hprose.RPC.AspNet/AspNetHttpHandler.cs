@@ -8,7 +8,7 @@
 |                                                          |
 |  AspNetHttpHandler class for C#.                         |
 |                                                          |
-|  LastModified: Feb 12, 2019                              |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -150,11 +150,11 @@ namespace Hprose.RPC.AspNet {
         public virtual async Task Handler(HttpContext httpContext) {
             var request = httpContext.Request;
             var response = httpContext.Response;
-            dynamic context = new ServiceContext(Service);
-            context.HttpContext = httpContext;
-            context.Request = request;
-            context.Response = response;
-            context.User = httpContext.User;
+            var context = new ServiceContext(Service);
+            context["httpContext"] = httpContext;
+            context["request"] = request;
+            context["response"] = response;
+            context["user"] = httpContext.User;
             context.RemoteEndPoint = GetIPEndPoint(request);
             context.Handler = this;
             if (await ClientAccessPolicyXmlHandler(request, response).ConfigureAwait(false)) {

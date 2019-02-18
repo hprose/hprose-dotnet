@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Feb 12, 2019                              |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -146,9 +146,9 @@ namespace Hprose.RPC {
                     return;
                 }
                 var data = await ReadAsync(netStream, new byte[length], 0, length).ConfigureAwait(false);
-                dynamic context = new ServiceContext(Service);
-                context.TcpClient = tcpClient;
-                context.Socket = tcpClient.Client;
+                var context = new ServiceContext(Service);
+                context["tcpClient"] = tcpClient;
+                context["socket"] = tcpClient.Client;
                 context.RemoteEndPoint = tcpClient.Client.RemoteEndPoint;
                 context.Handler = this;
                 Run(responses, index, data, context);
