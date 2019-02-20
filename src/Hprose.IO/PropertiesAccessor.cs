@@ -8,7 +8,7 @@
 |                                                          |
 |  PropertiesAccessor class for C#.                        |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -25,7 +25,11 @@ namespace Hprose.IO {
     internal static class PropertiesAccessor {
         public static Dictionary<string, MemberInfo> GetProperties(Type type) {
             var members = new Dictionary<string, MemberInfo>();
+#if !NET35_CF
             if (!type.IsSerializable) {
+#else
+            if ((type.Attributes & TypeAttributes.Serializable) != TypeAttributes.Serializable) {
+#endif
                 return members;
             }
             var flags = Public | Instance;

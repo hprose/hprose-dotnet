@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Int16Converter class for C#.                     |
 |                                                          |
-|  LastModified: Apr 21, 2018                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -31,7 +31,9 @@ namespace Hprose.IO.Converters {
             Converter<float, ushort>.convert = Convert.ToUInt16;
             Converter<double, ushort>.convert = Convert.ToUInt16;
             Converter<decimal, ushort>.convert = Convert.ToUInt16;
+#if !NET35_CF
             Converter<DateTime, ushort>.convert = Convert.ToUInt16;
+#endif
             Converter<BigInteger, ushort>.convert = (value) => (ushort)value;
         }
         internal static void Initialize() { }

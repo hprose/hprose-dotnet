@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Deserializer class for C#.                       |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -94,7 +94,6 @@ namespace Hprose.IO {
             Register(() => new StringBuilderDeserializer());
             Register(() => new CharsDeserializer());
             Register(() => new BytesDeserializer());
-            Register(() => new StringCollectionDeserializer());
             Register(() => new ValueTupleDeserializer());
             Register(() => new BitArrayDeserializer());
             Register(() => new BigIntegerDeserializer());
@@ -105,6 +104,9 @@ namespace Hprose.IO {
             Register(() => new ExceptionDeserializer<Exception>());
 #if !NET35
             Register(() => new ExpandoObjectDeserializer());
+#endif
+#if !NET35_CF
+            Register(() => new StringCollectionDeserializer());
 #endif
         }
 
@@ -260,9 +262,15 @@ namespace Hprose.IO {
             return typeof(ObjectDeserializer<>).MakeGenericType(type);
         }
 
+#if !NET35_CF
         private static readonly Func<Type, Lazy<IDeserializer>> deserializerFactory = type => new Lazy<IDeserializer>(
-                () => Activator.CreateInstance(GetDeserializerType(type)) as IDeserializer
-            );
+            () => Activator.CreateInstance(GetDeserializerType(type)) as IDeserializer
+        );
+#else
+        private static readonly Func2<Type, Lazy<IDeserializer>> deserializerFactory = type => new Lazy<IDeserializer>(
+            () => Activator.CreateInstance(GetDeserializerType(type)) as IDeserializer
+        );
+#endif
 
         public static IDeserializer GetInstance(Type type) => type == null ? Instance : deserializers.GetOrAdd(type, deserializerFactory).Value;
 

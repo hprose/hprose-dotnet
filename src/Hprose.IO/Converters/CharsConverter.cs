@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose CharsConverter class for C#.                     |
 |                                                          |
-|  LastModified: Apr 21, 2018                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -24,7 +24,11 @@ namespace Hprose.IO.Converters {
             Converter<string, char[]>.convert = (value) => value.ToCharArray();
             Converter<StringBuilder, char[]>.convert = (value) => {
                 char[] result = new char[value.Length];
+#if !NET35_CF
                 value.CopyTo(0, result, 0, value.Length);
+#else
+                value.ToString().CopyTo(0, result, 0, value.Length);
+#endif
                 return result;
             };
             Converter<byte[], char[]>.convert = (value) => {
@@ -53,7 +57,11 @@ namespace Hprose.IO.Converters {
                         return s.ToCharArray();
                     case StringBuilder sb:
                         char[] result = new char[sb.Length];
+#if !NET35_CF
                         sb.CopyTo(0, result, 0, sb.Length);
+#else
+                        sb.ToString().CopyTo(0, result, 0, sb.Length);
+#endif
                         return result;
                     case List<char> charList:
                         return charList.ToArray();

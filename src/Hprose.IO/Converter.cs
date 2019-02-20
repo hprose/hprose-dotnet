@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Converter class for C#.                          |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -23,18 +23,44 @@ namespace Hprose.IO {
     }
 
     public static class Converter<TOutput> {
+#if !NET35_CF
         internal static System.ComponentModel.TypeConverter converter = System.ComponentModel.TypeDescriptor.GetConverter(typeof(TOutput));
+
+        internal static TOutput ConvertFromChars(char[] value) => (TOutput)converter.ConvertFromString(new string(value));
+
+        internal static TOutput ConvertFromStringBuilder(StringBuilder value) => (TOutput)converter.ConvertFromString(value.ToString());
+
+        internal static TOutput ConvertFromObject(object value) => (TOutput)converter.ConvertFrom(value);
+
+        internal static TOutput ConvertFrom(object value) {
+            switch (value) {
+                case TOutput obj:
+                    return obj;
+                case char[] chars:
+                    return (TOutput)converter.ConvertFromString(new string(chars));
+                case StringBuilder sb:
+                    return (TOutput)converter.ConvertFromString(sb.ToString());
+                default:
+                    return (TOutput)converter.ConvertFrom(value);
+            }
+        }
+#else
+        internal static TOutput ConvertFromObject(object value) => (TOutput)value;
+        internal static TOutput ConvertFrom(object value) =>(TOutput)value;
+#endif
 
         static Converter() {
             if (Converter<object, TOutput>.convert == null) {
                 Converter<object, TOutput>.convert = ConvertFrom;
             }
+#if !NET35_CF
             if (Converter<char[], TOutput>.convert == null) {
                 Converter<char[], TOutput>.convert = ConvertFromChars;
             }
             if (Converter<StringBuilder, TOutput>.convert == null) {
                 Converter<StringBuilder, TOutput>.convert = ConvertFromStringBuilder;
             }
+#endif
             Converter.Initialize();
         }
 
@@ -57,24 +83,6 @@ namespace Hprose.IO {
             return ConvertFromObject(value);
         }
 
-        internal static TOutput ConvertFromChars(char[] value) => (TOutput)converter.ConvertFrom(new string(value));
-
-        internal static TOutput ConvertFromStringBuilder(StringBuilder value) => (TOutput)converter.ConvertFrom(value.ToString());
-
-        internal static TOutput ConvertFromObject(object value) => (TOutput)converter.ConvertFrom(value);
-
-        internal static TOutput ConvertFrom(object value) {
-            switch (value) {
-                case TOutput obj:
-                    return obj;
-                case char[] chars:
-                    return (TOutput)converter.ConvertFrom(new string(chars));
-                case StringBuilder sb:
-                    return (TOutput)converter.ConvertFrom(sb.ToString());
-                default:
-                    return (TOutput)converter.ConvertFrom(value);
-            }
-        }
     }
 
     public static class Converter {

@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose UInt64Converter class for C#.                    |
 |                                                          |
-|  LastModified: Apr 21, 2018                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -31,7 +31,9 @@ namespace Hprose.IO.Converters {
             Converter<float, ulong>.convert = Convert.ToUInt64;
             Converter<double, ulong>.convert = Convert.ToUInt64;
             Converter<decimal, ulong>.convert = Convert.ToUInt64;
+#if !NET35_CF
             Converter<DateTime, ulong>.convert = Convert.ToUInt64;
+#endif
             Converter<BigInteger, ulong>.convert = (value) => (ulong)value;
         }
         internal static void Initialize() { }

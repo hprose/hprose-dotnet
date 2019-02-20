@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose BoolConverter class for C#.                      |
 |                                                          |
-|  LastModified: Apr 21, 2018                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -31,7 +31,9 @@ namespace Hprose.IO.Converters {
             Converter<float, bool>.convert = Convert.ToBoolean;
             Converter<double, bool>.convert = Convert.ToBoolean;
             Converter<decimal, bool>.convert = Convert.ToBoolean;
+#if !NET35_CF
             Converter<DateTime, bool>.convert = Convert.ToBoolean;
+#endif
             Converter<BigInteger, bool>.convert = (value) => !value.IsZero;
         }
         internal static void Initialize() { }

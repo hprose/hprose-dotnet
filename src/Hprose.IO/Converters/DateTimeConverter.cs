@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose DateTimeConverter class for C#.                  |
 |                                                          |
-|  LastModified: Apr 21, 2018                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -19,6 +19,7 @@ using System.Text;
 namespace Hprose.IO.Converters {
     internal static class DateTimeConverter {
         static DateTimeConverter() {
+#if !NET35_CF
             Converter<bool, DateTime>.convert = Convert.ToDateTime;
             Converter<char, DateTime>.convert = Convert.ToDateTime;
             Converter<byte, DateTime>.convert = Convert.ToDateTime;
@@ -27,11 +28,12 @@ namespace Hprose.IO.Converters {
             Converter<ushort, DateTime>.convert = Convert.ToDateTime;
             Converter<int, DateTime>.convert = Convert.ToDateTime;
             Converter<uint, DateTime>.convert = Convert.ToDateTime;
-            Converter<long, DateTime>.convert = (value) => new DateTime(value);
             Converter<ulong, DateTime>.convert = Convert.ToDateTime;
             Converter<float, DateTime>.convert = Convert.ToDateTime;
             Converter<double, DateTime>.convert = Convert.ToDateTime;
             Converter<decimal, DateTime>.convert = Convert.ToDateTime;
+#endif
+            Converter<long, DateTime>.convert = (value) => new DateTime(value);
             Converter<string, DateTime>.convert = (value) => DateTime.Parse(value);
             Converter<StringBuilder, DateTime>.convert = (value) => DateTime.Parse(value.ToString());
             Converter<char[], DateTime>.convert = (value) => DateTime.Parse(new string(value));

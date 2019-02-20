@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose SByteConverter class for C#.                     |
 |                                                          |
-|  LastModified: Apr 21, 2018                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -31,7 +31,9 @@ namespace Hprose.IO.Converters {
             Converter<float, sbyte>.convert = Convert.ToSByte;
             Converter<double, sbyte>.convert = Convert.ToSByte;
             Converter<decimal, sbyte>.convert = Convert.ToSByte;
+#if !NET35_CF
             Converter<DateTime, sbyte>.convert = Convert.ToSByte;
+#endif
             Converter<BigInteger, sbyte>.convert = (value) => (sbyte)value;
         }
         internal static void Initialize() { }

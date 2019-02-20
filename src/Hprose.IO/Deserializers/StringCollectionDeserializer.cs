@@ -8,11 +8,12 @@
 |                                                          |
 |  StringCollectionDeserializer class for C#.              |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
+#if !NET35_CF
 using System.Collections.Specialized;
 using System.IO;
 
@@ -44,3 +45,4 @@ namespace Hprose.IO.Deserializers {
         }
     }
 }
+#endif

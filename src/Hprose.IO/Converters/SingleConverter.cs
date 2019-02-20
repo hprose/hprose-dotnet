@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose SingleConverter class for C#.                    |
 |                                                          |
-|  LastModified: Apr 21, 2018                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -31,7 +31,9 @@ namespace Hprose.IO.Converters {
             Converter<ulong, float>.convert = Convert.ToSingle;
             Converter<double, float>.convert = Convert.ToSingle;
             Converter<decimal, float>.convert = Convert.ToSingle;
+#if !NET35_CF
             Converter<DateTime, float>.convert = Convert.ToSingle;
+#endif
             Converter<BigInteger, float>.convert = (value) => (float)value;
         }
         internal static void Initialize() { }

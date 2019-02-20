@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose DoubleConverter class for C#.                    |
 |                                                          |
-|  LastModified: Apr 21, 2018                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -31,7 +31,9 @@ namespace Hprose.IO.Converters {
             Converter<ulong, double>.convert = Convert.ToDouble;
             Converter<float, double>.convert = Convert.ToDouble;
             Converter<decimal, double>.convert = Convert.ToDouble;
+#if !NET35_CF
             Converter<DateTime, double>.convert = Convert.ToDouble;
+#endif
             Converter<BigInteger, double>.convert = (value) => (double)value;
         }
         internal static void Initialize() { }

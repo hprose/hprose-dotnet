@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Int32Converter class for C#.                     |
 |                                                          |
-|  LastModified: Apr 21, 2018                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -31,7 +31,9 @@ namespace Hprose.IO.Converters {
             Converter<float, int>.convert = Convert.ToInt32;
             Converter<double, int>.convert = Convert.ToInt32;
             Converter<decimal, int>.convert = Convert.ToInt32;
+#if !NET35_CF
             Converter<DateTime, int>.convert = Convert.ToInt32;
+#endif
             Converter<BigInteger, int>.convert = (value) => (int)value;
         }
         internal static void Initialize() { }

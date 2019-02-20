@@ -8,7 +8,7 @@
 |                                                          |
 |  ObjectSerializer class for C#.                          |
 |                                                          |
-|  LastModified: Feb 20, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -86,7 +86,11 @@ namespace Hprose.IO {
         }
 #endif
         public static MembersWriter GetMembersWriter<T>(Mode mode) {
+#if !NET35_CF
             if (typeof(T).IsSerializable) {
+#else
+            if ((typeof(T).Attributes & TypeAttributes.Serializable) == TypeAttributes.Serializable) {
+#endif
                 switch (mode) {
                     case FieldMode: return FieldsWriter<T>.Instance;
                     case PropertyMode: return PropertiesWriter<T>.Instance;

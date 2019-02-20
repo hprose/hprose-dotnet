@@ -8,7 +8,7 @@
 |                                                          |
 |  MembersReader class for C#.                             |
 |                                                          |
-|  LastModified: Feb 18, 2018                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -109,7 +109,11 @@ namespace Hprose.IO {
         }
 #endif
         public static void ReadAllMembers<T>(Reader reader, string key, ref T obj) {
+#if !NET35_CF
             if (typeof(T).IsSerializable) {
+#else
+            if ((typeof(T).Attributes & TypeAttributes.Serializable) == TypeAttributes.Serializable) {
+#endif
                 switch (reader.Mode) {
                     case FieldMode:
                         FieldsReader<T>.ReadAllMembers(reader, key, ref obj);
@@ -123,7 +127,11 @@ namespace Hprose.IO {
         }
 
         public static void ReadMember<T>(Reader reader, string name, ref T obj) {
+#if !NET35_CF
             if (typeof(T).IsSerializable) {
+#else
+            if ((typeof(T).Attributes & TypeAttributes.Serializable) == TypeAttributes.Serializable) {
+#endif
                 switch (reader.Mode) {
                     case FieldMode:
                         FieldsReader<T>.ReadMember(reader, name, ref obj);
@@ -140,8 +148,13 @@ namespace Hprose.IO {
     internal static class MembersReader<T> {
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readMemberActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
+#if !NET35_CF
         private static readonly Func<string, Lazy<ReadAction<T>>> readActionFactory = (key) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(MembersAccessor<T>.Members, key.Split(' ')));
         private static readonly Func<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction<T>(MembersAccessor<T>.Members[name]));
+#else
+        private static readonly Func2<string, Lazy<ReadAction<T>>> readActionFactory = (key) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(MembersAccessor<T>.Members, key.Split(' ')));
+        private static readonly Func2<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction<T>(MembersAccessor<T>.Members[name]));
+#endif
         internal static void ReadAllMembers(Reader reader, string key, ref T obj) => readActions.GetOrAdd(key, readActionFactory).Value(reader, ref obj);
         internal static void ReadMember(Reader reader, string name, ref T obj) => readMemberActions.GetOrAdd(name, readMemberActionFactory).Value(reader, ref obj);
     }
@@ -149,8 +162,13 @@ namespace Hprose.IO {
     internal static class FieldsReader<T> {
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readMemberActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
+#if !NET35_CF
         private static readonly Func<string, Lazy<ReadAction<T>>> readActionFactory = (key) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(FieldsAccessor<T>.Fields, key.Split(' ')));
         private static readonly Func<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction<T>(FieldsAccessor<T>.Fields[name]));
+#else
+        private static readonly Func2<string, Lazy<ReadAction<T>>> readActionFactory = (key) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(FieldsAccessor<T>.Fields, key.Split(' ')));
+        private static readonly Func2<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction<T>(FieldsAccessor<T>.Fields[name]));
+#endif
         internal static void ReadAllMembers(Reader reader, string key, ref T obj) => readActions.GetOrAdd(key, readActionFactory).Value(reader, ref obj);
         internal static void ReadMember(Reader reader, string name, ref T obj) => readMemberActions.GetOrAdd(name, readMemberActionFactory).Value(reader, ref obj);
     }
@@ -158,8 +176,13 @@ namespace Hprose.IO {
     internal static class PropertiesReader<T> {
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
         private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readMemberActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
+#if !NET35_CF
         private static readonly Func<string, Lazy<ReadAction<T>>> readActionFactory = (key) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(PropertiesAccessor<T>.Properties, key.Split(' ')));
         private static readonly Func<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction<T>(PropertiesAccessor<T>.Properties[name]));
+#else
+        private static readonly Func2<string, Lazy<ReadAction<T>>> readActionFactory = (key) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(PropertiesAccessor<T>.Properties, key.Split(' ')));
+        private static readonly Func2<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction<T>(PropertiesAccessor<T>.Properties[name]));
+#endif
         internal static void ReadAllMembers(Reader reader, string key, ref T obj) => readActions.GetOrAdd(key, readActionFactory).Value(reader, ref obj);
         internal static void ReadMember(Reader reader, string name, ref T obj) => readMemberActions.GetOrAdd(name, readMemberActionFactory).Value(reader, ref obj);
     }

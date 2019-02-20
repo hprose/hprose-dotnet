@@ -42,8 +42,9 @@ namespace Hprose.Collections.Generic {
                 }
             }
         }
+#if !NET35_CF
         private NullableKeyDictionary(SerializationInfo serializationInfo, StreamingContext streamingContext) : base(serializationInfo, streamingContext) { }
-
+#endif
         public new IEqualityComparer<TKey> Comparer => base.Comparer == null ? null : ((NullableKeyEqualityComparer<TKey>)(base.Comparer)).Comparer;
 
         public bool IsReadOnly => false;

@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose ByteConverter class for C#.                      |
 |                                                          |
-|  LastModified: Apr 21, 2018                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -31,7 +31,9 @@ namespace Hprose.IO.Converters {
             Converter<float, byte>.convert = Convert.ToByte;
             Converter<double, byte>.convert = Convert.ToByte;
             Converter<decimal, byte>.convert = Convert.ToByte;
+#if !NET35_CF
             Converter<DateTime, byte>.convert = Convert.ToByte;
+#endif
             Converter<BigInteger, byte>.convert = (value) => (byte)value;
         }
         internal static void Initialize() { }

@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose UInt32Converter class for C#.                    |
 |                                                          |
-|  LastModified: Apr 21, 2018                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -31,7 +31,9 @@ namespace Hprose.IO.Converters {
             Converter<float, uint>.convert = Convert.ToUInt32;
             Converter<double, uint>.convert = Convert.ToUInt32;
             Converter<decimal, uint>.convert = Convert.ToUInt32;
+#if !NET35_CF
             Converter<DateTime, uint>.convert = Convert.ToUInt32;
+#endif
             Converter<BigInteger, uint>.convert = (value) => (uint)value;
         }
         internal static void Initialize() { }

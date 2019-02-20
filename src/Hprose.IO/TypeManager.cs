@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose TypeManager class for C#.                        |
 |                                                          |
-|  LastModified: Jan 17, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -27,7 +27,14 @@ namespace Hprose.IO {
                 set => name = value;
             }
         }
+#if NET35_CF
+        private static readonly Assembly[] assemblies = new Assembly[] {
+            Assembly.GetCallingAssembly(),
+            Assembly.GetExecutingAssembly()
+        };
+#else
         private static readonly Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+#endif
         private static readonly ConcurrentDictionary<string, Lazy<Type>> typeCache = new ConcurrentDictionary<string, Lazy<Type>>();
         private static readonly ConcurrentDictionary<Type, Type> intfCache = new ConcurrentDictionary<Type, Type>();
         public static void Register<T, I>(string name = null) where T : I {
@@ -64,7 +71,11 @@ namespace Hprose.IO {
             }
             return TypeName<T>.Name;
         }
+#if !NET35_CF
         private static readonly Func<string, Lazy<Type>> typeFactory = (name) => new Lazy<Type>(() => LoadType(name));
+#else
+        private static readonly Func2<string, Lazy<Type>> typeFactory = (name) => new Lazy<Type>(() => LoadType(name));
+#endif
         public static Type GetType<I>() {
             intfCache.TryGetValue(typeof(I), out Type result);
             return result;

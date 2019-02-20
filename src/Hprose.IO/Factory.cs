@@ -8,7 +8,7 @@
 |                                                          |
 |  Factory class for C#.                                   |
 |                                                          |
-|  LastModified: Jan 10, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -24,7 +24,11 @@ namespace Hprose.IO {
                 return Expression.Lambda<Func<T>>(Expression.New(typeof(T))).Compile();
             }
             catch {
+#if NET35_CF
+                return () => (T)typeof(T).GetConstructor(new Type[0]).Invoke(new object[0]);
+#else
                 return () => (T)Activator.CreateInstance(typeof(T), true);
+#endif
             }
         }
         public static T New() {
