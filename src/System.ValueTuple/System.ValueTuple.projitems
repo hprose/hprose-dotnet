@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>b150401d-145c-4b1d-b391-9a4188f72e91</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>System.ValueTuple</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\IStructuralComparable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\IStructuralEquatable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Numerics\Hashing\HashHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Runtime\CompilerServices\ITuple.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SR.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SR_corlib.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tuple.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TupleExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ValueTuple.cs" />
+  </ItemGroup>
+</Project>

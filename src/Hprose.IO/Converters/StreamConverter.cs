@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose StreamConverter class for C#.                    |
 |                                                          |
-|  LastModified: May 2, 2018                               |
+|  LastModified: Feb 18, 2018                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -20,11 +20,11 @@ using System.Text;
 namespace Hprose.IO.Converters {
     internal static class StreamConverter {
         static StreamConverter() {
-            Converter<string, Stream>.convert = Converter<string, MemoryStream>.convert;
-            Converter<StringBuilder, Stream>.convert = Converter<StringBuilder, MemoryStream>.convert;
-            Converter<char[], Stream>.convert = Converter<char[], MemoryStream>.convert;
-            Converter<List<char>, Stream>.convert = Converter<List<char>, MemoryStream>.convert;
-            Converter<List<byte>, Stream>.convert = Converter<List<byte>, MemoryStream>.convert;
+            Converter<string, Stream>.convert = (value) => Converter<string, MemoryStream>.convert(value);
+            Converter<StringBuilder, Stream>.convert = (value) => Converter<StringBuilder, MemoryStream>.convert(value);
+            Converter<char[], Stream>.convert = (value) => Converter<char[], MemoryStream>.convert(value);
+            Converter<List<char>, Stream>.convert = (value) => Converter<List<char>, MemoryStream>.convert(value);
+            Converter<List<byte>, Stream>.convert = (value) => Converter<List<byte>, MemoryStream>.convert(value);
             Converter<object, Stream>.convert = (value) => {
                 switch (value) {
                     case Stream stream:

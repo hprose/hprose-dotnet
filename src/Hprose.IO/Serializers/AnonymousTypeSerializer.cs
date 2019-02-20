@@ -8,11 +8,11 @@
 |                                                          |
 |  AnonymousTypeSerializer class for C#.                   |
 |                                                          |
-|  LastModified: Jan 19, 2019                              |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
-
+#if !NET35
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -68,3 +68,35 @@ namespace Hprose.IO.Serializers {
         }
     }
 }
+#else
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Reflection;
+
+namespace Hprose.IO.Serializers {
+    using static Tags;
+
+    internal class AnonymousTypeSerializer<T> : ReferenceSerializer<T> {
+        public override void Write(Writer writer, T obj) {
+            base.Write(writer, obj);
+            var stream = writer.Stream;
+            var properties = obj.GetType().GetProperties();
+            int length = properties.Length;
+            stream.WriteByte(TagMap);
+            if (length > 0) {
+                ValueWriter.WriteInt(stream, length);
+            }
+            stream.WriteByte(TagOpenbrace);
+            if (length > 0) {
+                var stringSerializer = Serializer<String>.Instance;
+                foreach (var property in properties) {
+                    stringSerializer.Serialize(writer, property.Name);
+                    writer.Serialize(property.GetValue(obj, null));
+                }
+            }
+            stream.WriteByte(TagClosebrace);
+        }
+    }
+}
+#endif

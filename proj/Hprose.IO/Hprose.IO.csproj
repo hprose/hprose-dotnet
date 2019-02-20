@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;net40;net45;net451;net452;net46;net461;net462;net47;net471;net472;monoandroid44;monoandroid50;monoandroid51;monoandroid60;monoandroid70;monoandroid71;monoandroid80;monoandroid81;xamarinmac20;xamarinios10;xamarintvos10;xamarinwatchos10</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;net35;net40;net45;net451;net452;net46;net461;net462;net47;net471;net472;monoandroid44;monoandroid50;monoandroid51;monoandroid60;monoandroid70;monoandroid71;monoandroid80;monoandroid81;xamarinmac20;xamarinios10;xamarintvos10;xamarinwatchos10</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
@@ -80,9 +80,19 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
 
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('net35')) ">
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <PackageReference Include="NETStandard.WindowsCE" Version="1.6.0" />
+    <PackageReference Include="NetLegacySupport.Numerics" Version="1.0.1" />
+  </ItemGroup>
+
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net40')) Or $(TargetFramework.StartsWith('net45')) Or $(TargetFramework.StartsWith('net46')) ">
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
+
+  <Import Condition=" $(TargetFramework.StartsWith('net35')) " Project="..\..\src\System.ValueTuple\System.ValueTuple.projitems" Label="Shared" />
 
   <Import Project="..\..\src\Hprose.Collections\Hprose.Collections.projitems" Label="Shared" />
 

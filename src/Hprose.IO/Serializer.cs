@@ -75,14 +75,19 @@ namespace Hprose.IO {
             Register(() => new BytesSerializer());
             Register(() => new ValueTupleSerializer());
             Register(() => new BitArraySerializer());
-            Register(() => new ExpandoObjectSerializer());
             Register(() => new ExceptionSerializer<Exception>());
+#if !NET35
+            Register(() => new ExpandoObjectSerializer());
+#endif
         }
 
         public static void Initialize() { }
 
+#if !NET35
         public static void Register<T>(Func<Serializer<T>> ctor) => serializers[typeof(T)] = new Lazy<ISerializer>(ctor);
-
+#else
+        public static void Register<T>(Func<Serializer<T>> ctor) => serializers[typeof(T)] = new Lazy<ISerializer>(() => ctor() as ISerializer);
+#endif
         private static Type GetSerializerType(Type type) {
             if (type.IsEnum) {
                 return typeof(EnumSerializer<>).MakeGenericType(type);

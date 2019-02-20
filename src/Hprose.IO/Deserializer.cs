@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Deserializer class for C#.                       |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -19,7 +19,9 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+#if !NET35
 using System.Dynamic;
+#endif
 using System.IO;
 using System.Runtime.Serialization;
 
@@ -85,7 +87,6 @@ namespace Hprose.IO {
             Register(() => new DecimalDeserializer());
             Register(() => new IntPtrDeserializer());
             Register(() => new UIntPtrDeserializer());
-            Register(() => new BigIntegerDeserializer());
             Register(() => new TimeSpanDeserializer());
             Register(() => new DateTimeDeserializer());
             Register(() => new GuidDeserializer());
@@ -96,17 +97,24 @@ namespace Hprose.IO {
             Register(() => new StringCollectionDeserializer());
             Register(() => new ValueTupleDeserializer());
             Register(() => new BitArrayDeserializer());
-            Register(() => new ExpandoObjectDeserializer());
+            Register(() => new BigIntegerDeserializer());
             Register(() => new DataTableDeserializer());
             Register(() => new DataSetDeserializer());
             Register(() => new StreamDeserializer<Stream>());
             Register(() => new StreamDeserializer<MemoryStream>());
             Register(() => new ExceptionDeserializer<Exception>());
+#if !NET35
+            Register(() => new ExpandoObjectDeserializer());
+#endif
         }
 
         public static void Initialize() { }
 
+#if !NET35
         public static void Register<T>(Func<Deserializer<T>> ctor) => deserializers[typeof(T)] = new Lazy<IDeserializer>(ctor);
+#else
+        public static void Register<T>(Func<Deserializer<T>> ctor) => deserializers[typeof(T)] = new Lazy<IDeserializer>(() => ctor() as IDeserializer);
+#endif
 
         private static Type GetDeserializerType(Type type) {
             if (type.IsEnum) {
@@ -138,6 +146,7 @@ namespace Hprose.IO {
                         }
                         if (type.IsInterface) {
                             var pairType = typeof(KeyValuePair<,>);
+#if !NET35
                             if (typeof(ISet<>) == genericType) {
                                 var arg = genericArgs[0];
                                 if (arg.IsGenericType && arg.GetGenericTypeDefinition() == pairType) {
@@ -149,8 +158,9 @@ namespace Hprose.IO {
                                 }
                                 return typeof(CollectionDeserializer<,,>).MakeGenericType(type, typeof(HashSet<>).MakeGenericType(genericArgs), genericArgs[0]);
                             }
+#endif
                             if (typeof(IList<>).MakeGenericType(genericArgs).IsAssignableFrom(type)
-#if !NET40
+#if !NET40 && !NET35
                                 || typeof(IReadOnlyList<>).MakeGenericType(genericArgs).IsAssignableFrom(type)
 #endif
                                 ) {
@@ -197,7 +207,7 @@ namespace Hprose.IO {
                         break;
                     case 2:
                         if (typeof(IDictionary<,>) == genericType
-#if !NET40
+#if !NET40 && !NET35
                             || typeof(IReadOnlyDictionary<,>) == genericType
 #endif
                             ) {
@@ -336,8 +346,10 @@ namespace Hprose.IO {
                     switch (reader.DictType) {
                         case DictType.Dictionary:
                             return DictionaryDeserializer<Dictionary<object, object>, object, object>.Read(reader);
+#if !NET35
                         case DictType.ExpandoObject:
                             return ExpandoObjectDeserializer.Read(reader);
+#endif
                         case DictType.Hashtable:
                             return DictionaryDeserializer<Hashtable>.Read(reader);
                         default:
@@ -358,7 +370,11 @@ namespace Hprose.IO {
             if (type != null) {
                 return ((IObjectDeserializer)GetInstance(type)).ReadObject(reader, typeInfo.key);
             }
+#if !NET35
             var obj = new ExpandoObject();
+#else
+            var obj = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+#endif
             reader.AddReference(obj);
             var dict = (IDictionary<string, object>)obj;
             string[] names = typeInfo.names;

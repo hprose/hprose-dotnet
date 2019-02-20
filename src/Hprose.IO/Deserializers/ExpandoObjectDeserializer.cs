@@ -8,12 +8,12 @@
 |                                                          |
 |  ExpandoObjectDeserializer class for C#.                 |
 |                                                          |
-|  LastModified: Jan 19, 2019                              |
+|  LastModified: Feb 18, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
-using System.Collections;
+#if !NET35
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
@@ -82,3 +82,4 @@ namespace Hprose.IO.Deserializers {
         }
     }
 }
+#endif

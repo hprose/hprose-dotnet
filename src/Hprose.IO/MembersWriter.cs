@@ -8,7 +8,7 @@
 |                                                          |
 |  ObjectSerializer class for C#.                          |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Feb 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -45,6 +45,7 @@ namespace Hprose.IO {
             stream.WriteByte(TagClosebrace);
             return stream.ToArray();
         }
+#if !NET35
         public static Action<Writer, T> CreateWriteAction<T>(IEnumerable<MemberInfo> members) {
             var writer = Expression.Variable(typeof(Writer), "writer");
             var obj = Expression.Variable(typeof(T), "obj");
@@ -66,6 +67,24 @@ namespace Hprose.IO {
             }
             return Expression.Lambda<Action<Writer, T>>(Expression.Block(expressions), writer, obj).Compile();
         }
+#else
+        public static Action<Writer, T> CreateWriteAction<T>(IEnumerable<MemberInfo> members) {
+            var actions = new List<Action<Writer, T>>();
+            foreach (var member in members) {
+                Type memberType = Accessor.GetMemberType(member);
+                var serializer = Serializer.GetInstance(memberType);
+                if (member is FieldInfo) {
+                    actions.Add((writer, obj) => serializer.Serialize(writer, ((FieldInfo)member).GetValue(obj)));
+                }
+                else {
+                    actions.Add((writer, obj) => serializer.Serialize(writer, ((PropertyInfo)member).GetValue(obj, null)));
+                }
+            }
+            return (writer, obj) => {
+                foreach (var action in actions) action(writer, obj);
+            };
+        }
+#endif
         public static MembersWriter GetMembersWriter<T>(Mode mode) {
             if (typeof(T).IsSerializable) {
                 switch (mode) {

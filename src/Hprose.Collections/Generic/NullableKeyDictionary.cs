@@ -8,7 +8,7 @@
 |                                                          |
 |  NullableKeyDictionary class for C#.                     |
 |                                                          |
-|  LastModified: Mar 29, 2018                              |
+|  LastModified: Feb 18, 2019                              |
 |  Authors: Ma Bingyao <andot@hprose.com>                  |
 |                                                          |
 \*________________________________________________________*/
@@ -24,7 +24,7 @@ namespace Hprose.Collections.Generic {
     public sealed class NullableKeyDictionary<TKey, TValue> : Dictionary<NullableKey<TKey>, TValue>,
         ICollection<KeyValuePair<TKey, TValue>>,
         IDictionary<TKey, TValue>,
-#if !NET40
+#if !NET40 && !NET35
         IReadOnlyCollection<KeyValuePair<TKey, TValue>>,
         IReadOnlyDictionary<TKey, TValue>,
 #endif
@@ -61,7 +61,7 @@ namespace Hprose.Collections.Generic {
 
         ICollection<TKey> IDictionary<TKey, TValue>.Keys => Keys;
 
-#if !NET40
+#if !NET40 && !NET35
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
 
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
@@ -155,7 +155,7 @@ namespace Hprose.Collections.Generic {
 
         [Serializable]
         public new sealed class KeyCollection : ICollection<TKey>,
-#if !NET40
+#if !NET40 && !NET35
             IReadOnlyCollection<TKey>,
 #endif
             IEnumerable<TKey>, IEnumerable, ICollection {

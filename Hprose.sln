@@ -43,6 +43,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hprose.RPC.Owin", "src\Hpro
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hprose.RPC.Owin", "proj\Hprose.RPC.Owin\Hprose.RPC.Owin.csproj", "{AA6918D5-4E9B-4165-A91D-A079FEE41B4B}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "System.ValueTuple", "src\System.ValueTuple\System.ValueTuple.shproj", "{B150401D-145C-4B1D-B391-9A4188F72E91}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		src\Hprose.RPC.Codec.JSONRPC\Hprose.RPC.Codec.JSONRPC.projitems*{26786c33-ea3c-4f7c-b506-f01733805c06}*SharedItemsImports = 13
@@ -51,6 +53,7 @@ Global
 		src\Hprose.RPC.Owin\Hprose.RPC.Owin.projitems*{51e54a00-4fdd-42f7-aaa2-12ccbc0b8ad3}*SharedItemsImports = 13
 		src\Hprose.Collections\Hprose.Collections.projitems*{645ef886-f73b-46a5-a484-7ebe81209303}*SharedItemsImports = 13
 		src\Hprose.RPC.AspNet\Hprose.RPC.AspNet.projitems*{74b6dced-32b7-4859-925f-1b33c2b4fdd9}*SharedItemsImports = 13
+		src\System.ValueTuple\System.ValueTuple.projitems*{b150401d-145c-4b1d-b391-9a4188f72e91}*SharedItemsImports = 13
 		src\Hprose.RPC.Plugins\Hprose.RPC.Plugins.projitems*{bd74acf1-7335-44d8-ab5d-c71e56117c43}*SharedItemsImports = 13
 		src\Hprose.RPC.AspNetCore\Hprose.RPC.AspNetCore.projitems*{d275b60d-d977-47cc-8630-9f9cf89ca987}*SharedItemsImports = 13
 	EndGlobalSection
@@ -231,6 +234,7 @@ Global
 		{2B7C4F6C-ADAD-4579-8453-5C1134DCAE3D} = {133CF4A1-F478-4AD3-86BA-6F2D55A08A0A}
 		{51E54A00-4FDD-42F7-AAA2-12CCBC0B8AD3} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
 		{AA6918D5-4E9B-4165-A91D-A079FEE41B4B} = {133CF4A1-F478-4AD3-86BA-6F2D55A08A0A}
+		{B150401D-145C-4B1D-B391-9A4188F72E91} = {1F8BC289-8A9D-4EDA-B400-469FD5983F4D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2EEAB779-9719-4703-8BDF-9C5F995D8A68}
