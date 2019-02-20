@@ -9,5 +9,11 @@
     <Import_RootNamespace>System.Numerics</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BigInteger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BigIntegerBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BigNumber.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Complex.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DoubleUlong.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumericsHelpers.cs" />
   </ItemGroup>
 </Project>

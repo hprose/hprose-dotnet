@@ -85,7 +85,6 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <PackageReference Include="NETStandard.WindowsCE" Version="1.6.0" />
-    <PackageReference Include="NetLegacySupport.Numerics" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net40')) Or $(TargetFramework.StartsWith('net45')) Or $(TargetFramework.StartsWith('net46')) ">
@@ -93,6 +92,7 @@
   </ItemGroup>
 
   <Import Condition=" $(TargetFramework.StartsWith('net35')) " Project="..\..\src\System.ValueTuple\System.ValueTuple.projitems" Label="Shared" />
+  <Import Condition=" $(TargetFramework.StartsWith('net35')) " Project="..\..\src\System.Numerics\System.Numerics.projitems" Label="Shared" />
 
   <Import Project="..\..\src\Hprose.Collections\Hprose.Collections.projitems" Label="Shared" />
 
