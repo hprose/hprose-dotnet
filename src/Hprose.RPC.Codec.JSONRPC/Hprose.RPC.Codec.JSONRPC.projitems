@@ -11,5 +11,6 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)JsonRpcServiceCodec.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JsonRpcClientCodec.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)JTokenExtensions.cs" />
   </ItemGroup>
 </Project>

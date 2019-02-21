@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;net40;net45;net451;net452;net46;net461;net462;net47;net471;net472;monoandroid44;monoandroid50;monoandroid51;monoandroid60;monoandroid70;monoandroid71;monoandroid80;monoandroid81;xamarinmac20;xamarinios10;xamarintvos10;xamarinwatchos10</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;net35-cf;net40;net45;net451;net452;net46;net461;net462;net47;net471;net472;monoandroid44;monoandroid50;monoandroid51;monoandroid60;monoandroid70;monoandroid71;monoandroid80;monoandroid81;xamarinmac20;xamarinios10;xamarintvos10;xamarinwatchos10</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
-    <Version>3.0.0-beta01</Version>
+    <Version>3.0.0-beta02</Version>
     <OutputType>Library</OutputType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -58,6 +58,20 @@
     <LanguageTargets>$(MSBuildExtensionsPath)\$(TargetFrameworkIdentifier.Replace('.', '\'))\$(TargetFrameworkIdentifier).CSharp.targets</LanguageTargets>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net35-cf'">
+    <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>CompactFramework</TargetFrameworkProfile>
+    <DefineConstants>NET35_CF;WindowsCE</DefineConstants>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <FileAlignment>512</FileAlignment>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <PlatformID>E2BECB1F-8C8C-41ba-B736-9BE7D946A398</PlatformID>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
   <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
     <Reference Include="Mono.Android" />
     <Reference Include="System" />
@@ -78,6 +92,15 @@
     <Reference Include="netstandard" Version="2.0.0.0" />
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net35-cf' ">
+    <Reference Include="mscorlib, Version=3.5.0.0, Culture=neutral, PublicKeyToken=969db8053d3322ac" />
+    <Reference Include="System, Version=3.5.0.0, Culture=neutral, PublicKeyToken=969db8053d3322ac" />
+    <Reference Include="System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=969db8053d3322ac" />
+    <Reference Include="System.Data, Version=3.5.0.0, Culture=neutral, PublicKeyToken=969db8053d3322ac" />
+    <PackageReference Include="NETStandard.WindowsCE" Version="1.6.0" />
+    <PackageReference Include="Newtonsoft.Json.Legacy" Version="3.5.9" />
+  </ItemGroup>
+
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net40')) Or $(TargetFramework.StartsWith('net45')) Or $(TargetFramework.StartsWith('net46')) ">
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
@@ -86,13 +109,11 @@
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" />
   </ItemGroup>
 
-  <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
-    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net35-cf' ">
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <ProjectReference Include="..\Hprose.IO\Hprose.IO.csproj" />
     <ProjectReference Include="..\Hprose.RPC\Hprose.RPC.csproj" />
   </ItemGroup>

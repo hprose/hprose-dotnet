@@ -8,7 +8,7 @@
 |                                                          |
 |  JsonRpcServiceCodec class for C#.                       |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -16,6 +16,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -95,7 +96,7 @@ namespace Hprose.RPC.Codec.JSONRPC {
                 throw new Exception("Parse error");
             }
             if (call.TryGetValue("jsonrpc", out var jsonrpc)) {
-                if (jsonrpc.ToObject<string>() != "2.0") {
+                if ((string)jsonrpc != "2.0") {
                     throw new Exception("Invalid Request");
                 }
             }
@@ -106,9 +107,9 @@ namespace Hprose.RPC.Codec.JSONRPC {
                 throw new Exception("Invalid Request");
             }
             context["jsonrpc.id"] = id;
-            var fullname = name.ToObject<string>();
+            var fullname = (string)name;
             var args = new JArray();
-            if (call.ContainsKey("params")) {
+            if ((call as IDictionary<string, JToken>).ContainsKey("params")) {
                 args = call["params"] as JArray;
             }
             var method = context.Service.Get(fullname, args.Count);
@@ -132,7 +133,7 @@ namespace Hprose.RPC.Codec.JSONRPC {
                         arguments[i] = args[i - autoParams].ToObject(paramType);
                     }
                     else {
-                        arguments[i] = parameters[i].RawDefaultValue;
+                        arguments[i] = parameters[i].DefaultValue;
                     }
                 }
             }

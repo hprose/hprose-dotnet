@@ -62,7 +62,7 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>CompactFramework</TargetFrameworkProfile>
-    <DefineConstants>NET35;NET35_CF;WindowsCE</DefineConstants>
+    <DefineConstants>NET35_CF;WindowsCE</DefineConstants>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
