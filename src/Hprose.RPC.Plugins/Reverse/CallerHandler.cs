@@ -8,11 +8,11 @@
 |                                                          |
 |  CallerHandler class for C#.                             |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
-
+#if !NET35_CF
 using System;
 using System.Collections.Concurrent;
 using System.Reflection;
@@ -120,3 +120,4 @@ namespace Hprose.RPC.Plugins.Reverse {
         }
     }
 }
+#endif

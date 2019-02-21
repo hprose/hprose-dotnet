@@ -8,7 +8,7 @@
 |                                                          |
 |  Broker plugin for C#.                                   |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -110,7 +110,7 @@ namespace Hprose.RPC.Plugins.Push {
             }
         }
         protected static string GetId(ServiceContext context) {
-            if (((IDictionary<string, object>)context.RequestHeaders).TryGetValue("Id", out var id)) {
+            if (context.RequestHeaders.TryGetValue("id", out var id)) {
                 return id.ToString();
             }
             throw new KeyNotFoundException("client unique id not found");

@@ -52,15 +52,27 @@ namespace Hprose.RPC.Plugins.Log {
             bool enabled = context.Contains("log") ? (bool)context["log"] : log.Enabled;
             if (!enabled) return await next(request, context).ConfigureAwait(false);
             var stream = await request.ToMemoryStream().ConfigureAwait(false);
+#if !NET35_CF
             Trace.TraceInformation(ToString(stream));
+#else
+            Trace.WriteLine(ToString(stream));
+#endif
             try {
                 var response = await next(stream, context).ConfigureAwait(false);
                 stream = await response.ToMemoryStream().ConfigureAwait(false);
+#if !NET35_CF
                 Trace.TraceInformation(ToString(stream));
+#else
+                Trace.WriteLine(ToString(stream));
+#endif
                 return stream;
             }
             catch (Exception e) {
+#if !NET35_CF
                 Trace.TraceError(e.StackTrace);
+#else
+                Trace.WriteLine(e.StackTrace);
+#endif
                 throw;
             }
         }
@@ -72,20 +84,36 @@ namespace Hprose.RPC.Plugins.Log {
                 a = (args.Length > 0) && typeof(Context).IsAssignableFrom(args.Last().GetType()) ? Stringify(new List<object>(args.Take(args.Length - 1))) : Stringify(args);
             }
             catch (Exception e) {
+#if !NET35_CF
                 Trace.TraceError(e.StackTrace);
+#else
+                Trace.WriteLine(e.StackTrace);
+#endif
             }
             try {
                 var result = await next(name, args, context).ConfigureAwait(false);
                 try {
+#if !NET35_CF
                     Trace.TraceInformation(name + "(" + a.Substring(1, a.Length - 2) + ") = " + Stringify(result));
+#else
+                    Trace.WriteLine(name + "(" + a.Substring(1, a.Length - 2) + ") = " + Stringify(result));
+#endif
                 }
                 catch (Exception e) {
+#if !NET35_CF
                     Trace.TraceError(e.StackTrace);
+#else
+                    Trace.WriteLine(e.StackTrace);
+#endif
                 }
                 return result;
             }
             catch (Exception e) {
+#if !NET35_CF
                 Trace.TraceError(e.StackTrace);
+#else
+                Trace.WriteLine(e.StackTrace);
+#endif
                 throw;
             }
         }

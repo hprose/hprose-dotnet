@@ -8,7 +8,7 @@
 |                                                          |
 |  Cluster class for C#.                                   |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -64,16 +64,20 @@ namespace Hprose.RPC.Plugins.Cluster {
             for (int i = 0; i < n; ++i) {
                 var forkingContext = clientContext.Clone() as ClientContext;
                 forkingContext.Uri = uris[i];
-                Task result = next(name, args, forkingContext).ContinueWith((task) => {
+                Task result = next(name, args, forkingContext).ContinueWith(task => {
                     if (task.Exception != null) {
                         if (Interlocked.Decrement(ref count) == 0) {
                             deferred.TrySetException(task.Exception);
                         }
                     }
                     else {
-                        deferred.TrySetResult(task.Result);
+                        deferred.TrySetResult((task as Task<object>)?.Result);
                     }
+#if !NET35_CF
                 }, TaskScheduler.Current);
+#else
+                });
+#endif
             }
             return await deferred.Task.ConfigureAwait(false);
         }

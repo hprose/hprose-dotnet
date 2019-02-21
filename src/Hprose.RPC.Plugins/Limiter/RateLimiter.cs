@@ -8,12 +8,11 @@
 |                                                          |
 |  RateLimiter plugin for C#.                              |
 |                                                          |
-|  LastModified: Feb 4, 2019                               |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
-
-using Hprose.IO;
+#if !NET35_CF
 using System;
 using System.IO;
 using System.Threading;
@@ -65,3 +64,4 @@ namespace Hprose.RPC.Plugins.Limiter {
         }
     }
 }
+#endif

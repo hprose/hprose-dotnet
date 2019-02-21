@@ -95,7 +95,7 @@ namespace Hprose.RPC.Plugins.Reverse {
                             }
                         }
                         else {
-                            arguments[i] = parameters[i].RawDefaultValue;
+                            arguments[i] = parameters[i].DefaultValue;
                         }
                     }
                     args = arguments;

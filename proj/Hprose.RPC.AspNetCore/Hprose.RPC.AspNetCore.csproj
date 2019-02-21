@@ -5,7 +5,7 @@
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
-    <Version>3.0.0-beta01</Version>
+    <Version>3.0.0-beta02</Version>
     <OutputType>Library</OutputType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -30,7 +30,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <ProjectReference Include="..\Hprose.IO\Hprose.IO.csproj" />
     <ProjectReference Include="..\Hprose.RPC\Hprose.RPC.csproj" />

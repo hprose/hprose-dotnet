@@ -58,7 +58,11 @@ namespace Hprose.RPC.Plugins.Limiter {
         public async Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
             await Acquire().ConfigureAwait(false);
             var result = next(name, args, context);
+#if !NET35_CF
             await result.ContinueWith((task) => Release(), TaskScheduler.Current).ConfigureAwait(false);
+#else
+            await result.ContinueWith((task) => Release()).ConfigureAwait(false);
+#endif
             return await result.ConfigureAwait(false);
         }
     }

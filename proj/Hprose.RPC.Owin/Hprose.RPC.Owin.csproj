@@ -5,7 +5,7 @@
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
-    <Version>3.0.0-beta01</Version>
+    <Version>3.0.0-beta02</Version>
     <OutputType>Library</OutputType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -90,12 +90,7 @@
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" />
   </ItemGroup>
 
-  <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
-    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-  </ItemGroup>
-
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
     <ProjectReference Include="..\Hprose.IO\Hprose.IO.csproj" />
     <ProjectReference Include="..\Hprose.RPC\Hprose.RPC.csproj" />
   </ItemGroup>

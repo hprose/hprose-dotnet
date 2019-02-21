@@ -8,7 +8,7 @@
 |                                                          |
 |  Caller class for C#.                                    |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -22,11 +22,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.Reverse {
     public class Caller {
-#if NET40 || NET45 || NET451 || NET452
         private static readonly (int, string, object[])[] emptyCall = new (int, string, object[])[0];
-#else
-        private static readonly (int, string, object[])[] emptyCall = Array.Empty<(int, string, object[])>();
-#endif
         private volatile int counter = 0;
         private ConcurrentDictionary<string, ConcurrentQueue<(int, string, object[])>> Calls { get; } = new ConcurrentDictionary<string, ConcurrentQueue<(int, string, object[])>>();
         private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>> Results { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>>();
@@ -42,7 +38,7 @@ namespace Hprose.RPC.Plugins.Reverse {
                    .Use(Handler);
         }
         internal static string GetId(ServiceContext context) {
-            if (((IDictionary<string, object>)context.RequestHeaders).TryGetValue("Id", out var id)) {
+            if (context.RequestHeaders.TryGetValue("id", out var id)) {
                 return id.ToString();
             }
             throw new KeyNotFoundException("client unique id not found");
@@ -132,7 +128,11 @@ namespace Hprose.RPC.Plugins.Reverse {
             var results = Results.GetOrAdd(id, (_) => new ConcurrentDictionary<int, TaskCompletionSource<object>>());
             results[index] = result;
             Response(id);
+#if !NET35_CF
             await result.Task.ContinueWith((_) => { }, TaskScheduler.Current).ConfigureAwait(false);
+#else
+            await result.Task.ContinueWith((_) => { }).ConfigureAwait(false);
+#endif
             var value = await result.Task.ConfigureAwait(false);
             if (typeof(T).IsAssignableFrom(value.GetType())) {
                 return (T)value;
@@ -141,6 +141,7 @@ namespace Hprose.RPC.Plugins.Reverse {
                 return Formatter.Deserialize<T>(Formatter.Serialize(value));
             }
         }
+#if !NET35_CF
         public T UseService<T>(string id, string ns = "") {
             Type type = typeof(T);
             CallerHandler handler = new CallerHandler(this, id, ns);
@@ -151,6 +152,7 @@ namespace Hprose.RPC.Plugins.Reverse {
                 return (T)Proxy.NewInstance(type.GetInterfaces(), handler);
             }
         }
+#endif
         private Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
             context = new CallerContext(this, context as ServiceContext);
             return next(name, args, context);
