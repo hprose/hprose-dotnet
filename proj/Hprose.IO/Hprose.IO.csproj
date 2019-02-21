@@ -5,7 +5,7 @@
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
-    <Version>3.0.0-beta01</Version>
+    <Version>3.0.0-beta02</Version>
     <OutputType>Library</OutputType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -98,14 +98,12 @@
     <Reference Include="mscorlib, Version=3.5.0.0, Culture=neutral, PublicKeyToken=969db8053d3322ac" />
     <Reference Include="System, Version=3.5.0.0, Culture=neutral, PublicKeyToken=969db8053d3322ac" />
     <Reference Include="System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=969db8053d3322ac" />
+    <Reference Include="System.Data, Version=3.5.0.0, Culture=neutral, PublicKeyToken=969db8053d3322ac" />
     <PackageReference Include="NETStandard.WindowsCE" Version="1.6.0" />
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'net35' ">
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <PackageReference Include="NETStandard.WindowsCE" Version="1.6.0" />
+    <PackageReference Include="TaskParallelLibrary" Version="1.0.2856" />
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net40')) Or $(TargetFramework.StartsWith('net45')) Or $(TargetFramework.StartsWith('net46')) ">

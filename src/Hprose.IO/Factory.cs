@@ -25,7 +25,8 @@ namespace Hprose.IO {
             }
             catch {
 #if NET35_CF
-                return () => (T)typeof(T).GetConstructor(new Type[0]).Invoke(new object[0]);
+                var ctor = typeof(T).GetConstructor(new Type[0]);
+                return () => (T)ctor.Invoke(new object[0]);
 #else
                 return () => (T)Activator.CreateInstance(typeof(T), true);
 #endif

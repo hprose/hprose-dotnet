@@ -8,7 +8,7 @@
 |                                                          |
 |  Service class for C#.                                   |
 |                                                          |
-|  LastModified: Feb 9, 2019                               |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -37,23 +37,27 @@ namespace Hprose.RPC {
         static Service() {
             Register<TcpHandler, TcpListener>("tcp");
             Register<UdpHandler, UdpClient>("udp");
-#if !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
+#if !NET35_CF && !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
             Register<SocketHandler, Socket>("socket");
 #endif
+#if !NET35_CF
 #if !NET40
             Register<WebSocketHandler, HttpListener>("http");
 #else
             Register<HttpHandler, HttpListener>("http");
 #endif
+#endif
         }
+#if !NET35_CF
 #if !NET40
         public WebSocketHandler Http => (WebSocketHandler)this["http"];
 #else
         public HttpHandler Http => (HttpHandler)this["http"];
 #endif
+#endif
         public TcpHandler Tcp => (TcpHandler)this["tcp"];
         public UdpHandler Udp => (UdpHandler)this["udp"];
-#if !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
+#if !NET35_CF && !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
         public SocketHandler Socket => (SocketHandler)this["socket"];
 #endif
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
@@ -68,7 +72,11 @@ namespace Hprose.RPC {
             invokeManager = new InvokeManager(Execute);
             ioManager = new IOManager(Process);
             foreach (var pair in handlerTypes) {
+#if !NET35_CF
                 var handler = Activator.CreateInstance(pair.Value, new object[] { this });
+#else
+                var handler = pair.Value.GetConstructor(new Type[] { typeof(Service) }).Invoke(new object[] { this });
+#endif
                 handlers[pair.Key] = handler;
             }
             Add(methodManager.GetNames, "~");

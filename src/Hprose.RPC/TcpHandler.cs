@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -16,10 +16,14 @@
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+#if !NET35_CF
 using System.Net.Security;
+#endif
 using System.Net.Sockets;
+#if !NET35_CF
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
+#endif
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,8 +32,10 @@ namespace Hprose.RPC {
         public Action<TcpClient> OnAccept { get; set; } = null;
         public Action<TcpClient> OnClose { get; set; } = null;
         public Action<Exception> OnError { get; set; } = null;
+#if !NET35_CF
         public X509Certificate ServerCertificate { get; set; } = null;
-#if !NET40
+#endif
+#if !NET35_CF && !NET40
         public bool ClientCertificateRequired { get; set; } = false;
         public bool CheckCertificateRevocation { get; set; } = false;
 #if !NETCOREAPP2_0 && !NETCOREAPP2_1 && !NETCOREAPP2_2
@@ -159,6 +165,7 @@ namespace Hprose.RPC {
             OnAccept?.Invoke(tcpClient);
             try {
                 Stream stream = tcpClient.GetStream();
+#if !NET35_CF
                 if (ServerCertificate != null) {
                     SslStream sslStream = new SslStream(stream, false);
 #if NET40
@@ -168,6 +175,7 @@ namespace Hprose.RPC {
 #endif
                     stream = sslStream;
                 }
+#endif
                 var receive = Receive(tcpClient, stream, responses);
                 var send = Send(stream, responses);
                 await receive.ConfigureAwait(false);

@@ -10,8 +10,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ContextAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CookieManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CRC32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HandlerManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HttpTransportCF.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NetExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WebSocketHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StreamExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SocketTransport.cs" />

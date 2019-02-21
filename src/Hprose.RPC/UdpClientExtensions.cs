@@ -8,7 +8,7 @@
 |                                                          |
 |  UdpClient Extensions for .NET 4.0                       |
 |                                                          |
-|  LastModified: Feb 9, 2019                               |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -32,6 +32,28 @@ namespace Hprose.RPC {
         public static Task<int> SendAsync(this UdpClient udpClient, byte[] datagram, int bytes) => Task<int>.Factory.FromAsync<byte[], int>(new Func<byte[], int, AsyncCallback, object, IAsyncResult>(udpClient.BeginSend), new Func<IAsyncResult, int>(udpClient.EndSend), datagram, bytes, null);
         public static Task<int> SendAsync(this UdpClient udpClient, byte[] datagram, int bytes, IPEndPoint endPoint) => Task<int>.Factory.FromAsync<byte[], int, IPEndPoint>(new Func<byte[], int, IPEndPoint, AsyncCallback, object, IAsyncResult>(udpClient.BeginSend), new Func<IAsyncResult, int>(udpClient.EndSend), datagram, bytes, endPoint, null);
         public static Task<int> SendAsync(this UdpClient udpClient, byte[] datagram, int bytes, string hostname, int port) => Task<int>.Factory.FromAsync((AsyncCallback callback, object state) => udpClient.BeginSend(datagram, bytes, hostname, port, callback, state), new Func<IAsyncResult, int>(udpClient.EndSend), null);
+    }
+}
+#endif
+
+#if NET35_CF
+using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading.Tasks;
+
+namespace Hprose.RPC {
+    public static class UdpClientExtensions {
+        public static Task<UdpReceiveResult> ReceiveAsync(this UdpClient udpClient) {
+            return Task.Run<UdpReceiveResult>(() => {
+                IPEndPoint remoteEndPoint = null;
+                byte[] buffer = udpClient.Receive(ref remoteEndPoint);
+                return new UdpReceiveResult(buffer, remoteEndPoint);
+            });
+        }
+        public static Task<int> SendAsync(this UdpClient udpClient, byte[] datagram, int bytes) => Task.Run<int>(() => udpClient.Send(datagram, bytes));
+        public static Task<int> SendAsync(this UdpClient udpClient, byte[] datagram, int bytes, IPEndPoint endPoint) => Task.Run<int>(() => udpClient.Send(datagram, bytes, endPoint));
+        public static Task<int> SendAsync(this UdpClient udpClient, byte[] datagram, int bytes, string hostname, int port) => Task.Run<int>(() => udpClient.Send(datagram, bytes, hostname, port));
     }
 }
 #endif

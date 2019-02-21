@@ -8,7 +8,7 @@
 |                                                          |
 |  MethodManager class for C#.                             |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -62,8 +62,10 @@ namespace Hprose.RPC {
                 if (typeof(Context).IsAssignableFrom(p.ParameterType)) {
                     autoParams = 1;
                 }
-#if NET40
-                else if (p.IsOptional && (p.Attributes & ParameterAttributes.HasDefault) == ParameterAttributes.HasDefault) {
+#if NET35_CF
+                else if ((p.Attributes & ParameterAttributes.Optional) != ParameterAttributes.None && (p.Attributes & ParameterAttributes.HasDefault) != ParameterAttributes.None) {
+#elif NET40
+                else if (p.IsOptional && (p.Attributes & ParameterAttributes.HasDefault) != ParameterAttributes.None) {
 #else
                 else if (p.IsOptional && p.HasDefaultValue) {
 #endif
@@ -178,7 +180,7 @@ namespace Hprose.RPC {
             Add(new Method(func.Method, fullname, func.Target));
         }
         public void AddMethod(string name, object target, string fullname = "") {
-#if NET40
+#if NET35_CF || NET40
             var methodInfos = target.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance);
 #else
             var methodInfos = target.GetType().GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Instance);
@@ -193,7 +195,7 @@ namespace Hprose.RPC {
             }
         }
         public void AddMethod(string name, Type type, string fullname = "") {
-#if NET40
+#if NET35_CF || NET40
             var methodInfos = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
 #else
             var methodInfos = type.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Static);
@@ -228,7 +230,7 @@ namespace Hprose.RPC {
             }
         }
         public void AddInstanceMethods(object target, string ns = "") {
-#if NET40
+#if NET35_CF || NET40
             var methodInfos = target.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance);
 #else
             var methodInfos = target.GetType().GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Instance);
@@ -244,7 +246,7 @@ namespace Hprose.RPC {
             }
         }
         public void AddStaticMethods(Type type, string ns = "") {
-#if NET40
+#if NET35_CF || NET40
             var methodInfos = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
 #else
             var methodInfos = type.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Static);

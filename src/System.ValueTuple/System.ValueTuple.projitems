@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Collections\IStructuralEquatable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Numerics\Hashing\HashHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Runtime\CompilerServices\ITuple.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Runtime\CompilerServices\TupleElementNamesAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SR.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SR_corlib.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tuple.cs" />

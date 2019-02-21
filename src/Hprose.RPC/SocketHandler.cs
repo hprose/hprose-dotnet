@@ -8,11 +8,11 @@
 |                                                          |
 |  SocketHandler class for C#.                             |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
-#if !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
+#if !NET35_CF && !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
 using System;
 using System.Collections.Concurrent;
 using System.IO;

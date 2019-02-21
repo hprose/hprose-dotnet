@@ -8,7 +8,7 @@
 |                                                          |
 |  Stream Extensions for C#.                               |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     public static class StreamExtensions {
-#if NET40 || NET45 || NET451 || NET452
+#if NET35_CF || NET40 || NET45 || NET451 || NET452
         public static ArraySegment<byte> GetArraySegment(this MemoryStream stream) {
             var bytes = stream.ToArray();
             return new ArraySegment<byte>(bytes, 0, bytes.Length);

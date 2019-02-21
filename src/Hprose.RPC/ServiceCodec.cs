@@ -8,7 +8,7 @@
 |                                                          |
 |  ServiceCodec class for C#.                              |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -22,11 +22,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     public class ServiceCodec : IServiceCodec {
-#if NET40 || NET45 || NET451 || NET452
         private static readonly object[] emptyArgs = { };
-#else
-        private static readonly object[] emptyArgs = Array.Empty<object>();
-#endif
         public static ServiceCodec Instance { get; } = new ServiceCodec();
         public bool Debug { get; set; } = false;
         public bool Simple { get; set; } = false;
@@ -97,7 +93,7 @@ namespace Hprose.RPC {
                     args[i] = reader.Deserialize(parameters[i].ParameterType);
                 }
                 else {
-                    args[i] = parameters[i].RawDefaultValue;
+                    args[i] = parameters[i].DefaultValue;
                 }
             }
             return args;

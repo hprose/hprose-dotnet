@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpTransport class for C#.                              |
 |                                                          |
-|  LastModified: Feb 12, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -17,7 +17,9 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
+#if !NET35_CF
 using System.Net.Security;
+#endif
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -25,29 +27,39 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     public class TcpTransport : ITransport {
+#if !NET35_CF
         public static string[] Schemes { get; } = new string[] { "tcp", "tcp4", "tcp6", "tls", "tls4", "tls6", "ssl", "ssl4", "ssl6" };
+#else
+        public static string[] Schemes { get; } = new string[] { "tcp", "tcp4", "tcp6" };
+#endif
         private volatile int counter = 0;
         public LingerOption LingerState { get; set; } = null;
         public bool NoDelay { get; set; } = true;
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         public int ReceiveBufferSize { get; set; } = 8192;
         public int SendBufferSize { get; set; } = 8192;
+#if !NET35_CF
         public RemoteCertificateValidationCallback ValidateServerCertificate { get; set; } = (sender, certificate, chain, sslPolicyErrors) => true;
         public LocalCertificateSelectionCallback CertificateSelection { get; set; } = null;
         public EncryptionPolicy EncryptionPolicy { get; set; } = EncryptionPolicy.RequireEncryption;
         public string ServerCertificateName { get; set; } = null;
+#endif
         private ConcurrentDictionary<string, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<string, ConcurrentQueue<(int, MemoryStream)>>();
         private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
         private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Sended { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
         private ConcurrentDictionary<string, Lazy<Task<(TcpClient, Stream)>>> TcpClients { get; } = new ConcurrentDictionary<string, Lazy<Task<(TcpClient, Stream)>>>();
+#if !NET35_CF
         private readonly Func<string, Lazy<Task<(TcpClient, Stream)>>> tcpClientFactory;
+#else
+        private readonly Func2<string, Lazy<Task<(TcpClient, Stream)>>> tcpClientFactory;
+#endif
         public TcpTransport() {
             tcpClientFactory = (uri) => {
                 return new Lazy<Task<(TcpClient, Stream)>>(async () => {
                     try {
                         var u = new Uri(uri);
                         var family = u.Scheme.Last() == '6' ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
-#if NET40 || NET45 || NET451 || NET452
+#if NET35_CF || NET40 || NET45 || NET451 || NET452
                         var host = u.DnsSafeHost;
 #else
                         var host = u.IdnHost;
@@ -64,6 +76,7 @@ namespace Hprose.RPC {
 
                         await client.ConnectAsync(host, port);
                         Stream stream = client.GetStream();
+#if !NET35_CF
                         switch (u.Scheme) {
                             case "tls":
                             case "tls4":
@@ -76,6 +89,7 @@ namespace Hprose.RPC {
                                 stream = sslstream;
                                 break;
                         }
+#endif
                         Receive(uri, client, stream);
                         return (client, stream);
                     }
@@ -137,7 +151,7 @@ namespace Hprose.RPC {
                     var data = await ReadAsync(netStream, new byte[length], 0, length).ConfigureAwait(false);
                     if (sended.TryRemove(index, out var result)) {
                         if (has_error) {
-                            result.TrySetException(new Exception(Encoding.UTF8.GetString(data)));
+                            result.TrySetException(new Exception(Encoding.UTF8.GetString(data, 0, data.Length)));
                             throw new IOException("connection closed");
                         }
                         result.TrySetResult(new MemoryStream(data, 0, data.Length, false, true));
@@ -222,7 +236,11 @@ namespace Hprose.RPC {
                 var LazyTcpClient = TcpClients.GetOrAdd(uri, tcpClientFactory);
                 var (tcpClient, stream) = await LazyTcpClient.Value.ConfigureAwait(false);
                 try {
+#if !NET35_CF
                     var available = tcpClient.Available;
+#else
+                    var available = tcpClient.Client.Available;
+#endif
                     return (tcpClient, stream);
                 }
                 catch {

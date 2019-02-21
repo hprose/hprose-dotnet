@@ -8,7 +8,7 @@
 |                                                          |
 |  UdpTransport class for C#.                              |
 |                                                          |
-|  LastModified: Feb 11, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -26,31 +26,41 @@ namespace Hprose.RPC {
     public class UdpTransport : ITransport {
         public static string[] Schemes { get; } = new string[] { "udp", "udp4", "udp6" };
         private volatile int counter = 0;
+#if !NET35_CF
         public bool EnableBroadcast { get; set; } = true;
         public short Ttl { get; set; } = 0;
+#endif
         private ConcurrentDictionary<string, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<string, ConcurrentQueue<(int, MemoryStream)>>();
         private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
         private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Sended { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
         private ConcurrentDictionary<string, Lazy<UdpClient>> UdpClients { get; } = new ConcurrentDictionary<string, Lazy<UdpClient>>();
+#if !NET35_CF
         private readonly Func<string, Lazy<UdpClient>> udpClientFactory;
+#else
+        private readonly Func2<string, Lazy<UdpClient>> udpClientFactory;
+#endif
         public UdpTransport() {
             udpClientFactory = (uri) => {
                 return new Lazy<UdpClient>(() => {
                     try {
                         var u = new Uri(uri);
                         var family = u.Scheme.Last() == '6' ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
-#if NET40 || NET45 || NET451 || NET452
+#if NET35_CF || NET40 || NET45 || NET451 || NET452
                         var host = u.DnsSafeHost;
 #else
                         var host = u.IdnHost;
 #endif
                         var port = u.Port > 0 ? u.Port : 8412;
+#if !NET35_CF
                         var client = new UdpClient(family) {
                             EnableBroadcast = EnableBroadcast
                         };
                         if (Ttl > 0) {
                             client.Ttl = Ttl;
                         }
+#else
+                        var client = new UdpClient(family);
+#endif
                         client.Connect(host, port);
                         Receive(uri, client);
                         return client;
@@ -119,7 +129,7 @@ namespace Hprose.RPC {
         }
         private async void Send(string uri, int index, MemoryStream stream) {
             var n = (int)stream.Length;
-#if NET40
+#if NET35_CF || NET40
             var buffer = new byte[n + 8];
 #else
             var buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(n + 8);
@@ -152,7 +162,7 @@ namespace Hprose.RPC {
             }
             finally {
                 stream.Dispose();
-#if !NET40
+#if !NET35_CF && !NET40
                 System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
 #endif
             }
@@ -187,7 +197,11 @@ namespace Hprose.RPC {
                 var LazyUdpClient = UdpClients.GetOrAdd(uri, udpClientFactory);
                 var udpClient = LazyUdpClient.Value;
                 try {
+#if !NET35_CF
                     var available = udpClient.Available;
+#else
+                    var available = udpClient.Client.Available;
+#endif
                     return udpClient;
                 }
                 catch {

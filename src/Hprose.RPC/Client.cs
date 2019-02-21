@@ -8,7 +8,7 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -50,20 +50,20 @@ namespace Hprose.RPC {
             Register<HttpTransport>("http");
             Register<TcpTransport>("tcp");
             Register<UdpTransport>("udp");
-#if !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
+#if !NET35_CF && !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
             Register<SocketTransport>("socket");
 #endif
-#if !NET40
+#if !NET35_CF && !NET40
             Register<WebSocketTransport>("websocket");
 #endif
         }
         public HttpTransport Http => (HttpTransport)this["http"];
         public TcpTransport Tcp => (TcpTransport)this["tcp"];
         public UdpTransport Udp => (UdpTransport)this["udp"];
-#if !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
+#if !NET35_CF && !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
         public SocketTransport Socket => (SocketTransport)this["socket"];
 #endif
-#if !NET40
+#if !NET35_CF && !NET40
         public WebSocketTransport WebSocket => (WebSocketTransport)this["websocket"];
 #endif
         private readonly Dictionary<string, ITransport> transports = new Dictionary<string, ITransport>();
@@ -90,7 +90,11 @@ namespace Hprose.RPC {
             };
         }
         public Client(string uri) : this() {
+#if !NET35_CF
             if (string.IsNullOrWhiteSpace(uri)) {
+#else
+            if (String2.IsNullOrWhiteSpace(uri)) {
+#endif
                 throw new ArgumentException("invalid uri", nameof(uri));
             }
             urilist.Add(uri);
@@ -101,6 +105,7 @@ namespace Hprose.RPC {
             }
             urilist.AddRange(uris);
         }
+#if !NET35_CF
         public T UseService<T>(string ns = "") {
             var type = typeof(T);
             var handler = new InvocationHandler(this, ns);
@@ -111,6 +116,7 @@ namespace Hprose.RPC {
                 return (T)Proxy.NewInstance(type.GetInterfaces(), handler);
             }
         }
+#endif
         public Client Use(params InvokeHandler[] handlers) {
             invokeManager.Use(handlers);
             return this;
@@ -138,7 +144,11 @@ namespace Hprose.RPC {
         public async Task InvokeAsync(string fullname, object[] args = null, Settings settings = null) {
             var context = new ClientContext(this, null, settings);
             var task = invokeManager.Handler(fullname, args, context);
+#if !NET35_CF
             await task.ContinueWith((_) => { }, TaskScheduler.Current).ConfigureAwait(false);
+#else
+            await task.ContinueWith((_) => { }).ConfigureAwait(false);
+#endif
             return;
         }
         public async Task<T> InvokeAsync<T>(string fullname, object[] args = null, Settings settings = null) {
@@ -149,10 +159,19 @@ namespace Hprose.RPC {
             }
             var context = new ClientContext(this, type, settings);
             var task = invokeManager.Handler(fullname, args, context);
+#if !NET35_CF
             await task.ContinueWith((_) => { }, TaskScheduler.Current).ConfigureAwait(false);
+#else
+            await task.ContinueWith((_) => { }).ConfigureAwait(false);
+#endif
             var result = await task.ConfigureAwait(false);
             if (isResultType) {
+#if !NET35_CF
                 return (T)Activator.CreateInstance(typeof(T), new object[] { result, context });
+#else
+                var ctor = typeof(T).GetConstructor(new Type[] { type, typeof(Context) });
+                return (T)ctor.Invoke(new object[] { result, context });
+#endif
             }
             return (T)result;
         }

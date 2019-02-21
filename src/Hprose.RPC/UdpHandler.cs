@@ -8,7 +8,7 @@
 |                                                          |
 |  UdpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Feb 11, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -34,7 +34,7 @@ namespace Hprose.RPC {
         }
         private static async void Send(UdpClient udpClient, int index, MemoryStream stream, IPEndPoint endPoint) {
             var n = (int)stream.Length;
-#if NET40
+#if NET35_CF || NET40
             var buffer = new byte[n + 8];
 #else
             var buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(n + 8);
@@ -54,7 +54,7 @@ namespace Hprose.RPC {
             }
             finally {
                 stream.Dispose();
-#if !NET40
+#if !NET35_CF && !NET40
                 System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
 #endif
             }

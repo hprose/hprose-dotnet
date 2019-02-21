@@ -8,11 +8,11 @@
 |                                                          |
 |  IInvocationHandler interface for C#.                    |
 |                                                          |
-|  LastModified: Jan 20, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
-
+#if !NET35_CF
 using System.Reflection;
 
 namespace Hprose.RPC {
@@ -20,3 +20,4 @@ namespace Hprose.RPC {
         object Invoke(object proxy, MethodInfo method, object[] args);
     }
 }
+#endif

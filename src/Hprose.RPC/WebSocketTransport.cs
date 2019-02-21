@@ -8,12 +8,11 @@
 |                                                          |
 |  WebSocketTransport class for C#.                        |
 |                                                          |
-|  LastModified: Feb 11, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
-
-#if !NET40
+#if !NET35_CF && !NET40
 using System;
 using System.Buffers;
 using System.Collections.Concurrent;

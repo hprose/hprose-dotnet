@@ -8,7 +8,7 @@
 |                                                          |
 |  TaskResult class for C#.                                |
 |                                                          |
-|  LastModified: Jan 29, 2019                              |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -32,7 +32,11 @@ namespace Hprose.RPC {
             ).Compile();
         }
         static async Task<object> Get<T>(Task<T> task) => await task.ConfigureAwait(false);
+#if !NET35_CF
         private static readonly Func<Type, Lazy<Func<Task, Task<object>>>> factory = (type) => new Lazy<Func<Task, Task<object>>>(() => GetFunc(type));
+#else
+        private static readonly Func2<Type, Lazy<Func<Task, Task<object>>>> factory = (type) => new Lazy<Func<Task, Task<object>>>(() => GetFunc(type));
+#endif
         public static async Task<object> Get(Task task) {
             var type = task.GetType();
             if (type.IsGenericType) {
