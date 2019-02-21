@@ -11,13 +11,15 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Authors>Ma Bingyao&lt;andot@hprose.com&gt;</Authors>
     <Company>hprose.com</Company>
-    <Copyright>Copyright © http://www.hprose.com, All rights reserved.</Copyright>
+    <Copyright>Copyright © https://hprose.com, All rights reserved.</Copyright>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
     <Product>Hprose.RPC.AspNetCore</Product>
-    <Title>Hprose.RPC.AspNetCore</Title>
+    <Title>Hprose RPC for ASP.NET Core</Title>
+    <Description>Hprose is a popular high-performance RPC library for ASP.NET Core</Description>
+    <PackageTags>Hprose RPC AspNetCore</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>http://www.hprose.com</PackageProjectUrl>
-    <PackageIconUrl>http://hprose.com/apple-touch-icon-180x180.png</PackageIconUrl>
+    <PackageProjectUrl>https://hprose.com</PackageProjectUrl>
+    <PackageIconUrl>https://hprose.com/apple-touch-icon-180x180.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/hprose/hprose-dotnet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
