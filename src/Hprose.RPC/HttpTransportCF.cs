@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpTransport class for .NET CF.                        |
 |                                                          |
-|  LastModified: Feb 22, 2019                              |
+|  LastModified: Feb 23, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -46,7 +46,7 @@ namespace Hprose.RPC {
             requests.Clear();
         }
         public async Task<Stream> Transport(Stream request, Context context) {
-            Uri uri = new Uri((context as ClientContext).Uri);
+            Uri uri = (context as ClientContext).Uri;
             var webRequest = WebRequest.Create(uri) as HttpWebRequest;
             requests[webRequest] = null;
             try {
