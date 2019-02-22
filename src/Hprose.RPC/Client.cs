@@ -8,7 +8,7 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Feb 23, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -41,8 +41,7 @@ namespace Hprose.RPC {
             var type = typeof(T);
             var schemes = type.GetProperty("Schemes", BindingFlags.Public | BindingFlags.Static).GetValue(type, null) as string[];
             transTypes.Add((name, type));
-            for (int i = 0, n = schemes.Length; i < n; ++i) {
-                var scheme = schemes[i];
+            foreach (var scheme in schemes) {
                 Client.schemes[scheme] = name;
             }
         }
@@ -68,7 +67,7 @@ namespace Hprose.RPC {
 #endif
         private readonly Dictionary<string, ITransport> transports = new Dictionary<string, ITransport>();
         public ITransport this[string name] => transports[name];
-        public IDictionary<string, object> RequestHeaders { get; set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+        public IDictionary<string, object> RequestHeaders { get; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public IClientCodec Codec { get; set; } = ClientCodec.Instance;
         private List<string> urilist = new List<string>();
         public List<string> Uris {
