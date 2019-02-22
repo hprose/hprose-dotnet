@@ -8,7 +8,7 @@
 |                                                          |
 |  SocketTransport class for C#.                           |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Feb 23, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -31,33 +31,32 @@ namespace Hprose.RPC {
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         public int ReceiveBufferSize { get; set; } = 8192;
         public int SendBufferSize { get; set; } = 8192;
-        private ConcurrentDictionary<string, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<string, ConcurrentQueue<(int, MemoryStream)>>();
-        private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
-        private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Sended { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
-        private ConcurrentDictionary<string, Lazy<Task<Socket>>> Sockets { get; } = new ConcurrentDictionary<string, Lazy<Task<Socket>>>();
-        private readonly Func<string, Lazy<Task<Socket>>> socketFactory;
+        private ConcurrentDictionary<Uri, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<Uri, ConcurrentQueue<(int, MemoryStream)>>();
+        private ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
+        private ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Sended { get; } = new ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
+        private ConcurrentDictionary<Uri, Lazy<Task<Socket>>> Sockets { get; } = new ConcurrentDictionary<Uri, Lazy<Task<Socket>>>();
+        private readonly Func<Uri, Lazy<Task<Socket>>> socketFactory;
         public SocketTransport() {
             socketFactory = (uri) => {
                 return new Lazy<Task<Socket>>(async () => {
                     try {
-                        var u = new Uri(uri);
-                        var family = u.Scheme.Last() == '6' ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
+                        var family = uri.Scheme.Last() == '6' ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
                         var protocol = ProtocolType.Tcp;
-                        if (u.Scheme == "unix") {
+                        if (uri.Scheme == "unix") {
                             family = AddressFamily.Unix;
                             protocol = ProtocolType.Unspecified;
                         }
                         var socket = new Socket(family, SocketType.Stream, protocol);
                         if (family == AddressFamily.Unix) {
 #if NETCOREAPP2_1 || NETCOREAPP2_2
-                            await socket.ConnectAsync(new UnixDomainSocketEndPoint(u.AbsolutePath));
+                            await socket.ConnectAsync(new UnixDomainSocketEndPoint(uri.AbsolutePath));
 #else
                             throw new NotSupportedException("not supported unix protocol");
 #endif
                         }
                         else {
-                            var host = u.IdnHost;
-                            var port = u.Port > 0 ? u.Port : 8412;
+                            var host = uri.IdnHost;
+                            var port = uri.Port > 0 ? uri.Port : 8412;
                             socket.NoDelay = NoDelay;
                             socket.ReceiveBufferSize = ReceiveBufferSize;
                             socket.SendBufferSize = SendBufferSize;
@@ -109,7 +108,7 @@ namespace Hprose.RPC {
             }
             return bytes;
         }
-        private async void Receive(string uri, Socket socket) {
+        private async void Receive(Uri uri, Socket socket) {
             var sended = Sended[uri];
             var header = new byte[12];
             try {
@@ -143,7 +142,7 @@ namespace Hprose.RPC {
                 socket.Close();
             }
         }
-        private async Task Send(string uri, int index, MemoryStream stream) {
+        private async Task Send(Uri uri, int index, MemoryStream stream) {
             var header = new byte[12];
             var n = (int)stream.Length;
             header[4] = (byte)(n >> 24 & 0xFF | 0x80);
@@ -180,7 +179,7 @@ namespace Hprose.RPC {
                 stream.Dispose();
             }
         }
-        private async void Send(string uri) {
+        private async void Send(Uri uri) {
             var requests = Requests[uri];
             var results = Results[uri];
             var sended = Sended.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());
@@ -200,7 +199,7 @@ namespace Hprose.RPC {
                 requests.TryDequeue(out request);
             }
         }
-        private async Task<Socket> GetSocket(string uri) {
+        private async Task<Socket> GetSocket(Uri uri) {
             int retried = 0;
             while(true) {
                 var LazySocket = Sockets.GetOrAdd(uri, socketFactory);
