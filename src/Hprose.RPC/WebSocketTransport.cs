@@ -8,7 +8,7 @@
 |                                                          |
 |  WebSocketTransport class for C#.                        |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Feb 23, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -36,11 +36,11 @@ namespace Hprose.RPC {
         public bool UseDefaultCredentials { get; set; } = true;
         public int ReceiveBufferSize { get; set; } = 16384;
         public int SendBufferSize { get; set; } = 16384;
-        private ConcurrentDictionary<string, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<string, ConcurrentQueue<(int, MemoryStream)>>();
-        private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
-        private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Sended { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
-        private ConcurrentDictionary<string, Lazy<Task<ClientWebSocket>>> WebSockets { get; } = new ConcurrentDictionary<string, Lazy<Task<ClientWebSocket>>>();
-        private readonly Func<string, Lazy<Task<ClientWebSocket>>> webSocketFactory;
+        private ConcurrentDictionary<Uri, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<Uri, ConcurrentQueue<(int, MemoryStream)>>();
+        private ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
+        private ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Sended { get; } = new ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
+        private ConcurrentDictionary<Uri, Lazy<Task<ClientWebSocket>>> WebSockets { get; } = new ConcurrentDictionary<Uri, Lazy<Task<ClientWebSocket>>>();
+        private readonly Func<Uri, Lazy<Task<ClientWebSocket>>> webSocketFactory;
         public WebSocketTransport() {
             webSocketFactory = (uri) => {
                 return new Lazy<Task<ClientWebSocket>>(async () => {
@@ -65,7 +65,7 @@ namespace Hprose.RPC {
                         if (KeepAliveInterval > TimeSpan.Zero) {
                             options.KeepAliveInterval = KeepAliveInterval;
                         }
-                        await webSocket.ConnectAsync(new Uri(uri), CancellationToken.None);
+                        await webSocket.ConnectAsync(uri, CancellationToken.None);
                         Receive(uri, webSocket);
                         return webSocket;
                     }
@@ -127,7 +127,7 @@ namespace Hprose.RPC {
                 ArrayPool<byte>.Shared.Return(buffer);
             }
         }
-        private async void Receive(string uri, ClientWebSocket webSocket) {
+        private async void Receive(Uri uri, ClientWebSocket webSocket) {
             var sended = Sended[uri];
             try {
                 while (true) {
@@ -154,7 +154,7 @@ namespace Hprose.RPC {
                 webSocket.Dispose();
             }
         }
-        private async Task Send(string uri, int index, MemoryStream stream) {
+        private async Task Send(Uri uri, int index, MemoryStream stream) {
             int n = (int)stream.Length;
             var buffer = ArrayPool<byte>.Shared.Rent(4 + n);
             ClientWebSocket webSocket = null;
@@ -184,7 +184,7 @@ namespace Hprose.RPC {
                 ArrayPool<byte>.Shared.Return(buffer);
             }
         }
-        private async void Send(string uri) {
+        private async void Send(Uri uri) {
             var requests = Requests[uri];
             var results = Results[uri];
             var sended = Sended.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());
@@ -204,7 +204,7 @@ namespace Hprose.RPC {
                 requests.TryDequeue(out request);
             }
         }
-        private async Task<ClientWebSocket> GetWebSocket(string uri) {
+        private async Task<ClientWebSocket> GetWebSocket(Uri uri) {
             int retried = 0;
             while(true) {
                 var LazyWebSocket = WebSockets.GetOrAdd(uri, webSocketFactory);
@@ -222,8 +222,7 @@ namespace Hprose.RPC {
         }
         public async Task<Stream> Transport(Stream request, Context context) {
             var stream = await request.ToMemoryStream().ConfigureAwait(false);
-            var clientContext = context as ClientContext;
-            var uri = clientContext.Uri;
+            var uri = (context as ClientContext).Uri;
             var index = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
             var results = Results.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());
             var result = new TaskCompletionSource<MemoryStream>();
