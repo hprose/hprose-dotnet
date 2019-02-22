@@ -23,7 +23,7 @@ namespace Hprose.RPC {
         public Type Type { get; set; }
         public IDictionary<string, object> RequestHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public IDictionary<string, object> ResponseHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
-        public ClientContext(Client client, Type type, Settings settings = null) {
+        public ClientContext(Client client, Type type, Settings settings) {
             Client = client;
             Uri = (client.Uris.Count > 0) ? client.Uris[0] : null;
             Type = settings?.Type;
@@ -34,10 +34,8 @@ namespace Hprose.RPC {
         }
         public override object Clone() {
             var context = base.Clone() as ClientContext;
-            context.RequestHeaders = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
-            context.ResponseHeaders = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
-            Copy(RequestHeaders, context.RequestHeaders);
-            Copy(ResponseHeaders, context.ResponseHeaders);
+            context.RequestHeaders = new Dictionary<string, object>(RequestHeaders, StringComparer.InvariantCultureIgnoreCase);
+            context.ResponseHeaders = new Dictionary<string, object>(ResponseHeaders, StringComparer.InvariantCultureIgnoreCase);
             return context;
         }
     }
