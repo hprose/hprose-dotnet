@@ -35,7 +35,7 @@ namespace Hprose.RPC {
     }
     public class Client : IDisposable {
         private static readonly Random random = new Random(Guid.NewGuid().GetHashCode());
-        private static readonly List<ValueTuple<string, Type>> transTypes = new List<ValueTuple<string, Type>>();
+        private static readonly List<(string, Type)> transTypes = new List<(string, Type)>();
         private static readonly Dictionary<string, string> schemes = new Dictionary<string, string>();
         public static void Register<T>(string name) where T : ITransport, new() {
             var type = typeof(T);
@@ -83,8 +83,7 @@ namespace Hprose.RPC {
         public Client() {
             invokeManager = new InvokeManager(Call);
             ioManager = new IOManager(Transport);
-            for (int i = 0, n = transTypes.Count; i < n; ++i) {
-                var (name, type) = transTypes[i];
+            foreach (var (name, type) in transTypes) {
                 transports[name] = (ITransport)Activator.CreateInstance(type);
             };
         }
