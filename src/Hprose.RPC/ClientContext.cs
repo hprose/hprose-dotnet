@@ -8,7 +8,7 @@
 |                                                          |
 |  ClientContext class for C#.                             |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Feb 23, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -19,7 +19,7 @@ using System.Collections.Generic;
 namespace Hprose.RPC {
     public class ClientContext : Context {
         public Client Client { get; private set; }
-        public string Uri { get; set; }
+        public Uri Uri { get; set; }
         public Type Type { get; set; }
         public IDictionary<string, object> RequestHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public IDictionary<string, object> ResponseHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
