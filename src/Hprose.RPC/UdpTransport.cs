@@ -8,7 +8,7 @@
 |                                                          |
 |  UdpTransport class for C#.                              |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Feb 23, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -30,27 +30,26 @@ namespace Hprose.RPC {
         public bool EnableBroadcast { get; set; } = true;
         public short Ttl { get; set; } = 0;
 #endif
-        private ConcurrentDictionary<string, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<string, ConcurrentQueue<(int, MemoryStream)>>();
-        private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
-        private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Sended { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
-        private ConcurrentDictionary<string, Lazy<UdpClient>> UdpClients { get; } = new ConcurrentDictionary<string, Lazy<UdpClient>>();
+        private ConcurrentDictionary<Uri, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<Uri, ConcurrentQueue<(int, MemoryStream)>>();
+        private ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
+        private ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Sended { get; } = new ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
+        private ConcurrentDictionary<Uri, Lazy<UdpClient>> UdpClients { get; } = new ConcurrentDictionary<Uri, Lazy<UdpClient>>();
 #if !NET35_CF
-        private readonly Func<string, Lazy<UdpClient>> udpClientFactory;
+        private readonly Func<Uri, Lazy<UdpClient>> udpClientFactory;
 #else
-        private readonly Func2<string, Lazy<UdpClient>> udpClientFactory;
+        private readonly Func2<Uri, Lazy<UdpClient>> udpClientFactory;
 #endif
         public UdpTransport() {
             udpClientFactory = (uri) => {
                 return new Lazy<UdpClient>(() => {
                     try {
-                        var u = new Uri(uri);
-                        var family = u.Scheme.Last() == '6' ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
+                        var family = uri.Scheme.Last() == '6' ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
 #if NET35_CF || NET40 || NET45 || NET451 || NET452
-                        var host = u.DnsSafeHost;
+                        var host = uri.DnsSafeHost;
 #else
-                        var host = u.IdnHost;
+                        var host = uri.IdnHost;
 #endif
-                        var port = u.Port > 0 ? u.Port : 8412;
+                        var port = uri.Port > 0 ? uri.Port : 8412;
 #if !NET35_CF
                         var client = new UdpClient(family) {
                             EnableBroadcast = EnableBroadcast
@@ -95,7 +94,7 @@ namespace Hprose.RPC {
                 catch { }
             }
         }
-        private async void Receive(string uri, UdpClient udpClient) {
+        private async void Receive(Uri uri, UdpClient udpClient) {
             var sended = Sended[uri];
             try {
                 while (true) {
@@ -127,7 +126,7 @@ namespace Hprose.RPC {
                 udpClient.Close();
             }
         }
-        private async void Send(string uri, int index, MemoryStream stream) {
+        private async void Send(Uri uri, int index, MemoryStream stream) {
             var n = (int)stream.Length;
 #if NET35_CF || NET40
             var buffer = new byte[n + 8];
@@ -167,7 +166,7 @@ namespace Hprose.RPC {
 #endif
             }
         }
-        private async void Send(string uri) {
+        private async void Send(Uri uri) {
             var requests = Requests[uri];
             var results = Results[uri];
             var sended = Sended.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());
@@ -191,7 +190,7 @@ namespace Hprose.RPC {
                 requests.TryDequeue(out request);
             }
         }
-        private UdpClient GetUdpClient(string uri) {
+        private UdpClient GetUdpClient(Uri uri) {
             int retried = 0;
             while(true) {
                 var LazyUdpClient = UdpClients.GetOrAdd(uri, udpClientFactory);
