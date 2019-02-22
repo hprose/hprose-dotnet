@@ -69,8 +69,8 @@ namespace Hprose.RPC {
         public ITransport this[string name] => transports[name];
         public IDictionary<string, object> RequestHeaders { get; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public IClientCodec Codec { get; set; } = ClientCodec.Instance;
-        private List<string> urilist = new List<string>();
-        public List<string> Uris {
+        private List<Uri> urilist = new List<Uri>();
+        public List<Uri> Uris {
             get => urilist;
             set {
                 if (value.Count > 0) {
@@ -89,16 +89,26 @@ namespace Hprose.RPC {
             };
         }
         public Client(string uri) : this() {
-#if !NET35_CF
-            if (string.IsNullOrWhiteSpace(uri)) {
-#else
-            if (String2.IsNullOrWhiteSpace(uri)) {
-#endif
-                throw new ArgumentException("invalid uri", nameof(uri));
+            if (uri == null) {
+                throw new ArgumentNullException(nameof(uri));
+            }
+            if (uri.Length > 0) {
+                urilist.Add(new Uri(uri));
+            }
+        }
+        public Client(Uri uri) : this() {
+            if (uri == null) {
+                throw new ArgumentNullException(nameof(uri));
             }
             urilist.Add(uri);
         }
         public Client(string[] uris) : this() {
+            if (uris == null) {
+                throw new ArgumentNullException(nameof(uris));
+            }
+            urilist.AddRange(uris.Select((uri) => new Uri(uri)));
+        }
+        public Client(Uri[] uris) : this() {
             if (uris == null) {
                 throw new ArgumentNullException(nameof(uris));
             }
@@ -180,7 +190,7 @@ namespace Hprose.RPC {
             return await Codec.Decode(response, context as ClientContext).ConfigureAwait(false);
         }
         public async Task<Stream> Transport(Stream request, Context context) {
-            var uri = new Uri((context as ClientContext).Uri);
+            var uri = (context as ClientContext).Uri;
             var scheme = uri.Scheme;
             if (schemes.TryGetValue(scheme, out string name)) {
                 return await transports[name].Transport(request, context).ConfigureAwait(false);
