@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpTransport class for C#.                              |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Feb 23, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -44,27 +44,26 @@ namespace Hprose.RPC {
         public EncryptionPolicy EncryptionPolicy { get; set; } = EncryptionPolicy.RequireEncryption;
         public string ServerCertificateName { get; set; } = null;
 #endif
-        private ConcurrentDictionary<string, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<string, ConcurrentQueue<(int, MemoryStream)>>();
-        private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
-        private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Sended { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
-        private ConcurrentDictionary<string, Lazy<Task<(TcpClient, Stream)>>> TcpClients { get; } = new ConcurrentDictionary<string, Lazy<Task<(TcpClient, Stream)>>>();
+        private ConcurrentDictionary<Uri, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<Uri, ConcurrentQueue<(int, MemoryStream)>>();
+        private ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
+        private ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Sended { get; } = new ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
+        private ConcurrentDictionary<Uri, Lazy<Task<(TcpClient, Stream)>>> TcpClients { get; } = new ConcurrentDictionary<Uri, Lazy<Task<(TcpClient, Stream)>>>();
 #if !NET35_CF
-        private readonly Func<string, Lazy<Task<(TcpClient, Stream)>>> tcpClientFactory;
+        private readonly Func<Uri, Lazy<Task<(TcpClient, Stream)>>> tcpClientFactory;
 #else
-        private readonly Func2<string, Lazy<Task<(TcpClient, Stream)>>> tcpClientFactory;
+        private readonly Func2<Uri, Lazy<Task<(TcpClient, Stream)>>> tcpClientFactory;
 #endif
         public TcpTransport() {
             tcpClientFactory = (uri) => {
                 return new Lazy<Task<(TcpClient, Stream)>>(async () => {
                     try {
-                        var u = new Uri(uri);
-                        var family = u.Scheme.Last() == '6' ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
+                        var family = uri.Scheme.Last() == '6' ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
 #if NET35_CF || NET40 || NET45 || NET451 || NET452
-                        var host = u.DnsSafeHost;
+                        var host = uri.DnsSafeHost;
 #else
-                        var host = u.IdnHost;
+                        var host = uri.IdnHost;
 #endif
-                        var port = u.Port > 0 ? u.Port : 8412;
+                        var port = uri.Port > 0 ? uri.Port : 8412;
                         var client = new TcpClient(family) {
                             NoDelay = NoDelay,
                             ReceiveBufferSize = ReceiveBufferSize,
@@ -77,7 +76,7 @@ namespace Hprose.RPC {
                         await client.ConnectAsync(host, port);
                         Stream stream = client.GetStream();
 #if !NET35_CF
-                        switch (u.Scheme) {
+                        switch (uri.Scheme) {
                             case "tls":
                             case "tls4":
                             case "tls6":
@@ -85,7 +84,7 @@ namespace Hprose.RPC {
                             case "ssl4":
                             case "ssl6":
                                 SslStream sslstream = new SslStream(stream, false, ValidateServerCertificate, CertificateSelection, EncryptionPolicy);
-                                await sslstream.AuthenticateAsClientAsync(ServerCertificateName ?? u.Host).ConfigureAwait(false);
+                                await sslstream.AuthenticateAsClientAsync(ServerCertificateName ?? uri.Host).ConfigureAwait(false);
                                 stream = sslstream;
                                 break;
                         }
@@ -134,7 +133,7 @@ namespace Hprose.RPC {
             }
             return bytes;
         }
-        private async void Receive(string uri, TcpClient tcpClient, Stream netStream) {
+        private async void Receive(Uri uri, TcpClient tcpClient, Stream netStream) {
             var sended = Sended[uri];
             var header = new byte[12];
             try {
@@ -167,7 +166,7 @@ namespace Hprose.RPC {
                 tcpClient.Close();
             }
         }
-        private async Task Send(string uri, int index, MemoryStream stream) {
+        private async Task Send(Uri uri, int index, MemoryStream stream) {
             var header = new byte[12];
             var n = (int)stream.Length;
             header[4] = (byte)(n >> 24 & 0xFF | 0x80);
@@ -206,7 +205,7 @@ namespace Hprose.RPC {
                 stream.Dispose();
             }
         }
-        private async void Send(string uri) {
+        private async void Send(Uri uri) {
             var requests = Requests[uri];
             var results = Results[uri];
             var sended = Sended.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());
@@ -230,7 +229,7 @@ namespace Hprose.RPC {
                 requests.TryDequeue(out request);
             }
         }
-        private async Task<(TcpClient, Stream)> GetTcpClient(string uri) {
+        private async Task<(TcpClient, Stream)> GetTcpClient(Uri uri) {
             int retried = 0;
             while(true) {
                 var LazyTcpClient = TcpClients.GetOrAdd(uri, tcpClientFactory);
