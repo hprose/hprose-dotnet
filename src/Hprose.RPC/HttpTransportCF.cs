@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpTransport class for .NET CF.                        |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Feb 22, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -49,54 +49,59 @@ namespace Hprose.RPC {
             Uri uri = new Uri((context as ClientContext).Uri);
             var webRequest = WebRequest.Create(uri) as HttpWebRequest;
             requests[webRequest] = null;
-            webRequest.Method = "POST";
-            webRequest.ContentType = "application/hprose";
-            webRequest.Credentials = Credentials;
-            webRequest.Timeout = (int)Timeout.TotalMilliseconds;
-            webRequest.SendChunked = false;
-            if (AcceptEncoding != null) {
-                webRequest.Headers.Set("Accept-Encoding", AcceptEncoding);
+            try {
+                webRequest.Method = "POST";
+                webRequest.ContentType = "application/hprose";
+                webRequest.Credentials = Credentials;
+                webRequest.Timeout = (int)Timeout.TotalMilliseconds;
+                webRequest.SendChunked = false;
+                if (AcceptEncoding != null) {
+                    webRequest.Headers.Set("Accept-Encoding", AcceptEncoding);
+                }
+                webRequest.ReadWriteTimeout = (int)Timeout.TotalMilliseconds;
+                webRequest.ProtocolVersion = HttpVersion.Version11;
+                if (Proxy != null) {
+                    webRequest.Proxy = Proxy;
+                }
+                webRequest.KeepAlive = KeepAlive;
+                if (KeepAlive) {
+                    webRequest.Headers.Set("Keep-Alive", KeepAliveTimeout.ToString());
+                }
+                webRequest.ConnectionGroupName = ConnectionGroupName;
+                if (ClientCertificates != null) {
+                    webRequest.ClientCertificates = ClientCertificates;
+                }
+                foreach (var header in Headers) {
+                    webRequest.Headers[header.Key] = header.Value;
+                }
+                webRequest.AllowWriteStreamBuffering = true;
+                webRequest.Headers.Set("Cookie", cookieManager.GetCookie(uri.Host, uri.AbsolutePath, uri.Scheme == "https"));
+                var ostream = await webRequest.GetRequestStreamAsync().ConfigureAwait(false);
+                await request.CopyToAsync(ostream).ConfigureAwait(false);
+                await ostream.FlushAsync().ConfigureAwait(false);
+                ostream.Dispose();
+                var webResponse = await webRequest.GetResponseAsync().ConfigureAwait(false) as HttpWebResponse;
+                requests[webRequest] = webResponse;
+                cookieManager.SetCookie(webResponse.Headers.GetValues("Set-Cookie"), uri.Host);
+                cookieManager.SetCookie(webResponse.Headers.GetValues("Set-Cookie2"), uri.Host);
+                var istream = webResponse.GetResponseStream();
+                string contentEncoding = webResponse.ContentEncoding.ToLower();
+                if (contentEncoding.IndexOf("deflate") > -1) {
+                    istream = new DeflateStream(istream, CompressionMode.Decompress);
+                }
+                else if (contentEncoding.IndexOf("gzip") > -1) {
+                    istream = new GZipStream(istream, CompressionMode.Decompress);
+                }
+                int len = (int)webResponse.ContentLength;
+                var response = (len > 0) ? new MemoryStream(len) : new MemoryStream();
+                await istream.CopyToAsync(response).ConfigureAwait(false);
+                istream.Dispose();
+                webResponse.Close();
+                return response;
             }
-            webRequest.ReadWriteTimeout = (int)Timeout.TotalMilliseconds;
-            webRequest.ProtocolVersion = HttpVersion.Version11;
-            if (Proxy != null) {
-                webRequest.Proxy = Proxy;
+            finally {
+                requests.Remove(webRequest, out var _);
             }
-            webRequest.KeepAlive = KeepAlive;
-            if (KeepAlive) {
-                webRequest.Headers.Set("Keep-Alive", KeepAliveTimeout.ToString());
-            }
-            webRequest.ConnectionGroupName = ConnectionGroupName;
-            if (ClientCertificates != null) {
-                webRequest.ClientCertificates = ClientCertificates;
-            }
-            foreach (var header in Headers) {
-                webRequest.Headers[header.Key] = header.Value;
-            }
-            webRequest.AllowWriteStreamBuffering = true;
-            webRequest.Headers.Set("Cookie", cookieManager.GetCookie(uri.Host, uri.AbsolutePath, uri.Scheme == "https"));
-            var ostream = await webRequest.GetRequestStreamAsync().ConfigureAwait(false);
-            await request.CopyToAsync(ostream).ConfigureAwait(false);
-            await ostream.FlushAsync().ConfigureAwait(false);
-            ostream.Dispose();
-            var webResponse = await webRequest.GetResponseAsync().ConfigureAwait(false) as HttpWebResponse;
-            requests[webRequest] = webResponse;
-            cookieManager.SetCookie(webResponse.Headers.GetValues("Set-Cookie"), uri.Host);
-            cookieManager.SetCookie(webResponse.Headers.GetValues("Set-Cookie2"), uri.Host);
-            var istream = webResponse.GetResponseStream();
-            string contentEncoding = webResponse.ContentEncoding.ToLower();
-            if (contentEncoding.IndexOf("deflate") > -1) {
-                istream = new DeflateStream(istream, CompressionMode.Decompress);
-            }
-            else if (contentEncoding.IndexOf("gzip") > -1) {
-                istream = new GZipStream(istream, CompressionMode.Decompress);
-            }
-            int len = (int)webResponse.ContentLength;
-            var response = (len > 0) ? new MemoryStream(len) : new MemoryStream();
-            await istream.CopyToAsync(response).ConfigureAwait(false);
-            istream.Dispose();
-            webResponse.Close();
-            return response;
         }
         private bool disposed = false;
         public void Dispose() {
