@@ -8,7 +8,7 @@
 |                                                          |
 |  ServiceContext class for C#.                            |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Feb 23, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -30,10 +30,8 @@ namespace Hprose.RPC {
         }
         public override object Clone() {
             var context = base.Clone() as ServiceContext;
-            context.RequestHeaders = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
-            context.ResponseHeaders = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
-            Copy(RequestHeaders, context.RequestHeaders);
-            Copy(ResponseHeaders, context.ResponseHeaders);
+            context.RequestHeaders = new Dictionary<string, object>(RequestHeaders, StringComparer.InvariantCultureIgnoreCase);
+            context.ResponseHeaders = new Dictionary<string, object>(ResponseHeaders, StringComparer.InvariantCultureIgnoreCase);
             return context;
         }
     }
