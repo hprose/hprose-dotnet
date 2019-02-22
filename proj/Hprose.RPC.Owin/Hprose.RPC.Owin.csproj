@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;net40;net40-client;net45;net451;net452;net46;net461;net462;net47;net471;net472;monoandroid44;monoandroid50;monoandroid51;monoandroid60;monoandroid70;monoandroid71;monoandroid80;monoandroid81;xamarinmac20;xamarinios10;xamarintvos10;xamarinwatchos10</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netcoreapp2.2;netcoreapp2.1;net40;net40-client;net45;net451;net452;net46;net461;net462;net47;net471;net472</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
-    <Version>3.0.0-beta03</Version>
+    <Version>3.0.0-beta04</Version>
     <OutputType>Library</OutputType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -27,39 +27,6 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
-    <FileAlignment>512</FileAlignment>
-    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <AndroidUseLatestPlatformSdk>true</AndroidUseLatestPlatformSdk>
-    <TargetFrameworkVersion>v$(TargetFramework[11]).$(TargetFramework[12])</TargetFrameworkVersion>
-    <TargetFrameworkIdentifier>MonoAndroid</TargetFrameworkIdentifier>
-    <LanguageTargets>$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets</LanguageTargets>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'xamarinmac20' ">
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
-    <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'xamarinios10' ">
-    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
-    <TargetFrameworkIdentifier>Xamarin.iOS</TargetFrameworkIdentifier>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'xamarintvos10' ">
-    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
-    <TargetFrameworkIdentifier>Xamarin.TVOS</TargetFrameworkIdentifier>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'xamarinwatchos10' ">
-    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
-    <TargetFrameworkIdentifier>Xamarin.WatchOS</TargetFrameworkIdentifier>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('xamarin')) ">
-    <LanguageTargets>$(MSBuildExtensionsPath)\$(TargetFrameworkIdentifier.Replace('.', '\'))\$(TargetFrameworkIdentifier).CSharp.targets</LanguageTargets>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(TargetFramework)' == 'net40-client'">
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
@@ -69,26 +36,6 @@
   <PropertyGroup>
     <NoWarn>1701;1702;CA1724;CA1812</NoWarn>
   </PropertyGroup>
-
-  <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
-    <Reference Include="Mono.Android" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Numerics" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin')) ">
-    <Reference Include="$(TargetFrameworkIdentifier)" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Numerics" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'xamarinmac20' ">
-    <Reference Include="netstandard" Version="2.0.0.0" />
-  </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net40')) Or $(TargetFramework.StartsWith('net45')) Or $(TargetFramework.StartsWith('net46')) ">
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
