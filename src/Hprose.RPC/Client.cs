@@ -8,7 +8,7 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Feb 23, 2019                              |
+|  LastModified: Feb 24, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -25,14 +25,7 @@ namespace Hprose.RPC {
         Task<Stream> Transport(Stream request, Context context);
         void Abort();
     }
-    public class Result<T> {
-        public T Value { get; private set; }
-        public Context Context { get; private set; }
-        public Result(T value, Context context) {
-            Value = value;
-            Context = context;
-        }
-    }
+
     public class Client : IDisposable {
         private static readonly Random random = new Random(Guid.NewGuid().GetHashCode());
         private static readonly List<(string, Type)> transTypes = new List<(string, Type)>();
@@ -141,47 +134,25 @@ namespace Hprose.RPC {
             ioManager.Unuse(handlers);
             return this;
         }
-        public void Invoke(string fullname, in object[] args = null, Settings settings = null) {
-            var context = new ClientContext(this, null, settings);
-            invokeManager.Handler(fullname, args, context).Wait();
-            return;
+        public void Invoke(string fullname, object[] args = null, ClientContext context = null) {
+            InvokeAsync<object>(fullname, args, context).Wait();
         }
-        public T Invoke<T>(string fullname, in object[] args = null, Settings settings = null) {
-            return InvokeAsync<T>(fullname, args, settings).Result;
+        public T Invoke<T>(string fullname, object[] args = null, ClientContext context = null) {
+            return InvokeAsync<T>(fullname, args, context).Result;
         }
-        public async Task InvokeAsync(string fullname, object[] args = null, Settings settings = null) {
-            var context = new ClientContext(this, null, settings);
+        public Task InvokeAsync(string fullname, object[] args = null, ClientContext context = null) {
+            return InvokeAsync<object>(fullname, args, context);
+        }
+        public async Task<T> InvokeAsync<T>(string fullname, object[] args = null, ClientContext context = null) {
+            if (context == null) context = new ClientContext();
+            context.Init(this, typeof(T));
             var task = invokeManager.Handler(fullname, args, context);
 #if !NET35_CF
             await task.ContinueWith((_) => { }, TaskScheduler.Current).ConfigureAwait(false);
 #else
             await task.ContinueWith((_) => { }).ConfigureAwait(false);
 #endif
-            return;
-        }
-        public async Task<T> InvokeAsync<T>(string fullname, object[] args = null, Settings settings = null) {
-            var type = typeof(T);
-            bool isResultType = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Result<>);
-            if (isResultType) {
-                type = type.GetGenericArguments()[0];
-            }
-            var context = new ClientContext(this, type, settings);
-            var task = invokeManager.Handler(fullname, args, context);
-#if !NET35_CF
-            await task.ContinueWith((_) => { }, TaskScheduler.Current).ConfigureAwait(false);
-#else
-            await task.ContinueWith((_) => { }).ConfigureAwait(false);
-#endif
-            var result = await task.ConfigureAwait(false);
-            if (isResultType) {
-#if !NET35_CF
-                return (T)Activator.CreateInstance(typeof(T), new object[] { result, context });
-#else
-                var ctor = typeof(T).GetConstructor(new Type[] { type, typeof(Context) });
-                return (T)ctor.Invoke(new object[] { result, context });
-#endif
-            }
-            return (T)result;
+            return (T)(await task.ConfigureAwait(false));
         }
         public async Task<object> Call(string fullname, object[] args, Context context) {
             var request = Codec.Encode(fullname, args, context as ClientContext);
