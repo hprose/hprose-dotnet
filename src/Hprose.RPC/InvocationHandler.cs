@@ -8,14 +8,13 @@
 |                                                          |
 |  InvocationHandler class for C#.                         |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Feb 24, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 #if !NET35_CF
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -27,28 +26,28 @@ namespace Hprose.RPC {
     internal class SyncInvoker<T> : IInvoker {
         private readonly Client client;
         private readonly string name;
-        private readonly Settings settings;
-        public SyncInvoker(Client client, string name, Settings settings) {
+        private readonly ClientContext context;
+        public SyncInvoker(Client client, string name, ClientContext context) {
             this.client = client;
             this.name = name;
-            this.settings = settings;
+            this.context = context;
         }
         public object Invoke(object[] args) {
-            return client.Invoke<T>(name, args, settings);
+            return client.Invoke<T>(name, args, context?.Clone() as ClientContext);
         }
     }
 
     internal class SyncInvoker : IInvoker {
         private readonly Client client;
         private readonly string name;
-        private readonly Settings settings;
-        public SyncInvoker(Client client, string name, Settings settings) {
+        private readonly ClientContext context;
+        public SyncInvoker(Client client, string name, ClientContext context) {
             this.client = client;
             this.name = name;
-            this.settings = settings;
+            this.context = context;
         }
         public object Invoke(object[] args) {
-            client.Invoke(name, args, settings);
+            client.Invoke(name, args, context?.Clone() as ClientContext);
             return null;
         }
     }
@@ -56,28 +55,28 @@ namespace Hprose.RPC {
     internal class AsyncInvoker<T> : IInvoker {
         private readonly Client client;
         private readonly string name;
-        private readonly Settings settings;
-        public AsyncInvoker(Client client, string name, Settings settings) {
+        private readonly ClientContext context;
+        public AsyncInvoker(Client client, string name, ClientContext context) {
             this.client = client;
             this.name = name;
-            this.settings = settings;
+            this.context = context;
         }
         public object Invoke(object[] args) {
-            return client.InvokeAsync<T>(name, args, settings);
+            return client.InvokeAsync<T>(name, args, context?.Clone() as ClientContext);
         }
     }
 
     internal class AsyncInvoker : IInvoker {
         private readonly Client client;
         private readonly string name;
-        private readonly Settings settings;
-        public AsyncInvoker(Client client, string name, Settings settings) {
+        private readonly ClientContext context;
+        public AsyncInvoker(Client client, string name, ClientContext context) {
             this.client = client;
             this.name = name;
-            this.settings = settings;
+            this.context = context;
         }
         public object Invoke(object[] args) {
-            return client.InvokeAsync(name, args, settings);
+            return client.InvokeAsync(name, args, context?.Clone() as ClientContext);
         }
     }
 
@@ -98,28 +97,23 @@ namespace Hprose.RPC {
             var name = method.Name;
             var returnType = method.ReturnType;
             var attributes = Attribute.GetCustomAttributes(method, true);
-            var settings = new Settings();
+            ClientContext context = null;
             foreach (var attribute in attributes) {
                 switch (attribute) {
                     case NameAttribute nameAttr:
                         name = nameAttr.Value;
                         break;
                     case HeaderAttribute headerAttr: {
-                            if (settings.RequestHeaders == null) {
-                                settings.RequestHeaders = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
-                            }
-                            var headers = settings.RequestHeaders;
+                            if (context == null) context = new ClientContext();
+                            var headers = context.RequestHeaders;
                             var (key, value) = headerAttr.Value;
-                            headers.Add(key, value);
+                            headers[key] = value;
                         }
                         break;
                     case ContextAttribute contextAttr: {
-                            if (settings.Context == null) {
-                                settings.Context = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
-                            }
-                            var context = settings.Context;
+                            if (context == null) context = new ClientContext();
                             var (key, value) = contextAttr.Value;
-                            context.Add(key, value);
+                            context[key] = value;
                         }
                         break;
                 }
@@ -129,16 +123,15 @@ namespace Hprose.RPC {
             }
             if (typeof(Task).IsAssignableFrom(returnType)) {
                 if (returnType == typeof(Task)) {
-                    return new AsyncInvoker(client, name, settings);
+                    return new AsyncInvoker(client, name, context);
                 }
-                settings.Type = returnType.GetGenericArguments()[0];
-                return (IInvoker)Activator.CreateInstance(typeof(AsyncInvoker<>).MakeGenericType(settings.Type), new object[] { client, name, settings });
+                returnType = returnType.GetGenericArguments()[0];
+                return (IInvoker)Activator.CreateInstance(typeof(AsyncInvoker<>).MakeGenericType(returnType), new object[] { client, name, context });
             }
             if (returnType == typeof(void)) {
-                return new SyncInvoker(client, name, settings);
+                return new SyncInvoker(client, name, context);
             }
-            settings.Type = returnType;
-            return (IInvoker)Activator.CreateInstance(typeof(SyncInvoker<>).MakeGenericType(settings.Type), new object[] { client, name, settings });
+            return (IInvoker)Activator.CreateInstance(typeof(SyncInvoker<>).MakeGenericType(returnType), new object[] { client, name, context });
         }
     }
 }
