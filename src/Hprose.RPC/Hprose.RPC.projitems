@@ -45,7 +45,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)ServiceContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NameAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Proxy.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TaskResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UdpReceiveResult.cs" />
   </ItemGroup>
