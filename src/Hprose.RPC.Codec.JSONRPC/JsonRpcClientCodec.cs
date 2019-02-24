@@ -8,7 +8,7 @@
 |                                                          |
 |  JsonRpcClientCodec class for C#.                        |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Feb 24, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -44,7 +44,7 @@ namespace Hprose.RPC.Codec.JSONRPC {
             var data = stream.GetArraySegment();
             var result = JsonConvert.DeserializeObject<JObject>(Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
             if ((result as IDictionary<string, JToken>).ContainsKey("result")) {
-                return result["result"].ToObject(context.Type ?? typeof(object));
+                return result["result"].ToObject(context.ReturnType ?? typeof(object));
             }
             if ((result as IDictionary<string, JToken>).ContainsKey("error")) {
                 var error = result["error"] as JObject;
