@@ -8,7 +8,7 @@
 |                                                          |
 |  ClientCodec class for C#.                               |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Feb 24, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -75,7 +75,7 @@ namespace Hprose.RPC {
                     if (responseHeaders.ContainsKey("simple") && (bool)responseHeaders["simple"]) {
                         reader.Simple = true;
                     }
-                    return reader.Deserialize(context.Type);
+                    return reader.Deserialize(context.ReturnType);
                 case Tags.TagError:
                     throw new Exception(reader.Deserialize<string>());
                 case Tags.TagEnd:
