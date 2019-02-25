@@ -303,9 +303,31 @@ namespace Hprose.UnitTests.RPC {
             server3.Close();
             server4.Close();
         }
-#if NETCOREAPP2_1 || NETCOREAPP2_2
         [TestMethod]
         public async Task Test9() {
+            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
+            TcpListener server = new TcpListener(iPAddress, 8426);
+            server.Start();
+            var service = new Service();
+            service.Add(
+                (ServiceContext context) =>
+                    (context.RemoteEndPoint as IPEndPoint).Address + ":" + (context.RemoteEndPoint as IPEndPoint).Port,
+                "getAddress"
+            );
+            service.Bind(server);
+            var client = new Client("tcp4://127.0.0.1:8426");
+            var log = new Log();
+            client.Use(log.IOHandler).Use(log.InvokeHandler);
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
+            await client.Abort();
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
+            server.Stop();
+        }
+#if NETCOREAPP2_1 || NETCOREAPP2_2
+        [TestMethod]
+        public async Task Test10() {
             if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
                 Socket server = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
                 server.Bind(new UnixDomainSocketEndPoint("/tmp/test"));
