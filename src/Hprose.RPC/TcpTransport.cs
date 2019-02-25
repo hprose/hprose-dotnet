@@ -231,7 +231,7 @@ namespace Hprose.RPC {
             Send(tcpClient, tcpStream);
             return await result.Task.ConfigureAwait(false);
         }
-        public async void Abort() {
+        public async Task Abort() {
             foreach (var LazyTcpClient in TcpClients.Values) {
                 try {
                     var (tcpClient, _) = await LazyTcpClient.Value.ConfigureAwait(false);
