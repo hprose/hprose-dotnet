@@ -8,7 +8,7 @@
 |                                                          |
 |  UdpTransport class for C#.                              |
 |                                                          |
-|  LastModified: Feb 23, 2019                              |
+|  LastModified: Feb 25, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -30,9 +30,9 @@ namespace Hprose.RPC {
         public bool EnableBroadcast { get; set; } = true;
         public short Ttl { get; set; } = 0;
 #endif
-        private ConcurrentDictionary<Uri, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<Uri, ConcurrentQueue<(int, MemoryStream)>>();
-        private ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
-        private ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Sended { get; } = new ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
+        private ConcurrentDictionary<UdpClient, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<UdpClient, ConcurrentQueue<(int, MemoryStream)>>();
+        private ConcurrentDictionary<UdpClient, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<UdpClient, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
+        private ConcurrentDictionary<UdpClient, byte> Lock { get; } = new ConcurrentDictionary<UdpClient, byte>();
         private ConcurrentDictionary<Uri, Lazy<UdpClient>> UdpClients { get; } = new ConcurrentDictionary<Uri, Lazy<UdpClient>>();
 #if !NET35_CF
         private readonly Func<Uri, Lazy<UdpClient>> udpClientFactory;
@@ -42,6 +42,7 @@ namespace Hprose.RPC {
         public UdpTransport() {
             udpClientFactory = (uri) => {
                 return new Lazy<UdpClient>(() => {
+                    UdpClient udpClient = null;
                     try {
                         var family = uri.Scheme.Last() == '6' ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
 #if NET35_CF || NET40 || NET45 || NET451 || NET452
@@ -51,51 +52,51 @@ namespace Hprose.RPC {
 #endif
                         var port = uri.Port > 0 ? uri.Port : 8412;
 #if !NET35_CF
-                        var client = new UdpClient(family) {
+                        udpClient = new UdpClient(family) {
                             EnableBroadcast = EnableBroadcast
                         };
                         if (Ttl > 0) {
-                            client.Ttl = Ttl;
+                            udpClient.Ttl = Ttl;
                         }
 #else
-                        var client = new UdpClient(family);
+                        udpClient = new UdpClient(family);
 #endif
-                        client.Connect(host, port);
-                        Receive(uri, client);
-                        return client;
+                        udpClient.Connect(host, port);
+                        Requests.TryAdd(udpClient, new ConcurrentQueue<(int, MemoryStream)>());
+                        Results.TryAdd(udpClient, new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());
+                        Receive(udpClient);
+                        return udpClient;
                     }
                     catch (Exception e) {
-                        var requests = Requests[uri];
-                        var sended = Sended[uri];
-                        var results = Results[uri];
-                        if (requests != null) {
-                            while (!requests.IsEmpty) {
-                                if (requests.TryDequeue(out (int index, MemoryStream stream) request)) {
-                                    if (sended.TryRemove(request.index, out var result)) {
-                                        result.TrySetException(e);
-                                    }
-                                    if (results.TryRemove(request.index, out result)) {
-                                        result.TrySetException(e);
-                                    }
-                                }
-                            }
+                        if (udpClient != null) {
+                            Close(udpClient, e);
                         }
                         throw;
                     }
                 });
             };
         }
-        public void Abort() {
-            foreach (var LazyUdpClient in UdpClients.Values) {
-                try {
-                    var udpClient = LazyUdpClient.Value;
-                    udpClient.Close();
+        private void Close(UdpClient udpClient, Exception e) {
+            try {
+                if (e.InnerException != null) {
+                    e = e.InnerException;
                 }
-                catch { }
+                Requests.TryRemove(udpClient, out var requests);
+                if (Results.TryRemove(udpClient, out var results)) {
+                    while (!results.IsEmpty) {
+                        foreach (var i in results.Keys) {
+                            if (results.TryRemove(i, out var result)) {
+                                result.TrySetException(e);
+                            }
+                        }
+                    }
+                }
+                udpClient.Close();
             }
+            catch { }
         }
-        private async void Receive(Uri uri, UdpClient udpClient) {
-            var sended = Sended[uri];
+        private async void Receive(UdpClient udpClient) {
+            var results = Results[udpClient];
             try {
                 while (true) {
                     var data = await udpClient.ReceiveAsync().ConfigureAwait(false);
@@ -109,7 +110,7 @@ namespace Hprose.RPC {
                     }
                     bool has_error = (index & 0x8000) != 0;
                     index &= 0x7FFF;
-                    if (sended.TryRemove(index, out var result)) {
+                    if (results.TryRemove(index, out var result)) {
                         if (has_error) {
                             result.TrySetException(new Exception(Encoding.UTF8.GetString(buffer, 8, length)));
                         }
@@ -118,81 +119,52 @@ namespace Hprose.RPC {
                 }
             }
             catch (Exception e) {
-                foreach (var index in sended.Keys) {
-                    if (sended.TryRemove(index, out var result)) {
-                        result.TrySetException(e);
-                    }
-                }
-                udpClient.Close();
+                Close(udpClient, e);
             }
         }
-        private async void Send(Uri uri, int index, MemoryStream stream) {
-            var n = (int)stream.Length;
-#if NET35_CF || NET40
-            var buffer = new byte[n + 8];
-#else
-            var buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(n + 8);
-#endif
-            UdpClient udpClient = null;
+        private async void Send(UdpClient udpClient) {
+            if (!Lock.TryAdd(udpClient, default)) return;
             try {
-                buffer[4] = (byte)(n >> 8 & 0xFF);
-                buffer[5] = (byte)(n & 0xFF);
-                buffer[6] = (byte)(index >> 8 & 0xFF);
-                buffer[7] = (byte)(index & 0xFF);
-                var crc32 = CRC32.Compute(buffer, 4, 4);
-                buffer[0] = (byte)(crc32 >> 24 & 0xFF);
-                buffer[1] = (byte)(crc32 >> 16 & 0xFF);
-                buffer[2] = (byte)(crc32 >> 8 & 0xFF);
-                buffer[3] = (byte)(crc32 & 0xFF);
-                stream.Read(buffer, 8, n);
-                udpClient = GetUdpClient(uri);
-                await udpClient.SendAsync(buffer, n + 8).ConfigureAwait(false);
-            }
-            catch (Exception e) {
-                var sended = Sended[uri];
-                foreach (var i in sended.Keys) {
-                    if (sended.TryRemove(i, out var value)) {
-                        value.TrySetException(e);
+                var requests = Requests[udpClient];
+                while (requests.TryDequeue(out var request)) {
+                    var (index, stream) = request;
+                    var n = (int)stream.Length;
+#if NET35_CF || NET40
+                    var buffer = new byte[n + 8];
+#else
+                    var buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(n + 8);
+#endif
+                    try {
+                        buffer[4] = (byte)(n >> 8 & 0xFF);
+                        buffer[5] = (byte)(n & 0xFF);
+                        buffer[6] = (byte)(index >> 8 & 0xFF);
+                        buffer[7] = (byte)(index & 0xFF);
+                        var crc32 = CRC32.Compute(buffer, 4, 4);
+                        buffer[0] = (byte)(crc32 >> 24 & 0xFF);
+                        buffer[1] = (byte)(crc32 >> 16 & 0xFF);
+                        buffer[2] = (byte)(crc32 >> 8 & 0xFF);
+                        buffer[3] = (byte)(crc32 & 0xFF);
+                        stream.Read(buffer, 8, n);
+                        await udpClient.SendAsync(buffer, n + 8).ConfigureAwait(false);
                     }
-                }
-                if (udpClient != null) {
-                    udpClient.Close();
+                    catch (Exception e) {
+                        Close(udpClient, e);
+                    }
+                    finally {
+                        stream.Dispose();
+#if !NET35_CF && !NET40
+                        System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
+#endif
+                    }
                 }
             }
             finally {
-                stream.Dispose();
-#if !NET35_CF && !NET40
-                System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
-#endif
-            }
-        }
-        private async void Send(Uri uri) {
-            var requests = Requests[uri];
-            var results = Results[uri];
-            var sended = Sended.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());
-            while (!requests.IsEmpty) {
-                requests.TryPeek(out (int index, MemoryStream stream) request);
-                var index = request.index;
-                if (results.TryGetValue(index, out var result)) {
-                    if (!(sended.TryAdd(index, result) && results.TryRemove(index, out result))) {
-#if NET40
-                        await TaskEx.Yield();
-#else
-                        await Task.Yield();
-#endif
-                        continue;
-                    }
-                }
-                else {
-                    return;
-                }
-                Send(uri, index, request.stream);
-                requests.TryDequeue(out request);
+                Lock.TryRemove(udpClient, out var _);
             }
         }
         private UdpClient GetUdpClient(Uri uri) {
             int retried = 0;
-            while(true) {
+            while (true) {
                 var LazyUdpClient = UdpClients.GetOrAdd(uri, udpClientFactory);
                 var udpClient = LazyUdpClient.Value;
                 try {
@@ -203,9 +175,9 @@ namespace Hprose.RPC {
 #endif
                     return udpClient;
                 }
-                catch {
+                catch (Exception e) {
                     UdpClients.TryRemove(uri, out LazyUdpClient);
-                    udpClient.Close();
+                    Close(udpClient, e);
                     if (++retried > 1) {
                         throw;
                     }
@@ -220,16 +192,21 @@ namespace Hprose.RPC {
             var clientContext = context as ClientContext;
             var uri = clientContext.Uri;
             var index = Interlocked.Increment(ref counter) & 0x7FFF;
-            var results = Results.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());
+            var udpClient = GetUdpClient(uri);
             var result = new TaskCompletionSource<MemoryStream>();
-            results[index] = result;
-            var requests = Requests.GetOrAdd(uri, (_) => new ConcurrentQueue<(int, MemoryStream)>());
-            requests.Enqueue((index, stream));
-            requests.TryPeek(out (int index, MemoryStream stream) first);
-            if (first.index == index) {
-                Send(uri);
-            }
+            Results[udpClient][index] = result;
+            Requests[udpClient].Enqueue((index, stream));
+            Send(udpClient);
             return await result.Task.ConfigureAwait(false);
+        }
+        public void Abort() {
+            foreach (var LazyUdpClient in UdpClients.Values) {
+                try {
+                    var udpClient = LazyUdpClient.Value;
+                    udpClient.Close();
+                }
+                catch { }
+            }
         }
     }
 }
