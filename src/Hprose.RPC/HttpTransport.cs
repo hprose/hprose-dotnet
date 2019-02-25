@@ -33,8 +33,15 @@ namespace Hprose.RPC {
             get => httpClient.MaxResponseContentBufferSize;
             set => httpClient.MaxResponseContentBufferSize = value;
         }
-        public void Abort() {
+        public Task Abort() {
             httpClient.CancelPendingRequests();
+#if NET40
+            return TaskEx.FromResult<object>(null);
+#elif NET45 || NET451 || NET452
+            return Task.FromResult<object>(null);
+#else
+            return Task.CompletedTask;
+#endif
         }
         public async Task<Stream> Transport(Stream request, Context context) {
             var clientContext = context as ClientContext;
