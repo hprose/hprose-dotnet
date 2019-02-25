@@ -199,7 +199,7 @@ namespace Hprose.RPC {
             Send(udpClient);
             return await result.Task.ConfigureAwait(false);
         }
-        public void Abort() {
+        public Task Abort() {
             foreach (var LazyUdpClient in UdpClients.Values) {
                 try {
                     var udpClient = LazyUdpClient.Value;
@@ -207,6 +207,13 @@ namespace Hprose.RPC {
                 }
                 catch { }
             }
+#if NET40
+            return TaskEx.FromResult<object>(null);
+#elif NET45 || NET451 || NET452
+            return Task.FromResult<object>(null);
+#else
+            return Task.CompletedTask;
+#endif
         }
     }
 }
