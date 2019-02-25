@@ -207,7 +207,7 @@ namespace Hprose.RPC {
             Send(webSocket);
             return await result.Task.ConfigureAwait(false);
         }
-        public async void Abort() {
+        public async Task Abort() {
             foreach (var LazyWebSocket in WebSockets.Values) {
                 try {
                     var webSocket = await LazyWebSocket.Value.ConfigureAwait(false);
