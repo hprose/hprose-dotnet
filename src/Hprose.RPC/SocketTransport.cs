@@ -8,7 +8,7 @@
 |                                                          |
 |  SocketTransport class for C#.                           |
 |                                                          |
-|  LastModified: Feb 23, 2019                              |
+|  LastModified: Feb 25, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -31,14 +31,15 @@ namespace Hprose.RPC {
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         public int ReceiveBufferSize { get; set; } = 8192;
         public int SendBufferSize { get; set; } = 8192;
-        private ConcurrentDictionary<Uri, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<Uri, ConcurrentQueue<(int, MemoryStream)>>();
-        private ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
-        private ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Sended { get; } = new ConcurrentDictionary<Uri, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
+        private ConcurrentDictionary<Socket, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<Socket, ConcurrentQueue<(int, MemoryStream)>>();
+        private ConcurrentDictionary<Socket, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<Socket, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
+        private ConcurrentDictionary<Socket, byte> Lock { get; } = new ConcurrentDictionary<Socket, byte>();
         private ConcurrentDictionary<Uri, Lazy<Task<Socket>>> Sockets { get; } = new ConcurrentDictionary<Uri, Lazy<Task<Socket>>>();
         private readonly Func<Uri, Lazy<Task<Socket>>> socketFactory;
         public SocketTransport() {
             socketFactory = (uri) => {
                 return new Lazy<Task<Socket>>(async () => {
+                    Socket socket = null;
                     try {
                         var family = uri.Scheme.Last() == '6' ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
                         var protocol = ProtocolType.Tcp;
@@ -46,7 +47,7 @@ namespace Hprose.RPC {
                             family = AddressFamily.Unix;
                             protocol = ProtocolType.Unspecified;
                         }
-                        var socket = new Socket(family, SocketType.Stream, protocol);
+                        socket = new Socket(family, SocketType.Stream, protocol);
                         if (family == AddressFamily.Unix) {
 #if NETCOREAPP2_1 || NETCOREAPP2_2
                             await socket.ConnectAsync(new UnixDomainSocketEndPoint(uri.AbsolutePath));
@@ -65,39 +66,39 @@ namespace Hprose.RPC {
                             }
                             await socket.ConnectAsync(host, port);
                         }
-                        Receive(uri, socket);
+                        Requests.TryAdd(socket, new ConcurrentQueue<(int, MemoryStream)>());
+                        Results.TryAdd(socket, new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());
+                        Receive(socket);
                         return socket;
                     }
                     catch (Exception e) {
-                        var requests = Requests[uri];
-                        var sended = Sended[uri];
-                        var results = Results[uri];
-                        if (requests != null) {
-                            while (!requests.IsEmpty) {
-                                if (requests.TryDequeue(out (int index, MemoryStream stream) request)) {
-                                    if (sended.TryRemove(request.index, out var result)) {
-                                        result.TrySetException(e);
-                                    }
-                                    if (results.TryRemove(request.index, out result)) {
-                                        result.TrySetException(e);
-                                    }
-                                }
-                            }
+                        if (socket != null) {
+                            Close(socket, e);
                         }
                         throw;
                     }
                 });
             };
         }
-        public async void Abort() {
-            foreach (var LazySocket in Sockets.Values) {
-                try {
-                    var socket = await LazySocket.Value.ConfigureAwait(false);
-                    socket.Shutdown(SocketShutdown.Both);
-                    socket.Close();
+        private void Close(Socket socket, Exception e) {
+            try {
+                if (e.InnerException != null) {
+                    e = e.InnerException;
                 }
-                catch { }
+                Requests.TryRemove(socket, out var requests);
+                if (Results.TryRemove(socket, out var results)) {
+                    while (!results.IsEmpty) {
+                        foreach (var i in results.Keys) {
+                            if (results.TryRemove(i, out var result)) {
+                                result.TrySetException(e);
+                            }
+                        }
+                    }
+                }
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Close();
             }
+            catch { }
         }
         private static async Task<byte[]> ReadAsync(Socket socket, byte[] bytes, int offset, int length) {
             while (length > 0) {
@@ -108,8 +109,8 @@ namespace Hprose.RPC {
             }
             return bytes;
         }
-        private async void Receive(Uri uri, Socket socket) {
-            var sended = Sended[uri];
+        private async void Receive(Socket socket) {
+            var results = Results[socket];
             var header = new byte[12];
             try {
                 while (true) {
@@ -123,7 +124,7 @@ namespace Hprose.RPC {
                     bool has_error = (index & 0x80000000) != 0;
                     index &= 0x7FFFFFFF;
                     var data = await ReadAsync(socket, new byte[length], 0, length).ConfigureAwait(false);
-                    if (sended.TryRemove(index, out var result)) {
+                    if (results.TryRemove(index, out var result)) {
                         if (has_error) {
                             result.TrySetException(new Exception(Encoding.UTF8.GetString(data)));
                             throw new IOException("connection closed");
@@ -133,85 +134,57 @@ namespace Hprose.RPC {
                 }
             }
             catch (Exception e) {
-                foreach (var index in sended.Keys) {
-                    if (sended.TryRemove(index, out var result)) {
-                        result.TrySetException(e);
-                    }
-                }
-                socket.Shutdown(SocketShutdown.Both);
-                socket.Close();
+                Close(socket, e);
             }
         }
-        private async Task Send(Uri uri, int index, MemoryStream stream) {
-            var header = new byte[12];
-            var n = (int)stream.Length;
-            header[4] = (byte)(n >> 24 & 0xFF | 0x80);
-            header[5] = (byte)(n >> 16 & 0xFF);
-            header[6] = (byte)(n >> 8 & 0xFF);
-            header[7] = (byte)(n & 0xFF);
-            header[8] = (byte)(index >> 24 & 0xFF);
-            header[9] = (byte)(index >> 16 & 0xFF);
-            header[10] = (byte)(index >> 8 & 0xFF);
-            header[11] = (byte)(index & 0xFF);
-            var crc32 = CRC32.Compute(header, 4, 8);
-            header[0] = (byte)(crc32 >> 24 & 0xFF);
-            header[1] = (byte)(crc32 >> 16 & 0xFF);
-            header[2] = (byte)(crc32 >> 8 & 0xFF);
-            header[3] = (byte)(crc32 & 0xFF);
-            Socket socket = null;
+        private async void Send(Socket socket) {
+            if (!Lock.TryAdd(socket, default)) return;
             try {
-                socket = await GetSocket(uri).ConfigureAwait(false);
-                await socket.SendAsync(new ArraySegment<byte>[] { new ArraySegment<byte>(header), stream.GetArraySegment() }, SocketFlags.None).ConfigureAwait(false);
-            }
-            catch (Exception e) {
-                var sended = Sended[uri];
-                foreach (var i in sended.Keys) {
-                    if (sended.TryRemove(i, out var value)) {
-                        value.TrySetException(e);
+                var requests = Requests[socket];
+                var header = new byte[12];
+                while (requests.TryDequeue(out var request)) {
+                    var (index, stream) = request;
+                    var n = (int)stream.Length;
+                    header[4] = (byte)(n >> 24 & 0xFF | 0x80);
+                    header[5] = (byte)(n >> 16 & 0xFF);
+                    header[6] = (byte)(n >> 8 & 0xFF);
+                    header[7] = (byte)(n & 0xFF);
+                    header[8] = (byte)(index >> 24 & 0xFF);
+                    header[9] = (byte)(index >> 16 & 0xFF);
+                    header[10] = (byte)(index >> 8 & 0xFF);
+                    header[11] = (byte)(index & 0xFF);
+                    var crc32 = CRC32.Compute(header, 4, 8);
+                    header[0] = (byte)(crc32 >> 24 & 0xFF);
+                    header[1] = (byte)(crc32 >> 16 & 0xFF);
+                    header[2] = (byte)(crc32 >> 8 & 0xFF);
+                    header[3] = (byte)(crc32 & 0xFF);
+                    try {
+                        await socket.SendAsync(new ArraySegment<byte>[] { new ArraySegment<byte>(header), stream.GetArraySegment() }, SocketFlags.None).ConfigureAwait(false);
                     }
-                }
-                if (socket != null) {
-                    socket.Shutdown(SocketShutdown.Both);
-                    socket.Close();
+                    catch (Exception e) {
+                        Close(socket, e);
+                    }
+                    finally {
+                        stream.Dispose();
+                    }
                 }
             }
             finally {
-                stream.Dispose();
-            }
-        }
-        private async void Send(Uri uri) {
-            var requests = Requests[uri];
-            var results = Results[uri];
-            var sended = Sended.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());
-            while (!requests.IsEmpty) {
-                requests.TryPeek(out (int index, MemoryStream stream) request);
-                var index = request.index;
-                if (results.TryGetValue(index, out var result)) {
-                    if (!(sended.TryAdd(index, result) && results.TryRemove(index, out result))) {
-                        await Task.Yield();
-                        continue;
-                    }
-                }
-                else {
-                    return;
-                }
-                await Send(uri, index, request.stream).ConfigureAwait(false);
-                requests.TryDequeue(out request);
+                Lock.TryRemove(socket, out var _);
             }
         }
         private async Task<Socket> GetSocket(Uri uri) {
             int retried = 0;
-            while(true) {
+            while (true) {
                 var LazySocket = Sockets.GetOrAdd(uri, socketFactory);
                 var socket = await LazySocket.Value.ConfigureAwait(false);
                 try {
                     var available = socket.Available;
                     return socket;
                 }
-                catch {
+                catch (Exception e) {
                     Sockets.TryRemove(uri, out LazySocket);
-                    socket.Shutdown(SocketShutdown.Both);
-                    socket.Close();
+                    Close(socket, e);
                     if (++retried > 1) {
                         throw;
                     }
@@ -223,16 +196,24 @@ namespace Hprose.RPC {
             var clientContext = context as ClientContext;
             var uri = clientContext.Uri;
             var index = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
-            var results = Results.GetOrAdd(uri, (_) => new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());
+            var socket = await GetSocket(uri).ConfigureAwait(false);
+            var results = Results[socket];
             var result = new TaskCompletionSource<MemoryStream>();
             results[index] = result;
-            var requests = Requests.GetOrAdd(uri, (_) => new ConcurrentQueue<(int, MemoryStream)>());
+            var requests = Requests[socket];
             requests.Enqueue((index, stream));
-            requests.TryPeek(out (int index, MemoryStream stream) first);
-            if (first.index == index) {
-                Send(uri);
-            }
+            Send(socket);
             return await result.Task.ConfigureAwait(false);
+        }
+        public async void Abort() {
+            foreach (var LazySocket in Sockets.Values) {
+                try {
+                    var socket = await LazySocket.Value.ConfigureAwait(false);
+                    socket.Shutdown(SocketShutdown.Both);
+                    socket.Close();
+                }
+                catch { }
+            }
         }
     }
 }
