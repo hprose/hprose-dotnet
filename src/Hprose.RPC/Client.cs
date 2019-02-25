@@ -23,10 +23,11 @@ using System.Threading.Tasks;
 namespace Hprose.RPC {
     public interface ITransport {
         Task<Stream> Transport(Stream request, Context context);
-        void Abort();
+        Task Abort();
     }
 
     public class Client : IDisposable {
+        private static readonly object[] emptyArgs = new object[0];
         private static readonly Random random = new Random(Guid.NewGuid().GetHashCode());
         private static readonly List<(string, Type)> transTypes = new List<(string, Type)>();
         private static readonly Dictionary<string, string> schemes = new Dictionary<string, string>();
@@ -144,6 +145,7 @@ namespace Hprose.RPC {
             return InvokeAsync<object>(fullname, args, context);
         }
         public async Task<T> InvokeAsync<T>(string fullname, object[] args = null, ClientContext context = null) {
+            if (args == null) args = emptyArgs;
             if (context == null) context = new ClientContext();
             context.Init(this, typeof(T));
             var task = invokeManager.Handler(fullname, args, context);
@@ -167,9 +169,9 @@ namespace Hprose.RPC {
             }
             throw new NotSupportedException("The protocol " + scheme + " is not supported.");
         }
-        public void Abort() {
+        public async Task Abort() {
             foreach (var pair in transports) {
-                pair.Value.Abort();
+                await pair.Value.Abort();
             }
         }
         private bool disposed = false;
