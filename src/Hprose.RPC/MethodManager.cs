@@ -8,7 +8,7 @@
 |                                                          |
 |  MethodManager class for C#.                             |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Feb 25, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -236,7 +236,7 @@ namespace Hprose.RPC {
             var methodInfos = target.GetType().GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Instance);
 #endif
             foreach (var methodInfo in methodInfos) {
-                if (Array.IndexOf(instanceMethodsOnObject, methodInfo.Name) != -1) {
+                if (Array.IndexOf(instanceMethodsOnObject, methodInfo.Name) == -1) {
                     var fullname = methodInfo.Name;
                     if (!string.IsNullOrEmpty(ns)) {
                         fullname = ns + "_" + fullname;
@@ -252,7 +252,7 @@ namespace Hprose.RPC {
             var methodInfos = type.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Static);
 #endif
             foreach (var methodInfo in methodInfos) {
-                if (Array.IndexOf(staticMethodsOnObject, methodInfo.Name) != -1) {
+                if (Array.IndexOf(staticMethodsOnObject, methodInfo.Name) == -1) {
                     var fullname = methodInfo.Name;
                     if (!string.IsNullOrEmpty(ns)) {
                         fullname = ns + "_" + fullname;
