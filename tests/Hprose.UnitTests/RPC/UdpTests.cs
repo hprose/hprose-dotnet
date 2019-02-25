@@ -232,5 +232,25 @@ namespace Hprose.UnitTests.RPC {
             server3.Close();
             server4.Close();
         }
+        [TestMethod]
+        public async Task Test8() {
+            UdpClient server = new UdpClient(8422);
+            var service = new Service();
+            service.Add(
+                (ServiceContext context) =>
+                    (context.RemoteEndPoint as IPEndPoint).Address + ":" + (context.RemoteEndPoint as IPEndPoint).Port,
+                "getAddress"
+            );
+            service.Bind(server);
+            var client = new Client("udp4://127.0.0.1:8422");
+            var log = new Log();
+            client.Use(log.IOHandler).Use(log.InvokeHandler);
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
+            await client.Abort();
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
+            server.Close();
+        }
     }
 }
