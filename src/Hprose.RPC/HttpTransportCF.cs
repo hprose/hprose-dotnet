@@ -38,12 +38,13 @@ namespace Hprose.RPC {
         public string ConnectionGroupName { get; set; } = null;
         public X509CertificateCollection ClientCertificates { get; set; } = null;
         public ConcurrentDictionary<WebRequest, WebResponse> requests = new ConcurrentDictionary<WebRequest, WebResponse>();
-        public void Abort() {
+        public Task Abort() {
             foreach (var request in requests) {
                 request.Key.Abort();
                 request.Value?.Close();
             }
             requests.Clear();
+            return Task.CompletedTask;
         }
         public async Task<Stream> Transport(Stream request, Context context) {
             Uri uri = (context as ClientContext).Uri;
