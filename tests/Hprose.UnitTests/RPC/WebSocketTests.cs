@@ -228,5 +228,27 @@ namespace Hprose.UnitTests.RPC {
             }
             server.Stop();
         }
+        [TestMethod]
+        public async Task Test8() {
+            HttpListener server = new HttpListener();
+            server.Prefixes.Add("http://127.0.0.1:8090/");
+            server.Start();
+            var service = new Service();
+            service.Add(
+                (ServiceContext context) =>
+                    (context.RemoteEndPoint as IPEndPoint).Address + ":" + (context.RemoteEndPoint as IPEndPoint).Port,
+                "getAddress"
+            );
+            service.Bind(server);
+            var client = new Client("ws://127.0.0.1:8090/");
+            var log = new Log();
+            client.Use(log.IOHandler).Use(log.InvokeHandler);
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
+            await client.Abort();
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
+            server.Stop();
+        }
     }
 }
