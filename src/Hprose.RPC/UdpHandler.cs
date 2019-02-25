@@ -8,7 +8,7 @@
 |                                                          |
 |  UdpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Feb 25, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -32,33 +32,6 @@ namespace Hprose.RPC {
         public async Task Bind(UdpClient server) {
             await Handler(server).ConfigureAwait(false);
         }
-        private static async void Send(UdpClient udpClient, int index, MemoryStream stream, IPEndPoint endPoint) {
-            var n = (int)stream.Length;
-#if NET35_CF || NET40
-            var buffer = new byte[n + 8];
-#else
-            var buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(n + 8);
-#endif
-            try {
-                buffer[4] = (byte)(n >> 8 & 0xFF);
-                buffer[5] = (byte)(n & 0xFF);
-                buffer[6] = (byte)(index >> 8 & 0xFF);
-                buffer[7] = (byte)(index & 0xFF);
-                var crc32 = CRC32.Compute(buffer, 4, 4);
-                buffer[0] = (byte)(crc32 >> 24 & 0xFF);
-                buffer[1] = (byte)(crc32 >> 16 & 0xFF);
-                buffer[2] = (byte)(crc32 >> 8 & 0xFF);
-                buffer[3] = (byte)(crc32 & 0xFF);
-                stream.Read(buffer, 8, n);
-                await udpClient.SendAsync(buffer, n + 8, endPoint).ConfigureAwait(false);
-            }
-            finally {
-                stream.Dispose();
-#if !NET35_CF && !NET40
-                System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
-#endif
-            }
-        }
         private static async Task Send(UdpClient udpClient, ConcurrentQueue<(int index, MemoryStream stream, IPEndPoint endPoint)> responses) {
             while (true) {
                 (int index, MemoryStream stream, IPEndPoint endPoint) response;
@@ -69,7 +42,32 @@ namespace Hprose.RPC {
                     await Task.Yield();
 #endif
                 }
-                Send(udpClient, response.index, response.stream, response.endPoint);
+                var (index, stream, endPoint) = response;
+                var n = (int)stream.Length;
+#if NET35_CF || NET40
+            var buffer = new byte[n + 8];
+#else
+                var buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(n + 8);
+#endif
+                try {
+                    buffer[4] = (byte)(n >> 8 & 0xFF);
+                    buffer[5] = (byte)(n & 0xFF);
+                    buffer[6] = (byte)(index >> 8 & 0xFF);
+                    buffer[7] = (byte)(index & 0xFF);
+                    var crc32 = CRC32.Compute(buffer, 4, 4);
+                    buffer[0] = (byte)(crc32 >> 24 & 0xFF);
+                    buffer[1] = (byte)(crc32 >> 16 & 0xFF);
+                    buffer[2] = (byte)(crc32 >> 8 & 0xFF);
+                    buffer[3] = (byte)(crc32 & 0xFF);
+                    stream.Read(buffer, 8, n);
+                    await udpClient.SendAsync(buffer, n + 8, endPoint).ConfigureAwait(false);
+                }
+                finally {
+                    stream.Dispose();
+#if !NET35_CF && !NET40
+                    System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
+#endif
+                }
             }
         }
         public async void Process(UdpClient udpClient, UdpReceiveResult result, ConcurrentQueue<(int index, MemoryStream stream, IPEndPoint endPoint)> responses) {
@@ -108,10 +106,10 @@ namespace Hprose.RPC {
             }
         }
         private async Task Handler(UdpClient udpClient) {
-            var responses = new ConcurrentQueue<(int index, MemoryStream stream, IPEndPoint endPoint)>();
-            var receive = Receive(udpClient, responses);
-            var send = Send(udpClient, responses);
             try {
+                var responses = new ConcurrentQueue<(int index, MemoryStream stream, IPEndPoint endPoint)>();
+                var receive = Receive(udpClient, responses);
+                var send = Send(udpClient, responses);
                 await receive.ConfigureAwait(false);
                 await send.ConfigureAwait(false);
             }
