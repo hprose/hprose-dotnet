@@ -8,7 +8,7 @@
 |                                                          |
 |  Caller class for C#.                                    |
 |                                                          |
-|  LastModified: Feb 24, 2019                              |
+|  LastModified: Feb 25, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.Reverse {
     public class Caller {
+        private static readonly object[] emptyArgs = new object[0];
         private static readonly (int, string, object[])[] emptyCall = new (int, string, object[])[0];
         private volatile int counter = 0;
         private ConcurrentDictionary<string, ConcurrentQueue<(int, string, object[])>> Calls { get; } = new ConcurrentDictionary<string, ConcurrentQueue<(int, string, object[])>>();
@@ -123,6 +124,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             var index = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
             var result = new TaskCompletionSource<object>();
             var calls = Calls.GetOrAdd(id, (_) => new ConcurrentQueue<(int, string, object[])>());
+            if (args == null) args = emptyArgs;
             calls.Enqueue((index, fullname, args));
             var results = Results.GetOrAdd(id, (_) => new ConcurrentDictionary<int, TaskCompletionSource<object>>());
             results[index] = result;
