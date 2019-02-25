@@ -205,7 +205,7 @@ namespace Hprose.RPC {
             Send(socket);
             return await result.Task.ConfigureAwait(false);
         }
-        public async void Abort() {
+        public async Task Abort() {
             foreach (var LazySocket in Sockets.Values) {
                 try {
                     var socket = await LazySocket.Value.ConfigureAwait(false);
