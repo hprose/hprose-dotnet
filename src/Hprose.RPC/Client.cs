@@ -170,9 +170,16 @@ namespace Hprose.RPC {
             throw new NotSupportedException("The protocol " + scheme + " is not supported.");
         }
         public async Task Abort() {
+            var tasks = new Task[transports.Count];
+            var i = 0;
             foreach (var pair in transports) {
-                await pair.Value.Abort();
+                tasks[i++] = pair.Value.Abort();
             }
+#if NET40
+            await TaskEx.WhenAll(tasks);
+#else
+            await Task.WhenAll(tasks);
+#endif
         }
         private bool disposed = false;
         public void Dispose() {
