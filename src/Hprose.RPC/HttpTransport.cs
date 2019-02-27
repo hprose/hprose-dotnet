@@ -26,6 +26,9 @@ namespace Hprose.RPC {
         public static string[] Schemes { get; } = new string[] { "http", "https" };
         private readonly HttpClient httpClient = new HttpClient();
         public HttpRequestHeaders HttpRequestHeaders => httpClient.DefaultRequestHeaders;
+        public HttpTransport() {
+            httpClient.Timeout = new TimeSpan(0, 0, 0, 0, Timeout.Infinite);
+        }
         public long MaxResponseContentBufferSize {
             get => httpClient.MaxResponseContentBufferSize;
             set => httpClient.MaxResponseContentBufferSize = value;
