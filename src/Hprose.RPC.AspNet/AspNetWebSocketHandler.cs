@@ -8,7 +8,7 @@
 |                                                          |
 |  AspNetWebSocketHandler class for C#.                    |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Feb 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -92,13 +92,13 @@ namespace Hprose.RPC.AspNet {
                     }
                     if (stream.Length > Service.MaxRequestLength) {
                         var data = stream.GetArraySegment();
-                        var bytes = Encoding.UTF8.GetBytes("request too long");
+                        var bytes = Encoding.UTF8.GetBytes("Request entity too large");
                         responses.Enqueue(((int)(index | 0x80000000), new MemoryStream(bytes, 0, bytes.Length, false, true)));
                         return (index, null);
                     }
                     if (result.EndOfMessage) {
                         if (index < 0) {
-                            throw new IOException("invalid request");
+                            throw new IOException("Invalid request");
                         }
                         stream.Position = 0;
                         return (index, stream);
