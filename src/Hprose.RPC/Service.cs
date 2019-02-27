@@ -35,11 +35,7 @@ namespace Hprose.RPC {
             serverTypes[typeof(S)] = name;
         }
         static Service() {
-            Register<TcpHandler, TcpListener>("tcp");
-            Register<UdpHandler, UdpClient>("udp");
-#if !NET35_CF && !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
-            Register<SocketHandler, Socket>("socket");
-#endif
+            Register<MockHandler, MockServer>("mock");
 #if !NET35_CF
 #if !NET40
             Register<WebSocketHandler, HttpListener>("http");
@@ -47,7 +43,13 @@ namespace Hprose.RPC {
             Register<HttpHandler, HttpListener>("http");
 #endif
 #endif
+            Register<TcpHandler, TcpListener>("tcp");
+            Register<UdpHandler, UdpClient>("udp");
+#if !NET35_CF && !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
+            Register<SocketHandler, Socket>("socket");
+#endif
         }
+        public MockHandler Mock => (MockHandler)this["mock"];
 #if !NET35_CF
 #if !NET40
         public WebSocketHandler Http => (WebSocketHandler)this["http"];

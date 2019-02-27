@@ -40,6 +40,7 @@ namespace Hprose.RPC {
             }
         }
         static Client() {
+            Register<MockTransport>("mock");
             Register<HttpTransport>("http");
             Register<TcpTransport>("tcp");
             Register<UdpTransport>("udp");
@@ -50,6 +51,7 @@ namespace Hprose.RPC {
             Register<WebSocketTransport>("websocket");
 #endif
         }
+        public MockTransport Mock => (MockTransport)this["mock"];
         public HttpTransport Http => (HttpTransport)this["http"];
         public TcpTransport Tcp => (TcpTransport)this["tcp"];
         public UdpTransport Udp => (UdpTransport)this["udp"];

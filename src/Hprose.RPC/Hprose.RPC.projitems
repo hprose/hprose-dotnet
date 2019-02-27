@@ -14,6 +14,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)CRC32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HandlerManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpTransportCF.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MockTransport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MockEndPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MockHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MockAgent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NetExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WebSocketHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StreamExtensions.cs" />
