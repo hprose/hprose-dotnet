@@ -8,7 +8,7 @@
 |                                                          |
 |  WebSocketTransport class for C#.                        |
 |                                                          |
-|  LastModified: Feb 25, 2019                              |
+|  LastModified: Feb 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -196,15 +196,26 @@ namespace Hprose.RPC {
         }
         public async Task<Stream> Transport(Stream request, Context context) {
             var stream = await request.ToMemoryStream().ConfigureAwait(false);
-            var uri = (context as ClientContext).Uri;
+            var clientContext = context as ClientContext;
             var index = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
-            var webSocket = await GetWebSocket(uri).ConfigureAwait(false);
+            var webSocket = await GetWebSocket(clientContext.Uri).ConfigureAwait(false);
             var results = Results[webSocket];
             var result = new TaskCompletionSource<MemoryStream>();
             results[index] = result;
             var requests = Requests[webSocket];
             requests.Enqueue((index, stream));
             Send(webSocket);
+            var timeout = clientContext.Timeout;
+            if (timeout > TimeSpan.Zero) {
+                using (CancellationTokenSource source = new CancellationTokenSource()) {
+                    var timer = Task.Delay(timeout, source.Token);
+                    var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
+                    source.Cancel();
+                    if (task == timer) {
+                        Close(webSocket, new TimeoutException());
+                    }
+                }
+            }
             return await result.Task.ConfigureAwait(false);
         }
         public async Task Abort() {

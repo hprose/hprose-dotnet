@@ -8,7 +8,7 @@
 |                                                          |
 |  SocketTransport class for C#.                           |
 |                                                          |
-|  LastModified: Feb 25, 2019                              |
+|  LastModified: Feb 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -28,7 +28,6 @@ namespace Hprose.RPC {
         private volatile int counter = 0;
         public LingerOption LingerState { get; set; } = null;
         public bool NoDelay { get; set; } = true;
-        public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         public int ReceiveBufferSize { get; set; } = 8192;
         public int SendBufferSize { get; set; } = 8192;
         private ConcurrentDictionary<Socket, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<Socket, ConcurrentQueue<(int, MemoryStream)>>();
@@ -194,15 +193,25 @@ namespace Hprose.RPC {
         public async Task<Stream> Transport(Stream request, Context context) {
             var stream = await request.ToMemoryStream().ConfigureAwait(false);
             var clientContext = context as ClientContext;
-            var uri = clientContext.Uri;
             var index = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
-            var socket = await GetSocket(uri).ConfigureAwait(false);
+            var socket = await GetSocket(clientContext.Uri).ConfigureAwait(false);
             var results = Results[socket];
             var result = new TaskCompletionSource<MemoryStream>();
             results[index] = result;
             var requests = Requests[socket];
             requests.Enqueue((index, stream));
             Send(socket);
+            var timeout = clientContext.Timeout;
+            if (timeout > TimeSpan.Zero) {
+                using (CancellationTokenSource source = new CancellationTokenSource()) {
+                    var timer = Task.Delay(timeout, source.Token);
+                    var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
+                    source.Cancel();
+                    if (task == timer) {
+                        Close(socket, new TimeoutException());
+                    }
+                }
+            }
             return await result.Task.ConfigureAwait(false);
         }
         public async Task Abort() {

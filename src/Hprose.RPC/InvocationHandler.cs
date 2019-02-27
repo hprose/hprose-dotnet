@@ -8,7 +8,7 @@
 |                                                          |
 |  InvocationHandler class for C#.                         |
 |                                                          |
-|  LastModified: Feb 24, 2019                              |
+|  LastModified: Feb 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -114,6 +114,11 @@ namespace Hprose.RPC {
                             if (context == null) context = new ClientContext();
                             var (key, value) = contextAttr.Value;
                             context[key] = value;
+                        }
+                        break;
+                    case TimeoutAttribute timeoutAttr: {
+                            if (context == null) context = new ClientContext();
+                            context.Timeout = timeoutAttr.Value;
                         }
                         break;
                 }

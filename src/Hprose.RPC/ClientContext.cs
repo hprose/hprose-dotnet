@@ -8,7 +8,7 @@
 |                                                          |
 |  ClientContext class for C#.                             |
 |                                                          |
-|  LastModified: Feb 24, 2019                              |
+|  LastModified: Feb 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -21,12 +21,14 @@ namespace Hprose.RPC {
         public Client Client { get; private set; }
         public Uri Uri { get; set; }
         public Type ReturnType { get; set; }
+        public TimeSpan Timeout { get; set; }
         public IDictionary<string, object> RequestHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public IDictionary<string, object> ResponseHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public void Init(Client client, Type returnType) {
             Client = client;
-            Uri = (client.Uris.Count > 0) ? client.Uris[0] : null;
-            ReturnType = returnType;
+            if (client.Uris.Count > 0) Uri = client.Uris[0];
+            if (ReturnType == null) ReturnType = returnType;
+            if (Timeout == default) Timeout = client.Timeout;
             Copy(client.RequestHeaders, RequestHeaders);
         }
         public override object Clone() {

@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpTransport class for C#.                             |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Feb 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -18,6 +18,7 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC {
@@ -25,10 +26,6 @@ namespace Hprose.RPC {
         public static string[] Schemes { get; } = new string[] { "http", "https" };
         private readonly HttpClient httpClient = new HttpClient();
         public HttpRequestHeaders HttpRequestHeaders => httpClient.DefaultRequestHeaders;
-        public TimeSpan Timeout {
-            get => httpClient.Timeout;
-            set => httpClient.Timeout = value;
-        }
         public long MaxResponseContentBufferSize {
             get => httpClient.MaxResponseContentBufferSize;
             set => httpClient.MaxResponseContentBufferSize = value;
@@ -55,7 +52,28 @@ namespace Hprose.RPC {
                 if (request.CanSeek) {
                     httpContext.Headers.ContentLength = request.Length;
                 }
-                var response = await httpClient.PostAsync(clientContext.Uri, httpContext).ConfigureAwait(false);
+                HttpResponseMessage response;
+                var timeout = clientContext.Timeout;
+                if (timeout > TimeSpan.Zero) {
+                    using (CancellationTokenSource source = new CancellationTokenSource()) {
+                        var responseTask = httpClient.PostAsync(clientContext.Uri, httpContext, source.Token);
+#if NET40
+                        var timer = TaskEx.Delay(timeout, source.Token);
+                        var task = await TaskEx.WhenAny(timer, responseTask).ConfigureAwait(false);
+#else
+                        var timer = Task.Delay(timeout, source.Token);
+                        var task = await Task.WhenAny(timer, responseTask).ConfigureAwait(false);
+#endif
+                        source.Cancel();
+                        if (task == timer) {
+                            throw new TimeoutException();
+                        }
+                        response = await responseTask.ConfigureAwait(false);
+                    }
+                }
+                else {
+                    response = await httpClient.PostAsync(clientContext.Uri, httpContext).ConfigureAwait(false);
+                }
                 if (response.IsSuccessStatusCode) {
                     context["httpResponseHeaders"] = response.Headers;
                     return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);

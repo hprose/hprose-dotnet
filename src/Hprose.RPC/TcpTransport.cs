@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpTransport class for C#.                              |
 |                                                          |
-|  LastModified: Feb 25, 2019                              |
+|  LastModified: Feb 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -222,13 +222,28 @@ namespace Hprose.RPC {
         public async Task<Stream> Transport(Stream request, Context context) {
             var stream = await request.ToMemoryStream().ConfigureAwait(false);
             var clientContext = context as ClientContext;
-            var uri = clientContext.Uri;
             var index = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
-            var (tcpClient, tcpStream) = await GetTcpClient(uri).ConfigureAwait(false);
+            var (tcpClient, tcpStream) = await GetTcpClient(clientContext.Uri).ConfigureAwait(false);
             var result = new TaskCompletionSource<MemoryStream>();
             Results[tcpClient][index] = result;
             Requests[tcpClient].Enqueue((index, stream));
             Send(tcpClient, tcpStream);
+            var timeout = clientContext.Timeout;
+            if (timeout > TimeSpan.Zero) {
+                using (CancellationTokenSource source = new CancellationTokenSource()) {
+#if NET40
+                   var timer = TaskEx.Delay(timeout, source.Token);
+                   var task = await TaskEx.WhenAny(timer, result.Task).ConfigureAwait(false);
+#else
+                    var timer = Task.Delay(timeout, source.Token);
+                    var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
+#endif
+                    source.Cancel();
+                    if (task == timer) {
+                        Close(tcpClient, new TimeoutException());
+                    }
+                }
+            }
             return await result.Task.ConfigureAwait(false);
         }
         public async Task Abort() {

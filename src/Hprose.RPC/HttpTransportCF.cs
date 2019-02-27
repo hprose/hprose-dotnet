@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpTransport class for .NET CF.                        |
 |                                                          |
-|  LastModified: Feb 23, 2019                              |
+|  LastModified: Feb 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -29,7 +29,6 @@ namespace Hprose.RPC {
         private static readonly CookieManager globalCookieManager = new CookieManager();
         private readonly CookieManager cookieManager = DisableGlobalCookie ? new CookieManager() : globalCookieManager;
         public Dictionary<string, string> Headers { get; }= new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
-        public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         public ICredentials Credentials { get; set; } = null;
         public bool KeepAlive { get; set; } = true;
         public int KeepAliveTimeout { get; set; } = 300;
@@ -47,19 +46,21 @@ namespace Hprose.RPC {
             return Task.CompletedTask;
         }
         public async Task<Stream> Transport(Stream request, Context context) {
-            Uri uri = (context as ClientContext).Uri;
+            var clientContext = context as ClientContext;
+            var uri = clientContext.Uri;
+            var timeout = (int)clientContext.Timeout.TotalMilliseconds;
             var webRequest = WebRequest.Create(uri) as HttpWebRequest;
             requests[webRequest] = null;
             try {
                 webRequest.Method = "POST";
                 webRequest.ContentType = "application/hprose";
                 webRequest.Credentials = Credentials;
-                webRequest.Timeout = (int)Timeout.TotalMilliseconds;
+                webRequest.Timeout = timeout;
                 webRequest.SendChunked = false;
                 if (AcceptEncoding != null) {
                     webRequest.Headers.Set("Accept-Encoding", AcceptEncoding);
                 }
-                webRequest.ReadWriteTimeout = (int)Timeout.TotalMilliseconds;
+                webRequest.ReadWriteTimeout = timeout;
                 webRequest.ProtocolVersion = HttpVersion.Version11;
                 if (Proxy != null) {
                     webRequest.Proxy = Proxy;

@@ -8,7 +8,7 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Feb 24, 2019                              |
+|  LastModified: Feb 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -74,6 +74,7 @@ namespace Hprose.RPC {
                 }
             }
         }
+        public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         private readonly InvokeManager invokeManager;
         private readonly IOManager ioManager;
         public Client() {
