@@ -310,8 +310,7 @@ namespace Hprose.UnitTests.RPC {
             server.Start();
             var service = new Service();
             service.Add(
-                (ServiceContext context) =>
-                    (context.RemoteEndPoint as IPEndPoint).Address + ":" + (context.RemoteEndPoint as IPEndPoint).Port,
+                (ServiceContext context) => context.RemoteEndPoint.ToString(),
                 "getAddress"
             );
             service.Bind(server);
@@ -328,7 +327,7 @@ namespace Hprose.UnitTests.RPC {
 #if NETCOREAPP2_1 || NETCOREAPP2_2
         [TestMethod]
         public async Task Test10() {
-            if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
                 Socket server = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
                 server.Bind(new UnixDomainSocketEndPoint("/tmp/test"));
                 server.Listen(128);
