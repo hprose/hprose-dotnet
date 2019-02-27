@@ -20,13 +20,9 @@ using System.Threading.Tasks;
 namespace Hprose.RPC {
 
     public class MockServer {
-        public Func<string, Stream, Task<Stream>> Handler { get; set; }
         public string Address { get; private set; }
         public MockServer(string address) {
             Address = address;
-        }
-        public void Listen() {
-            MockAgent.Register(Address, Handler);
         }
         public void Close() {
             MockAgent.Cancel(Address);
@@ -39,7 +35,7 @@ namespace Hprose.RPC {
             Service = service;
         }
         public Task Bind(MockServer server) {
-            server.Handler = Handler;
+            MockAgent.Register(server.Address, Handler);
 #if NET40
             return TaskEx.FromResult<object>(null);
 #elif NET45 || NET451 || NET452

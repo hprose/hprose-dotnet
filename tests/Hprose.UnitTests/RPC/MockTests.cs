@@ -34,7 +34,6 @@ namespace Hprose.UnitTests.RPC {
                    .Add<int, int, Task<int>>(Sum)
                    .Add(() => { return "good"; }, "Good")
                    .Bind(server);
-            server.Listen();
             var client = new Client("mock://test1");
             var result = await client.InvokeAsync<string>("hello", new object[] { "world" });
             Assert.AreEqual("Hello world", result);
@@ -58,7 +57,6 @@ namespace Hprose.UnitTests.RPC {
                    .AddMethod("Sum", this)
                    .Add<string>(OnewayCall)
                    .Bind(server);
-            server.Listen();
             var client = new Client("mock://test2");
             var log = new Log();
             client.Use(log.IOHandler).Use(log.InvokeHandler);
@@ -78,7 +76,6 @@ namespace Hprose.UnitTests.RPC {
             service.Use(Log.IOHandler)
                    .Use(Log.InvokeHandler)
                    .Bind(server);
-            server.Listen();
             var client1 = new Client("mock://test3");
             var prosumer1 = new Prosumer(client1, "1") {
                 OnSubscribe = (topic) => {
@@ -115,7 +112,6 @@ namespace Hprose.UnitTests.RPC {
             MockServer server = new MockServer("127.0.0.1");
             var service = new Service();
             service.AddMissingMethod(Missing).Bind(server);
-            server.Listen();
             var client = new Client("mock://127.0.0.1");
             var log = new Log();
             client.Use(log.IOHandler).Use(log.InvokeHandler);
@@ -136,8 +132,6 @@ namespace Hprose.UnitTests.RPC {
                 .Use(log.IOHandler);
             var caller = new Caller(service);
             service.Bind(server);
-            server.Listen();
-
             var client = new Client("mock://test5");
             var provider = new Provider(client, "1") {
                 Debug = true
@@ -174,7 +168,6 @@ namespace Hprose.UnitTests.RPC {
                    .AddMethod("Sum", this)
                    .Add<string>(OnewayCall)
                    .Bind(server);
-            server.Listen();
             var client = new Client("mock://test6") {
                 Codec = JsonRpcClientCodec.Instance
             };
@@ -202,10 +195,6 @@ namespace Hprose.UnitTests.RPC {
                    .Bind(server2)
                    .Bind(server3)
                    .Bind(server4);
-            server1.Listen();
-            server2.Listen();
-            server3.Listen();
-            server4.Listen();
 
             var client = new Client(/* "mock://testlb1" */);
             var lb = new WeightedRoundRobinLoadBalance(new Dictionary<string, int>() {
@@ -239,7 +228,6 @@ namespace Hprose.UnitTests.RPC {
                 "getAddress"
             );
             service.Bind(server);
-            server.Listen();
             var client = new Client("mock://test8");
             var log = new Log();
             client.Use(log.IOHandler).Use(log.InvokeHandler);
