@@ -235,8 +235,7 @@ namespace Hprose.UnitTests.RPC {
             server.Start();
             var service = new Service();
             service.Add(
-                (ServiceContext context) =>
-                    (context.RemoteEndPoint as IPEndPoint).Address + ":" + (context.RemoteEndPoint as IPEndPoint).Port,
+                (ServiceContext context) => context.RemoteEndPoint.ToString(),
                 "getAddress"
             );
             service.Bind(server);
