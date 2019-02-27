@@ -8,7 +8,7 @@
 |                                                          |
 |  UdpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Feb 25, 2019                              |
+|  LastModified: Feb 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -80,7 +80,7 @@ namespace Hprose.RPC {
                 return;
             }
             if (length > Service.MaxRequestLength) {
-                var bytes = Encoding.UTF8.GetBytes("request too long");
+                var bytes = Encoding.UTF8.GetBytes("Request entity too large");
                 responses.Enqueue((index | 0x8000, new MemoryStream(bytes), ipEndPoint));
                 return;
             }
