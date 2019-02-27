@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Feb 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -142,12 +142,12 @@ namespace Hprose.RPC {
                 await ReadAsync(netStream, header, 0, 12).ConfigureAwait(false);
                 uint crc = (uint)((header[0] << 24) | (header[1] << 16) | (header[2] << 8) | header[3]);
                 if (CRC32.Compute(header, 4, 8) != crc || (header[4] & 0x80) == 0 || (header[8] & 0x80) != 0) {
-                    throw new IOException("invalid request");
+                    throw new IOException("Invalid request");
                 }
                 int length = ((header[4] & 0x7F) << 24) | (header[5] << 16) | (header[6] << 8) | header[7];
                 int index = (header[8] << 24) | (header[9] << 16) | (header[10] << 8) | header[11];
                 if (length > Service.MaxRequestLength) {
-                    var bytes = Encoding.UTF8.GetBytes("request too long");
+                    var bytes = Encoding.UTF8.GetBytes("Request entity too large");
                     responses.Enqueue(((int)(index | 0x80000000), new MemoryStream(bytes, 0, bytes.Length, false, true)));
                     return;
                 }
