@@ -2,6 +2,9 @@
 
 # Hprose 3.0 for .NET
 
+[![Join the chat at https://gitter.im/hprose/hprose-dotnet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/hprose/hprose-dotnet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+
   Package Name  | platform | download | lastest-version |
 :---------------|:---------|:---------|:-----------------
 [![Hprose.IO](https://img.shields.io/badge/Hprose.IO-blue.svg)](https://www.nuget.org/packages/Hprose.IO) | [![Supported .NET Framework versions: 3.5+](https://img.shields.io/badge/.net-3.5+-blue.svg) ![Supported .NET Core versions: 2.0+](https://img.shields.io/badge/.netcore-2.0+-blue.svg) ![Supported .NET Compact Framework versions: 3.5+](https://img.shields.io/badge/.netcf-3.5+-blue.svg) ![Supported .NET Standard versions: 2.0+](https://img.shields.io/badge/.netstandard-2.0+-blue.svg)](https://www.nuget.org/packages/Hprose.IO) | [![NuGet](https://img.shields.io/nuget/v/Hprose.IO.svg)](https://www.nuget.org/packages/Hprose.IO) | [![NuGet](https://img.shields.io/nuget/dt/Hprose.IO.svg)](https://www.nuget.org/packages/Hprose.IO)
