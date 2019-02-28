@@ -8,13 +8,12 @@
 |                                                          |
 |  Service class for C#.                                   |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Feb 28, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -28,8 +27,8 @@ namespace Hprose.RPC {
         Task Bind(T server);
     }
     public class Service : IDisposable {
-        private readonly static ConcurrentDictionary<string, Type> handlerTypes = new ConcurrentDictionary<string, Type>();
-        private readonly static ConcurrentDictionary<Type, string> serverTypes = new ConcurrentDictionary<Type, string>();
+        private readonly static Dictionary<string, Type> handlerTypes = new Dictionary<string, Type>();
+        private readonly static Dictionary<Type, string> serverTypes = new Dictionary<Type, string>();
         public static void Register<T, S>(string name) where T : IHandler<S> {
             handlerTypes[name] = typeof(T);
             serverTypes[typeof(S)] = name;
