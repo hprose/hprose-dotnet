@@ -8,7 +8,7 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Feb 27, 2019                              |
+|  LastModified: Feb 28, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -29,12 +29,12 @@ namespace Hprose.RPC {
     public class Client : IDisposable {
         private static readonly object[] emptyArgs = new object[0];
         private static readonly Random random = new Random(Guid.NewGuid().GetHashCode());
-        private static readonly List<(string, Type)> transTypes = new List<(string, Type)>();
+        private static readonly Dictionary<string, Type> transTypes = new Dictionary<string, Type>();
         private static readonly Dictionary<string, string> schemes = new Dictionary<string, string>();
         public static void Register<T>(string name) where T : ITransport, new() {
             var type = typeof(T);
             var schemes = type.GetProperty("Schemes", BindingFlags.Public | BindingFlags.Static).GetValue(type, null) as string[];
-            transTypes.Add((name, type));
+            transTypes[name] = type;
             foreach (var scheme in schemes) {
                 Client.schemes[scheme] = name;
             }
@@ -80,8 +80,8 @@ namespace Hprose.RPC {
         public Client() {
             invokeManager = new InvokeManager(Call);
             ioManager = new IOManager(Transport);
-            foreach (var (name, type) in transTypes) {
-                transports[name] = (ITransport)Activator.CreateInstance(type);
+            foreach (var entry in transTypes) {
+                transports[entry.Key] = (ITransport)Activator.CreateInstance(entry.Value);
             };
         }
         public Client(string uri) : this() {
