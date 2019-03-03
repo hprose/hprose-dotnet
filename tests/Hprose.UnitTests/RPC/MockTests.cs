@@ -238,5 +238,21 @@ namespace Hprose.UnitTests.RPC {
             Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
             server.Close();
         }
+        [TestMethod]
+        public async Task Test9() {
+            MockServer server = new MockServer("test9");
+            var service = new Service();
+            ServiceCodec.Instance.Debug = true;
+            service.Use(Log.IOHandler)
+                   .Use(Log.InvokeHandler)
+                   .Add<int, int, Task<int>>(Sum)
+                   .Bind(server);
+            var client = new Client("mock://test9");
+            var r1 = client.InvokeAsync<int>("sum", new object[] { 1, 2 });
+            var r2 = client.InvokeAsync<int>("sum", new object[] { 3, 4 });
+            Assert.AreEqual(10, await client.InvokeAsync<int>("sum", new object[] { r1, r2 }));
+            server.Close();
+        }
+
     }
 }
