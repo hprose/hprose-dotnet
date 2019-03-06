@@ -8,7 +8,7 @@
 |                                                          |
 |  CircuitBreaker plugin for C#.                           |
 |                                                          |
-|  LastModified: Feb 1, 2019                               |
+|  LastModified: Feb 6, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -43,7 +43,7 @@ namespace Hprose.RPC.Plugins.CircuitBreaker {
             }
             try {
                 var response = await next(request, context).ConfigureAwait(false);
-                if (failCount > 0) failCount = 0;
+                failCount = 0;
                 return response;
             }
             catch (Exception) {
