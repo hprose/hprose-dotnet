@@ -8,7 +8,7 @@
 |                                                          |
 |  RateLimiter plugin for C#.                              |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Mar 6, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -23,9 +23,9 @@ namespace Hprose.RPC.Plugins.Limiter {
         private long next = DateTime.Now.Ticks;
         private readonly double interval;
         public long PermitsPerSecond { get; private set; }
-        public long MaxPermits { get; private set; }
+        public double MaxPermits { get; private set; }
         public TimeSpan Timeout { get; private set; }
-        public RateLimiter(long permitsPerSecond, long maxPermits = long.MaxValue, TimeSpan timeout = default) {
+        public RateLimiter(long permitsPerSecond, double maxPermits = double.PositiveInfinity, TimeSpan timeout = default) {
             PermitsPerSecond = permitsPerSecond;
             MaxPermits = maxPermits;
             Timeout = timeout;
