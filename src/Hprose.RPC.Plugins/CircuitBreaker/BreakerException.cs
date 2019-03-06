@@ -19,7 +19,7 @@ using System.Runtime.Serialization;
 namespace Hprose.RPC.Plugins.CircuitBreaker {
     [Serializable]
     public class BreakerException : Exception {
-        public BreakerException() : base("service breaked") { }
+        public BreakerException() : base("Service breaked") { }
         public BreakerException(string message) : base(message) { }
         public BreakerException(string message, Exception innerException) : base(message, innerException) { }
 #if !NET35_CF
