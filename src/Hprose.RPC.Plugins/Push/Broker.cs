@@ -8,7 +8,7 @@
 |                                                          |
 |  Broker plugin for C#.                                   |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Mar 8, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -47,13 +47,13 @@ namespace Hprose.RPC.Plugins.Push {
                    .Add<string, IList<string>>(IdList, "|")
                    .Use(Handler);
         }
-        protected bool Send(string id, TaskCompletionSource<Dictionary<string, Message[]>> responders) {
+        protected bool Send(string id, TaskCompletionSource<Dictionary<string, Message[]>> responder) {
             if (!Messages.TryGetValue(id, out var topics)) {
-                responders.TrySetResult(null);
+                responder.TrySetResult(null);
                 return true;
             }
             if (topics.IsEmpty) {
-                responders.TrySetResult(null);
+                responder.TrySetResult(null);
                 return true;
             }
             var result = new Dictionary<string, Message[]>();
@@ -78,7 +78,7 @@ namespace Hprose.RPC.Plugins.Push {
                 }
             }
             if (count == 0) return false;
-            responders.TrySetResult(result);
+            responder.TrySetResult(result);
             if (HeartBeat > TimeSpan.Zero) {
                 DoHeartBeat(id);
             }
@@ -103,9 +103,9 @@ namespace Hprose.RPC.Plugins.Push {
                     timer.TrySetResult(true);
                 }
             }
-            if (await timer.Task.ConfigureAwait(false) && Messages.TryGetValue(id, out var t)) {
-                foreach (var topic in t.Keys) {
-                    Offline(t, id, topic, new ServiceContext(Service));
+            if (await timer.Task.ConfigureAwait(false) && Messages.TryGetValue(id, out var topics)) {
+                foreach (var topic in topics.Keys) {
+                    Offline(topics, id, topic, new ServiceContext(Service));
                 }
             }
         }
@@ -113,7 +113,7 @@ namespace Hprose.RPC.Plugins.Push {
             if (context.RequestHeaders.TryGetValue("id", out var id)) {
                 return id.ToString();
             }
-            throw new KeyNotFoundException("client unique id not found");
+            throw new KeyNotFoundException("Client unique id not found");
         }
         protected bool Subscribe(string topic, ServiceContext context) {
             var id = GetId(context);
