@@ -8,7 +8,7 @@
 |                                                          |
 |  Prosumer plugin for C#.                                 |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Mar 9, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -42,7 +42,7 @@ namespace Hprose.RPC.Plugins.Push {
             if (Client.RequestHeaders.ContainsKey("id")) {
                 return Client.RequestHeaders["id"].ToString();
             }
-            throw new KeyNotFoundException("client unique id not found");
+            throw new KeyNotFoundException("Client unique id not found");
         }
         public Prosumer(Client client, string id = null) {
             Client = client;
