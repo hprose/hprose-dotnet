@@ -60,17 +60,12 @@ namespace Hprose.RPC.Plugins.LoadBalance {
             actives[index]++;
             rwlock.ExitWriteLock();
             try {
-                var response = await next(request, context).ConfigureAwait(false);
-                rwlock.EnterWriteLock();
-                actives[index]--;
-                rwlock.ExitWriteLock();
-                return response;
+                return await next(request, context).ConfigureAwait(false);
             }
-            catch {
+            finally {
                 rwlock.EnterWriteLock();
                 actives[index]--;
                 rwlock.ExitWriteLock();
-                throw;
             }
         }
         private bool disposed = false;
