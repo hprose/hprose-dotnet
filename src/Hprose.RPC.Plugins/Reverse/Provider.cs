@@ -8,7 +8,7 @@
 |                                                          |
 |  Provider class for C#.                                  |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Mar 9, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -40,7 +40,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             if (Client.RequestHeaders.ContainsKey("id")) {
                 return Client.RequestHeaders["id"].ToString();
             }
-            throw new KeyNotFoundException("client unique id not found");
+            throw new KeyNotFoundException("Client unique id not found");
         }
         public Provider(Client client, string id = null) {
             invokeManager = new InvokeManager(Execute);
