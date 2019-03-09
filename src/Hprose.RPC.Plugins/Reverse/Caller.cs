@@ -42,7 +42,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             if (context.RequestHeaders.TryGetValue("id", out var id)) {
                 return id.ToString();
             }
-            throw new KeyNotFoundException("client unique id not found");
+            throw new KeyNotFoundException("Client unique id not found");
         }
         private bool Send(string id, TaskCompletionSource<(int, string, object[])[]> responder) {
             if (Calls.TryRemove(id, out var calls)) {
