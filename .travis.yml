@@ -1,6 +1,6 @@
 language: csharp
 mono: latest
-dotnet: 2.2.2
+dotnet: latest
 solution: Hprose.sln
 script:
   - dotnet restore
