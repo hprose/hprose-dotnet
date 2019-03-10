@@ -2,7 +2,7 @@ language: csharp
 mono: latest
 dotnet: 2.2
 sudo: required
-dist: trusty
+dist: xenial
 solution: Hprose.sln
 script:
   - dotnet restore

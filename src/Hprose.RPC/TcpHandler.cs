@@ -38,7 +38,7 @@ namespace Hprose.RPC {
 #if !NET35_CF && !NET40
         public bool ClientCertificateRequired { get; set; } = false;
         public bool CheckCertificateRevocation { get; set; } = false;
-#if !NETCOREAPP2_0 && !NETCOREAPP2_1 && !NETCOREAPP2_2
+#if !(NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0)
         public SslProtocols EnabledSslProtocols { get; set; } = SslProtocols.Default | SslProtocols.Tls11 | SslProtocols.Tls12;
 #else
         public SslProtocols EnabledSslProtocols { get; set; } = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;

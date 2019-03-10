@@ -17,13 +17,13 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
-#if NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
 using System.Text;
 #endif
 
 namespace Hprose.IO {
     public static class Accessor {
-#if NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
         public static string UnifiedName(string name) => string.Create(name.Length, name, (Span<char> dist, string src) => {
             src.AsSpan().CopyTo(dist);
             dist[0] = char.ToLower(src[0]);

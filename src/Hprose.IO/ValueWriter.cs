@@ -17,7 +17,7 @@ using System;
 using System.IO;
 using System.Numerics;
 using System.Text;
-#if !(NETCOREAPP2_1 || NETCOREAPP2_2)
+#if !(NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0)
 using System.Threading;
 #endif
 
@@ -52,12 +52,12 @@ namespace Hprose.IO {
             "0123456789");
         private static readonly byte[] minIntBuf = GetASCII("-2147483648");
         private static readonly byte[] minLongBuf = GetASCII("-9223372036854775808");
-#if !(NETCOREAPP2_1 || NETCOREAPP2_2)
+#if !(NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0)
         private static readonly ThreadLocal<byte[]> intBuf = new ThreadLocal<byte[]>(() => new byte[INT_SIZE]);
         private static readonly ThreadLocal<byte[]> longBuf = new ThreadLocal<byte[]>(() => new byte[LONG_SIZE]);
 #endif
 
-#if NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
         public static void WriteASCII(Stream stream, string s) {
             int size = s.Length;
             Span<byte> buf = stackalloc byte[size];
@@ -90,7 +90,7 @@ namespace Hprose.IO {
                 stream.Write(minIntBuf, 0, minIntBuf.Length);
             }
             else {
-#if NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
                 Span<byte> buf = stackalloc byte[INT_SIZE];
 #else
                 byte[] buf = intBuf.Value;
@@ -99,7 +99,7 @@ namespace Hprose.IO {
                 if (i < 0) {
                     buf[--off] = (byte)'-';
                 }
-#if NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
                 stream.Write(buf.Slice(off, INT_SIZE - off));
 #else
                 stream.Write(buf, off, INT_SIZE - off);
@@ -112,7 +112,7 @@ namespace Hprose.IO {
                 stream.WriteByte(digits[i]);
             }
             else {
-#if NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
                 Span<byte> buf = stackalloc byte[INT_SIZE];
                 int off = ToBytes(i, buf, INT_SIZE);
                 stream.Write(buf.Slice(off, INT_SIZE - off));
@@ -132,7 +132,7 @@ namespace Hprose.IO {
                 stream.Write(minLongBuf, 0, minLongBuf.Length);
             }
             else {
-#if NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
                 Span<byte> buf = stackalloc byte[LONG_SIZE];
 #else
                 byte[] buf = longBuf.Value;
@@ -141,7 +141,7 @@ namespace Hprose.IO {
                 if (i < 0) {
                     buf[--off] = (byte)'-';
                 }
-#if NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
                 stream.Write(buf.Slice(off, LONG_SIZE - off));
 #else
                 stream.Write(buf, off, LONG_SIZE - off);
@@ -154,7 +154,7 @@ namespace Hprose.IO {
                 stream.WriteByte(digits[i]);
             }
             else {
-#if NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
                 Span<byte> buf = stackalloc byte[LONG_SIZE];
                 int off = ToBytes(i, buf, LONG_SIZE);
                 stream.Write(buf.Slice(off, LONG_SIZE - off));
@@ -166,7 +166,7 @@ namespace Hprose.IO {
             }
         }
 
-#if NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
         private static int ToBytes(uint i, Span<byte> buf, int off) {
 #else
         private static int ToBytes(uint i, byte[] buf, int off) {
@@ -189,7 +189,7 @@ namespace Hprose.IO {
             return off;
         }
 
-#if NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
         private static int ToBytes(ulong i, Span<byte> buf, int off) {
 #else
         private static int ToBytes(ulong i, byte[] buf, int off) {

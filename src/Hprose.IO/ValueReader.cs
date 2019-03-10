@@ -225,7 +225,7 @@ namespace Hprose.IO {
             return u;
         }
 
-#if NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
         private static void ReadChars(Span<char> buf, Stream stream) {
 #else
         private static void ReadChars(char[] buf, Stream stream) {
@@ -301,7 +301,7 @@ namespace Hprose.IO {
         public static double ReadInfinity(Stream stream) => (stream.ReadByte() == TagNeg) ? double.NegativeInfinity : double.PositiveInfinity;
         public static string ReadUTF8Char(Stream stream) => new string(ReadChar(stream), 1);
 
-#if NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
         public static string ReadString(Stream stream) {
             int len = ReadLength(stream);
             return string.Create<Stream>(len, stream, ReadChars);
@@ -324,7 +324,7 @@ namespace Hprose.IO {
         }
 
         public static Guid ReadGuid(Stream stream) {
-#if NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
             Span<char> buf = stackalloc char[38];
 #else
             char[] buf = new char[38];

@@ -324,7 +324,7 @@ namespace Hprose.UnitTests.RPC {
             Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
             server.Stop();
         }
-#if NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
         [TestMethod]
         public async Task Test10() {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
