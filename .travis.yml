@@ -1,6 +1,7 @@
 language: csharp
-solution: Hprose.sln
+mono: none
 dotnet: 2.1.502
+solution: Hprose.sln
 script:
   - dotnet restore
   - dotnet test
