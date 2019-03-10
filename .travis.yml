@@ -1,0 +1,6 @@
+language: csharp
+solution: Hprose.sln
+dotnet: 2.1.502
+script:
+  - dotnet restore
+  - dotnet test
