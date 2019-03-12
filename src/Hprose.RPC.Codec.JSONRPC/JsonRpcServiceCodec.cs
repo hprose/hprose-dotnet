@@ -8,7 +8,7 @@
 |                                                          |
 |  JsonRpcServiceCodec class for C#.                       |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Mar 12, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -28,41 +28,44 @@ namespace Hprose.RPC.Codec.JSONRPC {
             if (!context.Contains("jsonrpc") || !(bool)context["jsonrpc"]) {
                 return ServiceCodec.Instance.Encode(result, context);
             }
-            JObject response = new JObject {
+            var response = new Dictionary<string, object> {
                 { "jsonrpc", "2.0" }
             };
             if (context.Contains("jsonrpc.id")) {
-                response["id"] = (JToken)context["jsonrpc.id"];
-            } 
+                response["id"] = context["jsonrpc.id"];
+            }
+            if (context.ResponseHeaders.Count > 0) {
+                response["headers"] = context.ResponseHeaders;
+            }
             if (result is Exception) {
                 var error = result as Exception;
                 switch (error.Message) {
                     case "Parse error":
-                        response["error"] = new JObject {
+                        response["error"] = new Dictionary<string, object> {
                             { "code", -32700 },
                             { "message", "Parse error" }
                         };
                         break;
                     case "Invalid Request":
-                        response["error"] = new JObject {
+                        response["error"] = new Dictionary<string, object> {
                             { "code", -32600 },
                             { "message", "Invalid Request" }
                         };
                         break;
                     case "Method not found":
-                        response["error"] = new JObject {
+                        response["error"] = new Dictionary<string, object> {
                             { "code", -32601 },
                             { "message", "Method not found" }
                         };
                         break;
                     case "Invalid params":
-                        response["error"] = new JObject {
+                        response["error"] = new Dictionary<string, object> {
                             { "code", -32602 },
                             { "message", "Invalid params" }
                         };
                         break;
                     default:
-                        response["error"] = new JObject {
+                        response["error"] = new Dictionary<string, object> {
                             { "code", 0 },
                             { "message",  error.Message },
                             { "data", error.StackTrace }
@@ -71,7 +74,7 @@ namespace Hprose.RPC.Codec.JSONRPC {
                 }
             }
             else {
-                response["result"] = new JValue(result);
+                response["result"] = result;
             }
             var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response));
             return new MemoryStream(data, 0, data.Length, false, true);
@@ -107,6 +110,13 @@ namespace Hprose.RPC.Codec.JSONRPC {
                 throw new Exception("Invalid Request");
             }
             context["jsonrpc.id"] = id;
+            if ((call as IDictionary<string, JToken>).ContainsKey("headers")) {
+                var requestHeaders = context.RequestHeaders;
+                var headers = call["headers"].ToObject<IDictionary<string, object>>();
+                foreach (var pair in headers) {
+                    requestHeaders[pair.Key] = pair.Value;
+                }
+            }
             var fullname = (string)name;
             var args = new JArray();
             if ((call as IDictionary<string, JToken>).ContainsKey("params")) {
