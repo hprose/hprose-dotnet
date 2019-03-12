@@ -8,7 +8,7 @@
 |                                                          |
 |  Caller class for C#.                                    |
 |                                                          |
-|  LastModified: Mar 9, 2019                               |
+|  LastModified: Mar 12, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -140,6 +140,9 @@ namespace Hprose.RPC.Plugins.Reverse {
             await result.Task.ContinueWith((_) => { }).ConfigureAwait(false);
 #endif
             var value = await result.Task.ConfigureAwait(false);
+            if (value == null) {
+                return default;
+            }
             if (typeof(T).IsAssignableFrom(value.GetType())) {
                 return (T)value;
             }
