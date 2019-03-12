@@ -8,7 +8,7 @@
 |                                                          |
 |  JsonRpcClientCodec class for C#.                        |
 |                                                          |
-|  LastModified: Feb 24, 2019                              |
+|  LastModified: Mar 12, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -28,13 +28,16 @@ namespace Hprose.RPC.Codec.JSONRPC {
         private volatile int counter = 0;
         public Stream Encode(string name, object[] args, ClientContext context) {
             var id = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
-            JObject request = new JObject {
+            var request = new Dictionary<string, object> {
                 { "jsonrpc", "2.0" },
                 { "id", id },
                 { "method", name }
             };
+            if (context.RequestHeaders.Count > 0) {
+                request.Add("headers", context.RequestHeaders);
+            }
             if (args != null && args.Length > 0) {
-                request.Add("params", new JArray(args));
+                request.Add("params", args);
             }
             var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(request));
             return new MemoryStream(data, 0, data.Length, false, true);
@@ -43,6 +46,13 @@ namespace Hprose.RPC.Codec.JSONRPC {
             MemoryStream stream = await response.ToMemoryStream().ConfigureAwait(false);
             var data = stream.GetArraySegment();
             var result = JsonConvert.DeserializeObject<JObject>(Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
+            if ((result as IDictionary<string, JToken>).ContainsKey("headers")) {
+                var responseHeaders = context.ResponseHeaders;
+                var headers = result["headers"].ToObject<IDictionary<string, object>>();
+                foreach (var pair in headers) {
+                    responseHeaders[pair.Key] = pair.Value;
+                }
+            }
             if ((result as IDictionary<string, JToken>).ContainsKey("result")) {
                 return result["result"].ToObject(context.ReturnType ?? typeof(object));
             }
