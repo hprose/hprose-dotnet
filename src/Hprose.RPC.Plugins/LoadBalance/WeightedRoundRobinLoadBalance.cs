@@ -8,7 +8,7 @@
 |                                                          |
 |  Weighted RoundRobin LoadBalance plugin for C#.          |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Mar 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.LoadBalance {
     public class WeightedRoundRobinLoadBalance : WeightedLoadBalance {
+        // SpinLock can't store in readonly field.
         private SpinLock spanlock = new SpinLock();
         private readonly int maxWeight;
         private readonly int gcdWeight;
