@@ -8,7 +8,7 @@
 |                                                          |
 |  HandlerManager class for C#.                            |
 |                                                          |
-|  LastModified: Feb 4, 2019                               |
+|  LastModified: Mar 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -19,8 +19,8 @@ using System.Threading;
 
 namespace Hprose.RPC {
     public abstract class HandlerManager<THandler, TNextHandler> : IDisposable {
-        private List<THandler> handlers = new List<THandler>();
-        private ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
+        private readonly List<THandler> handlers = new List<THandler>();
+        private readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
         private readonly TNextHandler defaultHandler;
         public TNextHandler Handler { get; private set; }
         public HandlerManager(TNextHandler handler) {
