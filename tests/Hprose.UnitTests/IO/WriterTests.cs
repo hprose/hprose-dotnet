@@ -108,8 +108,9 @@ namespace Hprose.UnitTests.IO {
                 s = "hello";
                 writer.Serialize(s);
                 writer.Serialize(s);
+                writer.Serialize("🥁🐎🍄");
                 var data = stream.GetArraySegment();
-                Assert.AreEqual("ns5\"hello\"r0;", Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
+                Assert.AreEqual("ns5\"hello\"r0;s6\"🥁🐎🍄\"", Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
             }
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
