@@ -8,7 +8,7 @@
 |                                                          |
 |  Nginx RoundRobin LoadBalance plugin for C#.             |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Mar 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -22,8 +22,9 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.LoadBalance {
     public class NginxRoundRobinLoadBalance : WeightedLoadBalance {
+        // SpinLock can't store in readonly field.
         private SpinLock spanlock = new SpinLock();
-        private readonly Random random = new Random(Guid.NewGuid().GetHashCode());
+        private readonly ThreadLocal<Random> random = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
         private readonly int[] effectiveWeights;
         private readonly int[] currentWeights;
         public NginxRoundRobinLoadBalance(IDictionary<string, int> uriList) : base(uriList) {
@@ -51,7 +52,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
                     currentWeights[index] = currentWeight - totalWeight;
                 }
                 else {
-                    index = random.Next(n);
+                    index = random.Value.Next(n);
                 }
             }
             finally {
