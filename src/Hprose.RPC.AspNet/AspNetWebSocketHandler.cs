@@ -8,7 +8,7 @@
 |                                                          |
 |  AspNetWebSocketHandler class for C#.                    |
 |                                                          |
-|  LastModified: Feb 27, 2019                              |
+|  LastModified: Mar 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -26,8 +26,9 @@ using System.Web.WebSockets;
 
 namespace Hprose.RPC.AspNet {
     public class AspNetWebSocketHandler : AspNetHttpHandler {
-        public Action<WebSocket> OnAccept { get; set; } = null;
-        public Action<WebSocket> OnClose { get; set; } = null;
+        public event Action<WebSocket> OnAccept;
+        public event Action<WebSocket> OnClose;
+        public event Action<Exception> OnError;
         public AspNetWebSocketHandler(Service service) : base(service) { }
         private static async Task Send(WebSocket webSocket, ConcurrentQueue<(int index, MemoryStream stream)> responses) {
             while (webSocket.State == WebSocketState.Open) {
