@@ -611,6 +611,7 @@ namespace Hprose.UnitTests.IO {
                 writer.Serialize(new byte[] { (byte)'0', (byte)'1', (byte)'2' });
                 writer.Serialize(new List<char> { '0', '1', '2' });
                 writer.Serialize(new List<char> { '0', '1', '2' });
+                writer.Serialize("🥁🐎🍄😈😈");
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
                 Assert.AreEqual(null, reader.Deserialize<string>());
@@ -633,6 +634,7 @@ namespace Hprose.UnitTests.IO {
                 Assert.AreEqual("012", reader.Deserialize<string>());
                 Assert.AreEqual("012", reader.Deserialize<string>());
                 Assert.AreEqual("012", reader.Deserialize<string>());
+                Assert.AreEqual("🥁🐎🍄😈😈", reader.Deserialize<string>());
             }
         }
         [TestMethod]
