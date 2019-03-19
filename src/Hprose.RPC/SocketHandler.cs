@@ -8,7 +8,7 @@
 |                                                          |
 |  SocketHandler class for C#.                             |
 |                                                          |
-|  LastModified: Feb 27, 2019                              |
+|  LastModified: Mar 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -22,9 +22,9 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     public class SocketHandler : IHandler<Socket> {
-        public Action<Socket> OnAccept { get; set; } = null;
-        public Action<Socket> OnClose { get; set; } = null;
-        public Action<Exception> OnError { get; set; } = null;
+        public event Action<Socket> OnAccept;
+        public event Action<Socket> OnClose;
+        public event Action<Exception> OnError;
         public Service Service { get; private set; }
         public SocketHandler(Service service) {
             Service = service;
