@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpHandler class for C#.                               |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Mar 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -34,7 +34,7 @@ namespace Hprose.RPC {
         private readonly string lastModified;
         private readonly string etag;
         private readonly Dictionary<string, bool> origins = new Dictionary<string, bool>();
-        public Action<Exception> OnError { get; set; } = null;
+        public virtual event Action<Exception> OnError;
         public Service Service { get; private set; }
         public HttpHandler(Service service) {
             Service = service;
