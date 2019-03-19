@@ -8,14 +8,12 @@
 |                                                          |
 |  IOManager class for C#.                                 |
 |                                                          |
-|  LastModified: Feb 4, 2019                               |
+|  LastModified: Mar 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
-using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC {
