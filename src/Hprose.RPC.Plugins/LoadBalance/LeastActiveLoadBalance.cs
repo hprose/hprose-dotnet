@@ -8,7 +8,7 @@
 |                                                          |
 |  LeastActive LoadBalance plugin for C#.                  |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Mar 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.LoadBalance {
     public class LeastActiveLoadBalance : IDisposable {
-        private readonly Random random = new Random(Guid.NewGuid().GetHashCode());
+        private readonly ThreadLocal<Random> random = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
         private int[] actives = new int[0];
         private readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
         public async Task<Stream> Handler(Stream request, Context context, NextIOHandler next) {
@@ -51,7 +51,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
             int index = leastActiveIndexes[0];
             var count = leastActiveIndexes.Count;
             if (count > 1) {
-                index = leastActiveIndexes[random.Next(count)];
+                index = leastActiveIndexes[random.Value.Next(count)];
             }
 
             clientContext.Uri = uris[index];
