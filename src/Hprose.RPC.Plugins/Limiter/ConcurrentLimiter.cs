@@ -8,7 +8,7 @@
 |                                                          |
 |  ConcurrentLimiter plugin for C#.                        |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Mar 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 namespace Hprose.RPC.Plugins.Limiter {
     public class ConcurrentLimiter {
         private volatile int counter = 0;
-        private ConcurrentQueue<TaskCompletionSource<bool>> tasks = new ConcurrentQueue<TaskCompletionSource<bool>>();
+        private readonly ConcurrentQueue<TaskCompletionSource<bool>> tasks = new ConcurrentQueue<TaskCompletionSource<bool>>();
         public int MaxConcurrentRequests { get; private set; }
         public TimeSpan Timeout { get; private set; }
         public ConcurrentLimiter(int maxConcurrentRequests, TimeSpan timeout = default) {
