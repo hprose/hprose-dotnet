@@ -8,7 +8,7 @@
 |                                                          |
 |  UdpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Feb 27, 2019                              |
+|  LastModified: Mar 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -23,8 +23,8 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     public class UdpHandler : IHandler<UdpClient> {
-        public Action<UdpClient> OnClose { get; set; } = null;
-        public Action<Exception> OnError { get; set; } = null;
+        public event Action<UdpClient> OnClose;
+        public event Action<Exception> OnError;
         public Service Service { get; private set; }
         public UdpHandler(Service service) {
             Service = service;
