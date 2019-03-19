@@ -8,7 +8,7 @@
 |                                                          |
 |  Weighted LeastActive LoadBalance plugin for C#.         |
 |                                                          |
-|  LastModified: Feb 1, 2019                               |
+|  LastModified: Mar 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.LoadBalance {
     public class WeightedLeastActiveLoadBalance : WeightedLoadBalance, IDisposable {
-        private readonly Random random = new Random(Guid.NewGuid().GetHashCode());
+        private readonly ThreadLocal<Random> random = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
         private readonly int[] actives = null;
         private readonly int[] effectiveWeights;
         private readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
@@ -51,7 +51,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
             var count = leastActiveIndexes.Count;
             if (count > 1) {
                 if (totalWeight > 0) {
-                    var currentWeight = random.Next(totalWeight);
+                    var currentWeight = random.Value.Next(totalWeight);
                     rwlock.EnterReadLock();
                     for (int i = 0; i < count; ++i) {
                         currentWeight -= effectiveWeights[leastActiveIndexes[i]];
