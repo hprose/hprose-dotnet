@@ -63,7 +63,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
                     rwlock.ExitReadLock();
                 }
                 else {
-                    index = leastActiveIndexes[random.Next(count)];
+                    index = leastActiveIndexes[random.Value.Next(count)];
                 }
             }
 
