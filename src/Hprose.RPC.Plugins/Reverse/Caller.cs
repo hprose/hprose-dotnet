@@ -8,7 +8,7 @@
 |                                                          |
 |  Caller class for C#.                                    |
 |                                                          |
-|  LastModified: Mar 12, 2019                              |
+|  LastModified: Mar 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -28,12 +28,12 @@ namespace Hprose.RPC.Plugins.Reverse {
         private ConcurrentDictionary<string, ConcurrentQueue<(int, string, object[])>> Calls { get; } = new ConcurrentDictionary<string, ConcurrentQueue<(int, string, object[])>>();
         private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>> Results { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>>();
         private ConcurrentDictionary<string, TaskCompletionSource<(int, string, object[])[]>> Responders { get; } = new ConcurrentDictionary<string, TaskCompletionSource<(int, string, object[])[]>>();
-        private ConcurrentDictionary<string, TaskCompletionSource<bool>> Timers { get; } = new ConcurrentDictionary<string, TaskCompletionSource<bool>>();
+        private ConcurrentDictionary<string, bool> Onlines { get; } = new ConcurrentDictionary<string, bool>();
         public Service Service { get; private set; }
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 2, 0);
         public Caller(Service service) {
             Service = service;
-            Service.Add<ServiceContext, string>(Close, "!!")
+            Service.Add<ServiceContext>(Close, "!!")
                    .Add<ServiceContext, Task<(int, string, object[])[]>>(Begin, "!")
                    .Add<(int, object, string)[], ServiceContext>(End, "=")
                    .Use(Handler);
@@ -65,15 +65,20 @@ namespace Hprose.RPC.Plugins.Reverse {
                 }
             }
         }
-        private string Close(ServiceContext context) {
+        private string Stop(ServiceContext context) {
             var id = GetId(context);
             if (Responders.TryRemove(id, out var responder)) {
                 responder?.TrySetResult(null);
             }
             return id;
         }
+        private void Close(ServiceContext context) {
+            var id = Stop(context);
+            Onlines.TryRemove(id, out var _);
+        }
         private async Task<(int, string, object[])[]> Begin(ServiceContext context) {
-            var id = Close(context);
+            var id = Stop(context);
+            Onlines.TryAdd(id, true);
             var responder = new TaskCompletionSource<(int, string, object[])[]>();
             if (!Send(id, responder)) {
                 Responders.AddOrUpdate(id, responder, (_, oldResponder) => {
@@ -162,6 +167,12 @@ namespace Hprose.RPC.Plugins.Reverse {
             }
         }
 #endif
+        public bool Exists(string id) {
+            return Onlines.ContainsKey(id);
+        }
+        public IList<string> IdList() {
+            return new List<string>(Onlines.Keys);
+        }
         private Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
             context = new CallerContext(this, context as ServiceContext);
             return next(name, args, context);
