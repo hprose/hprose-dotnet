@@ -8,7 +8,7 @@
 |                                                          |
 |  Broker plugin for C#.                                   |
 |                                                          |
-|  LastModified: Mar 8, 2019                               |
+|  LastModified: Mar 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -33,8 +33,8 @@ namespace Hprose.RPC.Plugins.Push {
         public int MessageQueueMaxLength { get; set; } = 10;
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 2, 0);
         public TimeSpan HeartBeat { get; set; } = new TimeSpan(0, 0, 10);
-        public Action<string, string, ServiceContext> OnSubscribe { get; set; } = null;
-        public Action<string, string, Message[], ServiceContext> OnUnsubscribe { get; set; } = null;
+        public event Action<string, string, ServiceContext> OnSubscribe;
+        public event Action<string, string, Message[], ServiceContext> OnUnsubscribe;
         public Broker(Service service) {
             Service = service;
             Service.Add<string, ServiceContext, bool>(Subscribe, "+")
