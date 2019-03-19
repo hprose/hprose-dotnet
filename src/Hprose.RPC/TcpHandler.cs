@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Feb 27, 2019                              |
+|  LastModified: Mar 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -29,9 +29,9 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     public class TcpHandler : IHandler<TcpListener> {
-        public Action<TcpClient> OnAccept { get; set; } = null;
-        public Action<TcpClient> OnClose { get; set; } = null;
-        public Action<Exception> OnError { get; set; } = null;
+        public event Action<TcpClient> OnAccept;
+        public event Action<TcpClient> OnClose;
+        public event Action<Exception> OnError;
 #if !NET35_CF
         public X509Certificate ServerCertificate { get; set; } = null;
 #endif
