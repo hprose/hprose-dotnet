@@ -26,9 +26,9 @@ namespace Hprose.RPC.Plugins.Push {
             TypeManager.Register<Message>("@");
         }
         private ConcurrentDictionary<string, Action<Message>> callbacks = new ConcurrentDictionary<string, Action<Message>>();
-        public Action<Exception> OnError { get; set; } = null;
-        public Action<string> OnSubscribe { get; set; } = null;
-        public Action<string> OnUnsubscribe { get; set; } = null;
+        public event Action<Exception> OnError;
+        public event Action<string> OnSubscribe;
+        public event Action<string> OnUnsubscribe;
         public Client Client { get; private set; }
         public string Id {
             get {

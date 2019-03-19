@@ -53,6 +53,7 @@ namespace Hprose.UnitTests.RPC {
             Assert.AreEqual("good", await client.InvokeAsync<string>("good"));
             server.Stop();
         }
+
         public interface ITestInterface {
             int Sum(int x, int y);
             [Log(false)]
@@ -94,13 +95,12 @@ namespace Hprose.UnitTests.RPC {
                    .Bind(server);
 
             var client1 = new Client("tcp4://127.0.0.1:8414");
-            var prosumer1 = new Prosumer(client1, "1") {
-                OnSubscribe = (topic) => {
-                    Console.WriteLine(topic + " is subscribed.");
-                },
-                OnUnsubscribe = (topic) => {
-                    Console.WriteLine(topic + " is unsubscribed.");
-                }
+            var prosumer1 = new Prosumer(client1, "1");
+            prosumer1.OnSubscribe += (topic) => {
+                Console.WriteLine(topic + " is subscribed.");
+            };
+            prosumer1.OnUnsubscribe += (topic) => {
+                Console.WriteLine(topic + " is unsubscribed.");
             };
             var client2 = new Client("tcp4://127.0.0.1:8414");
             var prosumer2 = new Prosumer(client2, "2");
