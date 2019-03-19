@@ -8,7 +8,7 @@
 |                                                          |
 |  OwinHttpHandler class for C#.                           |
 |                                                          |
-|  LastModified: Feb 12, 2019                              |
+|  LastModified: Mar 20, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -33,7 +33,6 @@ namespace Hprose.RPC.Owin {
         private readonly string lastModified;
         private readonly string etag;
         private readonly Dictionary<string, bool> origins = new Dictionary<string, bool>();
-        public Action<Exception> OnError { get; set; } = null;
         public Service Service { get; private set; }
         public OwinHttpHandler(Service service) {
             Service = service;
