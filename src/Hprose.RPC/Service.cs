@@ -8,7 +8,7 @@
 |                                                          |
 |  Service class for C#.                                   |
 |                                                          |
-|  LastModified: Feb 28, 2019                              |
+|  LastModified: Mar 24, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -69,6 +69,7 @@ namespace Hprose.RPC {
         private readonly MethodManager methodManager = new MethodManager();
         private readonly Dictionary<string, object> handlers = new Dictionary<string, object>();
         public object this[string name] => handlers[name];
+        public List<string> Names => new List<string>(methodManager.GetNames());
         public Service() {
             invokeManager = new InvokeManager(Execute);
             ioManager = new IOManager(Process);
