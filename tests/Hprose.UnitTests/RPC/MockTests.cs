@@ -3,6 +3,7 @@ using Hprose.RPC.Plugins.Limiter;
 using Hprose.RPC.Plugins.Log;
 using Hprose.RPC.Plugins.Push;
 using Hprose.RPC.Plugins.Reverse;
+using Hprose.RPC.Plugins.Oneway;
 using Hprose.RPC.Codec.JSONRPC;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -252,6 +253,18 @@ namespace Hprose.UnitTests.RPC {
             Assert.AreEqual(10, await client.InvokeAsync<int>("sum", new object[] { r1, r2 }));
             server.Close();
         }
-
+        [TestMethod]
+        public void Test10() {
+            MockServer server = new MockServer("test9");
+            var service = new Service();
+            ServiceCodec.Instance.Debug = true;
+            service.Bind(server);
+            var client = new Client("mock://test9");
+            client.Use(Oneway.Handler);
+            client.Invoke("oneway", null, new ClientContext() {
+                ["Oneway"] = true
+            });
+            server.Close();
+        }
     }
 }
