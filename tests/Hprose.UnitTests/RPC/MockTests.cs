@@ -1,16 +1,15 @@
 ﻿using Hprose.RPC;
+using Hprose.RPC.Codec.JSONRPC;
 using Hprose.RPC.Plugins.Limiter;
+using Hprose.RPC.Plugins.LoadBalance;
 using Hprose.RPC.Plugins.Log;
+using Hprose.RPC.Plugins.Oneway;
 using Hprose.RPC.Plugins.Push;
 using Hprose.RPC.Plugins.Reverse;
-using Hprose.RPC.Plugins.Oneway;
-using Hprose.RPC.Codec.JSONRPC;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Net;
-using System.Threading.Tasks;
-using Hprose.RPC.Plugins.LoadBalance;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Hprose.UnitTests.RPC {
     [TestClass]
@@ -255,16 +254,11 @@ namespace Hprose.UnitTests.RPC {
         }
         [TestMethod]
         public void Test10() {
-            MockServer server = new MockServer("test9");
-            var service = new Service();
-            ServiceCodec.Instance.Debug = true;
-            service.Bind(server);
-            var client = new Client("mock://test9");
+            var client = new Client("mock://test10/");
             client.Use(Oneway.Handler);
             client.Invoke("oneway", null, new ClientContext() {
                 ["Oneway"] = true
             });
-            server.Close();
         }
     }
 }
