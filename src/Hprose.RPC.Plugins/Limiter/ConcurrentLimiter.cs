@@ -8,7 +8,7 @@
 |                                                          |
 |  ConcurrentLimiter plugin for C#.                        |
 |                                                          |
-|  LastModified: Mar 20, 2019                              |
+|  LastModified: Mar 27, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -50,20 +50,23 @@ namespace Hprose.RPC.Plugins.Limiter {
             await deferred.Task.ConfigureAwait(false);
         }
         public void Release() {
-            Interlocked.Decrement(ref counter);
-            if(tasks.TryDequeue(out var task)) {
-                task.TrySetResult(true);
+            while (true) {
+                Interlocked.Decrement(ref counter);
+                if (tasks.TryDequeue(out var task)) {
+                    if (task.TrySetResult(true)) return;
+                } else {
+                    return;
+                }
             }
         }
         public async Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
             await Acquire().ConfigureAwait(false);
-            var result = next(name, args, context);
-#if !NET35_CF
-            await result.ContinueWith((task) => Release(), TaskScheduler.Current).ConfigureAwait(false);
-#else
-            await result.ContinueWith((task) => Release()).ConfigureAwait(false);
-#endif
-            return await result.ConfigureAwait(false);
+            try {
+                return await next(name, args, context).ConfigureAwait(false);
+            }
+            finally {
+                Release();
+            }
         }
     }
 }
