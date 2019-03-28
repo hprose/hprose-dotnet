@@ -131,6 +131,7 @@ namespace Hprose.RPC {
             context["response"] = httpContext.Response;
             context["user"] = httpContext.User;
             context.RemoteEndPoint = request.RemoteEndPoint;
+            context.LocalEndPoint = request.LocalEndPoint;
             context.Handler = this;
             var responses = new ConcurrentQueue<(int index, MemoryStream stream)>();
             OnAccept?.Invoke(webSocket);

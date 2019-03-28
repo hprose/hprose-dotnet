@@ -8,7 +8,7 @@
 |                                                          |
 | MockHandler for C#.                                      |
 |                                                          |
-| LastModified: Feb 27, 2019                               |
+| LastModified: Mar 28, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -51,6 +51,7 @@ namespace Hprose.RPC {
             }
             var context = new ServiceContext(Service) {
                 RemoteEndPoint = new MockEndPoint(address),
+                LocalEndPoint = new MockEndPoint(address),
                 Handler = this
             };
             return await Service.Handle(request, context).ConfigureAwait(false);

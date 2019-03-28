@@ -8,7 +8,7 @@
 |                                                          |
 |  AspNetHttpHandler class for C#.                         |
 |                                                          |
-|  LastModified: Mar 20, 2019                              |
+|  LastModified: Mar 28, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -133,18 +133,33 @@ namespace Hprose.RPC.AspNet {
             }
             return false;
         }
-        public static IPEndPoint GetIPEndPoint(HttpRequest request) {
-            string result = request.ServerVariables["HTTP_X_FORWARDED_FOR"];
-            if (string.IsNullOrEmpty(result)) {
-                result = request.ServerVariables["REMOTE_ADDR"];
+        public static IPEndPoint GetRemoteEndPoint(HttpRequest request) {
+            string host = request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+            if (string.IsNullOrEmpty(host)) {
+                host = request.ServerVariables["REMOTE_ADDR"];
             }
-            if (string.IsNullOrEmpty(result)) {
-                result = request.UserHostAddress;
+            if (string.IsNullOrEmpty(host)) {
+                host = request.UserHostAddress;
             }
-            if (string.IsNullOrEmpty(result)) {
-                result = "0.0.0.0";
+            if (string.IsNullOrEmpty(host)) {
+                host = "0.0.0.0";
             }
-            return new IPEndPoint(IPAddress.Parse(result), 0);
+            string port = request.ServerVariables["REMOTE_PORT"];
+            if (string.IsNullOrEmpty(port)) {
+                port = "0";
+            }
+            return new IPEndPoint(IPAddress.Parse(host), int.Parse(port));
+        }
+        public static IPEndPoint GetLocalEndPoint(HttpRequest request) {
+            string host = request.ServerVariables["LOCAL_ADDR"];
+            if (string.IsNullOrEmpty(host)) {
+                host = "0.0.0.0";
+            }
+            string port = request.ServerVariables["SERVER_PORT"];
+            if (string.IsNullOrEmpty(port)) {
+                port = "0";
+            }
+            return new IPEndPoint(IPAddress.Parse(host), int.Parse(port));
         }
         public virtual async Task Handler(HttpContext httpContext) {
             var request = httpContext.Request;
@@ -154,7 +169,8 @@ namespace Hprose.RPC.AspNet {
             context["request"] = request;
             context["response"] = response;
             context["user"] = httpContext.User;
-            context.RemoteEndPoint = GetIPEndPoint(request);
+            context.RemoteEndPoint = GetRemoteEndPoint(request);
+            context.LocalEndPoint = GetLocalEndPoint(request);
             context.Handler = this;
             if (await ClientAccessPolicyXmlHandler(request, response).ConfigureAwait(false)) {
                 return;

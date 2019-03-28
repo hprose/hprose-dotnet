@@ -122,6 +122,7 @@ namespace Hprose.RPC {
                 var context = new ServiceContext(Service);
                 context["socket"] = socket;
                 context.RemoteEndPoint = socket.RemoteEndPoint;
+                context.LocalEndPoint = socket.LocalEndPoint;
                 context.Handler = this;
                 Run(responses, index, data, context);
             }

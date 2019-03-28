@@ -88,6 +88,7 @@ namespace Hprose.RPC {
             context["udpClient"] = udpClient;
             context["socket"] = udpClient.Client;
             context.RemoteEndPoint = ipEndPoint;
+            context.LocalEndPoint = udpClient.Client.LocalEndPoint;
             context.Handler = this;
             using (var request = new MemoryStream(buffer, 8, length, false, true)) {
                 try {

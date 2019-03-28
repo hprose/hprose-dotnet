@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpHandler class for C#.                               |
 |                                                          |
-|  LastModified: Mar 20, 2019                              |
+|  LastModified: Mar 28, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -151,6 +151,7 @@ namespace Hprose.RPC {
             context["response"] = httpContext.Response;
             context["user"] = httpContext.User;
             context.RemoteEndPoint = httpContext.Request.RemoteEndPoint;
+            context.LocalEndPoint = httpContext.Request.LocalEndPoint;
             context.Handler = this;
             var request = httpContext.Request;
             var response = httpContext.Response;

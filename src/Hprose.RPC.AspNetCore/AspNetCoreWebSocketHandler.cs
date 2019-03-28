@@ -8,7 +8,7 @@
 |                                                          |
 |  AspNetCoreWebSocketHandler class for C#.                |
 |                                                          |
-|  LastModified: Mar 20, 2019                              |
+|  LastModified: Mar 28, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -127,7 +127,8 @@ namespace Hprose.RPC.AspNetCore {
             context["request"] = httpContext.Request;
             context["response"] = httpContext.Response;
             context["user"] = httpContext.User;
-            context.RemoteEndPoint = GetIPEndPoint(httpContext);
+            context.RemoteEndPoint = GetRemoteEndPoint(httpContext);
+            context.LocalEndPoint = GetLocalEndPoint(httpContext);
             context.Handler = this;
             var responses = new ConcurrentQueue<(int index, MemoryStream stream)>();
             OnAccept?.Invoke(webSocket);

@@ -156,6 +156,7 @@ namespace Hprose.RPC {
                 context["tcpClient"] = tcpClient;
                 context["socket"] = tcpClient.Client;
                 context.RemoteEndPoint = tcpClient.Client.RemoteEndPoint;
+                context.LocalEndPoint = tcpClient.Client.LocalEndPoint;
                 context.Handler = this;
                 Run(responses, index, data, context);
             }

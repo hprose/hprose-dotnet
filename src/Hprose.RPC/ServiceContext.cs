@@ -8,7 +8,7 @@
 |                                                          |
 |  ServiceContext class for C#.                            |
 |                                                          |
-|  LastModified: Feb 23, 2019                              |
+|  LastModified: Mar 28, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -22,6 +22,7 @@ namespace Hprose.RPC {
         public Service Service { get; private set; }
         public Method Method { get; set; } = null;
         public EndPoint RemoteEndPoint { get; set; } = null;
+        public EndPoint LocalEndPoint { get; set; } = null;
         public object Handler { get; set; } = null;
         public IDictionary<string, object> RequestHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public IDictionary<string, object> ResponseHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);

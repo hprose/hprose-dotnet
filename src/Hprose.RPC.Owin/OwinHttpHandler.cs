@@ -8,7 +8,7 @@
 |                                                          |
 |  OwinHttpHandler class for C#.                           |
 |                                                          |
-|  LastModified: Mar 20, 2019                              |
+|  LastModified: Mar 28, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -140,9 +140,16 @@ namespace Hprose.RPC.Owin {
             }
             return false;
         }
-        public static IPEndPoint GetIPEndPoint(IDictionary<string, object> environment) {
+        public static IPEndPoint GetRemoteEndPoint(IDictionary<string, object> environment) {
             var ip = IPAddress.Parse(environment["server.RemoteIpAddress"] as string);
             if (int.TryParse(environment["server.RemotePort"] as string, out int port)) {
+                return new IPEndPoint(ip, port);
+            }
+            return new IPEndPoint(ip, 0);
+        }
+        public static IPEndPoint GetLocalEndPoint(IDictionary<string, object> environment) {
+            var ip = IPAddress.Parse(environment["server.LocalIpAddress"] as string);
+            if (int.TryParse(environment["server.LocalPort"] as string, out int port)) {
                 return new IPEndPoint(ip, port);
             }
             return new IPEndPoint(ip, 0);
@@ -150,7 +157,8 @@ namespace Hprose.RPC.Owin {
         public virtual async Task Handler(IDictionary<string, object> environment) {
             var context = new ServiceContext(Service);
             context["owin"] = environment;
-            context.RemoteEndPoint = GetIPEndPoint(environment);
+            context.RemoteEndPoint = GetRemoteEndPoint(environment);
+            context.LocalEndPoint = GetLocalEndPoint(environment);
             context.Handler = this;
             if (await ClientAccessPolicyXmlHandler(environment).ConfigureAwait(false)) {
                 return;

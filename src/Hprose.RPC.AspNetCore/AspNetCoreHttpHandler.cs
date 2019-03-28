@@ -8,7 +8,7 @@
 |                                                          |
 |  AspNetCoreHttpHandler class for C#.                     |
 |                                                          |
-|  LastModified: Mar 20, 2019                              |
+|  LastModified: Mar 28, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -133,9 +133,16 @@ namespace Hprose.RPC.AspNetCore {
             }
             return false;
         }
-        public static IPEndPoint GetIPEndPoint(HttpContext httpContext) {
-            var ip = httpContext.Connection.RemoteIpAddress;
-            var port = httpContext.Connection.RemotePort;
+        public static IPEndPoint GetRemoteEndPoint(HttpContext httpContext) {
+            var connection = httpContext.Connection;
+            var ip = connection.RemoteIpAddress;
+            var port = connection.RemotePort;
+            return new IPEndPoint(ip, port);
+        }
+        public static IPEndPoint GetLocalEndPoint(HttpContext httpContext) {
+            var connection = httpContext.Connection;
+            var ip = connection.LocalIpAddress;
+            var port = connection.LocalPort;
             return new IPEndPoint(ip, port);
         }
         public virtual async Task Handler(HttpContext httpContext) {
@@ -146,7 +153,8 @@ namespace Hprose.RPC.AspNetCore {
             context["request"] = request;
             context["response"] = response;
             context["user"] = httpContext.User;
-            context.RemoteEndPoint = GetIPEndPoint(httpContext);
+            context.RemoteEndPoint = GetRemoteEndPoint(httpContext);
+            context.LocalEndPoint = GetLocalEndPoint(httpContext);
             context.Handler = this;
             if (await ClientAccessPolicyXmlHandler(request, response).ConfigureAwait(false)) {
                 return;
