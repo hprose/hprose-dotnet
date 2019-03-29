@@ -8,7 +8,7 @@
 |                                                          |
 |  Service class for C#.                                   |
 |                                                          |
-|  LastModified: Mar 24, 2019                              |
+|  LastModified: Mar 29, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -72,6 +72,7 @@ namespace Hprose.RPC {
         public List<string> Names => new List<string>(methodManager.GetNames());
         public Service() {
             invokeManager = new InvokeManager(Execute);
+            invokeManager.Use(TimeoutHandler);
             ioManager = new IOManager(Process);
             foreach (var pair in handlerTypes) {
 #if !NET35_CF
@@ -99,34 +100,38 @@ namespace Hprose.RPC {
             object result;
             try {
                 var (fullname, args) = await Codec.Decode(request, context as ServiceContext).ConfigureAwait(false);
-                var resultTask = invokeManager.Handler(fullname, args, context);
-                if (Timeout > TimeSpan.Zero) {
-                    using (CancellationTokenSource source = new CancellationTokenSource()) {
-#if NET40
-                        var timer = TaskEx.Delay(Timeout, source.Token);
-                        var task = await TaskEx.WhenAny(resultTask, timer).ConfigureAwait(false);
-#else
-                        var timer = Task.Delay(Timeout, source.Token);
-                        var task = await Task.WhenAny(resultTask, timer).ConfigureAwait(false);
-#endif
-                        source.Cancel();
-                        if (task == timer) {
-                            throw new TimeoutException();
-                        }
-                    }
-                }
-                result = await resultTask.ConfigureAwait(false);
+                result = await invokeManager.Handler(fullname, args, context).ConfigureAwait(false);
             }
             catch (Exception e) {
                 result = e.InnerException ?? e;
             }
             return Codec.Encode(result, context as ServiceContext);
         }
+        private static async Task<object> TimeoutHandler(string fullname, object[] args, Context context, NextInvokeHandler next) {
+            var resultTask = next(fullname, args, context);
+            var timeout = (context as ServiceContext).Service.Timeout;
+            if (timeout > TimeSpan.Zero) {
+                using (CancellationTokenSource source = new CancellationTokenSource()) {
+#if NET40
+                        var timer = TaskEx.Delay(timeout, source.Token);
+                        var task = await TaskEx.WhenAny(resultTask, timer).ConfigureAwait(false);
+#else
+                    var timer = Task.Delay(timeout, source.Token);
+                    var task = await Task.WhenAny(resultTask, timer).ConfigureAwait(false);
+#endif
+                    source.Cancel();
+                    if (task == timer) {
+                        throw new TimeoutException();
+                    }
+                }
+            }
+            return await resultTask.ConfigureAwait(false);
+        }
         public static async Task<object> Execute(string fullname, object[] args, Context context) {
             var method = (context as ServiceContext).Method;
             var result = method.MethodInfo.Invoke(
                 method.Target,
-                method.Missing ? 
+                method.Missing ?
                 method.Parameters.Length == 3 ?
                 new object[] { fullname, args, context } :
                 new object[] { fullname, args } :
