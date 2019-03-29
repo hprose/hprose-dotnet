@@ -8,7 +8,7 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Mar 4, 2019                               |
+|  LastModified: Mar 29, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -166,8 +166,11 @@ namespace Hprose.RPC {
         }
         public async Task<object> Call(string fullname, object[] args, Context context) {
             var request = Codec.Encode(fullname, args, context as ClientContext);
-            var response = await ioManager.Handler(request, context).ConfigureAwait(false);
+            Stream response = await Request(request, context).ConfigureAwait(false);
             return await Codec.Decode(response, context as ClientContext).ConfigureAwait(false);
+        }
+        public Task<Stream> Request(Stream request, Context context) {
+            return ioManager.Handler(request, context);
         }
         public async Task<Stream> Transport(Stream request, Context context) {
             var uri = (context as ClientContext).Uri;
