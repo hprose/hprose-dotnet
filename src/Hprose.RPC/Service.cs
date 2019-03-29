@@ -70,6 +70,7 @@ namespace Hprose.RPC {
         private readonly Dictionary<string, object> handlers = new Dictionary<string, object>();
         public object this[string name] => handlers[name];
         public List<string> Names => new List<string>(methodManager.GetNames());
+        public IDictionary<string, object> Options { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public Service() {
             invokeManager = new InvokeManager(Execute);
             invokeManager.Use(TimeoutHandler);
@@ -109,12 +110,13 @@ namespace Hprose.RPC {
         }
         private static async Task<object> TimeoutHandler(string fullname, object[] args, Context context, NextInvokeHandler next) {
             var resultTask = next(fullname, args, context);
-            var timeout = (context as ServiceContext).Service.Timeout;
+            var serviceContext = context as ServiceContext;
+            var timeout = serviceContext.Method.Timeout > TimeSpan.Zero ? serviceContext.Method.Timeout : serviceContext.Service.Timeout;
             if (timeout > TimeSpan.Zero) {
                 using (CancellationTokenSource source = new CancellationTokenSource()) {
 #if NET40
-                        var timer = TaskEx.Delay(timeout, source.Token);
-                        var task = await TaskEx.WhenAny(resultTask, timer).ConfigureAwait(false);
+                    var timer = TaskEx.Delay(timeout, source.Token);
+                    var task = await TaskEx.WhenAny(resultTask, timer).ConfigureAwait(false);
 #else
                     var timer = Task.Delay(timeout, source.Token);
                     var task = await Task.WhenAny(resultTask, timer).ConfigureAwait(false);

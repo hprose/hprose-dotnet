@@ -13,6 +13,8 @@
 |                                                          |
 \*________________________________________________________*/
 
+using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Hprose.RPC {
@@ -22,6 +24,12 @@ namespace Hprose.RPC {
         public MethodInfo MethodInfo { get; private set; }
         public ParameterInfo[] Parameters { get; private set; }
         public object Target { get; private set; }
+        public TimeSpan Timeout { get; set; } = TimeSpan.Zero;
+        public IDictionary<string, object> Options { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+        public object this[string name] {
+            get => Options[name];
+            set => Options[name] = value;
+        }
         public Method(MethodInfo methodInfo, string fullname, object target = null) {
             MethodInfo = methodInfo;
             Fullname = fullname ?? methodInfo.Name;
