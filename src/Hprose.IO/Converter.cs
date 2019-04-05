@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Converter class for C#.                          |
 |                                                          |
-|  LastModified: Apr 5, 2019                               |
+|  LastModified: Feb 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,6 @@
 using Hprose.IO.Converters;
 using System;
 using System.Text;
-using System.Globalization;
 
 namespace Hprose.IO {
     internal class Converter<TInput, TOutput> {
@@ -41,12 +40,6 @@ namespace Hprose.IO {
                     return (TOutput)converter.ConvertFromString(new string(chars));
                 case StringBuilder sb:
                     return (TOutput)converter.ConvertFromString(sb.ToString());
-                case System.ComponentModel.ICustomTypeDescriptor typeDescriptor:
-                    var typeConverter = typeDescriptor.GetConverter();
-                    if (typeConverter != null) {
-                        return (TOutput)typeConverter.ConvertTo(value, typeof(TOutput));
-                    }
-                    goto default;
                 default:
                     return (TOutput)converter.ConvertFrom(value);
             }
