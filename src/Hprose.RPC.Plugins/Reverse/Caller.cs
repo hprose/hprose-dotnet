@@ -8,7 +8,7 @@
 |                                                          |
 |  Caller class for C#.                                    |
 |                                                          |
-|  LastModified: Mar 20, 2019                              |
+|  LastModified: May 4, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -30,7 +30,8 @@ namespace Hprose.RPC.Plugins.Reverse {
         private ConcurrentDictionary<string, TaskCompletionSource<(int, string, object[])[]>> Responders { get; } = new ConcurrentDictionary<string, TaskCompletionSource<(int, string, object[])[]>>();
         private ConcurrentDictionary<string, bool> Onlines { get; } = new ConcurrentDictionary<string, bool>();
         public Service Service { get; private set; }
-        public TimeSpan Timeout { get; set; } = new TimeSpan(0, 2, 0);
+        public TimeSpan HeartBeat { get; set; } = new TimeSpan(0, 2, 0);
+        public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         public Caller(Service service) {
             Service = service;
             Service.Add<ServiceContext>(Close, "!!")
@@ -85,13 +86,13 @@ namespace Hprose.RPC.Plugins.Reverse {
                     oldResponder?.TrySetResult(null);
                     return responder;
                 });
-                if (Timeout > TimeSpan.Zero) {
+                if (HeartBeat > TimeSpan.Zero) {
                     using (CancellationTokenSource source = new CancellationTokenSource()) {
 #if NET40
-                        var delay = TaskEx.Delay(Timeout, source.Token);
+                        var delay = TaskEx.Delay(HeartBeat, source.Token);
                         var task = await TaskEx.WhenAny(responder.Task, delay).ConfigureAwait(false);
 #else
-                        var delay = Task.Delay(Timeout, source.Token);
+                        var delay = Task.Delay(HeartBeat, source.Token);
                         var task = await Task.WhenAny(responder.Task, delay).ConfigureAwait(false);
 #endif
                         source.Cancel();
@@ -139,6 +140,31 @@ namespace Hprose.RPC.Plugins.Reverse {
             var results = Results.GetOrAdd(id, (_) => new ConcurrentDictionary<int, TaskCompletionSource<object>>());
             results[index] = result;
             Response(id);
+            if (Timeout > TimeSpan.Zero) {
+                using (CancellationTokenSource source = new CancellationTokenSource()) {
+#if NET40
+                    var delay = TaskEx.Delay(Timeout, source.Token);
+                    var task = await TaskEx.WhenAny(result.Task, delay).ConfigureAwait(false);
+#else
+                    var delay = Task.Delay(Timeout, source.Token);
+                    var task = await Task.WhenAny(result.Task, delay).ConfigureAwait(false);
+#endif
+                    source.Cancel();
+                    if (task == delay) {
+                        lock(calls) {
+                            for (var i = 0; i < calls.Count; i++) {
+                                if (calls.TryDequeue(out (int index, string fullname, object[] args) call)) {
+                                    if (index != call.index) {
+                                        calls.Enqueue(call);
+                                    }
+                                }
+                            }
+                        }
+                        results.TryRemove(index, out var _);
+                        result.TrySetException(new TimeoutException());
+                    }
+                }
+            }
 #if !NET35_CF
             await result.Task.ContinueWith((_) => { }, TaskScheduler.Current).ConfigureAwait(false);
 #else
