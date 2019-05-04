@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpTransport class for C#.                             |
 |                                                          |
-|  LastModified: Feb 27, 2019                              |
+|  LastModified: May 4, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -77,6 +77,8 @@ namespace Hprose.RPC {
                 else {
                     response = await httpClient.PostAsync(clientContext.Uri, httpContext).ConfigureAwait(false);
                 }
+                context["httpStatusCode"] = response.StatusCode;
+                context["httpStatusText"] = response.ReasonPhrase;
                 if (response.IsSuccessStatusCode) {
                     context["httpResponseHeaders"] = response.Headers;
                     return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
