@@ -117,34 +117,39 @@ namespace Hprose.RPC {
             }
         }
         public override async void Handler(HttpListenerContext httpContext) {
-            var request = httpContext.Request;
-            if (!request.IsWebSocketRequest) {
-                base.Handler(httpContext);
-                return;
-            }
-            var webSocketContext = await httpContext.AcceptWebSocketAsync("hprose").ConfigureAwait(false);
-            var webSocket = webSocketContext.WebSocket;
-            var context = new ServiceContext(Service);
-            context["httpContext"] = httpContext;
-            context["webSocketContext"] = webSocketContext;
-            context["request"] = request;
-            context["response"] = httpContext.Response;
-            context["user"] = httpContext.User;
-            context.RemoteEndPoint = request.RemoteEndPoint;
-            context.LocalEndPoint = request.LocalEndPoint;
-            context.Handler = this;
-            var responses = new ConcurrentQueue<(int index, MemoryStream stream)>();
-            OnAccept?.Invoke(webSocket);
-            var receive = Receive(webSocket, context, responses);
-            var send = Send(webSocket, responses);
             try {
-                await receive.ConfigureAwait(false);
-                await send.ConfigureAwait(false);
+                var request = httpContext.Request;
+                if (!request.IsWebSocketRequest) {
+                    base.Handler(httpContext);
+                    return;
+                }
+                var webSocketContext = await httpContext.AcceptWebSocketAsync("hprose").ConfigureAwait(false);
+                var webSocket = webSocketContext.WebSocket;
+                var context = new ServiceContext(Service);
+                context["httpContext"] = httpContext;
+                context["webSocketContext"] = webSocketContext;
+                context["request"] = request;
+                context["response"] = httpContext.Response;
+                context["user"] = httpContext.User;
+                context.RemoteEndPoint = request.RemoteEndPoint;
+                context.LocalEndPoint = request.LocalEndPoint;
+                context.Handler = this;
+                var responses = new ConcurrentQueue<(int index, MemoryStream stream)>();
+                OnAccept?.Invoke(webSocket);
+                var receive = Receive(webSocket, context, responses);
+                var send = Send(webSocket, responses);
+                try {
+                    await receive.ConfigureAwait(false);
+                    await send.ConfigureAwait(false);
+                }
+                catch (Exception e) {
+                    OnError?.Invoke(e);
+                    webSocket.Abort();
+                    OnClose?.Invoke(webSocket);
+                }
             }
             catch (Exception e) {
                 OnError?.Invoke(e);
-                webSocket.Abort();
-                OnClose?.Invoke(webSocket);
             }
         }
     }

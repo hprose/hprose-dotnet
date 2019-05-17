@@ -44,12 +44,7 @@ namespace Hprose.RPC {
         }
         public async Task Bind(HttpListener server) {
             while (server.IsListening) {
-                try {
-                    Handler(await server.GetContextAsync().ConfigureAwait(false));
-                }
-                catch (Exception error) {
-                    OnError?.Invoke(error);
-                }
+                Handler(await server.GetContextAsync().ConfigureAwait(false));
             }
         }
         public void AddAccessControlAllowOrigin(string origin) {
@@ -145,68 +140,73 @@ namespace Hprose.RPC {
             return false;
         }
         public virtual async void Handler(HttpListenerContext httpContext) {
-            var context = new ServiceContext(Service);
-            context["httpContext"] = httpContext;
-            context["request"] = httpContext.Request;
-            context["response"] = httpContext.Response;
-            context["user"] = httpContext.User;
-            context.RemoteEndPoint = httpContext.Request.RemoteEndPoint;
-            context.LocalEndPoint = httpContext.Request.LocalEndPoint;
-            context.Handler = this;
-            var request = httpContext.Request;
-            var response = httpContext.Response;
-            if (await ClientAccessPolicyXmlHandler(request, response).ConfigureAwait(false)) {
-                return;
-            }
-            if (await CrossDomainXmlHandler(request, response).ConfigureAwait(false)) {
-                return;
-            }
-            using (var instream = request.InputStream) {
-                if (request.ContentLength64 > Service.MaxRequestLength
-                    || request.ContentLength64 == -1
-                        && instream.CanSeek
-                        && instream.Length > Service.MaxRequestLength) {
-                    instream.Dispose();
-                    response.StatusCode = 413;
-                    response.StatusDescription = "Request Entity Too Large";
-                    response.Close();
+            try {
+                var context = new ServiceContext(Service);
+                context["httpContext"] = httpContext;
+                context["request"] = httpContext.Request;
+                context["response"] = httpContext.Response;
+                context["user"] = httpContext.User;
+                context.RemoteEndPoint = httpContext.Request.RemoteEndPoint;
+                context.LocalEndPoint = httpContext.Request.LocalEndPoint;
+                context.Handler = this;
+                var request = httpContext.Request;
+                var response = httpContext.Response;
+                if (await ClientAccessPolicyXmlHandler(request, response).ConfigureAwait(false)) {
                     return;
                 }
-                string method = request.HttpMethod;
-                Stream outstream = null;
-                switch (method) {
-                    case "GET":
-                        if (!Get) {
-                            response.StatusCode = 403;
-                            response.StatusDescription = "Forbidden";
-                            break;
-                        }
-                        goto case "POST";
-                    case "POST":
-                        try {
-                            outstream = await Service.Handle(instream, context).ConfigureAwait(false);
-                        }
-                        catch (Exception e) {
-                            response.StatusCode = 500;
-                            response.StatusDescription = "Internal Server Error";
-                            using (var outputStream = GetOutputStream(request, response)) {
-                                var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
-                                await outputStream.WriteAsync(stackTrace, 0, stackTrace.Length).ConfigureAwait(false);
-                            }
-                            response.Close();
-                            return;
-                        }
-                        break;
+                if (await CrossDomainXmlHandler(request, response).ConfigureAwait(false)) {
+                    return;
                 }
-                SendHeader(request, response);
-                if (outstream != null) {
-                    using (var outputStream = GetOutputStream(request, response)) {
-                        await outstream.CopyToAsync(outputStream).ConfigureAwait(false);
+                using (var instream = request.InputStream) {
+                    if (request.ContentLength64 > Service.MaxRequestLength
+                        || request.ContentLength64 == -1
+                            && instream.CanSeek
+                            && instream.Length > Service.MaxRequestLength) {
+                        instream.Dispose();
+                        response.StatusCode = 413;
+                        response.StatusDescription = "Request Entity Too Large";
+                        response.Close();
+                        return;
                     }
-                    outstream.Dispose();
+                    string method = request.HttpMethod;
+                    Stream outstream = null;
+                    switch (method) {
+                        case "GET":
+                            if (!Get) {
+                                response.StatusCode = 403;
+                                response.StatusDescription = "Forbidden";
+                                break;
+                            }
+                            goto case "POST";
+                        case "POST":
+                            try {
+                                outstream = await Service.Handle(instream, context).ConfigureAwait(false);
+                            }
+                            catch (Exception e) {
+                                response.StatusCode = 500;
+                                response.StatusDescription = "Internal Server Error";
+                                using (var outputStream = GetOutputStream(request, response)) {
+                                    var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
+                                    await outputStream.WriteAsync(stackTrace, 0, stackTrace.Length).ConfigureAwait(false);
+                                }
+                                response.Close();
+                                return;
+                            }
+                            break;
+                    }
+                    SendHeader(request, response);
+                    if (outstream != null) {
+                        using (var outputStream = GetOutputStream(request, response)) {
+                            await outstream.CopyToAsync(outputStream).ConfigureAwait(false);
+                        }
+                        outstream.Dispose();
+                    }
                 }
+                response.Close();
             }
-            response.Close();
+            catch (Exception error) {
+                OnError?.Invoke(error);
+            }
         }
     }
 }
