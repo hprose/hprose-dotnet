@@ -8,7 +8,7 @@
 |                                                          |
 |  UdpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Mar 20, 2019                              |
+|  LastModified: May 17, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -30,7 +30,12 @@ namespace Hprose.RPC {
             Service = service;
         }
         public async Task Bind(UdpClient server) {
-            await Handler(server).ConfigureAwait(false);
+            try {
+                await Handler(server).ConfigureAwait(false);
+            }
+            catch (Exception e) {
+                OnError?.Invoke(e);
+            }
         }
         private static async Task Send(UdpClient udpClient, ConcurrentQueue<(int index, MemoryStream stream, IPEndPoint endPoint)> responses) {
             while (true) {
