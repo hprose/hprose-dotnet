@@ -8,7 +8,7 @@
 |                                                          |
 |  AspNetWebSocketHandler class for C#.                    |
 |                                                          |
-|  LastModified: Mar 28, 2019                              |
+|  LastModified: Jun 5, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -30,11 +30,12 @@ namespace Hprose.RPC.AspNet {
         public event Action<WebSocket> OnClose;
         public event Action<Exception> OnError;
         public AspNetWebSocketHandler(Service service) : base(service) { }
-        private static async Task Send(WebSocket webSocket, ConcurrentQueue<(int index, MemoryStream stream)> responses) {
+        private async Task Send(WebSocket webSocket, ConcurrentQueue<(int index, MemoryStream stream)> responses, AutoResetEvent autoResetEvent) {
             while (webSocket.State == WebSocketState.Open) {
                 (int index, MemoryStream stream) response;
                 while (!responses.TryDequeue(out response)) {
                     await Task.Yield();
+                    autoResetEvent.WaitOne(1);
                 }
                 int index = response.index;
                 MemoryStream stream = response.stream;
@@ -59,7 +60,7 @@ namespace Hprose.RPC.AspNet {
                 }
             }
         }
-        private async void Run(ConcurrentQueue<(int index, MemoryStream stream)> responses, int index, MemoryStream request, Context context) {
+        private async void Run(ConcurrentQueue<(int index, MemoryStream stream)> responses, int index, MemoryStream request, Context context, AutoResetEvent autoResetEvent) {
             MemoryStream response = null;
             try {
                 response = await (await Service.Handle(request, context).ConfigureAwait(false)).ToMemoryStream().ConfigureAwait(false);
@@ -71,6 +72,7 @@ namespace Hprose.RPC.AspNet {
             }
             finally {
                 responses.Enqueue((index, response));
+                autoResetEvent.Set();
                 request.Dispose();
             }
         }
@@ -110,42 +112,49 @@ namespace Hprose.RPC.AspNet {
                 ArrayPool<byte>.Shared.Return(buffer);
             }
         }
-        public async Task Receive(WebSocket webSocket, ServiceContext context, ConcurrentQueue<(int index, MemoryStream stream)> responses) {
+        public async Task Receive(WebSocket webSocket, ServiceContext context, ConcurrentQueue<(int index, MemoryStream stream)> responses, AutoResetEvent autoResetEvent) {
             while (webSocket.State == WebSocketState.Open) {
                 var (index, stream) = await ReadAsync(webSocket, responses).ConfigureAwait(false);
                 if (stream == null) return;
-                Run(responses, index, stream, context.Clone() as Context);
+                Run(responses, index, stream, context.Clone() as Context, autoResetEvent);
             }
         }
         public override async Task Handler(HttpContext httpContext) {
-            var request = httpContext.Request;
             if (!httpContext.IsWebSocketRequest) {
                 await base.Handler(httpContext).ConfigureAwait(false);
                 return;
             }
             httpContext.AcceptWebSocketRequest(async (webSocketContext) => {
-                WebSocket webSocket = webSocketContext.WebSocket;
-                var context = new ServiceContext(Service);
-                context["httpContext"] = httpContext;
-                context["webSocketContext"] = webSocketContext;
-                context["request"] = httpContext.Request;
-                context["response"] = httpContext.Response;
-                context["user"] = httpContext.User;
-                context.RemoteEndPoint = GetRemoteEndPoint(request);
-                context.LocalEndPoint = GetLocalEndPoint(request);
-                context.Handler = this;
-                var responses = new ConcurrentQueue<(int index, MemoryStream stream)>();
-                OnAccept?.Invoke(webSocket);
-                var receive = Receive(webSocket, context, responses);
-                var send = Send(webSocket, responses);
                 try {
-                    await receive.ConfigureAwait(false);
-                    await send.ConfigureAwait(false);
+                    WebSocket webSocket = webSocketContext.WebSocket;
+                    try {
+                        var request = httpContext.Request;
+                        var context = new ServiceContext(Service);
+                        context["httpContext"] = httpContext;
+                        context["webSocketContext"] = webSocketContext;
+                        context["request"] = request;
+                        context["response"] = httpContext.Response;
+                        context["user"] = httpContext.User;
+                        context.RemoteEndPoint = GetRemoteEndPoint(request);
+                        context.LocalEndPoint = GetLocalEndPoint(request);
+                        context.Handler = this;
+                        var responses = new ConcurrentQueue<(int index, MemoryStream stream)>();
+                        OnAccept?.Invoke(webSocket);
+                        using (var autoResetEvent = new AutoResetEvent(false)) {
+                            var receive = Receive(webSocket, context, responses, autoResetEvent);
+                            var send = Send(webSocket, responses, autoResetEvent);
+                            await receive.ConfigureAwait(false);
+                            await send.ConfigureAwait(false);
+                        }
+                    }
+                    catch (Exception e) {
+                        OnError?.Invoke(e);
+                        webSocket.Abort();
+                        OnClose?.Invoke(webSocket);
+                    }
                 }
                 catch (Exception e) {
                     OnError?.Invoke(e);
-                    webSocket.Abort();
-                    OnClose?.Invoke(webSocket);
                 }
             }, new AspNetWebSocketOptions { SubProtocol = "hprose" });
         }

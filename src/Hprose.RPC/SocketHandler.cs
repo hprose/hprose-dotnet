@@ -8,7 +8,7 @@
 |                                                          |
 |  SocketHandler class for C#.                             |
 |                                                          |
-|  LastModified: Mar 20, 2019                              |
+|  LastModified: Jun 5, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -18,6 +18,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC {
@@ -54,12 +55,13 @@ namespace Hprose.RPC {
             }
             return bytes;
         }
-        private static async Task Send(Socket socket, ConcurrentQueue<(int index, MemoryStream stream)> responses) {
+        private async Task Send(Socket socket, ConcurrentQueue<(int index, MemoryStream stream)> responses, AutoResetEvent autoResetEvent) {
             var header = new byte[12];
             while (true) {
                 (int index, MemoryStream stream) response;
                 while (!responses.TryDequeue(out response)) {
                     await Task.Yield();
+                    autoResetEvent.WaitOne(1);
                 }
                 int index = response.index;
                 var stream = response.stream;
@@ -87,7 +89,7 @@ namespace Hprose.RPC {
                 stream.Dispose();
             }
         }
-        private async void Run(ConcurrentQueue<(int index, MemoryStream stream)> responses, int index, byte[] data, Context context) {
+        private async void Run(ConcurrentQueue<(int index, MemoryStream stream)> responses, int index, byte[] data, Context context, AutoResetEvent autoResetEvent) {
             using (var request = new MemoryStream(data, 0, data.Length, false, true)) {
                 MemoryStream response = null;
                 try {
@@ -100,10 +102,11 @@ namespace Hprose.RPC {
                 }
                 finally {
                     responses.Enqueue((index, response));
+                    autoResetEvent.Set();
                 }
             }
         }
-        public async Task Receive(Socket socket, ConcurrentQueue<(int index, MemoryStream stream)> responses) {
+        public async Task Receive(Socket socket, ConcurrentQueue<(int index, MemoryStream stream)> responses, AutoResetEvent autoResetEvent) {
             var header = new byte[12];
             while (true) {
                 await ReadAsync(socket, header, 0, 12).ConfigureAwait(false);
@@ -124,17 +127,19 @@ namespace Hprose.RPC {
                 context.RemoteEndPoint = socket.RemoteEndPoint;
                 context.LocalEndPoint = socket.LocalEndPoint;
                 context.Handler = this;
-                Run(responses, index, data, context);
+                Run(responses, index, data, context, autoResetEvent);
             }
         }
         private async void Handler(Socket socket) {
-            var responses = new ConcurrentQueue<(int index, MemoryStream stream)>();
-            OnAccept?.Invoke(socket);
-            var receive = Receive(socket, responses);
-            var send = Send(socket, responses);
             try {
-                await receive.ConfigureAwait(false);
-                await send.ConfigureAwait(false);
+                var responses = new ConcurrentQueue<(int index, MemoryStream stream)>();
+                OnAccept?.Invoke(socket);
+                using (var autoResetEvent = new AutoResetEvent(false)) {
+                    var receive = Receive(socket, responses, autoResetEvent);
+                    var send = Send(socket, responses, autoResetEvent);
+                    await receive.ConfigureAwait(false);
+                    await send.ConfigureAwait(false);
+                }
             }
             catch (Exception e) {
                 OnError?.Invoke(e);

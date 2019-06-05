@@ -8,7 +8,7 @@
 |                                                          |
 |  UdpHandler class for C#.                                |
 |                                                          |
-|  LastModified: May 17, 2019                              |
+|  LastModified: Jun 5, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -19,6 +19,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC {
@@ -37,7 +38,7 @@ namespace Hprose.RPC {
                 OnError?.Invoke(e);
             }
         }
-        private static async Task Send(UdpClient udpClient, ConcurrentQueue<(int index, MemoryStream stream, IPEndPoint endPoint)> responses) {
+        private async Task Send(UdpClient udpClient, ConcurrentQueue<(int index, MemoryStream stream, IPEndPoint endPoint)> responses, AutoResetEvent autoResetEvent) {
             while (true) {
                 (int index, MemoryStream stream, IPEndPoint endPoint) response;
                 while (!responses.TryDequeue(out response)) {
@@ -46,6 +47,7 @@ namespace Hprose.RPC {
 #else
                     await Task.Yield();
 #endif
+                    autoResetEvent.WaitOne(1);
                 }
                 var (index, stream, endPoint) = response;
                 var n = (int)stream.Length;
@@ -75,7 +77,7 @@ namespace Hprose.RPC {
                 }
             }
         }
-        public async void Process(UdpClient udpClient, UdpReceiveResult result, ConcurrentQueue<(int index, MemoryStream stream, IPEndPoint endPoint)> responses) {
+        public async void Process(UdpClient udpClient, UdpReceiveResult result, ConcurrentQueue<(int index, MemoryStream stream, IPEndPoint endPoint)> responses, AutoResetEvent autoResetEvent) {
             var buffer = result.Buffer;
             var ipEndPoint = result.RemoteEndPoint;
             uint crc = (uint)((buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3]);
@@ -103,21 +105,26 @@ namespace Hprose.RPC {
                 catch (Exception e) {
                     responses.Enqueue((index | 0x8000, new MemoryStream(Encoding.UTF8.GetBytes(e.Message)), ipEndPoint));
                 }
+                finally {
+                    autoResetEvent.Set();
+                }
             }
         }
-        public async Task Receive(UdpClient udpClient, ConcurrentQueue<(int index, MemoryStream stream, IPEndPoint endPoint)> responses) {
+        public async Task Receive(UdpClient udpClient, ConcurrentQueue<(int index, MemoryStream stream, IPEndPoint endPoint)> responses, AutoResetEvent autoResetEvent) {
             while (true) {
                 var result = await udpClient.ReceiveAsync().ConfigureAwait(false);
-                Process(udpClient, result, responses);
+                Process(udpClient, result, responses, autoResetEvent);
             }
         }
         private async Task Handler(UdpClient udpClient) {
             try {
                 var responses = new ConcurrentQueue<(int index, MemoryStream stream, IPEndPoint endPoint)>();
-                var receive = Receive(udpClient, responses);
-                var send = Send(udpClient, responses);
-                await receive.ConfigureAwait(false);
-                await send.ConfigureAwait(false);
+                using (var autoResetEvent = new AutoResetEvent(false)) {
+                    var receive = Receive(udpClient, responses, autoResetEvent);
+                    var send = Send(udpClient, responses, autoResetEvent);
+                    await receive.ConfigureAwait(false);
+                    await send.ConfigureAwait(false);
+                }
             }
             catch (Exception e) {
                 OnError?.Invoke(e);

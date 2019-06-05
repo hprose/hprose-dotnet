@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Mar 20, 2019                              |
+|  LastModified: Jun 5, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -25,6 +25,7 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 #endif
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC {
@@ -72,7 +73,7 @@ namespace Hprose.RPC {
             }
             return bytes;
         }
-        private async Task Send(Stream netStream, ConcurrentQueue<(int index, Stream stream)> responses) {
+        private async Task Send(Stream netStream, ConcurrentQueue<(int index, Stream stream)> responses, AutoResetEvent autoResetEvent) {
             var header = new byte[12];
             while (true) {
                 (int index, Stream stream) response;
@@ -82,6 +83,7 @@ namespace Hprose.RPC {
 #else
                     await Task.Yield();
 #endif
+                    autoResetEvent.WaitOne(1);
                 }
                 int index = response.index;
                 Stream stream = response.stream;
@@ -120,7 +122,7 @@ namespace Hprose.RPC {
                 stream.Dispose();
             }
         }
-        private async void Run(ConcurrentQueue<(int index, Stream stream)> responses, int index, byte[] data, Context context) {
+        private async void Run(ConcurrentQueue<(int index, Stream stream)> responses, int index, byte[] data, Context context, AutoResetEvent autoResetEvent) {
             using (var request = new MemoryStream(data, 0, data.Length, false, true)) {
                 Stream response = null;
                 try {
@@ -133,10 +135,11 @@ namespace Hprose.RPC {
                 }
                 finally {
                     responses.Enqueue((index, response));
+                    autoResetEvent.Set();
                 }
             }
         }
-        public async Task Receive(TcpClient tcpClient, Stream netStream, ConcurrentQueue<(int index, Stream stream)> responses) {
+        public async Task Receive(TcpClient tcpClient, Stream netStream, ConcurrentQueue<(int index, Stream stream)> responses, AutoResetEvent autoResetEvent) {
             var header = new byte[12];
             while (true) {
                 await ReadAsync(netStream, header, 0, 12).ConfigureAwait(false);
@@ -158,13 +161,13 @@ namespace Hprose.RPC {
                 context.RemoteEndPoint = tcpClient.Client.RemoteEndPoint;
                 context.LocalEndPoint = tcpClient.Client.LocalEndPoint;
                 context.Handler = this;
-                Run(responses, index, data, context);
+                Run(responses, index, data, context, autoResetEvent);
             }
         }
         private async void Handler(TcpClient tcpClient) {
-            var responses = new ConcurrentQueue<(int index, Stream stream)>();
-            OnAccept?.Invoke(tcpClient);
             try {
+                var responses = new ConcurrentQueue<(int index, Stream stream)>();
+                OnAccept?.Invoke(tcpClient);
                 Stream stream = tcpClient.GetStream();
 #if !NET35_CF
                 if (ServerCertificate != null) {
@@ -177,10 +180,12 @@ namespace Hprose.RPC {
                     stream = sslStream;
                 }
 #endif
-                var receive = Receive(tcpClient, stream, responses);
-                var send = Send(stream, responses);
-                await receive.ConfigureAwait(false);
-                await send.ConfigureAwait(false);
+                using (var autoResetEvent = new AutoResetEvent(false)) {
+                    var receive = Receive(tcpClient, stream, responses, autoResetEvent);
+                    var send = Send(stream, responses, autoResetEvent);
+                    await receive.ConfigureAwait(false);
+                    await send.ConfigureAwait(false);
+                }
             }
             catch (Exception e) {
                 if (e.InnerException != null) {
