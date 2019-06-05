@@ -47,7 +47,12 @@ namespace Hprose.RPC {
 #else
                     await Task.Yield();
 #endif
-                    autoResetEvent.WaitOne(1);
+                    try {
+                        autoResetEvent.WaitOne(1);
+                    }
+                    catch (Exception) {
+                        return;
+                    }
                 }
                 var (index, stream, endPoint) = response;
                 var n = (int)stream.Length;
@@ -89,6 +94,10 @@ namespace Hprose.RPC {
             if (length > Service.MaxRequestLength) {
                 var bytes = Encoding.UTF8.GetBytes("Request entity too large");
                 responses.Enqueue((index | 0x8000, new MemoryStream(bytes), ipEndPoint));
+                try {
+                    autoResetEvent.Set();
+                }
+                catch (Exception) { }
                 return;
             }
             var context = new ServiceContext(Service);
@@ -106,7 +115,10 @@ namespace Hprose.RPC {
                     responses.Enqueue((index | 0x8000, new MemoryStream(Encoding.UTF8.GetBytes(e.Message)), ipEndPoint));
                 }
                 finally {
-                    autoResetEvent.Set();
+                    try {
+                        autoResetEvent.Set();
+                    }
+                    catch (Exception) { }
                 }
             }
         }

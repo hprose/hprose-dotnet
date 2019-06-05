@@ -61,7 +61,12 @@ namespace Hprose.RPC {
                 (int index, MemoryStream stream) response;
                 while (!responses.TryDequeue(out response)) {
                     await Task.Yield();
-                    autoResetEvent.WaitOne(1);
+                    try {
+                        autoResetEvent.WaitOne(1);
+                    }
+                    catch (Exception) {
+                        return;
+                    }
                 }
                 int index = response.index;
                 var stream = response.stream;
@@ -102,7 +107,10 @@ namespace Hprose.RPC {
                 }
                 finally {
                     responses.Enqueue((index, response));
-                    autoResetEvent.Set();
+                    try {
+                        autoResetEvent.Set();
+                    }
+                    catch (Exception) { }
                 }
             }
         }
@@ -119,6 +127,10 @@ namespace Hprose.RPC {
                 if (length > Service.MaxRequestLength) {
                     var bytes = Encoding.UTF8.GetBytes("Request entity too large");
                     responses.Enqueue(((int)(index | 0x80000000), new MemoryStream(bytes, 0, bytes.Length, false, true)));
+                    try {
+                        autoResetEvent.Set();
+                    }
+                    catch (Exception) { }
                     return;
                 }
                 var data = await ReadAsync(socket, new byte[length], 0, length).ConfigureAwait(false);

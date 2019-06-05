@@ -34,7 +34,12 @@ namespace Hprose.RPC.AspNetCore {
                 (int index, MemoryStream stream) response;
                 while (!responses.TryDequeue(out response)) {
                     await Task.Yield();
-                    autoResetEvent.WaitOne(1);
+                    try {
+                        autoResetEvent.WaitOne(1);
+                    }
+                    catch (Exception) {
+                        return;
+                    }
                 }
                 int index = response.index;
                 MemoryStream stream = response.stream;
@@ -71,11 +76,14 @@ namespace Hprose.RPC.AspNetCore {
             }
             finally {
                 responses.Enqueue((index, response));
-                autoResetEvent.Set();
+                try {
+                    autoResetEvent.Set();
+                }
+                catch (Exception) { }
                 request.Dispose();
             }
         }
-        private async Task<(int, MemoryStream)> ReadAsync(WebSocket webSocket, ConcurrentQueue<(int index, MemoryStream stream)> responses) {
+        private async Task<(int, MemoryStream)> ReadAsync(WebSocket webSocket, ConcurrentQueue<(int index, MemoryStream stream)> responses, AutoResetEvent autoResetEvent) {
             MemoryStream stream = new MemoryStream();
             var buffer = ArrayPool<byte>.Shared.Rent(16384);
             var index = -1;
@@ -96,6 +104,10 @@ namespace Hprose.RPC.AspNetCore {
                         var data = stream.GetArraySegment();
                         var bytes = Encoding.UTF8.GetBytes("Request entity too large");
                         responses.Enqueue(((int)(index | 0x80000000), new MemoryStream(bytes, 0, bytes.Length, false, true)));
+                        try {
+                            autoResetEvent.Set();
+                        }
+                        catch (Exception) { }
                         return (index, null);
                     }
                     if (result.EndOfMessage) {
@@ -113,7 +125,7 @@ namespace Hprose.RPC.AspNetCore {
         }
         public async Task Receive(WebSocket webSocket, ServiceContext context, ConcurrentQueue<(int index, MemoryStream stream)> responses, AutoResetEvent autoResetEvent) {
             while (webSocket.State == WebSocketState.Open) {
-                var (index, stream) = await ReadAsync(webSocket, responses).ConfigureAwait(false);
+                var (index, stream) = await ReadAsync(webSocket, responses, autoResetEvent).ConfigureAwait(false);
                 if (stream == null) return;
                 Run(responses, index, stream, context.Clone() as Context, autoResetEvent);
             }
