@@ -8,7 +8,7 @@
 |                                                          |
 |  Prosumer plugin for C#.                                 |
 |                                                          |
-|  LastModified: Mar 9, 2019                               |
+|  LastModified: Jun 5, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -25,7 +25,7 @@ namespace Hprose.RPC.Plugins.Push {
         static Prosumer() {
             TypeManager.Register<Message>("@");
         }
-        private ConcurrentDictionary<string, Action<Message>> callbacks = new ConcurrentDictionary<string, Action<Message>>();
+        private readonly ConcurrentDictionary<string, Action<Message>> callbacks = new ConcurrentDictionary<string, Action<Message>>();
         public event Action<Exception> OnError;
         public event Action<string> OnSubscribe;
         public event Action<string> OnUnsubscribe;
