@@ -37,7 +37,7 @@ namespace Hprose.IO.Serializers {
             int r = writer.WriteClass(columns, () => {
                 stream.WriteByte(TagClass);
                 ValueWriter.Write(stream, obj.TableName);
-                ValueWriter.Write(stream, count);
+                ValueWriter.WriteInt(stream, count);
                 stream.WriteByte(TagOpenbrace);
                 var strSerializer = Serializer<string>.Instance;
                 for (int i = 0; i < count; ++i) {
