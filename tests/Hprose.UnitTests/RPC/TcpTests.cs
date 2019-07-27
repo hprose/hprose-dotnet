@@ -257,6 +257,7 @@ namespace Hprose.UnitTests.RPC {
             server3.Stop();
             server4.Stop();
         }
+#if !NET35_CF && !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
         [TestMethod]
         public async Task Test8() {
             IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
@@ -303,6 +304,7 @@ namespace Hprose.UnitTests.RPC {
             server3.Close();
             server4.Close();
         }
+#endif
         [TestMethod]
         public async Task Test9() {
             IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];

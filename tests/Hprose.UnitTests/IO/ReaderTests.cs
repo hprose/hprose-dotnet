@@ -446,7 +446,6 @@ namespace Hprose.UnitTests.IO {
                 writer.Serialize("123456789");
                 writer.Serialize((UIntPtr)(123456789));
                 writer.Serialize((byte)123);
-                writer.Serialize((sbyte)-123);
                 writer.Serialize(3.14);
                 stream.Position = 0;
                 Reader reader = new Reader(stream);
@@ -460,7 +459,6 @@ namespace Hprose.UnitTests.IO {
                 Assert.AreEqual((UIntPtr)123456789, reader.Deserialize<UIntPtr>());
                 Assert.AreEqual((UIntPtr)123456789, reader.Deserialize<UIntPtr>());
                 Assert.AreEqual((UIntPtr)123, reader.Deserialize<UIntPtr>());
-                Assert.AreEqual((UIntPtr)(-123), reader.Deserialize<UIntPtr>());
                 Assert.AreEqual((UIntPtr)3, reader.Deserialize<UIntPtr>());
             }
         }
