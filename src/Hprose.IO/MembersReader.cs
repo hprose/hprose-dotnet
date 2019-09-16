@@ -29,6 +29,9 @@ namespace Hprose.IO {
 #if !NET35
         private static BlockExpression CreateReadBlock(Dictionary<string, MemberInfo> members, string[] names, ParameterExpression reader, ParameterExpression obj) {
             var length = names.Length;
+            if (length == 1 && names[0].Length == 0) {
+                length = 0;
+            }
             Expression[] expressions = new Expression[length + 1];
             for (var i = 0; i < length; ++i) {
                 expressions[i] = CreateReadMemberExpression(members[names[i]], reader, obj);
