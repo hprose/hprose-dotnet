@@ -50,6 +50,7 @@ namespace Hprose.RPC {
             while (length > 0) {
                 var buffer = new ArraySegment<byte>(bytes, offset, length);
                 int size = await socket.ReceiveAsync(buffer, SocketFlags.None).ConfigureAwait(false);
+                if (size == 0) throw new EndOfStreamException();
                 offset += size;
                 length -= size;
             }
