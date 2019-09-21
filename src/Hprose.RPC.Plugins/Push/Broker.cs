@@ -8,7 +8,7 @@
 |                                                          |
 |  Broker plugin for C#.                                   |
 |                                                          |
-|  LastModified: Mar 20, 2019                              |
+|  LastModified: Sep 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -190,14 +190,17 @@ namespace Hprose.RPC.Plugins.Push {
             return await responder.Task.ConfigureAwait(false);
         }
         public bool Unicast(object data, string topic, string id, string from = "") {
-            if (Messages.TryGetValue(id, out var topics)) {
-                if (topics.TryGetValue(topic, out var messages)) {
-                    if (messages.TryAdd(new Message() { Data = data, From = from })) {
-                        Response(id);
-                        return true;
+            try {
+                if (Messages.TryGetValue(id, out var topics)) {
+                    if (topics.TryGetValue(topic, out var messages)) {
+                        if (messages.TryAdd(new Message() { Data = data, From = from })) {
+                            Response(id);
+                            return true;
+                        }
                     }
                 }
             }
+            catch (Exception) {}
             return false;
         }
         public IDictionary<string, bool> Multicast(object data, string topic, IEnumerable<string> ids, string from = "") {
