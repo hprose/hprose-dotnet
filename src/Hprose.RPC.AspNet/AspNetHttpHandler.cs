@@ -8,7 +8,7 @@
 |                                                          |
 |  AspNetHttpHandler class for C#.                         |
 |                                                          |
-|  LastModified: Mar 28, 2019                              |
+|  LastModified: Sep 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -29,6 +29,7 @@ namespace Hprose.RPC.AspNet {
         public bool P3P { get; set; } = true;
         public bool Get { get; set; } = true;
         public bool Compress { get; set; } = false;
+        public Dictionary<string, string> HttpHeaders { get; set; } = new Dictionary<string, string>();
         public string CrossDomainXmlFile { get; set; } = null;
         public string ClientAccessPolicyXmlFile { get; set; } = null;
         private readonly string lastModified;
@@ -84,6 +85,11 @@ namespace Hprose.RPC.AspNet {
                 else if (origins.Count == 0 || origins.ContainsKey(origin)) {
                     response.AppendHeader("Access-Control-Allow-Origin", origin);
                     response.AppendHeader("Access-Control-Allow-Credentials", "true");
+                }
+            }
+            if (HttpHeaders != null) {
+                foreach (var header in HttpHeaders) {
+                    response.AppendHeader(header.Key, header.Value);
                 }
             }
         }
