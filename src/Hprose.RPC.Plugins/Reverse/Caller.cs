@@ -8,7 +8,7 @@
 |                                                          |
 |  Caller class for C#.                                    |
 |                                                          |
-|  LastModified: May 4, 2019                               |
+|  LastModified: Sep 21, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -117,10 +117,10 @@ namespace Hprose.RPC.Plugins.Reverse {
                 }
             }
         }
-        public void Invoke(string id, string fullname, in object[] args = null) {
+        public void Invoke(string id, string fullname, object[] args = null) {
             InvokeAsync<object>(id, fullname, args).Wait();
         }
-        public T Invoke<T>(string id, string fullname, in object[] args = null) {
+        public T Invoke<T>(string id, string fullname, object[] args = null) {
             return InvokeAsync<T>(id, fullname, args).Result;
         }
         public Task InvokeAsync(string id, string fullname, object[] args = null) {
