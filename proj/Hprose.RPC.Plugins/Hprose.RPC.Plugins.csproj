@@ -5,7 +5,7 @@
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
-    <Version>3.0.3</Version>
+    <Version>3.0.4</Version>
     <OutputType>Library</OutputType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -19,7 +19,7 @@
     <PackageTags>Hprose RPC CircuitBreaker Cluster Limiter LoadBalance Log Push Reverse net35-cf WindowsCE wince</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://hprose.com</PackageProjectUrl>
-    <PackageIconUrl>https://hprose.com/apple-touch-icon-180x180.png</PackageIconUrl>
+    <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/hprose/hprose-dotnet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -51,6 +51,10 @@
     <NoWarn>1701;1702;CA1724;CA1812</NoWarn>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="..\..\icon.png" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
+      
   <ItemGroup Condition=" '$(TargetFramework)' == 'net35-cf' ">
     <Reference Include="mscorlib, Version=3.5.0.0, Culture=neutral, PublicKeyToken=969db8053d3322ac" />
     <Reference Include="System, Version=3.5.0.0, Culture=neutral, PublicKeyToken=969db8053d3322ac" />
