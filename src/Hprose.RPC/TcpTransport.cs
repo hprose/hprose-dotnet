@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpTransport class for C#.                              |
 |                                                          |
-|  LastModified: Feb 27, 2019                              |
+|  LastModified: Nov 13, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -74,7 +74,7 @@ namespace Hprose.RPC {
                             tcpClient.LingerState = LingerState;
                         }
 
-                        await tcpClient.ConnectAsync(host, port);
+                        await tcpClient.ConnectAsync(host, port).ConfigureAwait(false);
                         Stream tcpStream = tcpClient.GetStream();
 #if !NET35_CF
                         switch (uri.Scheme) {

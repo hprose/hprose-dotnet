@@ -8,7 +8,7 @@
 |                                                          |
 |  WebSocketTransport class for C#.                        |
 |                                                          |
-|  LastModified: Feb 27, 2019                              |
+|  LastModified: Nov 13, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -66,7 +66,7 @@ namespace Hprose.RPC {
                         if (KeepAliveInterval > TimeSpan.Zero) {
                             options.KeepAliveInterval = KeepAliveInterval;
                         }
-                        await webSocket.ConnectAsync(uri, CancellationToken.None);
+                        await webSocket.ConnectAsync(uri, CancellationToken.None).ConfigureAwait(false);
                         Requests.TryAdd(webSocket, new ConcurrentQueue<(int, MemoryStream)>());
                         Results.TryAdd(webSocket, new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());
                         Receive(webSocket);

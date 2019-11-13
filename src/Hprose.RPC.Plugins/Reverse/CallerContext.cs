@@ -8,7 +8,7 @@
 |                                                          |
 |  CallerContext class for C#.                             |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Nov 13, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -26,11 +26,11 @@ namespace Hprose.RPC.Plugins.Reverse {
             Copy(context.Items, Items);
         }
         public void Invoke(string fullname, in object[] args = null) {
-            Caller.InvokeAsync<object>(Caller.GetId(this), fullname, args).Wait();
+            Caller.InvokeAsync<object>(Caller.GetId(this), fullname, args).ConfigureAwait(false).GetAwaiter().GetResult();
             return;
         }
         public T Invoke<T>(string fullname, in object[] args = null) {
-            return Caller.InvokeAsync<T>(Caller.GetId(this), fullname, args).Result;
+            return Caller.InvokeAsync<T>(Caller.GetId(this), fullname, args).ConfigureAwait(false).GetAwaiter().GetResult();
         }
         public Task InvokeAsync(string fullname, object[] args = null) {
             return Caller.InvokeAsync(Caller.GetId(this), fullname, args);

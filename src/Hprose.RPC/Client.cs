@@ -8,7 +8,7 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Mar 29, 2019                              |
+|  LastModified: Nov 13, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -139,10 +139,10 @@ namespace Hprose.RPC {
             return this;
         }
         public void Invoke(string fullname, object[] args = null, ClientContext context = null) {
-            InvokeAsync<object>(fullname, args, context).Wait();
+            InvokeAsync<object>(fullname, args, context).ConfigureAwait(false).GetAwaiter().GetResult();
         }
         public T Invoke<T>(string fullname, object[] args = null, ClientContext context = null) {
-            return InvokeAsync<T>(fullname, args, context).Result;
+            return InvokeAsync<T>(fullname, args, context).ConfigureAwait(false).GetAwaiter().GetResult();
         }
         public Task InvokeAsync(string fullname, object[] args = null, ClientContext context = null) {
             return InvokeAsync<object>(fullname, args, context);
@@ -187,9 +187,9 @@ namespace Hprose.RPC {
                 tasks[i++] = pair.Value.Abort();
             }
 #if NET40
-            await TaskEx.WhenAll(tasks);
+            await TaskEx.WhenAll(tasks).ConfigureAwait(false);
 #else
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
 #endif
         }
         private bool disposed = false;

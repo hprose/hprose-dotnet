@@ -8,7 +8,7 @@
 |                                                          |
 |  SocketTransport class for C#.                           |
 |                                                          |
-|  LastModified: Feb 27, 2019                              |
+|  LastModified: Nov 13, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -49,7 +49,7 @@ namespace Hprose.RPC {
                         socket = new Socket(family, SocketType.Stream, protocol);
                         if (family == AddressFamily.Unix) {
 #if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
-                            await socket.ConnectAsync(new UnixDomainSocketEndPoint(uri.AbsolutePath));
+                            await socket.ConnectAsync(new UnixDomainSocketEndPoint(uri.AbsolutePath)).ConfigureAwait(false);
 #else
                             throw new NotSupportedException("not supported unix protocol");
 #endif
@@ -63,7 +63,7 @@ namespace Hprose.RPC {
                             if (LingerState != null) {
                                 socket.LingerState = LingerState;
                             }
-                            await socket.ConnectAsync(host, port);
+                            await socket.ConnectAsync(host, port).ConfigureAwait(false);
                         }
                         Requests.TryAdd(socket, new ConcurrentQueue<(int, MemoryStream)>());
                         Results.TryAdd(socket, new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());

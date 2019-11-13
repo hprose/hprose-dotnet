@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Jun 5, 2019                               |
+|  LastModified: Nov 13, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -186,7 +186,7 @@ namespace Hprose.RPC {
                 if (ServerCertificate != null) {
                     SslStream sslStream = new SslStream(stream, false);
 #if NET40
-                    await sslStream.AuthenticateAsServerAsync(ServerCertificate);
+                    await sslStream.AuthenticateAsServerAsync(ServerCertificate).ConfigureAwait(false);
 #else
                     await sslStream.AuthenticateAsServerAsync(ServerCertificate, ClientCertificateRequired, EnabledSslProtocols, CheckCertificateRevocation).ConfigureAwait(false);
 #endif
