@@ -35,7 +35,7 @@ namespace Hprose.UnitTests.RPC {
         }
         [TestMethod]
         public async Task Test1() {
-            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
+            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1").ConfigureAwait(false))[0];
             TcpListener server = new TcpListener(iPAddress, 8412);
             server.Start();
             var service = new Service();
@@ -47,10 +47,10 @@ namespace Hprose.UnitTests.RPC {
                    .Add(() => { return "good"; }, "Good")
                    .Bind(server);
             var client = new Client("tcp://127.0.0.1");
-            var result = await client.InvokeAsync<string>("hello", new object[] { "world" });
+            var result = await client.InvokeAsync<string>("hello", new object[] { "world" }).ConfigureAwait(false);
             Assert.AreEqual("Hello world", result);
-            Assert.AreEqual(3, await client.InvokeAsync<int>("sum", new object[] { 1, 2 }));
-            Assert.AreEqual("good", await client.InvokeAsync<string>("good"));
+            Assert.AreEqual(3, await client.InvokeAsync<int>("sum", new object[] { 1, 2 }).ConfigureAwait(false));
+            Assert.AreEqual("good", await client.InvokeAsync<string>("good").ConfigureAwait(false));
             server.Stop();
         }
 
@@ -64,7 +64,7 @@ namespace Hprose.UnitTests.RPC {
         }
         [TestMethod]
         public async Task Test2() {
-            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
+            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1").ConfigureAwait(false))[0];
             TcpListener server = new TcpListener(iPAddress, 8413);
             server.Start();
             var service = new Service();
@@ -76,16 +76,16 @@ namespace Hprose.UnitTests.RPC {
             var log = new Log();
             client.Use(log.IOHandler).Use(log.InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
-            var result = await proxy.Hello("world");
+            var result = await proxy.Hello("world").ConfigureAwait(false);
             Assert.AreEqual("Hello world", result);
             Assert.AreEqual(3, proxy.Sum(1, 2));
             proxy.OnewayCall("Oneway Sync");
-            await proxy.OnewayCallAsync("Oneway Async");
+            await proxy.OnewayCallAsync("Oneway Async").ConfigureAwait(false);
             server.Stop();
         }
         [TestMethod]
         public async Task Test3() {
-            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
+            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1").ConfigureAwait(false))[0];
             TcpListener server = new TcpListener(iPAddress, 8414);
             server.Start();
             var service = new Broker(new Service()).Service;
@@ -109,26 +109,26 @@ namespace Hprose.UnitTests.RPC {
                 Assert.AreEqual("hello", data);
                 System.Console.WriteLine(from);
                 Assert.AreEqual("2", from);
-            });
+            }).ConfigureAwait(false);
             await prosumer1.Subscribe<string>("test2", (data) => {
                 System.Console.WriteLine(data);
                 Assert.AreEqual("world", data);
-            });
+            }).ConfigureAwait(false);
             await prosumer1.Subscribe<Exception>("test3", (data) => {
                 System.Console.WriteLine(data);
                 Assert.AreEqual("error", data.Message);
-            });
+            }).ConfigureAwait(false);
             var r1 = prosumer2.Push("hello", "test", "1");
             var r2 = prosumer2.Push("hello", "test", "1");
             var r3 = prosumer2.Push("world", "test2", "1");
             var r4 = prosumer2.Push("world", "test2", "1");
             var r5 = prosumer2.Push(new Exception("error"), "test3", "1");
             var r6 = prosumer2.Push(new Exception("error"), "test3", "1");
-            await Task.WhenAll(r1, r2, r3, r4, r5, r6);
-            await Task.Delay(10);
-            await prosumer1.Unsubscribe("test");
-            await prosumer1.Unsubscribe("test2");
-            await prosumer1.Unsubscribe("test3");
+            await Task.WhenAll(r1, r2, r3, r4, r5, r6).ConfigureAwait(false);
+            await Task.Delay(10).ConfigureAwait(false);
+            await prosumer1.Unsubscribe("test").ConfigureAwait(false);
+            await prosumer1.Unsubscribe("test2").ConfigureAwait(false);
+            await prosumer1.Unsubscribe("test3").ConfigureAwait(false);
             server.Stop();
         }
         public object Missing(string name, object[] args, Context context) {
@@ -136,7 +136,7 @@ namespace Hprose.UnitTests.RPC {
         }
         [TestMethod]
         public async Task Test4() {
-            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
+            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1").ConfigureAwait(false))[0];
             TcpListener server = new TcpListener(iPAddress, 8415);
             server.Start();
             var service = new Service();
@@ -152,7 +152,7 @@ namespace Hprose.UnitTests.RPC {
         }
         [TestMethod]
         public async Task Test5() {
-            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
+            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1").ConfigureAwait(false))[0];
             TcpListener server = new TcpListener(iPAddress, 8416);
             server.Start();
             var log = new Log();
@@ -183,16 +183,16 @@ namespace Hprose.UnitTests.RPC {
             Assert.AreEqual(r1, "Hello world1");
             Assert.AreEqual(r2, "Hello world2");
             Assert.AreEqual(r3, "Hello world3");
-            var results = await Task.WhenAll(result1, result2, result3);
+            var results = await Task.WhenAll(result1, result2, result3).ConfigureAwait(false);
             Assert.AreEqual(results[0], "Hello world1");
             Assert.AreEqual(results[1], "Hello world2");
             Assert.AreEqual(results[2], "Hello world3");
-            await provider.Close();
+            await provider.Close().ConfigureAwait(false);
             server.Stop();
         }
         [TestMethod]
         public async Task Test6() {
-            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
+            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1").ConfigureAwait(false))[0];
             TcpListener server = new TcpListener(iPAddress, 8417);
             server.Start();
             var service = new Service {
@@ -208,16 +208,16 @@ namespace Hprose.UnitTests.RPC {
             var log = new Log();
             client.Use(log.IOHandler).Use(log.InvokeHandler);
             var proxy = client.UseService<ITestInterface>();
-            var result = await proxy.Hello("world");
+            var result = await proxy.Hello("world").ConfigureAwait(false);
             Assert.AreEqual("Hello world", result);
             Assert.AreEqual(3, proxy.Sum(1, 2));
             proxy.OnewayCall("Oneway Sync");
-            await proxy.OnewayCallAsync("Oneway Async");
+            await proxy.OnewayCallAsync("Oneway Async").ConfigureAwait(false);
             server.Stop();
         }
         [TestMethod]
         public async Task Test7() {
-            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
+            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1").ConfigureAwait(false))[0];
             TcpListener server1 = new TcpListener(iPAddress, 8418);
             server1.Start();
             TcpListener server2 = new TcpListener(iPAddress, 8419);
@@ -248,7 +248,7 @@ namespace Hprose.UnitTests.RPC {
             for (int i = 0; i < n; ++i) {
                 tasks[i] = proxy.Hello("world" + i);
             }
-            var results = await Task.WhenAll(tasks);
+            var results = await Task.WhenAll(tasks).ConfigureAwait(false);
             for (int i = 0; i < n; ++i) {
                 Assert.AreEqual(results[i], "Hello world" + i);
             }
@@ -260,7 +260,7 @@ namespace Hprose.UnitTests.RPC {
 #if !NET35_CF && !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
         [TestMethod]
         public async Task Test8() {
-            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
+            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1").ConfigureAwait(false))[0];
             Socket server1 = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             server1.Bind(new IPEndPoint(iPAddress, 8422));
             server1.Listen(128);
@@ -295,7 +295,7 @@ namespace Hprose.UnitTests.RPC {
             for (int i = 0; i < n; ++i) {
                 tasks[i] = proxy.Hello("world" + i);
             }
-            var results = await Task.WhenAll(tasks);
+            var results = await Task.WhenAll(tasks).ConfigureAwait(false);
             for (int i = 0; i < n; ++i) {
                 Assert.AreEqual(results[i], "Hello world" + i);
             }
@@ -307,7 +307,7 @@ namespace Hprose.UnitTests.RPC {
 #endif
         [TestMethod]
         public async Task Test9() {
-            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1"))[0];
+            IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1").ConfigureAwait(false))[0];
             TcpListener server = new TcpListener(iPAddress, 8426);
             server.Start();
             var service = new Service();
@@ -319,11 +319,11 @@ namespace Hprose.UnitTests.RPC {
             var client = new Client("tcp4://127.0.0.1:8426");
             var log = new Log();
             client.Use(log.IOHandler).Use(log.InvokeHandler);
-            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
-            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
-            await client.Abort();
-            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
-            Console.WriteLine(await client.InvokeAsync<string>("getAddress"));
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress").ConfigureAwait(false));
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress").ConfigureAwait(false));
+            await client.Abort().ConfigureAwait(false);
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress").ConfigureAwait(false));
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress").ConfigureAwait(false));
             server.Stop();
         }
 #if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
@@ -345,7 +345,7 @@ namespace Hprose.UnitTests.RPC {
                 for (int i = 0; i < n; ++i) {
                     tasks[i] = proxy.Hello("world" + i);
                 }
-                var results = await Task.WhenAll(tasks);
+                var results = await Task.WhenAll(tasks).ConfigureAwait(false);
                 for (int i = 0; i < n; ++i) {
                     Assert.AreEqual(results[i], "Hello world" + i);
                 }

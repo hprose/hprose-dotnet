@@ -18,7 +18,7 @@ namespace Hprose.UnitTests.RPC {
         public async Task TestTask2() {
             MethodInfo sum = GetType().GetMethod("Sum");
             Task result = (Task)sum.Invoke(this, new object[] { 1, 2 });
-            Assert.AreEqual(3, (int)await TaskResult.Get(result));
+            Assert.AreEqual(3, (int)await TaskResult.Get(result).ConfigureAwait(false));
         }
     }
 }
