@@ -8,7 +8,7 @@
 |                                                          |
 |  Context class for C#.                                   |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Dec 30, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -19,6 +19,8 @@ using System.Collections.Generic;
 namespace Hprose.RPC {
     public class Context : ICloneable {
         public IDictionary<string, object> Items { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+        public IDictionary<string, object> RequestHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+        public IDictionary<string, object> ResponseHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public object this[string name] {
             get => Items[name];
             set => Items[name] = value;
@@ -33,8 +35,9 @@ namespace Hprose.RPC {
         }
         public virtual object Clone() {
             var context = MemberwiseClone() as Context;
-            context.Items = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
-            Copy(Items, context.Items);
+            context.Items = new Dictionary<string, object>(Items, StringComparer.InvariantCultureIgnoreCase);
+            context.RequestHeaders = new Dictionary<string, object>(RequestHeaders, StringComparer.InvariantCultureIgnoreCase);
+            context.ResponseHeaders = new Dictionary<string, object>(ResponseHeaders, StringComparer.InvariantCultureIgnoreCase);
             return context;
         }
     }
