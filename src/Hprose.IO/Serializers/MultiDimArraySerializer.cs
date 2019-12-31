@@ -24,7 +24,7 @@ namespace Hprose.IO.Serializers {
             Array array = (Array)(object)obj;
             int rank = array.Rank;
             int i;
-#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
+#if NETSTANDARD2_1 || NETCOREAPP2_1_UP
             Span<int> lb = stackalloc int[rank];
             Span<int> ub = stackalloc int[rank];
             Span<int> len = stackalloc int[rank];

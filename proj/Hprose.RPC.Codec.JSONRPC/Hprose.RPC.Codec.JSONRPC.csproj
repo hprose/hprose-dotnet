@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;net35-cf;net40;net40-client;net45;net451;net452;net46;net461;net462;net47;net471;net472;net48</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;net35-cf;net40;net40-client;net45;net451;net452;net46;net461;net462;net47;net471;net472;net48</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
-    <Version>3.0.2</Version>
+    <Version>3.0.4</Version>
     <OutputType>Library</OutputType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -25,6 +25,26 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
+    <DefineConstants>NETCOREAPP2_0_UP</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'">
+    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
+    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP;NETCOREAPP3_0_UP</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP;NETCOREAPP3_0_UP;NETCOREAPP3_1_UP</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net35-cf'">

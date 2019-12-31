@@ -48,7 +48,7 @@ namespace Hprose.RPC {
                         }
                         socket = new Socket(family, SocketType.Stream, protocol);
                         if (family == AddressFamily.Unix) {
-#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
+#if NETSTANDARD2_1 || NETCOREAPP2_1_UP
                             await socket.ConnectAsync(new UnixDomainSocketEndPoint(uri.AbsolutePath)).ConfigureAwait(false);
 #else
                             throw new NotSupportedException("not supported unix protocol");

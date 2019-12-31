@@ -1,22 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;net45;net451;net452;net46;net461;net462;net47;net471;net472;net48</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;net45;net451;net452;net46;net461;net462;net47;net471;net472;net48</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <LangVersion>latest</LangVersion>
     <RootNamespace>Hprose.UnitTests</RootNamespace>
     <NoWarn>CS0414</NoWarn>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
+    <DefineConstants>NETCOREAPP2_0_UP</DefineConstants>
+  </PropertyGroup>
 
-  <ItemGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'">
+    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
+    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP;NETCOREAPP3_0_UP</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP;NETCOREAPP3_0_UP;NETCOREAPP3_1_UP</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" !$(TargetFramework.StartsWith('netcoreapp3')) ">
     <Reference Include="Microsoft.CSharp" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
-    <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
   </ItemGroup>
 
-  <ItemGroup Condition=" $(TargetFramework.StartsWith('net45')) Or  $(TargetFramework.StartsWith('net46')) ">
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.0.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('net45')) Or $(TargetFramework.StartsWith('net46')) ">
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 

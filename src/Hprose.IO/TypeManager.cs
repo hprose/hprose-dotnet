@@ -85,7 +85,7 @@ namespace Hprose.IO {
             Type type;
             int length = alias.Length - alias.Replace("_", "").Length;
             if (length > 0) {
-#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
+#if NETSTANDARD2_1 || NETCOREAPP2_1_UP
                 Span<int> positions = stackalloc int[length];
 #else
                 int[] positions = new int[length];
@@ -116,7 +116,7 @@ namespace Hprose.IO {
             }
             return type;
         }
-#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
+#if NETSTANDARD2_1 || NETCOREAPP2_1_UP
         private static Type GetNestedType(char[] name, Span<int> positions, int i, char c) {
 #else
         private static Type GetNestedType(char[] name, int[] positions, int i, char c) {
@@ -135,7 +135,7 @@ namespace Hprose.IO {
             }
             return type;
         }
-#if NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
+#if NETSTANDARD2_1 || NETCOREAPP2_1_UP
         private static Type GetType(char[] name, Span<int> positions, int i, char c) {
 #else
         private static Type GetType(char[] name, int[] positions, int i, char c) {
