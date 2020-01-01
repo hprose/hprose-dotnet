@@ -1,6 +1,6 @@
 language: csharp
 mono: latest
-dotnet: 2.2
+dotnet: 3.1
 sudo: required
 dist: xenial
 solution: Hprose.sln
