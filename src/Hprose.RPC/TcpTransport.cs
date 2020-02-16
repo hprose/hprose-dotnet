@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpTransport class for C#.                              |
 |                                                          |
-|  LastModified: Nov 13, 2019                              |
+|  LastModified: Jan 17, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -33,12 +33,12 @@ namespace Hprose.RPC {
         public static string[] Schemes { get; } = new string[] { "tcp", "tcp4", "tcp6" };
 #endif
         private volatile int counter = 0;
+        public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
+#if !NET35_CF
         public LingerOption LingerState { get; set; } = null;
         public bool NoDelay { get; set; } = true;
-        public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         public int ReceiveBufferSize { get; set; } = 8192;
         public int SendBufferSize { get; set; } = 8192;
-#if !NET35_CF
         public RemoteCertificateValidationCallback ValidateServerCertificate { get; set; } = (sender, certificate, chain, sslPolicyErrors) => true;
         public LocalCertificateSelectionCallback CertificateSelection { get; set; } = null;
         public EncryptionPolicy EncryptionPolicy { get; set; } = EncryptionPolicy.RequireEncryption;
@@ -65,6 +65,7 @@ namespace Hprose.RPC {
                         var host = uri.IdnHost;
 #endif
                         var port = uri.Port > 0 ? uri.Port : 8412;
+#if !NET35_CF
                         tcpClient = new TcpClient(family) {
                             NoDelay = NoDelay,
                             ReceiveBufferSize = ReceiveBufferSize,
@@ -73,7 +74,9 @@ namespace Hprose.RPC {
                         if (LingerState != null) {
                             tcpClient.LingerState = LingerState;
                         }
-
+#else
+                        tcpClient = new TcpClient(family);
+#endif
                         await tcpClient.ConnectAsync(host, port).ConfigureAwait(false);
                         Stream tcpStream = tcpClient.GetStream();
 #if !NET35_CF
