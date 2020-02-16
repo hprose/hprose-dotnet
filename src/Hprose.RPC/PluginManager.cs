@@ -4,11 +4,11 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-|  HandlerManager.cs                                       |
+|  PluginManager.cs                                        |
 |                                                          |
-|  HandlerManager class for C#.                            |
+|  PluginManager class for C#.                             |
 |                                                          |
-|  LastModified: Mar 20, 2019                              |
+|  LastModified: Feb 16, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -18,12 +18,12 @@ using System.Collections.Generic;
 using System.Threading;
 
 namespace Hprose.RPC {
-    public abstract class HandlerManager<THandler, TNextHandler> : IDisposable {
+    public abstract class PluginManager<THandler, TNextHandler> : IDisposable {
         private readonly List<THandler> handlers = new List<THandler>();
         private readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
         private readonly TNextHandler defaultHandler;
         public TNextHandler Handler { get; private set; }
-        public HandlerManager(TNextHandler handler) {
+        public PluginManager(TNextHandler handler) {
             Handler = defaultHandler = handler;
         }
         protected abstract TNextHandler GetNextHandler(THandler handler, TNextHandler next);

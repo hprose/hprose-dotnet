@@ -12,7 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ContextAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CookieManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CRC32.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)HandlerManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpTransportCF.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MockTransport.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MockEndPoint.cs" />
