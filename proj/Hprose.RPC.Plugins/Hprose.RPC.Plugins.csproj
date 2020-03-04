@@ -5,7 +5,7 @@
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
-    <Version>3.0.6</Version>
+    <Version>3.0.7</Version>
     <OutputType>Library</OutputType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -28,30 +28,30 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
-    <DefineConstants>NETCOREAPP2_0_UP</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETCOREAPP2_0_UP</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
-    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETCOREAPP2_0_UP;NETCOREAPP2_1_UP</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'">
-    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
-    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP;NETCOREAPP3_0_UP</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP;NETCOREAPP3_0_UP</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP;NETCOREAPP3_0_UP;NETCOREAPP3_1_UP</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP;NETCOREAPP3_0_UP;NETCOREAPP3_1_UP</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net35-cf'">
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>CompactFramework</TargetFrameworkProfile>
-    <DefineConstants>NET35_CF;WindowsCE</DefineConstants>
+    <DefineConstants>$(DefineConstants);NET35_CF;WindowsCE</DefineConstants>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
