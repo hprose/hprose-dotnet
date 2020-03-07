@@ -8,7 +8,7 @@
 |                                                          |
 |  CookieManager for .NET 3.5 CF                           |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Mar 7, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -21,7 +21,7 @@ using System.Threading;
 public class CookieManager: IDisposable {
     private static readonly char[] EQU = new char[] {'='};
     private static readonly char[] SEM = new char[] {';'};
-    private Dictionary<string, Dictionary<string, Dictionary<string, string>>> container = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();
+    private readonly Dictionary<string, Dictionary<string, Dictionary<string, string>>> container = new Dictionary<string, Dictionary<string, Dictionary<string, string>>>();
     private readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
     public CookieManager() {
     }
@@ -50,8 +50,9 @@ public class CookieManager: IDisposable {
                 string path = cookie["PATH"];
                 if (path[0] == '"')
                     path = path.Substring(1);
-                if (path[path.Length - 1] == '"')
-                    path = path.Substring(0, path.Length - 1);
+      
+                if (path[^1] == '"')
+                    path = path[0..^1];
                 cookie["PATH"] = path;
             }
             else {
