@@ -30,7 +30,7 @@ namespace Hprose.RPC {
         public CharType CharType { get; set; } = CharType.String;
         public ListType ListType { get; set; } = ListType.List;
         public DictType DictType { get; set; } = DictType.NullableKeyDictionary;
-        public Stream Encode(string name, object[] args, ClientContext context) {
+        public MemoryStream Encode(string name, object[] args, ClientContext context) {
             var stream = new MemoryStream();
             var writer = new Writer(stream, Simple, Mode);
             if (Simple) {
@@ -51,16 +51,15 @@ namespace Hprose.RPC {
             stream.Position = 0;
             return stream;
         }
-        public async Task<object> Decode(Stream response, ClientContext context) {
-            var stream = await response.ToMemoryStream().ConfigureAwait(false);
-            var reader = new Reader(stream, false, Mode) {
+        public object Decode(MemoryStream response, ClientContext context) {
+            var reader = new Reader(response, false, Mode) {
                 LongType = LongType,
                 RealType = RealType,
                 CharType = CharType,
                 ListType = ListType,
                 DictType = DictType
             };
-            var tag = stream.ReadByte();
+            var tag = response.ReadByte();
             var responseHeaders = context.ResponseHeaders;
             if (tag == Tags.TagHeader) {
                 var headers = reader.Deserialize<Dictionary<string, object>>();
@@ -68,7 +67,7 @@ namespace Hprose.RPC {
                     responseHeaders[pair.Key] = pair.Value;
                 }
                 reader.Reset();
-                tag = stream.ReadByte();
+                tag = response.ReadByte();
             }
             switch (tag) {
                 case Tags.TagResult:
@@ -81,7 +80,7 @@ namespace Hprose.RPC {
                 case Tags.TagEnd:
                     return null;
                 default:
-                    var data = stream.GetArraySegment();
+                    var data = response.GetArraySegment();
                     throw new Exception("Invalid response\r\n" + Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
             }
         }

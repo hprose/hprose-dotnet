@@ -8,7 +8,7 @@
 |                                                          |
 |  JsonRpcClientCodec class for C#.                        |
 |                                                          |
-|  LastModified: Mar 12, 2019                              |
+|  LastModified: Mar 7, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -26,7 +26,7 @@ namespace Hprose.RPC.Codec.JSONRPC {
     public class JsonRpcClientCodec : IClientCodec {
         public static JsonRpcClientCodec Instance { get; } = new JsonRpcClientCodec();
         private volatile int counter = 0;
-        public Stream Encode(string name, object[] args, ClientContext context) {
+        public MemoryStream Encode(string name, object[] args, ClientContext context) {
             var id = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
             var request = new Dictionary<string, object> {
                 { "jsonrpc", "2.0" },
@@ -42,9 +42,8 @@ namespace Hprose.RPC.Codec.JSONRPC {
             var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(request));
             return new MemoryStream(data, 0, data.Length, false, true);
         }
-        public async Task<object> Decode(Stream response, ClientContext context) {
-            MemoryStream stream = await response.ToMemoryStream().ConfigureAwait(false);
-            var data = stream.GetArraySegment();
+        public object Decode(MemoryStream response, ClientContext context) {
+            var data = response.GetArraySegment();
             var result = JsonConvert.DeserializeObject<JObject>(Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
             if ((result as IDictionary<string, JToken>).ContainsKey("headers")) {
                 var responseHeaders = context.ResponseHeaders;

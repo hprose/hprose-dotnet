@@ -8,7 +8,7 @@
 |                                                          |
 |  JsonRpcServiceCodec class for C#.                       |
 |                                                          |
-|  LastModified: Mar 12, 2019                              |
+|  LastModified: Mar 7, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 namespace Hprose.RPC.Codec.JSONRPC {
     public class JsonRpcServiceCodec : IServiceCodec {
         public static JsonRpcServiceCodec Instance { get; } = new JsonRpcServiceCodec();
-        public Stream Encode(object result, ServiceContext context) {
+        public MemoryStream Encode(object result, ServiceContext context) {
             if (!context.Contains("jsonrpc") || !(bool)context["jsonrpc"]) {
                 return ServiceCodec.Instance.Encode(result, context);
             }
@@ -79,17 +79,16 @@ namespace Hprose.RPC.Codec.JSONRPC {
             var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response));
             return new MemoryStream(data, 0, data.Length, false, true);
         }
-        public async Task<(string, object[])> Decode(Stream request, ServiceContext context) {
-            MemoryStream stream = await request.ToMemoryStream().ConfigureAwait(false);
-            var tag = stream.ReadByte();
-            stream.Position = 0;
+        public (string, object[]) Decode(MemoryStream request, ServiceContext context) {
+            var tag = request.ReadByte();
+            request.Position = 0;
             context["jsonrpc"] = (tag == '{');
             if (!(bool)context["jsonrpc"]) {
-                return await ServiceCodec.Instance.Decode(stream, context).ConfigureAwait(false);
+                return ServiceCodec.Instance.Decode(request, context);
             }
             JObject call = null;
             try {
-                var data = stream.GetArraySegment();
+                var data = request.GetArraySegment();
                 call = JsonConvert.DeserializeObject<JObject>(Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
             }
             catch {

@@ -8,7 +8,7 @@
 |                                                          |
 |  Service class for C#.                                   |
 |                                                          |
-|  LastModified: Mar 29, 2019                              |
+|  LastModified: Mar 7, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -19,7 +19,6 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC {
@@ -61,7 +60,6 @@ namespace Hprose.RPC {
 #if !NET35_CF && !NET40 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47
         public SocketHandler Socket => (SocketHandler)this["socket"];
 #endif
-        public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
         public IServiceCodec Codec { get; set; } = ServiceCodec.Instance;
         public int MaxRequestLength { get; set; } = 0x7FFFFFFF;
         private readonly InvokeManager invokeManager;
@@ -73,7 +71,6 @@ namespace Hprose.RPC {
         public IDictionary<string, object> Options { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public Service() {
             invokeManager = new InvokeManager(Execute);
-            invokeManager.Use(TimeoutHandler);
             ioManager = new IOManager(Process);
             foreach (var pair in handlerTypes) {
 #if !NET35_CF
@@ -100,7 +97,8 @@ namespace Hprose.RPC {
         public async Task<Stream> Process(Stream request, Context context) {
             object result;
             try {
-                var (fullname, args) = await Codec.Decode(request, context as ServiceContext).ConfigureAwait(false);
+                var stream = await request.ToMemoryStream().ConfigureAwait(false);
+                var (fullname, args) = Codec.Decode(stream, context as ServiceContext);
                 result = await invokeManager.Handler(fullname, args, context).ConfigureAwait(false);
             }
             catch (Exception e) {
@@ -108,27 +106,7 @@ namespace Hprose.RPC {
             }
             return Codec.Encode(result, context as ServiceContext);
         }
-        private static async Task<object> TimeoutHandler(string fullname, object[] args, Context context, NextInvokeHandler next) {
-            var resultTask = next(fullname, args, context);
-            var serviceContext = context as ServiceContext;
-            var timeout = serviceContext.Method.Timeout > TimeSpan.Zero ? serviceContext.Method.Timeout : serviceContext.Service.Timeout;
-            if (timeout > TimeSpan.Zero) {
-                using (CancellationTokenSource source = new CancellationTokenSource()) {
-#if NET40
-                    var timer = TaskEx.Delay(timeout, source.Token);
-                    var task = await TaskEx.WhenAny(resultTask, timer).ConfigureAwait(false);
-#else
-                    var timer = Task.Delay(timeout, source.Token);
-                    var task = await Task.WhenAny(resultTask, timer).ConfigureAwait(false);
-#endif
-                    source.Cancel();
-                    if (task == timer) {
-                        throw new TimeoutException();
-                    }
-                }
-            }
-            return await resultTask.ConfigureAwait(false);
-        }
+
         public static async Task<object> Execute(string fullname, object[] args, Context context) {
             var method = (context as ServiceContext).Method;
             var result = method.MethodInfo.Invoke(

@@ -42,5 +42,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Reverse\Caller.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Reverse\CallerContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Reverse\ProviderContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Timeout\ExecuteTimeout.cs" />
   </ItemGroup>
 </Project>

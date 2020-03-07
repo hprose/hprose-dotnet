@@ -8,7 +8,7 @@
 |                                                          |
 |  Method class for C#.                                    |
 |                                                          |
-|  LastModified: Jan 26, 2019                              |
+|  LastModified: Mar 7, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -24,7 +24,6 @@ namespace Hprose.RPC {
         public MethodInfo MethodInfo { get; private set; }
         public ParameterInfo[] Parameters { get; private set; }
         public object Target { get; private set; }
-        public TimeSpan Timeout { get; set; } = TimeSpan.Zero;
         public IDictionary<string, object> Options { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public object this[string name] {
             get => Options[name];

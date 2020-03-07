@@ -163,7 +163,8 @@ namespace Hprose.RPC {
         public async Task<object> Call(string fullname, object[] args, Context context) {
             var request = Codec.Encode(fullname, args, context as ClientContext);
             Stream response = await Request(request, context).ConfigureAwait(false);
-            return Codec.Decode(response, context as ClientContext);
+            MemoryStream stream = await response.ToMemoryStream().ConfigureAwait(false);
+            return Codec.Decode(stream, context as ClientContext);
         }
         public Task<Stream> Request(Stream request, Context context) {
             return ioManager.Handler(request, context);

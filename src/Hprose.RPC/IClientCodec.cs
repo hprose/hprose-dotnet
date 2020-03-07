@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     public interface IClientCodec {
-        Stream Encode(string name, object[] args, ClientContext context);
-        Task<object> Decode(Stream response, ClientContext context);
+        MemoryStream Encode(string name, object[] args, ClientContext context);
+        object Decode(MemoryStream response, ClientContext context);
     }
 }

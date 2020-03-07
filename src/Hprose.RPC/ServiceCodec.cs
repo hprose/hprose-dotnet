@@ -32,7 +32,7 @@ namespace Hprose.RPC {
         public CharType CharType { get; set; } = CharType.String;
         public ListType ListType { get; set; } = ListType.List;
         public DictType DictType { get; set; } = DictType.NullableKeyDictionary;
-        public Stream Encode(object result, ServiceContext context) {
+        public MemoryStream Encode(object result, ServiceContext context) {
             var stream = new MemoryStream();
             var writer = new Writer(stream, Simple, Mode);
             if (Simple) {
@@ -98,20 +98,19 @@ namespace Hprose.RPC {
             }
             return args;
         }
-        public async Task<(string, object[])> Decode(Stream request, ServiceContext context) {
-            var stream = await request.ToMemoryStream().ConfigureAwait(false);
-            if (stream.Length == 0) {
+        public (string, object[]) Decode(MemoryStream request, ServiceContext context) {
+            if (request.Length == 0) {
                 DecodeMethod("~", 0, context);
                 return ("~", emptyArgs);
             }
-            var reader = new Reader(stream, false, Mode) {
+            var reader = new Reader(request, false, Mode) {
                 LongType = LongType,
                 RealType = RealType,
                 CharType = CharType,
                 ListType = ListType,
                 DictType = DictType
             };
-            var tag = stream.ReadByte();
+            var tag = request.ReadByte();
             var requestHeaders = context.RequestHeaders;
             if (tag == Tags.TagHeader) {
                 var headers = reader.Deserialize<Dictionary<string, object>>();
@@ -119,7 +118,7 @@ namespace Hprose.RPC {
                     requestHeaders[pair.Key] = pair.Value;
                 }
                 reader.Reset();
-                tag = stream.ReadByte();
+                tag = request.ReadByte();
             }
             switch (tag) {
                 case Tags.TagCall:
@@ -133,7 +132,7 @@ namespace Hprose.RPC {
                     DecodeMethod("~", 0, context);
                     return ("~", emptyArgs);
                 default:
-                    var data = stream.GetArraySegment();
+                    var data = request.GetArraySegment();
                     throw new Exception("Invalid request:\r\n" + Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
             }
         }
