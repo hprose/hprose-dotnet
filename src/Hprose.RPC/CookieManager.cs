@@ -51,8 +51,8 @@ public class CookieManager: IDisposable {
                 if (path[0] == '"')
                     path = path.Substring(1);
       
-                if (path[^1] == '"')
-                    path = path[0..^1];
+                if (path[path.Length - 1] == '"')
+                    path = path.Substring(0, path.Length - 1);
                 cookie["PATH"] = path;
             }
             else {
