@@ -198,18 +198,17 @@ namespace Hprose.RPC {
             Send(udpClient);
             var timeout = clientContext.Timeout;
             if (timeout > TimeSpan.Zero) {
-                using (CancellationTokenSource source = new CancellationTokenSource()) {
+                using CancellationTokenSource source = new CancellationTokenSource();
 #if NET40
-                   var timer = TaskEx.Delay(timeout, source.Token);
-                   var task = await TaskEx.WhenAny(timer, result.Task).ConfigureAwait(false);
+                var timer = TaskEx.Delay(timeout, source.Token);
+                var task = await TaskEx.WhenAny(timer, result.Task).ConfigureAwait(false);
 #else
-                    var timer = Task.Delay(timeout, source.Token);
-                    var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
+                var timer = Task.Delay(timeout, source.Token);
+                var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
 #endif
-                    source.Cancel();
-                    if (task == timer) {
-                        Close(udpClient, new TimeoutException());
-                    }
+                source.Cancel();
+                if (task == timer) {
+                    Close(udpClient, new TimeoutException());
                 }
             }
             return await result.Task.ConfigureAwait(false);
