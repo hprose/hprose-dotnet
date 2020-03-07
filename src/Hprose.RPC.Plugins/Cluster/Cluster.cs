@@ -73,11 +73,7 @@ namespace Hprose.RPC.Plugins.Cluster {
                     else {
                         deferred.TrySetResult((task as Task<object>)?.Result);
                     }
-#if !NET35_CF
                 }, TaskScheduler.Current);
-#else
-                });
-#endif
             }
             return await deferred.Task.ConfigureAwait(false);
         }
