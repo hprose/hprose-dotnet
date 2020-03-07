@@ -106,20 +106,19 @@ namespace Hprose.RPC {
             context.RemoteEndPoint = ipEndPoint;
             context.LocalEndPoint = udpClient.Client.LocalEndPoint;
             context.Handler = this;
-            using (var request = new MemoryStream(buffer, 8, length, false, true)) {
+            using var request = new MemoryStream(buffer, 8, length, false, true);
+            try {
+                Stream response = await Service.Handle(request, context).ConfigureAwait(false);
+                responses.Enqueue((index, (await response.ToMemoryStream().ConfigureAwait(false)), ipEndPoint));
+            }
+            catch (Exception e) {
+                responses.Enqueue((index | 0x8000, new MemoryStream(Encoding.UTF8.GetBytes(e.Message)), ipEndPoint));
+            }
+            finally {
                 try {
-                    Stream response = await Service.Handle(request, context).ConfigureAwait(false);
-                    responses.Enqueue((index, (await response.ToMemoryStream().ConfigureAwait(false)), ipEndPoint));
+                    autoResetEvent.Set();
                 }
-                catch (Exception e) {
-                    responses.Enqueue((index | 0x8000, new MemoryStream(Encoding.UTF8.GetBytes(e.Message)), ipEndPoint));
-                }
-                finally {
-                    try {
-                        autoResetEvent.Set();
-                    }
-                    catch (Exception) { }
-                }
+                catch (Exception) { }
             }
         }
         public async Task Receive(UdpClient udpClient, ConcurrentQueue<(int index, MemoryStream stream, IPEndPoint endPoint)> responses, AutoResetEvent autoResetEvent) {
@@ -131,12 +130,11 @@ namespace Hprose.RPC {
         private async Task Handler(UdpClient udpClient) {
             try {
                 var responses = new ConcurrentQueue<(int index, MemoryStream stream, IPEndPoint endPoint)>();
-                using (var autoResetEvent = new AutoResetEvent(false)) {
-                    var receive = Receive(udpClient, responses, autoResetEvent);
-                    var send = Send(udpClient, responses, autoResetEvent);
-                    await receive.ConfigureAwait(false);
-                    await send.ConfigureAwait(false);
-                }
+                using var autoResetEvent = new AutoResetEvent(false);
+                var receive = Receive(udpClient, responses, autoResetEvent);
+                var send = Send(udpClient, responses, autoResetEvent);
+                await receive.ConfigureAwait(false);
+                await send.ConfigureAwait(false);
             }
             catch (Exception e) {
                 OnError?.Invoke(e);
