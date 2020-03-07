@@ -157,9 +157,7 @@ namespace Hprose.RPC {
             if (context == null) context = new ClientContext();
             context.Init(this, typeof(T));
             var task = invokeManager.Handler(fullname, args, context);
-#if !NET35_CF
             await task.ContinueWith((_) => { }, TaskScheduler.Current).ConfigureAwait(false);
-#endif
             return (T)(await task.ConfigureAwait(false));
         }
         public async Task<object> Call(string fullname, object[] args, Context context) {
