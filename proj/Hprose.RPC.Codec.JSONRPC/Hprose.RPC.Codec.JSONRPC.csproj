@@ -76,7 +76,7 @@
     <Reference Include="System, Version=3.5.0.0, Culture=neutral, PublicKeyToken=969db8053d3322ac" />
     <Reference Include="System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=969db8053d3322ac" />
     <Reference Include="System.Data, Version=3.5.0.0, Culture=neutral, PublicKeyToken=969db8053d3322ac" />
-    <PackageReference Include="NETStandard.WindowsCE" Version="1.6.0" />
+    <PackageReference Include="NETStandard.WindowsCE" Version="1.7.1" />
     <PackageReference Include="Newtonsoft.Json.Legacy" Version="3.5.9" />
   </ItemGroup>
 
