@@ -159,24 +159,22 @@ namespace Hprose.RPC {
             var task = invokeManager.Handler(fullname, args, context);
 #if !NET35_CF
             await task.ContinueWith((_) => { }, TaskScheduler.Current).ConfigureAwait(false);
-#else
-            await task.ContinueWith((_) => { }).ConfigureAwait(false);
 #endif
             return (T)(await task.ConfigureAwait(false));
         }
         public async Task<object> Call(string fullname, object[] args, Context context) {
             var request = Codec.Encode(fullname, args, context as ClientContext);
             Stream response = await Request(request, context).ConfigureAwait(false);
-            return await Codec.Decode(response, context as ClientContext).ConfigureAwait(false);
+            return Codec.Decode(response, context as ClientContext);
         }
         public Task<Stream> Request(Stream request, Context context) {
             return ioManager.Handler(request, context);
         }
-        public async Task<Stream> Transport(Stream request, Context context) {
+        public Task<Stream> Transport(Stream request, Context context) {
             var uri = (context as ClientContext).Uri;
             var scheme = uri.Scheme;
             if (schemes.TryGetValue(scheme, out string name)) {
-                return await transports[name].Transport(request, context).ConfigureAwait(false);
+                return transports[name].Transport(request, context);
             }
             throw new NotSupportedException("The protocol " + scheme + " is not supported.");
         }
