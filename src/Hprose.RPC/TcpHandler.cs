@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Dec 31, 2019                              |
+|  LastModified: Mar 8, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -45,21 +45,23 @@ namespace Hprose.RPC {
         public TcpHandler(Service service) {
             Service = service;
         }
-        public async Task Bind(TcpListener server) {
-            while (true) {
-                try {
-                    Handler(await server.AcceptTcpClientAsync().ConfigureAwait(false));
+        public Task Bind(TcpListener server) {
+            return Task.Factory.StartNew(async () => {
+                while (true) {
+                    try {
+                        Handler(await server.AcceptTcpClientAsync().ConfigureAwait(false));
+                    }
+                    catch (InvalidOperationException) {
+                        return;
+                    }
+                    catch (SocketException) {
+                        return;
+                    }
+                    catch (Exception error) {
+                        OnError?.Invoke(error);
+                    }
                 }
-                catch (InvalidOperationException) {
-                    return;
-                }
-                catch (SocketException) {
-                    return;
-                }
-                catch (Exception error) {
-                    OnError?.Invoke(error);
-                }
-            }
+            }, TaskCreationOptions.LongRunning);
         }
         private static async Task<byte[]> ReadAsync(Stream stream, byte[] bytes, int offset, int length) {
             while (length > 0) {
