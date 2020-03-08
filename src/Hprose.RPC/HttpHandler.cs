@@ -8,7 +8,7 @@
 |                                                          |
 |  HttpHandler class for C#.                               |
 |                                                          |
-|  LastModified: Sep 21, 2019                              |
+|  LastModified: Mar 8, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -43,10 +43,12 @@ namespace Hprose.RPC {
             lastModified = DateTime.Now.ToString("R", CultureInfo.InvariantCulture);
             etag = '"' + rand.Next().ToString("x", CultureInfo.InvariantCulture) + ":" + rand.Next().ToString("x", CultureInfo.InvariantCulture) + '"';
         }
-        public async Task Bind(HttpListener server) {
-            while (server.IsListening) {
-                Handler(await server.GetContextAsync().ConfigureAwait(false));
-            }
+        public Task Bind(HttpListener server) {
+            return Task.Factory.StartNew(async () => {
+                while (server.IsListening) {
+                    Handler(await server.GetContextAsync().ConfigureAwait(false));
+                }
+            }, TaskCreationOptions.LongRunning);
         }
         public void AddAccessControlAllowOrigin(string origin) {
             origins[origin] = true;
