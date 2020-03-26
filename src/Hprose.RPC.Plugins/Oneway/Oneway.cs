@@ -8,18 +8,17 @@
 |                                                          |
 |  Oneway plugin for C#.                                   |
 |                                                          |
-|  LastModified: Mar 26, 2020                              |
+|  LastModified: Feb 2, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.Oneway {
     public static class Oneway {
-        public static async Task<Stream> Handler(Stream request, Context context, NextIOHandler next) {
-            var result = next(request, context);
+        public static async Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
+            var result = next(name, args, context);
             if (context.Contains("Oneway")) {
                 return null;
             }
