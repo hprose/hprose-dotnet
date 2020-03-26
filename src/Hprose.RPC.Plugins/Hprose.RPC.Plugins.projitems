@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Cluster\ClusterConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Cluster\RetryAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Cluster\IdempotentAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Forward\Forward.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LoadBalance\WeightedLeastActiveLoadBalance.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LoadBalance\NginxRoundRobinLoadBalance.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LoadBalance\LeastActiveLoadBalance.cs" />
