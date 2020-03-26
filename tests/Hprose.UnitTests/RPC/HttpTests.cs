@@ -10,6 +10,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Hprose.RPC.Plugins.LoadBalance;
 using System.Collections.Generic;
+using Hprose.RPC.Plugins.Forward;
 
 namespace Hprose.UnitTests.RPC {
     [TestClass]
@@ -247,6 +248,29 @@ namespace Hprose.UnitTests.RPC {
             Console.WriteLine(await client.InvokeAsync<string>("getAddress").ConfigureAwait(false));
             Console.WriteLine(await client.InvokeAsync<string>("getAddress").ConfigureAwait(false));
             server.Stop();
+        }
+        [TestMethod]
+        public async Task Test9() {
+            HttpListener server = new HttpListener();
+            server.Prefixes.Add("http://127.0.0.1:8090/");
+            server.Start();
+            var service = new Service();
+            service.Add(
+                (ServiceContext context) => context.LocalEndPoint.ToString(),
+                "getAddress"
+            );
+            service.Bind(server);
+            HttpListener server2 = new HttpListener();
+            server2.Prefixes.Add("http://127.0.0.1:8091/");
+            server2.Start();
+            var service2 = new Service();
+            service2.Use(new Forward("http://127.0.0.1:8090/").IOHandler).Bind(server2);
+            var client = new Client("http://127.0.0.1:8091/");
+            var log = new Log();
+            client.Use(log.IOHandler).Use(log.InvokeHandler);
+            Console.WriteLine(await client.InvokeAsync<string>("getAddress").ConfigureAwait(false));
+            server.Stop();
+            server2.Stop();
         }
     }
 }
