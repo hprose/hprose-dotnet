@@ -8,13 +8,14 @@
 |                                                          |
 |  ConcurrentLimiter plugin for C#.                        |
 |                                                          |
-|  LastModified: Mar 27, 2019                              |
+|  LastModified: Mar 26, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
 using System;
 using System.Collections.Concurrent;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -59,10 +60,10 @@ namespace Hprose.RPC.Plugins.Limiter {
                 }
             }
         }
-        public async Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
+        public async Task<Stream> Handler(Stream request, Context context, NextIOHandler next) {
             await Acquire().ConfigureAwait(false);
             try {
-                return await next(name, args, context).ConfigureAwait(false);
+                return await next(request, context).ConfigureAwait(false);
             }
             finally {
                 Release();
