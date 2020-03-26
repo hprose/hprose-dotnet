@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1F8BC289-8A9D-4EDA-B400-469FD5983F4D}"
 EndProject
@@ -49,16 +49,24 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "System.Numerics", "src\Syst
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\Hprose.RPC.AspNet\Hprose.RPC.AspNet.projitems*{0077fc95-0788-4887-bd09-75bdc5608736}*SharedItemsImports = 5
+		src\Hprose.RPC.Plugins\Hprose.RPC.Plugins.projitems*{1e877639-172a-4916-b2bc-b81fa01228bc}*SharedItemsImports = 5
 		src\Hprose.RPC.Codec.JSONRPC\Hprose.RPC.Codec.JSONRPC.projitems*{26786c33-ea3c-4f7c-b506-f01733805c06}*SharedItemsImports = 13
 		src\Hprose.RPC\Hprose.RPC.projitems*{26af48ad-8f09-4146-bc18-d35529afa89e}*SharedItemsImports = 13
+		src\Hprose.RPC.AspNetCore\Hprose.RPC.AspNetCore.projitems*{2b7c4f6c-adad-4579-8453-5c1134dcae3d}*SharedItemsImports = 5
+		src\Hprose.Collections\Hprose.Collections.projitems*{2d93d037-2300-4b33-8fcb-099d41aa579f}*SharedItemsImports = 5
+		src\Hprose.IO\Hprose.IO.projitems*{2d93d037-2300-4b33-8fcb-099d41aa579f}*SharedItemsImports = 5
 		src\Hprose.IO\Hprose.IO.projitems*{3bbafd96-bce6-4d52-a2b4-8abd2250465f}*SharedItemsImports = 13
+		src\Hprose.RPC\Hprose.RPC.projitems*{51d3034a-d18b-411b-91ce-8530a516f0f1}*SharedItemsImports = 5
 		src\Hprose.RPC.Owin\Hprose.RPC.Owin.projitems*{51e54a00-4fdd-42f7-aaa2-12ccbc0b8ad3}*SharedItemsImports = 13
 		src\Hprose.Collections\Hprose.Collections.projitems*{645ef886-f73b-46a5-a484-7ebe81209303}*SharedItemsImports = 13
 		src\Hprose.RPC.AspNet\Hprose.RPC.AspNet.projitems*{74b6dced-32b7-4859-925f-1b33c2b4fdd9}*SharedItemsImports = 13
+		src\Hprose.RPC.Owin\Hprose.RPC.Owin.projitems*{aa6918d5-4e9b-4165-a91d-a079fee41b4b}*SharedItemsImports = 5
 		src\System.ValueTuple\System.ValueTuple.projitems*{b150401d-145c-4b1d-b391-9a4188f72e91}*SharedItemsImports = 13
 		src\Hprose.RPC.Plugins\Hprose.RPC.Plugins.projitems*{bd74acf1-7335-44d8-ab5d-c71e56117c43}*SharedItemsImports = 13
 		src\System.Numerics\System.Numerics.projitems*{cc41f2a1-78f2-47da-b490-2783d8169201}*SharedItemsImports = 13
 		src\Hprose.RPC.AspNetCore\Hprose.RPC.AspNetCore.projitems*{d275b60d-d977-47cc-8630-9f9cf89ca987}*SharedItemsImports = 13
+		src\Hprose.RPC.Codec.JSONRPC\Hprose.RPC.Codec.JSONRPC.projitems*{d44ec6ff-f867-49de-b130-1c3a911f3511}*SharedItemsImports = 5
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
