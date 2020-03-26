@@ -8,7 +8,7 @@
 |                                                          |
 |  CallerContext class for C#.                             |
 |                                                          |
-|  LastModified: Nov 13, 2019                              |
+|  LastModified: Mar 26, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -39,4 +39,12 @@ namespace Hprose.RPC.Plugins.Reverse {
             return Caller.InvokeAsync<T>(Caller.GetId(this), fullname, args);
         }
     }
+#if !NET35_CF
+    public class CallerContext<T> : CallerContext {
+        public T Proxy { get; private set; }
+        public CallerContext(Caller caller, ServiceContext context) : base(caller, context) {
+            Proxy = caller.UseService<T>(Caller.GetId(this));
+        }
+    }
+#endif
 }

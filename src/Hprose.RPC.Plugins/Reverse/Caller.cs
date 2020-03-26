@@ -8,7 +8,7 @@
 |                                                          |
 |  Caller class for C#.                                    |
 |                                                          |
-|  LastModified: Mar 7, 2020                               |
+|  LastModified: Mar 26, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -196,7 +196,18 @@ namespace Hprose.RPC.Plugins.Reverse {
             return new List<string>(Onlines.Keys);
         }
         private Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
-            context = new CallerContext(this, context as ServiceContext);
+            var serviceContext = context as ServiceContext;
+#if !NET35_CF
+            var parameters = serviceContext.Method.Parameters;
+            if (parameters.Length > 0) {
+                var parameterType = parameters[parameters.Length - 1].ParameterType;
+                if (typeof(CallerContext).IsAssignableFrom(parameterType) && parameterType.IsGenericType) {
+                    context = (CallerContext)(Activator.CreateInstance(typeof(CallerContext<>).MakeGenericType(parameterType.GetGenericArguments()[0]), new object[] { this, serviceContext }));
+                    return next(name, args, context);
+                }
+            }
+#endif
+            context = new CallerContext(this, serviceContext);
             return next(name, args, context);
         }
     }
