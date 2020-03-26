@@ -17,7 +17,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Hprose.RPC.Plugins.Oneway {
+namespace Hprose.RPC.Plugins.Forward {
     public class Forward : IDisposable {
         private readonly Client client;
         public Forward() {
