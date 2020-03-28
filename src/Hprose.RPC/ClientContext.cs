@@ -8,13 +8,12 @@
 |                                                          |
 |  ClientContext class for C#.                             |
 |                                                          |
-|  LastModified: Dec 30, 2019                              |
+|  LastModified: Mar 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
 using System;
-using System.Collections.Generic;
 
 namespace Hprose.RPC {
     public class ClientContext : Context {
@@ -22,7 +21,7 @@ namespace Hprose.RPC {
         public Uri Uri { get; set; }
         public Type ReturnType { get; set; }
         public TimeSpan Timeout { get; set; }
-        public void Init(Client client, Type returnType) {
+        public void Init(Client client, Type returnType = null) {
             Client = client;
             if (client.Uris.Count > 0) Uri = client.Uris[0];
             if (ReturnType == null) ReturnType = returnType;
