@@ -5,7 +5,7 @@
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
-    <Version>3.0.10</Version>
+    <Version>3.0.11</Version>
     <OutputType>Library</OutputType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -16,7 +16,7 @@
     <Product>Hprose.RPC.Plugins</Product>
     <Title>Hprose RPC Plugins for .NET</Title>
     <Description>Hprose is a popular high-performance RPC library for .NET</Description>
-    <PackageTags>Hprose RPC CircuitBreaker Cluster Limiter LoadBalance Log Push Reverse net35-cf WindowsCE wince</PackageTags>
+    <PackageTags>Hprose RPC CircuitBreaker Cluster Limiter LoadBalance Log Push Reverse Forward Timeout net35-cf WindowsCE wince</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://hprose.com</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
