@@ -34,6 +34,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Oneway\Oneway.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Limiter\RateLimiter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Limiter\ConcurrentLimiter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Push\BrokerContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Push\Prosumer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Push\Message.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Push\Broker.cs" />
