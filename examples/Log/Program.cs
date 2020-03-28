@@ -36,6 +36,7 @@ class Program {
         server.Start();
         var service = new Service();
         service.Use(Log.IOHandler)
+            .Use(Log.InvokeHandler)
             .AddInstanceMethods(new MyService())
             .Bind(server);
         RunClient().Wait();
