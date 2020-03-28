@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 namespace Hprose.RPC.Plugins.Forward {
     public class Forward : IDisposable {
         private readonly Client client;
+        public TimeSpan Timeout { get; set; }
         public Forward() {
             client = new Client();
         }
@@ -37,11 +38,14 @@ namespace Hprose.RPC.Plugins.Forward {
         }
         public Task<Stream> IOHandler(Stream request, Context context, NextIOHandler next) {
             var clientContext = new ClientContext();
-            clientContext.Init(client, null);
+            clientContext.Timeout = Timeout;
+            clientContext.Init(client);
             return client.Request(request, clientContext);
         }
         public Task<object> InvokeHandler(string name, object[] args, Context context, NextInvokeHandler next) {
-            return client.InvokeAsync<object>(name, args);
+            var clientContext = new ClientContext();
+            clientContext.Timeout = Timeout;
+            return client.InvokeAsync<object>(name, args, clientContext);
         }
         public Forward Use(params InvokeHandler[] handlers) {
             client.Use(handlers);
