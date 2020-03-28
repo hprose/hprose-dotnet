@@ -16,6 +16,7 @@
 using Hprose.IO;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,14 +53,15 @@ namespace Hprose.RPC.Plugins.Reverse {
         }
         public static async Task<object> Execute(string name, object[] args, Context context) {
             var method = (context as ProviderContext).Method;
-            var result = method.MethodInfo.Invoke(
-                method.Target,
-                method.Missing ?
-                method.Parameters.Length == 3 ?
-                new object[] { name, args, context } :
-                new object[] { name, args } :
-                args
-            );
+            if (method.Missing) {
+                args = method.PassContext ? new object[] { name, args, context } : new object[] { name, args };
+            }
+            else if (method.PassContext) {
+                var arglist = args.ToList();
+                arglist.Add(context);
+                args = arglist.ToArray();
+            }
+            var result = method.MethodInfo.Invoke(method.Target, args);
             if (result is Task) {
                 return await TaskResult.Get((Task)result).ConfigureAwait(false);
             }
@@ -77,16 +79,14 @@ namespace Hprose.RPC.Plugins.Reverse {
                     var count = args.Length;
                     var parameters = method.Parameters;
                     var n = parameters.Length;
+                    if (method.PassContext) {
+                        n--;
+                    }
                     var arguments = new object[n];
-                    var autoParams = 0;
                     for (int i = 0; i < n; ++i) {
-                        var paramType = parameters[i].ParameterType;
-                        if (typeof(Context).IsAssignableFrom(paramType)) {
-                            autoParams = 1;
-                            arguments[i] = context;
-                        }
-                        else if (i - autoParams < count) {
-                            var argument = args[i - autoParams];
+                        if (i < count) {
+                            var paramType = parameters[i].ParameterType;
+                            var argument = args[i];
                             if (paramType.IsAssignableFrom(argument.GetType())) {
                                 arguments[i] = argument;
                             }

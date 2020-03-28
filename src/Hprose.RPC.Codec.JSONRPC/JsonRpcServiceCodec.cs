@@ -127,18 +127,16 @@ namespace Hprose.RPC.Codec.JSONRPC {
             }
             var count = args.Count;
             var parameters = method.Parameters;
+
             var n = parameters.Length;
+            if (method.PassContext) {
+                n--;
+            }
             var arguments = new object[n];
-            var autoParams = 0;
             try {
                 for (int i = 0; i < n; ++i) {
-                    var paramType = parameters[i].ParameterType;
-                    if (typeof(Context).IsAssignableFrom(paramType)) {
-                        autoParams = 1;
-                        arguments[i] = context;
-                    }
-                    else if (i - autoParams < count) {
-                        arguments[i] = args[i - autoParams].ToObject(paramType);
+                    if (i < count) {
+                        arguments[i] = args[i].ToObject(parameters[i].ParameterType);
                     }
                     else {
                         arguments[i] = parameters[i].DefaultValue;

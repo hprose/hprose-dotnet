@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     public class ServiceCodec : IServiceCodec {
@@ -82,14 +81,12 @@ namespace Hprose.RPC {
             }
             var parameters = method.Parameters;
             var n = parameters.Length;
+            if (method.PassContext) {
+                n--;
+            }
             args = new object[n];
-            var autoParams = 0;
             for (int i = 0; i < n; ++i) {
-                if (typeof(Context).IsAssignableFrom(parameters[i].ParameterType)) {
-                    autoParams = 1;
-                    args[i] = context;
-                }
-                else if (i - autoParams < count) {
+                if (i < count) {
                     args[i] = reader.Deserialize(parameters[i].ParameterType);
                 }
                 else {

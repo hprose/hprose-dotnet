@@ -8,16 +8,14 @@
 |                                                          |
 |  Log plugin for C#.                                      |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Mar 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -81,7 +79,7 @@ namespace Hprose.RPC.Plugins.Log {
             if (!enabled) return await next(name, args, context).ConfigureAwait(false);
             string a = "";
             try {
-                a = (args.Length > 0) && typeof(Context).IsAssignableFrom(args.Last().GetType()) ? Stringify(new List<object>(args.Take(args.Length - 1))) : Stringify(args);
+                a = Stringify(args);
             }
             catch (Exception e) {
 #if !NET35_CF

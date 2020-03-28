@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
@@ -109,14 +110,15 @@ namespace Hprose.RPC {
 
         public static async Task<object> Execute(string name, object[] args, Context context) {
             var method = (context as ServiceContext).Method;
-            var result = method.MethodInfo.Invoke(
-                method.Target,
-                method.Missing ?
-                method.Parameters.Length == 3 ?
-                new object[] { name, args, context } :
-                new object[] { name, args } :
-                args
-            );
+            if (method.Missing) {
+                args = method.PassContext ? new object[] { name, args, context } : new object[] { name, args };
+            }
+            else if (method.PassContext) {
+                var arglist = args.ToList();
+                arglist.Add(context);
+                args = arglist.ToArray();
+            }
+            var result = method.MethodInfo.Invoke(method.Target, args);
             if (result is Task) {
                 return await TaskResult.Get((Task)result).ConfigureAwait(false);
             }
