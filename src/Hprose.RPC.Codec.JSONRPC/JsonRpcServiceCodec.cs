@@ -8,7 +8,7 @@
 |                                                          |
 |  JsonRpcServiceCodec class for C#.                       |
 |                                                          |
-|  LastModified: Mar 7, 2020                               |
+|  LastModified: Mar 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -19,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Hprose.RPC.Codec.JSONRPC {
     public class JsonRpcServiceCodec : IServiceCodec {
@@ -102,7 +101,7 @@ namespace Hprose.RPC.Codec.JSONRPC {
                     throw new Exception("Invalid Request");
                 }
             }
-            if (!call.TryGetValue("method", out var name)) {
+            if (!call.TryGetValue("method", out var methodName)) {
                 throw new Exception("Invalid Request");
             }
             if (!call.TryGetValue("id", out var id)) {
@@ -116,15 +115,15 @@ namespace Hprose.RPC.Codec.JSONRPC {
                     requestHeaders[pair.Key] = pair.Value;
                 }
             }
-            var fullname = (string)name;
+            var name = methodName.ToString();
             var args = new JArray();
             if ((call as IDictionary<string, JToken>).ContainsKey("params")) {
                 args = call["params"] as JArray;
             }
-            var method = context.Service.Get(fullname, args.Count);
+            var method = context.Service.Get(name, args.Count);
             context.Method = method ?? throw new Exception("Method not found");
             if (method.Missing) {
-                return (fullname, args.ToObject<object[]>());
+                return (name, args.ToObject<object[]>());
             }
             var count = args.Count;
             var parameters = method.Parameters;
@@ -149,7 +148,7 @@ namespace Hprose.RPC.Codec.JSONRPC {
             catch {
                 throw new Exception("Invalid params");
             }
-            return (fullname, arguments);
+            return (name, arguments);
         }
     }
 }

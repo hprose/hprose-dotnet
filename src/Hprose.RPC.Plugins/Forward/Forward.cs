@@ -8,7 +8,7 @@
 |                                                          |
 |  Forward plugin for C#.                                  |
 |                                                          |
-|  LastModified: Mar 26, 2020                              |
+|  LastModified: Mar 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -40,8 +40,8 @@ namespace Hprose.RPC.Plugins.Forward {
             clientContext.Init(client, null);
             return client.Request(request, clientContext);
         }
-        public Task<object> InvokeHandler(string fullname, object[] args, Context context, NextInvokeHandler next) {
-            return client.InvokeAsync<object>(fullname, args);
+        public Task<object> InvokeHandler(string name, object[] args, Context context, NextInvokeHandler next) {
+            return client.InvokeAsync<object>(name, args);
         }
         public Forward Use(params InvokeHandler[] handlers) {
             client.Use(handlers);

@@ -8,7 +8,7 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Nov 13, 2019                              |
+|  LastModified: Mar 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -138,16 +138,16 @@ namespace Hprose.RPC {
             ioManager.Unuse(handlers);
             return this;
         }
-        public void Invoke(string fullname, object[] args = null, ClientContext context = null) {
-            InvokeAsync<object>(fullname, args, context).ConfigureAwait(false).GetAwaiter().GetResult();
+        public void Invoke(string name, object[] args = null, ClientContext context = null) {
+            InvokeAsync<object>(name, args, context).ConfigureAwait(false).GetAwaiter().GetResult();
         }
-        public T Invoke<T>(string fullname, object[] args = null, ClientContext context = null) {
-            return InvokeAsync<T>(fullname, args, context).ConfigureAwait(false).GetAwaiter().GetResult();
+        public T Invoke<T>(string name, object[] args = null, ClientContext context = null) {
+            return InvokeAsync<T>(name, args, context).ConfigureAwait(false).GetAwaiter().GetResult();
         }
-        public Task InvokeAsync(string fullname, object[] args = null, ClientContext context = null) {
-            return InvokeAsync<object>(fullname, args, context);
+        public Task InvokeAsync(string name, object[] args = null, ClientContext context = null) {
+            return InvokeAsync<object>(name, args, context);
         }
-        public async Task<T> InvokeAsync<T>(string fullname, object[] args = null, ClientContext context = null) {
+        public async Task<T> InvokeAsync<T>(string name, object[] args = null, ClientContext context = null) {
             if (args == null) args = emptyArgs;
             for (int i = 0; i < args.Length; ++i) {
                 if (args[i] is Task) {
@@ -156,12 +156,12 @@ namespace Hprose.RPC {
             }
             if (context == null) context = new ClientContext();
             context.Init(this, typeof(T));
-            var task = invokeManager.Handler(fullname, args, context);
+            var task = invokeManager.Handler(name, args, context);
             await task.ContinueWith((_) => { }, TaskScheduler.Current).ConfigureAwait(false);
             return (T)(await task.ConfigureAwait(false));
         }
-        public async Task<object> Call(string fullname, object[] args, Context context) {
-            var request = Codec.Encode(fullname, args, context as ClientContext);
+        public async Task<object> Call(string name, object[] args, Context context) {
+            var request = Codec.Encode(name, args, context as ClientContext);
             Stream response = await Request(request, context).ConfigureAwait(false);
             MemoryStream stream = await response.ToMemoryStream().ConfigureAwait(false);
             return Codec.Decode(stream, context as ClientContext);

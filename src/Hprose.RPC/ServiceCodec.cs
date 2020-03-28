@@ -8,7 +8,7 @@
 |                                                          |
 |  ServiceCodec class for C#.                              |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Mar 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -56,23 +56,23 @@ namespace Hprose.RPC {
             stream.Position = 0;
             return stream;
         }
-        private static Method DecodeMethod(string fullname, int paramCount, ServiceContext context) {
+        private static Method DecodeMethod(string name, int paramCount, ServiceContext context) {
             var service = context.Service;
-            var method = service.Get(fullname, paramCount);
-            context.Method = method ?? throw new Exception("Can't find this method " + fullname + "().");
+            var method = service.Get(name, paramCount);
+            context.Method = method ?? throw new Exception("Can't find this method " + name + "().");
             return method;
         }
-        private object[] DecodeArguments(string fullname, Reader reader, ServiceContext context) {
+        private object[] DecodeArguments(string name, Reader reader, ServiceContext context) {
             var stream = reader.Stream;
             var tag = stream.ReadByte();
-            object[] args = emptyArgs;
             var count = 0;
             if (tag == Tags.TagList) {
                 reader.Reset();
                 count = ValueReader.ReadCount(stream);
                 reader.AddReference(null);
             }
-            var method = DecodeMethod(fullname, count, context);
+            var method = DecodeMethod(name, count, context);
+            object[] args;
             if (method.Missing) {
                 args = new object[count];
                 for (int i = 0; i < count; i++) {
@@ -125,9 +125,9 @@ namespace Hprose.RPC {
                     if (requestHeaders.ContainsKey("simple") && (bool)requestHeaders["simple"]) {
                         reader.Simple = true;
                     }
-                    var fullname = reader.Deserialize<string>();
-                    var args = DecodeArguments(fullname, reader, context);
-                    return (fullname, args);
+                    var name = reader.Deserialize<string>();
+                    var args = DecodeArguments(name, reader, context);
+                    return (name, args);
                 case Tags.TagEnd:
                     DecodeMethod("~", 0, context);
                     return ("~", emptyArgs);

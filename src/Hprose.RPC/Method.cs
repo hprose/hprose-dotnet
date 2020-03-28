@@ -8,7 +8,7 @@
 |                                                          |
 |  Method class for C#.                                    |
 |                                                          |
-|  LastModified: Mar 7, 2020                               |
+|  LastModified: Mar 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -20,7 +20,7 @@ using System.Reflection;
 namespace Hprose.RPC {
     public class Method {
         public bool Missing { get; set; } = false;
-        public string Fullname { get; private set; }
+        public string Name { get; private set; }
         public MethodInfo MethodInfo { get; private set; }
         public ParameterInfo[] Parameters { get; private set; }
         public object Target { get; private set; }
@@ -29,9 +29,9 @@ namespace Hprose.RPC {
             get => Options[name];
             set => Options[name] = value;
         }
-        public Method(MethodInfo methodInfo, string fullname, object target = null) {
+        public Method(MethodInfo methodInfo, string name, object target = null) {
             MethodInfo = methodInfo;
-            Fullname = fullname ?? methodInfo.Name;
+            Name = name ?? methodInfo.Name;
             Target = target;
             Parameters = methodInfo.GetParameters();
         }

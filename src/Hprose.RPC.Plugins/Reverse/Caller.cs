@@ -8,7 +8,7 @@
 |                                                          |
 |  Caller class for C#.                                    |
 |                                                          |
-|  LastModified: Mar 26, 2020                              |
+|  LastModified: Mar 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -117,16 +117,16 @@ namespace Hprose.RPC.Plugins.Reverse {
                 }
             }
         }
-        public void Invoke(string id, string fullname, object[] args = null) {
-            InvokeAsync<object>(id, fullname, args).Wait();
+        public void Invoke(string id, string name, object[] args = null) {
+            InvokeAsync<object>(id, name, args).Wait();
         }
-        public T Invoke<T>(string id, string fullname, object[] args = null) {
-            return InvokeAsync<T>(id, fullname, args).Result;
+        public T Invoke<T>(string id, string name, object[] args = null) {
+            return InvokeAsync<T>(id, name, args).Result;
         }
-        public Task InvokeAsync(string id, string fullname, object[] args = null) {
-            return InvokeAsync<object>(id, fullname, args);
+        public Task InvokeAsync(string id, string name, object[] args = null) {
+            return InvokeAsync<object>(id, name, args);
         }
-        public async Task<T> InvokeAsync<T>(string id, string fullname, object[] args = null) {
+        public async Task<T> InvokeAsync<T>(string id, string name, object[] args = null) {
             if (args == null) args = emptyArgs;
             for (int i = 0; i < args.Length; ++i) {
                 if (args[i] is Task) {
@@ -136,7 +136,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             var index = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
             var result = new TaskCompletionSource<object>();
             var calls = Calls.GetOrAdd(id, (_) => new ConcurrentQueue<(int, string, object[])>());
-            calls.Enqueue((index, fullname, args));
+            calls.Enqueue((index, name, args));
             var results = Results.GetOrAdd(id, (_) => new ConcurrentDictionary<int, TaskCompletionSource<object>>());
             results[index] = result;
             Response(id);
@@ -153,7 +153,7 @@ namespace Hprose.RPC.Plugins.Reverse {
                     if (task == delay) {
                         lock(calls) {
                             for (var i = 0; i < calls.Count; i++) {
-                                if (calls.TryDequeue(out (int index, string fullname, object[] args) call)) {
+                                if (calls.TryDequeue(out (int index, string name, object[] args) call)) {
                                     if (index != call.index) {
                                         calls.Enqueue(call);
                                     }

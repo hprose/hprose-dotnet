@@ -8,7 +8,7 @@
 |                                                          |
 |  ExecuteTimeout plugin for C#.                           |
 |                                                          |
-|  LastModified: Mar 7, 2020                               |
+|  LastModified: Mar 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -20,8 +20,8 @@ using System.Threading.Tasks;
 namespace Hprose.RPC.Plugins.Timeout {
     public class ExecuteTimeout {
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
-        public async Task<object> Handler(string fullname, object[] args, Context context, NextInvokeHandler next) {
-            var resultTask = next(fullname, args, context);
+        public async Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
+            var resultTask = next(name, args, context);
             var serviceContext = context as ServiceContext;
             var timeout = Timeout;
             if (serviceContext.Method.Options.ContainsKey("timeout")) {
