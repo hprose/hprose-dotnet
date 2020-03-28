@@ -200,7 +200,7 @@ namespace Hprose.RPC.Plugins.Push {
                     }
                 }
             }
-            catch (Exception) {}
+            catch (Exception) { }
             return false;
         }
         public IDictionary<string, bool> Multicast(object data, string topic, IEnumerable<string> ids, string from = "") {
@@ -271,8 +271,9 @@ namespace Hprose.RPC.Plugins.Push {
             return idlist;
         }
         protected async Task<object> Handler(string name, object[] args, Context context, NextInvokeHandler next) {
+            var serviceContext = context as ServiceContext;
             var from = "";
-            if (((context as ServiceContext).RequestHeaders).TryGetValue("id", out var id)) {
+            if (serviceContext.RequestHeaders.TryGetValue("id", out var id)) {
                 from = id.ToString();
             }
             switch (name) {
@@ -284,9 +285,7 @@ namespace Hprose.RPC.Plugins.Push {
                     args[2] = from;
                     break;
             }
-            IProducer producer = new Producer(this, from);
-            context["producer"] = producer;
-            return await next(name, args, context).ConfigureAwait(false);
+            return await next(name, args, new BrokerContext(new Producer(this, from), serviceContext)).ConfigureAwait(false);
         }
         private class Producer : IProducer {
             private readonly Broker Broker;
