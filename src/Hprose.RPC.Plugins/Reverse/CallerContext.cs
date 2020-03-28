@@ -19,11 +19,8 @@ namespace Hprose.RPC.Plugins.Reverse {
     public class CallerContext : ServiceContext {
         public Caller Caller { get; private set; }
         public CallerContext(Caller caller, ServiceContext context) : base(context.Service) {
+            context.CopyTo(this);
             Caller = caller;
-            Copy(context.RequestHeaders, RequestHeaders);
-            Copy(context.ResponseHeaders, ResponseHeaders);
-            Method = context.Method;
-            Copy(context.Items, Items);
         }
         public void Invoke(string name, in object[] args = null) {
             Caller.InvokeAsync<object>(Caller.GetId(this), name, args).ConfigureAwait(false).GetAwaiter().GetResult();

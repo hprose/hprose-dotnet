@@ -8,7 +8,7 @@
 |                                                          |
 |  ServiceContext class for C#.                            |
 |                                                          |
-|  LastModified: Dec 30, 2019                              |
+|  LastModified: Mar 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -24,6 +24,15 @@ namespace Hprose.RPC {
         public object Handler { get; set; } = null;
         public ServiceContext(Service service) {
             Service = service;
+        }
+        public override void CopyTo(Context context) {
+            base.CopyTo(context);
+            var serviceContext = context as ServiceContext;
+            serviceContext.Service = Service;
+            serviceContext.Method = Method;
+            serviceContext.RemoteEndPoint = RemoteEndPoint;
+            serviceContext.LocalEndPoint = LocalEndPoint;
+            serviceContext.Handler = Handler;
         }
     }
 }

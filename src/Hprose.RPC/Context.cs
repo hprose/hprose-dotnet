@@ -8,7 +8,7 @@
 |                                                          |
 |  Context class for C#.                                   |
 |                                                          |
-|  LastModified: Dec 30, 2019                              |
+|  LastModified: Mar 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -33,11 +33,14 @@ namespace Hprose.RPC {
         public bool Contains(string name) {
             return Items.ContainsKey(name);
         }
-        public virtual object Clone() {
-            var context = MemberwiseClone() as Context;
+        public virtual void CopyTo(Context context) {
             context.Items = new Dictionary<string, object>(Items, StringComparer.InvariantCultureIgnoreCase);
             context.RequestHeaders = new Dictionary<string, object>(RequestHeaders, StringComparer.InvariantCultureIgnoreCase);
             context.ResponseHeaders = new Dictionary<string, object>(ResponseHeaders, StringComparer.InvariantCultureIgnoreCase);
+        }
+        public virtual object Clone() {
+            var context = MemberwiseClone() as Context;
+            CopyTo(context);
             return context;
         }
     }

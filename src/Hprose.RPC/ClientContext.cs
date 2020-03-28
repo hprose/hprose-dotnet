@@ -28,5 +28,13 @@ namespace Hprose.RPC {
             if (Timeout == default) Timeout = client.Timeout;
             Copy(client.RequestHeaders, RequestHeaders);
         }
+        public override void CopyTo(Context context) {
+            base.CopyTo(context);
+            var clientContext = context as ClientContext;
+            clientContext.Client = Client;
+            clientContext.Uri = Uri;
+            clientContext.ReturnType = ReturnType;
+            clientContext.Timeout = Timeout;
+        }
     }
 }
