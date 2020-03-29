@@ -8,13 +8,14 @@
 |                                                          |
 |  HttpTransport class for .NET CF.                        |
 |                                                          |
-|  LastModified: Mar 8, 2020                               |
+|  LastModified: Mar 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 #if NET35_CF
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Collections.Concurrent;
 using System.IO;
 using System.IO.Compression;
@@ -28,7 +29,7 @@ namespace Hprose.RPC {
         public static bool DisableGlobalCookie { get; set; } = false;
         private static readonly CookieManager globalCookieManager = new CookieManager();
         private readonly CookieManager cookieManager = DisableGlobalCookie ? new CookieManager() : globalCookieManager;
-        public Dictionary<string, string> Headers { get; }= new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+        public NameValueCollection HttpRequestHeaders { get; } = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
         public ICredentials Credentials { get; set; } = null;
         public bool KeepAlive { get; set; } = true;
         public int KeepAliveTimeout { get; set; } = 300;
@@ -75,8 +76,9 @@ namespace Hprose.RPC {
                 if (ClientCertificates != null) {
                     webRequest.ClientCertificates = ClientCertificates;
                 }
-                foreach (var header in Headers) {
-                    webRequest.Headers[header.Key] = header.Value;
+                webRequest.Headers.Add(HttpRequestHeaders);
+                if (context.Contains("httpRequestHeaders")) {
+                    webRequest.Headers.Add(context["httpRequestHeaders"] as NameValueCollection);
                 }
                 webRequest.AllowWriteStreamBuffering = true;
                 webRequest.Headers.Set("Cookie", cookieManager.GetCookie(uri.Host, uri.AbsolutePath, uri.Scheme == "https"));
@@ -86,6 +88,14 @@ namespace Hprose.RPC {
                 }
                 using (var webResponse = await webRequest.GetResponseAsync().ConfigureAwait(false) as HttpWebResponse) {
                     requests[webRequest] = webResponse;
+                    context["httpStatusCode"] = (int)webResponse.StatusCode;
+                    context["httpStatusText"] = webResponse.StatusDescription;
+                    if ((int)webResponse.StatusCode < 200 || (int)webResponse.StatusCode >= 300) {
+                        throw new Exception(((int)webResponse.StatusCode) + ":" + webResponse.StatusDescription);
+                    }
+                    var headers = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
+                    headers.Add(webResponse.Headers);
+                    context["httpResponseHeaders"] = headers;
                     cookieManager.SetCookie(webResponse.Headers.GetValues("Set-Cookie"), uri.Host);
                     cookieManager.SetCookie(webResponse.Headers.GetValues("Set-Cookie2"), uri.Host);
                     int len = (int)webResponse.ContentLength;

@@ -8,7 +8,7 @@
 |                                                          |
 |  AspNetCoreHttpHandler class for C#.                     |
 |                                                          |
-|  LastModified: Sep 21, 2019                              |
+|  LastModified: Mar 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -16,6 +16,7 @@
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
@@ -29,7 +30,7 @@ namespace Hprose.RPC.AspNetCore {
         public bool P3P { get; set; } = true;
         public bool Get { get; set; } = true;
         public bool Compress { get; set; } = false;
-        public Dictionary<string, string> HttpHeaders { get; set; } = new Dictionary<string, string>();
+        public NameValueCollection HttpHeaders { get; set; } = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
         public string CrossDomainXmlFile { get; set; } = null;
         public string ClientAccessPolicyXmlFile { get; set; } = null;
         private readonly string lastModified;
@@ -69,7 +70,13 @@ namespace Hprose.RPC.AspNetCore {
             }
             return ostream;
         }
-        private void SendHeader(HttpRequest request, HttpResponse response) {
+        private void SendHeader(HttpRequest request, HttpResponse response, Context context) {
+            if (context.Contains("httpStatusCode")) {
+                response.StatusCode = (int)context["httpStatusCode"];
+            }
+            else {
+                response.StatusCode = 200;
+            }
             response.ContentType = "text/plain";
             if (P3P) {
                 response.Headers.Add("P3P",
@@ -88,8 +95,14 @@ namespace Hprose.RPC.AspNetCore {
                 }
             }
             if (HttpHeaders != null) {
-                foreach (var header in HttpHeaders) {
-                    response.Headers.Add(header.Key, header.Value);
+                foreach (var key in HttpHeaders.AllKeys) {
+                    response.Headers.Add(key, HttpHeaders.GetValues(key));
+                }
+            }
+            if (context.Contains("httpResponseHeaders")) {
+                var headers = context["httpResponseHeaders"] as NameValueCollection;
+                foreach (var key in headers.AllKeys) {
+                    response.Headers.Add(key, headers.GetValues(key));
                 }
             }
         }
@@ -104,9 +117,8 @@ namespace Hprose.RPC.AspNetCore {
                     response.Headers.Add("Etag", etag);
                     response.ContentType = "text/xml";
                     using (var fileStream = new FileStream(CrossDomainXmlFile, FileMode.Open, FileAccess.Read)) {
-                        using (var outputStream = GetOutputStream(request, response)) {
-                            await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
-                        }
+                        using var outputStream = GetOutputStream(request, response);
+                        await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
                     };
                 }
                 else {
@@ -127,9 +139,8 @@ namespace Hprose.RPC.AspNetCore {
                     response.Headers.Add("Etag", etag);
                     response.ContentType = "text/xml";
                     using (var fileStream = new FileStream(ClientAccessPolicyXmlFile, FileMode.Open, FileAccess.Read)) {
-                        using (var outputStream = GetOutputStream(request, response)) {
-                            await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
-                        }
+                        using var outputStream = GetOutputStream(request, response);
+                        await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
                     };
                 }
                 else {
@@ -162,48 +173,49 @@ namespace Hprose.RPC.AspNetCore {
             context.RemoteEndPoint = GetRemoteEndPoint(httpContext);
             context.LocalEndPoint = GetLocalEndPoint(httpContext);
             context.Handler = this;
-            if (await ClientAccessPolicyXmlHandler(request, response).ConfigureAwait(false)) {
-                return;
+            var headers = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
+            foreach (var header in request.Headers) {
+                foreach (var value in header.Value) {
+                    headers.Add(header.Key, value);
+                }
             }
-            if (await CrossDomainXmlHandler(request, response).ConfigureAwait(false)) {
-                return;
-            }
-            using (var instream = request.Body) {
-                if (request.ContentLength > Service.MaxRequestLength) {
-                    instream.Dispose();
-                    response.StatusCode = 413;
+            context["httpRequestHeaders"] = headers;
+            if (request.Method == "GET") {
+                if (await ClientAccessPolicyXmlHandler(request, response).ConfigureAwait(false)) {
                     return;
                 }
-                string method = request.Method;
-                Stream outstream = null;
-                switch (method) {
-                    case "GET":
-                        if (!Get) {
-                            response.StatusCode = 403;
-                            break;
-                        }
-                        goto case "POST";
-                    case "POST":
-                        try {
-                            outstream = await Service.Handle(instream, context).ConfigureAwait(false);
-                        }
-                        catch (Exception e) {
-                            response.StatusCode = 500;
-                            using (var outputStream = GetOutputStream(request, response)) {
-                                var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
-                                await outputStream.WriteAsync(stackTrace, 0, stackTrace.Length).ConfigureAwait(false);
-                            }
-                            return;
-                        }
-                        break;
+                if (await CrossDomainXmlHandler(request, response).ConfigureAwait(false)) {
+                    return;
                 }
-                SendHeader(request, response);
-                if (outstream != null) {
-                    using (var outputStream = GetOutputStream(request, response)) {
-                        await outstream.CopyToAsync(outputStream).ConfigureAwait(false);
-                    }
-                    outstream.Dispose();
+                if (!Get) {
+                    response.StatusCode = 403;
+                    return;
                 }
+            }
+            using var instream = request.Body;
+            if (request.ContentLength > Service.MaxRequestLength) {
+                instream.Dispose();
+                response.StatusCode = 413;
+                return;
+            }
+            string method = request.Method;
+            Stream outstream = null;
+            try {
+                outstream = await Service.Handle(instream, context).ConfigureAwait(false);
+            }
+            catch (Exception e) {
+                response.StatusCode = 500;
+                using var outputStream = GetOutputStream(request, response);
+                var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
+                await outputStream.WriteAsync(stackTrace, 0, stackTrace.Length).ConfigureAwait(false);
+                return;
+            }
+            SendHeader(request, response, context);
+            if (outstream != null) {
+                using (var outputStream = GetOutputStream(request, response)) {
+                    await outstream.CopyToAsync(outputStream).ConfigureAwait(false);
+                }
+                outstream.Dispose();
             }
         }
     }

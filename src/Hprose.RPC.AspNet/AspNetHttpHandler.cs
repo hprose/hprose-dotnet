@@ -8,13 +8,14 @@
 |                                                          |
 |  AspNetHttpHandler class for C#.                         |
 |                                                          |
-|  LastModified: Sep 21, 2019                              |
+|  LastModified: Mar 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
@@ -29,7 +30,7 @@ namespace Hprose.RPC.AspNet {
         public bool P3P { get; set; } = true;
         public bool Get { get; set; } = true;
         public bool Compress { get; set; } = false;
-        public Dictionary<string, string> HttpHeaders { get; set; } = new Dictionary<string, string>();
+        public NameValueCollection HttpHeaders { get; set; } = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
         public string CrossDomainXmlFile { get; set; } = null;
         public string ClientAccessPolicyXmlFile { get; set; } = null;
         private readonly string lastModified;
@@ -69,7 +70,16 @@ namespace Hprose.RPC.AspNet {
             }
             return ostream;
         }
-        private void SendHeader(HttpRequest request, HttpResponse response) {
+        private void SendHeader(HttpRequest request, HttpResponse response, Context context) {
+            if (context.Contains("httpStatusCode")) {
+                response.StatusCode = (int)context["httpStatusCode"];
+                if (context.Contains("httpStatusText")) {
+                    response.StatusDescription = (string)context["httpStatusText"];
+                }
+            }
+            else {
+                response.StatusCode = 200;
+            }
             response.ContentType = "text/plain";
             if (P3P) {
                 response.AppendHeader("P3P",
@@ -88,9 +98,11 @@ namespace Hprose.RPC.AspNet {
                 }
             }
             if (HttpHeaders != null) {
-                foreach (var header in HttpHeaders) {
-                    response.AppendHeader(header.Key, header.Value);
-                }
+                response.Headers.Add(HttpHeaders);
+            }
+            if (context.Contains("httpResponseHeaders")) {
+                var headers = context["httpResponseHeaders"] as NameValueCollection;
+                response.Headers.Add(headers);
             }
         }
         private async Task<bool> CrossDomainXmlHandler(HttpRequest request, HttpResponse response) {
@@ -104,9 +116,8 @@ namespace Hprose.RPC.AspNet {
                     response.AppendHeader("Etag", etag);
                     response.ContentType = "text/xml";
                     using (var fileStream = new FileStream(CrossDomainXmlFile, FileMode.Open, FileAccess.Read)) {
-                        using (var outputStream = GetOutputStream(request, response)) {
-                            await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
-                        }
+                        using var outputStream = GetOutputStream(request, response);
+                        await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
                     };
                 }
                 else {
@@ -127,9 +138,8 @@ namespace Hprose.RPC.AspNet {
                     response.AppendHeader("Etag", etag);
                     response.ContentType = "text/xml";
                     using (var fileStream = new FileStream(ClientAccessPolicyXmlFile, FileMode.Open, FileAccess.Read)) {
-                        using (var outputStream = GetOutputStream(request, response)) {
-                            await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
-                        }
+                        using var outputStream = GetOutputStream(request, response);
+                        await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
                     };
                 }
                 else {
@@ -178,51 +188,47 @@ namespace Hprose.RPC.AspNet {
             context.RemoteEndPoint = GetRemoteEndPoint(request);
             context.LocalEndPoint = GetLocalEndPoint(request);
             context.Handler = this;
-            if (await ClientAccessPolicyXmlHandler(request, response).ConfigureAwait(false)) {
-                return;
-            }
-            if (await CrossDomainXmlHandler(request, response).ConfigureAwait(false)) {
-                return;
-            }
-            using (var instream = request.InputStream) {
-                if (request.ContentLength > Service.MaxRequestLength) {
-                    instream.Dispose();
-                    response.StatusCode = 413;
-                    response.StatusDescription = "Request Entity Too Large";
+            context["httpRequestHeaders"] = request.Headers;
+            if (request.HttpMethod == "GET") {
+                if (await ClientAccessPolicyXmlHandler(request, response).ConfigureAwait(false)) {
                     return;
                 }
-                string method = request.HttpMethod;
-                Stream outstream = null;
-                switch (method) {
-                    case "GET":
-                        if (!Get) {
-                            response.StatusCode = 403;
-                            response.StatusDescription = "Forbidden";
-                            break;
-                        }
-                        goto case "POST";
-                    case "POST":
-                        try {
-                            outstream = await Service.Handle(instream, context).ConfigureAwait(false);
-                        }
-                        catch (Exception e) {
-                            response.StatusCode = 500;
-                            response.StatusDescription = "Internal Server Error";
-                            using (var outputStream = GetOutputStream(request, response)) {
-                                var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
-                                await outputStream.WriteAsync(stackTrace, 0, stackTrace.Length).ConfigureAwait(false);
-                            }
-                            return;
-                        }
-                        break;
+                if (await CrossDomainXmlHandler(request, response).ConfigureAwait(false)) {
+                    return;
                 }
-                SendHeader(request, response);
-                if (outstream != null) {
-                    using (var outputStream = GetOutputStream(request, response)) {
-                        await outstream.CopyToAsync(outputStream).ConfigureAwait(false);
-                    }
-                    outstream.Dispose();
+                if (!Get) {
+                    response.StatusCode = 403;
+                    response.StatusDescription = "Forbidden";
+                    response.Close();
+                    return;
                 }
+            }
+            using var instream = request.InputStream;
+            if (request.ContentLength > Service.MaxRequestLength) {
+                instream.Dispose();
+                response.StatusCode = 413;
+                response.StatusDescription = "Request Entity Too Large";
+                return;
+            }
+            string method = request.HttpMethod;
+            Stream outstream = null;
+            try {
+                outstream = await Service.Handle(instream, context).ConfigureAwait(false);
+            }
+            catch (Exception e) {
+                response.StatusCode = 500;
+                response.StatusDescription = "Internal Server Error";
+                using var outputStream = GetOutputStream(request, response);
+                var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
+                await outputStream.WriteAsync(stackTrace, 0, stackTrace.Length).ConfigureAwait(false);
+                return;
+            }
+            SendHeader(request, response, context);
+            if (outstream != null) {
+                using (var outputStream = GetOutputStream(request, response)) {
+                    await outstream.CopyToAsync(outputStream).ConfigureAwait(false);
+                }
+                outstream.Dispose();
             }
         }
     }

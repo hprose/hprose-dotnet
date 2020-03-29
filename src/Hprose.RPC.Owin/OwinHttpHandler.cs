@@ -8,13 +8,14 @@
 |                                                          |
 |  OwinHttpHandler class for C#.                           |
 |                                                          |
-|  LastModified: Sep 21, 2019                              |
+|  LastModified: Mar 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
@@ -28,7 +29,7 @@ namespace Hprose.RPC.Owin {
         public bool P3P { get; set; } = true;
         public bool Get { get; set; } = true;
         public bool Compress { get; set; } = false;
-        public Dictionary<string, string> HttpHeaders { get; set; } = new Dictionary<string, string>();
+        public NameValueCollection HttpHeaders { get; set; } = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
         public string CrossDomainXmlFile { get; set; } = null;
         public string ClientAccessPolicyXmlFile { get; set; } = null;
         private readonly string lastModified;
@@ -70,9 +71,14 @@ namespace Hprose.RPC.Owin {
             }
             return ostream;
         }
-        private void SendHeader(IDictionary<string, object> environment) {
+        private void SendHeader(IDictionary<string, object> environment, Context context) {
             var requestHeaders = environment["owin.RequestHeaders"] as IDictionary<string, string[]>;
             var responseHeaders = environment["owin.ResponseHeaders"] as IDictionary<string, string[]>;
+            if (context.Contains("httpStatusCode")) {
+                environment["owin.ResponseStatusCode"] = context["httpStatusCode"];
+            } else {
+                environment["owin.ResponseStatusCode"] = 200;
+            }
             responseHeaders.Add("Content-Type", new string[] { "text/plain" });
             if (P3P) {
                 responseHeaders.Add("P3P", new string[] {
@@ -91,8 +97,14 @@ namespace Hprose.RPC.Owin {
                 }
             }
             if (HttpHeaders != null) {
-                foreach (var header in HttpHeaders) {
-                    responseHeaders.Add(header.Key, new string[] { header.Value });
+                foreach (var key in HttpHeaders.AllKeys) {
+                    responseHeaders.Add(key, HttpHeaders.GetValues(key));
+                }
+            }
+            if (context.Contains("httpResponseHeaders")) {
+                var headers = context["httpResponseHeaders"] as NameValueCollection;
+                foreach (var key in headers.AllKeys) {
+                    responseHeaders.Add(key, headers.GetValues(key));
                 }
             }
         }
@@ -109,9 +121,8 @@ namespace Hprose.RPC.Owin {
                     responseHeaders.Add("Etag", new string[] { etag });
                     responseHeaders.Add("Content-Type", new string[] { "text/xml" });
                     using (var fileStream = new FileStream(CrossDomainXmlFile, FileMode.Open, FileAccess.Read)) {
-                        using (var outputStream = GetOutputStream(environment)) {
-                            await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
-                        }
+                        using var outputStream = GetOutputStream(environment);
+                        await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
                     };
                 }
                 else {
@@ -134,9 +145,8 @@ namespace Hprose.RPC.Owin {
                     responseHeaders.Add("Etag", new string[] { etag });
                     responseHeaders.Add("Content-Type", new string[] { "text/xml" });
                     using (var fileStream = new FileStream(ClientAccessPolicyXmlFile, FileMode.Open, FileAccess.Read)) {
-                        using (var outputStream = GetOutputStream(environment)) {
-                            await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
-                        }
+                        using var outputStream = GetOutputStream(environment);
+                        await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
                     };
                 }
                 else {
@@ -166,50 +176,52 @@ namespace Hprose.RPC.Owin {
             context.RemoteEndPoint = GetRemoteEndPoint(environment);
             context.LocalEndPoint = GetLocalEndPoint(environment);
             context.Handler = this;
-            if (await ClientAccessPolicyXmlHandler(environment).ConfigureAwait(false)) {
-                return;
+            var requestHeaders = environment["owin.RequestHeaders"] as IDictionary<string, string[]>;
+            var headers = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
+            foreach (var header in requestHeaders) {
+                foreach (var value in header.Value) {
+                    headers.Add(header.Key, value);
+                }
             }
-            if (await CrossDomainXmlHandler(environment).ConfigureAwait(false)) {
-                return;
-            }
-            using (var instream = (environment["owin.RequestBody"] as Stream) ?? Stream.Null) {
-                if (instream.Length > Service.MaxRequestLength) {
-                    instream.Dispose();
-                    environment["owin.ResponseStatusCode"] = 413;
-                    environment["owin.ResponseReasonPhrase"] = "Request Entity Too Large";
+            context["httpRequestHeaders"] = headers;
+            string method = environment["owin.RequestMethod"] as string;
+            if (method == "GET") {
+                if (await ClientAccessPolicyXmlHandler(environment).ConfigureAwait(false)) {
                     return;
                 }
-                string method = environment["owin.RequestMethod"] as string;
-                Stream outstream = null;
-                switch (method) {
-                    case "GET":
-                        if (!Get) {
-                            environment["owin.ResponseStatusCode"] = 403;
-                            environment["owin.ResponseReasonPhrase"] = "Forbidden";
-                            break;
-                        }
-                        goto case "POST";
-                    case "POST":
-                        try {
-                            outstream = await Service.Handle(instream, context).ConfigureAwait(false);
-                        }
-                        catch (Exception e) {
-                            environment["owin.ResponseStatusCode"] = 500;
-                            using (var outputStream = GetOutputStream(environment)) {
-                                var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
-                                await outputStream.WriteAsync(stackTrace, 0, stackTrace.Length).ConfigureAwait(false);
-                            }
-                            return;
-                        }
-                        break;
+                if (await CrossDomainXmlHandler(environment).ConfigureAwait(false)) {
+                    return;
                 }
-                SendHeader(environment);
-                if (outstream != null) {
-                    using (var outputStream = GetOutputStream(environment)) {
-                        await outstream.CopyToAsync(outputStream).ConfigureAwait(false);
-                    }
-                    outstream.Dispose();
+                if (!Get) {
+                    environment["owin.ResponseStatusCode"] = 403;
+                    environment["owin.ResponseReasonPhrase"] = "Forbidden";
+                    return;
                 }
+            }
+            using var instream = (environment["owin.RequestBody"] as Stream) ?? Stream.Null;
+            if (instream.Length > Service.MaxRequestLength) {
+                instream.Dispose();
+                environment["owin.ResponseStatusCode"] = 413;
+                environment["owin.ResponseReasonPhrase"] = "Request Entity Too Large";
+                return;
+            }
+            Stream outstream = null;
+            try {
+                outstream = await Service.Handle(instream, context).ConfigureAwait(false);
+            }
+            catch (Exception e) {
+                environment["owin.ResponseStatusCode"] = 500;
+                using var outputStream = GetOutputStream(environment);
+                var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
+                await outputStream.WriteAsync(stackTrace, 0, stackTrace.Length).ConfigureAwait(false);
+                return;
+            }
+            SendHeader(environment, context);
+            if (outstream != null) {
+                using (var outputStream = GetOutputStream(environment)) {
+                    await outstream.CopyToAsync(outputStream).ConfigureAwait(false);
+                }
+                outstream.Dispose();
             }
         }
     }
