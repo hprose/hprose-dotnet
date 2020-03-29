@@ -19,8 +19,8 @@ using System.Collections.Generic;
 namespace Hprose.RPC {
     public class Context : ICloneable {
         public IDictionary<string, object> Items { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
-        public IDictionary<string, object> RequestHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
-        public IDictionary<string, object> ResponseHeaders { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+        public IDictionary<string, object> RequestHeaders { get; set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+        public IDictionary<string, object> ResponseHeaders { get; set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public object this[string name] {
             get => Items[name];
             set => Items[name] = value;
