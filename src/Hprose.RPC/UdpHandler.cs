@@ -8,7 +8,7 @@
 |                                                          |
 |  UdpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Mar 8, 2020                               |
+|  LastModified: Mar 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -139,9 +139,16 @@ namespace Hprose.RPC {
                 await send.ConfigureAwait(false);
             }
             catch (Exception e) {
-                OnError?.Invoke(e);
-                udpClient.Close();
-                OnClose?.Invoke(udpClient);
+                if (e.InnerException != null) {
+                    e = e.InnerException;
+                }
+                try {
+                    OnError?.Invoke(e);
+                    OnClose?.Invoke(udpClient);
+                }
+                finally {
+                    udpClient.Close();
+                }
             }
         }
     }

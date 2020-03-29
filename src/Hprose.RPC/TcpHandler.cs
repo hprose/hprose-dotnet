@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Mar 8, 2020                               |
+|  LastModified: Mar 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -202,9 +202,13 @@ namespace Hprose.RPC {
                 if (e.InnerException != null) {
                     e = e.InnerException;
                 }
-                OnError?.Invoke(e);
-                tcpClient.Close();
-                OnClose?.Invoke(tcpClient);
+                try {
+                    OnError?.Invoke(e);
+                    OnClose?.Invoke(tcpClient);
+                }
+                finally {
+                    tcpClient.Close();
+                }
             }
         }
     }

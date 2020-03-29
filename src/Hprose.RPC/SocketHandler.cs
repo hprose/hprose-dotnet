@@ -8,7 +8,7 @@
 |                                                          |
 |  SocketHandler class for C#.                             |
 |                                                          |
-|  LastModified: Mar 8, 2020                               |
+|  LastModified: Mar 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -157,10 +157,17 @@ namespace Hprose.RPC {
                 }
             }
             catch (Exception e) {
-                OnError?.Invoke(e);
-                socket.Shutdown(SocketShutdown.Both);
-                socket.Close();
-                OnClose?.Invoke(socket);
+                if (e.InnerException != null) {
+                    e = e.InnerException;
+                }
+                try {
+                    OnError?.Invoke(e);
+                    OnClose?.Invoke(socket);
+                }
+                finally {
+                    socket.Shutdown(SocketShutdown.Both);
+                    socket.Close();
+                }
             }
         }
     }

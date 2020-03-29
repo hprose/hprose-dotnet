@@ -8,7 +8,7 @@
 |                                                          |
 |  AspNetCoreWebSocketHandler class for C#.                |
 |                                                          |
-|  LastModified: Jun 5, 2019                               |
+|  LastModified: Mar 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -156,12 +156,22 @@ namespace Hprose.RPC.AspNetCore {
                     }
                 }
                 catch (Exception e) {
-                    OnError?.Invoke(e);
-                    webSocket.Abort();
-                    OnClose?.Invoke(webSocket);
+                    if (e.InnerException != null) {
+                        e = e.InnerException;
+                    }
+                    try {
+                        OnError?.Invoke(e);
+                        OnClose?.Invoke(webSocket);
+                    }
+                    finally {
+                        webSocket.Abort();
+                    }
                 }
             }
             catch (Exception e) {
+                if (e.InnerException != null) {
+                    e = e.InnerException;
+                }
                 OnError?.Invoke(e);
             }
         }
