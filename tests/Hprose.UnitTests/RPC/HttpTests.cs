@@ -264,7 +264,8 @@ namespace Hprose.UnitTests.RPC {
             server2.Prefixes.Add("http://127.0.0.1:8091/");
             server2.Start();
             var service2 = new Service();
-            service2.Use(new Forward("http://127.0.0.1:8090/").IOHandler).Bind(server2);
+            service2.AddMissingMethod((name, args) => null);
+            service2.Use(new Forward("http://127.0.0.1:8090/").InvokeHandler).Bind(server2);
             var client = new Client("http://127.0.0.1:8091/");
             var log = new Log();
             client.Use(log.IOHandler).Use(log.InvokeHandler);
