@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;net40;net40-client;net45;net451;net452;net46;net461;net462;net47;net471;net472;net48</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;net40;net40-client;net45;net451;net452;net46;net461;net462;net47;net471;net472;net48;net50</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>HproseKeys.snk</AssemblyOriginatorKeyFile>
-    <Version>3.0.14</Version>
+    <Version>3.0.15</Version>
     <OutputType>Library</OutputType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -45,6 +45,10 @@
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
     <DefineConstants>$(DefineConstants);NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP;NETCOREAPP3_0_UP;NETCOREAPP3_1_UP</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net50'">
+    <DefineConstants>$(DefineConstants);NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP;NETCOREAPP3_0_UP;NETCOREAPP3_1_UP;NET50_UP</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net40-client'">

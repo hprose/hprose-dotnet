@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;net45;net451;net452;net46;net461;net462;net47;net471;net472;net48</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;net45;net451;net452;net46;net461;net462;net47;net471;net472;net48;net50</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <LangVersion>latest</LangVersion>
     <RootNamespace>Hprose.UnitTests</RootNamespace>
@@ -10,26 +10,30 @@
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
-    <DefineConstants>NETCOREAPP2_0_UP</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETCOREAPP2_0_UP</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
-    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETCOREAPP2_0_UP;NETCOREAPP2_1_UP</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'">
-    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
-    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP;NETCOREAPP3_0_UP</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP;NETCOREAPP3_0_UP</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-    <DefineConstants>NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP;NETCOREAPP3_0_UP;NETCOREAPP3_1_UP</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP;NETCOREAPP3_0_UP;NETCOREAPP3_1_UP</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup Condition=" !$(TargetFramework.StartsWith('netcoreapp3')) ">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net50'">
+    <DefineConstants>$(DefineConstants);NETCOREAPP2_0_UP;NETCOREAPP2_1_UP;NETCOREAPP2_2_UP;NETCOREAPP3_0_UP;NETCOREAPP3_1_UP;NET50_UP</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" !$(TargetFramework.StartsWith('netcoreapp3')) And !$(TargetFramework.StartsWith('net5')) ">
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
