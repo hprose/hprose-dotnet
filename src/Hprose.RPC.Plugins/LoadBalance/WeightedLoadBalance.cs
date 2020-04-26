@@ -8,7 +8,7 @@
 |                                                          |
 |  Weighted LoadBalance plugin for C#.                     |
 |                                                          |
-|  LastModified: Feb 23, 2019                              |
+|  LastModified: Apr 26, 2019                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -36,6 +36,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
                 if (weights[i] <= 0) {
                     throw new ArgumentOutOfRangeException(nameof(uriList), "weight must be great than 0");
                 }
+                i++;
             }
             if (uris.Length == 0) {
                 throw new ArgumentException("cannot be empty", nameof(uriList));
