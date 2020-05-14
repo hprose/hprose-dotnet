@@ -8,7 +8,7 @@
 |                                                          |
 |  Prosumer plugin for C#.                                 |
 |                                                          |
-|  LastModified: Jun 5, 2019                               |
+|  LastModified: May 14, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -26,6 +26,7 @@ namespace Hprose.RPC.Plugins.Push {
             TypeManager.Register<Message>("@");
         }
         private readonly ConcurrentDictionary<string, Action<Message>> callbacks = new ConcurrentDictionary<string, Action<Message>>();
+        public TimeSpan RetryInterval { get; set; } = new TimeSpan(0, 0, 1);
         public event Action<Exception> OnError;
         public event Action<string> OnSubscribe;
         public event Action<string> OnUnsubscribe;
@@ -77,7 +78,16 @@ namespace Hprose.RPC.Plugins.Push {
                     if (topics == null) return;
                     Dispatch(topics);
                 }
+                catch (TimeoutException) {
+                }
                 catch (Exception e) {
+                    if (RetryInterval != default) {
+#if NET40
+                        await TaskEx.Delay(RetryInterval);
+#else
+                        await Task.Delay(RetryInterval);
+#endif
+                    }
                     OnError?.Invoke(e);
                 }
             }
