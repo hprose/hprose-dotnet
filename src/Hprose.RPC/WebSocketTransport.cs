@@ -8,7 +8,7 @@
 |                                                          |
 |  WebSocketTransport class for C#.                        |
 |                                                          |
-|  LastModified: Nov 13, 2019                              |
+|  LastModified: May 14, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -39,6 +39,7 @@ namespace Hprose.RPC {
         private ConcurrentDictionary<ClientWebSocket, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<ClientWebSocket, ConcurrentQueue<(int, MemoryStream)>>();
         private ConcurrentDictionary<ClientWebSocket, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<ClientWebSocket, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
         private ConcurrentDictionary<ClientWebSocket, byte> Lock { get; } = new ConcurrentDictionary<ClientWebSocket, byte>();
+        private ConcurrentDictionary<ClientWebSocket, Uri> Uris { get; } = new ConcurrentDictionary<ClientWebSocket, Uri>();
         private ConcurrentDictionary<Uri, Lazy<Task<ClientWebSocket>>> WebSockets { get; } = new ConcurrentDictionary<Uri, Lazy<Task<ClientWebSocket>>>();
         private readonly Func<Uri, Lazy<Task<ClientWebSocket>>> webSocketFactory;
         public WebSocketTransport() {
@@ -47,6 +48,7 @@ namespace Hprose.RPC {
                     ClientWebSocket webSocket = null;
                     try {
                         webSocket = new ClientWebSocket();
+                        Uris.TryAdd(webSocket, uri);
                         var options = webSocket.Options;
                         options.AddSubProtocol("hprose");
                         options.UseDefaultCredentials = UseDefaultCredentials;
@@ -85,6 +87,9 @@ namespace Hprose.RPC {
             try {
                 if (e.InnerException != null) {
                     e = e.InnerException;
+                }
+                if (Uris.TryRemove(webSocket, out var uri)) {
+                    WebSockets.TryRemove(uri, out var _);
                 }
                 Requests.TryRemove(webSocket, out var requests);
                 if (Results.TryRemove(webSocket, out var results)) {
@@ -178,21 +183,8 @@ namespace Hprose.RPC {
                 Lock.TryRemove(webSocket, out var _);
             }
         }
-        private async Task<ClientWebSocket> GetWebSocket(Uri uri) {
-            int retried = 0;
-            while (true) {
-                var LazyWebSocket = WebSockets.GetOrAdd(uri, webSocketFactory);
-                var webSocket = await LazyWebSocket.Value.ConfigureAwait(false);
-                if (webSocket.CloseStatus == null && webSocket.State == WebSocketState.Open) {
-                    return webSocket;
-                }
-                WebSockets.TryRemove(uri, out LazyWebSocket);
-                webSocket.Abort();
-                webSocket.Dispose();
-                if (++retried > 1) {
-                    throw new WebSocketException(WebSocketError.Faulted);
-                }
-            }
+        private Task<ClientWebSocket> GetWebSocket(Uri uri) {
+            return WebSockets.GetOrAdd(uri, webSocketFactory).Value;
         }
         public async Task<Stream> Transport(Stream request, Context context) {
             var stream = await request.ToMemoryStream().ConfigureAwait(false);
@@ -222,8 +214,7 @@ namespace Hprose.RPC {
             foreach (var LazyWebSocket in WebSockets.Values) {
                 try {
                     var webSocket = await LazyWebSocket.Value.ConfigureAwait(false);
-                    webSocket.Abort();
-                    webSocket.Dispose();
+                    Close(webSocket, new WebSocketException(WebSocketError.ConnectionClosedPrematurely));
                 }
                 catch { }
             }
