@@ -8,7 +8,7 @@
 |                                                          |
 |  SocketTransport class for C#.                           |
 |                                                          |
-|  LastModified: Nov 13, 2019                              |
+|  LastModified: May 14, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -33,6 +33,7 @@ namespace Hprose.RPC {
         private ConcurrentDictionary<Socket, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<Socket, ConcurrentQueue<(int, MemoryStream)>>();
         private ConcurrentDictionary<Socket, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<Socket, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
         private ConcurrentDictionary<Socket, byte> Lock { get; } = new ConcurrentDictionary<Socket, byte>();
+        private ConcurrentDictionary<Socket, Uri> Uris { get; } = new ConcurrentDictionary<Socket, Uri>();
         private ConcurrentDictionary<Uri, Lazy<Task<Socket>>> Sockets { get; } = new ConcurrentDictionary<Uri, Lazy<Task<Socket>>>();
         private readonly Func<Uri, Lazy<Task<Socket>>> socketFactory;
         public SocketTransport() {
@@ -47,6 +48,7 @@ namespace Hprose.RPC {
                             protocol = ProtocolType.Unspecified;
                         }
                         socket = new Socket(family, SocketType.Stream, protocol);
+                        Uris.TryAdd(socket, uri);
                         if (family == AddressFamily.Unix) {
 #if NETSTANDARD2_1 || NETCOREAPP2_1_UP
                             await socket.ConnectAsync(new UnixDomainSocketEndPoint(uri.AbsolutePath)).ConfigureAwait(false);
@@ -83,6 +85,9 @@ namespace Hprose.RPC {
             try {
                 if (e.InnerException != null) {
                     e = e.InnerException;
+                }
+                if (Uris.TryRemove(socket, out var uri)) {
+                    Sockets.TryRemove(uri, out var _);
                 }
                 Requests.TryRemove(socket, out var requests);
                 if (Results.TryRemove(socket, out var results)) {
@@ -173,23 +178,8 @@ namespace Hprose.RPC {
                 Lock.TryRemove(socket, out var _);
             }
         }
-        private async Task<Socket> GetSocket(Uri uri) {
-            int retried = 0;
-            while (true) {
-                var LazySocket = Sockets.GetOrAdd(uri, socketFactory);
-                var socket = await LazySocket.Value.ConfigureAwait(false);
-                try {
-                    var available = socket.Available;
-                    return socket;
-                }
-                catch (Exception e) {
-                    Sockets.TryRemove(uri, out LazySocket);
-                    Close(socket, e);
-                    if (++retried > 1) {
-                        throw;
-                    }
-                }
-            }
+        private Task<Socket> GetSocket(Uri uri) {
+            return Sockets.GetOrAdd(uri, socketFactory).Value;
         }
         public async Task<Stream> Transport(Stream request, Context context) {
             var stream = await request.ToMemoryStream().ConfigureAwait(false);
@@ -219,8 +209,7 @@ namespace Hprose.RPC {
             foreach (var LazySocket in Sockets.Values) {
                 try {
                     var socket = await LazySocket.Value.ConfigureAwait(false);
-                    socket.Shutdown(SocketShutdown.Both);
-                    socket.Close();
+                    Close(socket, new SocketException(10053));
                 }
                 catch { }
             }
