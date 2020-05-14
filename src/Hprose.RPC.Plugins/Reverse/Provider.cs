@@ -8,7 +8,7 @@
 |                                                          |
 |  Provider class for C#.                                  |
 |                                                          |
-|  LastModified: Mar 28, 2020                              |
+|  LastModified: May 14, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -28,6 +28,7 @@ namespace Hprose.RPC.Plugins.Reverse {
         private readonly InvokeManager invokeManager;
         public bool Debug { get; set; } = false;
         public event Action<Exception> OnError;
+        public TimeSpan RetryInterval { get; set; } = new TimeSpan(0, 0, 1);
         public Client Client { get; private set; }
         public string Id {
             get {
@@ -114,15 +115,26 @@ namespace Hprose.RPC.Plugins.Reverse {
             for (int i = 0; i < n; ++i) {
                 results[i] = Process(calls[i]);
             }
-            try {
+            while (true) {
+                try {
 #if NET40
-                await Client.InvokeAsync("=", new object[] { await TaskEx.WhenAll(results).ConfigureAwait(false) }).ConfigureAwait(false);
+                    await Client.InvokeAsync("=", new object[] { await TaskEx.WhenAll(results).ConfigureAwait(false) }).ConfigureAwait(false);
 #else
-                await Client.InvokeAsync("=", new object[] { await Task.WhenAll(results).ConfigureAwait(false) }).ConfigureAwait(false);
+                    await Client.InvokeAsync("=", new object[] { await Task.WhenAll(results).ConfigureAwait(false) }).ConfigureAwait(false);
 #endif
-            }
-            catch (Exception e) {
-                OnError?.Invoke(e);
+                    return;
+                }
+                catch (TimeoutException) { }
+                catch (Exception e) {
+                    if (RetryInterval != default) {
+#if NET40
+                        await TaskEx.Delay(RetryInterval);
+#else
+                        await Task.Delay(RetryInterval);
+#endif
+                    }
+                    OnError?.Invoke(e);
+                }
             }
         }
         public async Task Listen() {
@@ -133,7 +145,15 @@ namespace Hprose.RPC.Plugins.Reverse {
                     if (calls == null) return;
                     Dispatch(calls);
                 }
+                catch (TimeoutException) { }
                 catch (Exception e) {
+                    if (RetryInterval != default) {
+#if NET40
+                        await TaskEx.Delay(RetryInterval);
+#else
+                        await Task.Delay(RetryInterval);
+#endif
+                    }
                     OnError?.Invoke(e);
                 }
             }
