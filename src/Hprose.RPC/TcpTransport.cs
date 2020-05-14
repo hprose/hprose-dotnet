@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpTransport class for C#.                              |
 |                                                          |
-|  LastModified: Jan 17, 2020                              |
+|  LastModified: May 14, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -47,6 +47,7 @@ namespace Hprose.RPC {
         private ConcurrentDictionary<TcpClient, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<TcpClient, ConcurrentQueue<(int, MemoryStream)>>();
         private ConcurrentDictionary<TcpClient, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<TcpClient, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
         private ConcurrentDictionary<TcpClient, byte> Lock { get; } = new ConcurrentDictionary<TcpClient, byte>();
+        private ConcurrentDictionary<TcpClient, Uri> Uris { get; } = new ConcurrentDictionary<TcpClient, Uri>();
         private ConcurrentDictionary<Uri, Lazy<Task<(TcpClient, Stream)>>> TcpClients { get; } = new ConcurrentDictionary<Uri, Lazy<Task<(TcpClient, Stream)>>>();
 #if !NET35_CF
         private readonly Func<Uri, Lazy<Task<(TcpClient, Stream)>>> tcpClientFactory;
@@ -77,6 +78,7 @@ namespace Hprose.RPC {
 #else
                         tcpClient = new TcpClient(family);
 #endif
+                        Uris.TryAdd(tcpClient, uri);
                         await tcpClient.ConnectAsync(host, port).ConfigureAwait(false);
                         Stream tcpStream = tcpClient.GetStream();
 #if !NET35_CF
@@ -111,6 +113,9 @@ namespace Hprose.RPC {
             try {
                 if (e.InnerException != null) {
                     e = e.InnerException;
+                }
+                if (Uris.TryRemove(tcpClient, out var uri)) {
+                    TcpClients.TryRemove(uri, out var _);
                 }
                 Requests.TryRemove(tcpClient, out var requests);
                 if (Results.TryRemove(tcpClient, out var results)) {
@@ -201,27 +206,8 @@ namespace Hprose.RPC {
                 Lock.TryRemove(tcpClient, out var _);
             }
         }
-        private async Task<(TcpClient, Stream)> GetTcpClient(Uri uri) {
-            int retried = 0;
-            while(true) {
-                var LazyTcpClient = TcpClients.GetOrAdd(uri, tcpClientFactory);
-                var (tcpClient, tcpStream) = await LazyTcpClient.Value.ConfigureAwait(false);
-                try {
-#if !NET35_CF
-                    var available = tcpClient.Available;
-#else
-                    var available = tcpClient.Client.Available;
-#endif
-                    return (tcpClient, tcpStream);
-                }
-                catch (Exception e) {
-                    TcpClients.TryRemove(uri, out LazyTcpClient);
-                    Close(tcpClient, e);
-                    if (++retried > 1) {
-                        throw;
-                    }
-                }
-            }
+        private Task<(TcpClient, Stream)> GetTcpClient(Uri uri) {
+            return TcpClients.GetOrAdd(uri, tcpClientFactory).Value;
         }
         public async Task<Stream> Transport(Stream request, Context context) {
             var stream = await request.ToMemoryStream().ConfigureAwait(false);
@@ -254,7 +240,7 @@ namespace Hprose.RPC {
             foreach (var LazyTcpClient in TcpClients.Values) {
                 try {
                     var (tcpClient, _) = await LazyTcpClient.Value.ConfigureAwait(false);
-                    tcpClient.Close();
+                    Close(tcpClient, new SocketException(10053));
                 }
                 catch { }
             }
