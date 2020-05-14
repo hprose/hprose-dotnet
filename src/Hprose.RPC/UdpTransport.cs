@@ -8,7 +8,7 @@
 |                                                          |
 |  UdpTransport class for C#.                              |
 |                                                          |
-|  LastModified: Feb 27, 2019                              |
+|  LastModified: May 14, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -33,6 +33,7 @@ namespace Hprose.RPC {
         private ConcurrentDictionary<UdpClient, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<UdpClient, ConcurrentQueue<(int, MemoryStream)>>();
         private ConcurrentDictionary<UdpClient, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<UdpClient, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
         private ConcurrentDictionary<UdpClient, byte> Lock { get; } = new ConcurrentDictionary<UdpClient, byte>();
+        private ConcurrentDictionary<UdpClient, Uri> Uris { get; } = new ConcurrentDictionary<UdpClient, Uri>();
         private ConcurrentDictionary<Uri, Lazy<UdpClient>> UdpClients { get; } = new ConcurrentDictionary<Uri, Lazy<UdpClient>>();
 #if !NET35_CF
         private readonly Func<Uri, Lazy<UdpClient>> udpClientFactory;
@@ -61,6 +62,7 @@ namespace Hprose.RPC {
 #else
                         udpClient = new UdpClient(family);
 #endif
+                        Uris.TryAdd(udpClient, uri);
                         udpClient.Connect(host, port);
                         Requests.TryAdd(udpClient, new ConcurrentQueue<(int, MemoryStream)>());
                         Results.TryAdd(udpClient, new ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>());
@@ -80,6 +82,9 @@ namespace Hprose.RPC {
             try {
                 if (e.InnerException != null) {
                     e = e.InnerException;
+                }
+                if (Uris.TryRemove(udpClient, out var uri)) {
+                    UdpClients.TryRemove(uri, out var _);
                 }
                 Requests.TryRemove(udpClient, out var requests);
                 if (Results.TryRemove(udpClient, out var results)) {
@@ -163,26 +168,7 @@ namespace Hprose.RPC {
             }
         }
         private UdpClient GetUdpClient(Uri uri) {
-            int retried = 0;
-            while (true) {
-                var LazyUdpClient = UdpClients.GetOrAdd(uri, udpClientFactory);
-                var udpClient = LazyUdpClient.Value;
-                try {
-#if !NET35_CF
-                    var available = udpClient.Available;
-#else
-                    var available = udpClient.Client.Available;
-#endif
-                    return udpClient;
-                }
-                catch (Exception e) {
-                    UdpClients.TryRemove(uri, out LazyUdpClient);
-                    Close(udpClient, e);
-                    if (++retried > 1) {
-                        throw;
-                    }
-                }
-            }
+            return UdpClients.GetOrAdd(uri, udpClientFactory).Value;
         }
         public async Task<Stream> Transport(Stream request, Context context) {
             var stream = await request.ToMemoryStream().ConfigureAwait(false);
@@ -217,7 +203,7 @@ namespace Hprose.RPC {
             foreach (var LazyUdpClient in UdpClients.Values) {
                 try {
                     var udpClient = LazyUdpClient.Value;
-                    udpClient.Close();
+                    Close(udpClient, new SocketException(10053));
                 }
                 catch { }
             }
