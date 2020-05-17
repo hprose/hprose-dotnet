@@ -8,7 +8,7 @@
 |                                                          |
 |  WebSocketTransport class for C#.                        |
 |                                                          |
-|  LastModified: May 14, 2020                              |
+|  LastModified: May 17, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -76,20 +76,23 @@ namespace Hprose.RPC {
                     }
                     catch (Exception e) {
                         if (webSocket != null) {
-                            Close(webSocket, e);
+                            await Close(webSocket, e).ConfigureAwait(false);
                         }
                         throw;
                     }
                 });
             };
         }
-        private void Close(ClientWebSocket webSocket, Exception e) {
+        private async Task Close(ClientWebSocket webSocket, Exception e) {
             try {
                 if (e.InnerException != null) {
                     e = e.InnerException;
                 }
                 if (Uris.TryRemove(webSocket, out var uri)) {
-                    WebSockets.TryRemove(uri, out var _);
+                    WebSockets.TryGetValue(uri, out var value);
+                    if (await value.Value.ConfigureAwait(false) == webSocket) {
+                        WebSockets.TryRemove(uri, out _);
+                    }
                 }
                 Requests.TryRemove(webSocket, out var requests);
                 if (Results.TryRemove(webSocket, out var results)) {
@@ -151,7 +154,7 @@ namespace Hprose.RPC {
                 }
             }
             catch (Exception e) {
-                Close(webSocket, e);
+                await Close(webSocket, e).ConfigureAwait(false);
             }
         }
         private async void Send(ClientWebSocket webSocket) {
@@ -171,7 +174,7 @@ namespace Hprose.RPC {
                         await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, 4 + n), WebSocketMessageType.Binary, true, CancellationToken.None).ConfigureAwait(false);
                     }
                     catch (Exception e) {
-                        Close(webSocket, e);
+                        await Close(webSocket, e).ConfigureAwait(false);
                     }
                     finally {
                         stream.Dispose();
@@ -204,7 +207,7 @@ namespace Hprose.RPC {
                     var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
                     source.Cancel();
                     if (task == timer) {
-                        Close(webSocket, new TimeoutException());
+                        await Close(webSocket, new TimeoutException()).ConfigureAwait(false);
                     }
                 }
             }
@@ -214,7 +217,7 @@ namespace Hprose.RPC {
             foreach (var LazyWebSocket in WebSockets.Values) {
                 try {
                     var webSocket = await LazyWebSocket.Value.ConfigureAwait(false);
-                    Close(webSocket, new WebSocketException(WebSocketError.ConnectionClosedPrematurely));
+                    await Close(webSocket, new WebSocketException(WebSocketError.ConnectionClosedPrematurely)).ConfigureAwait(false);
                 }
                 catch { }
             }

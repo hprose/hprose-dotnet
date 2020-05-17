@@ -8,7 +8,7 @@
 |                                                          |
 |  UdpTransport class for C#.                              |
 |                                                          |
-|  LastModified: May 14, 2020                              |
+|  LastModified: May 17, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -84,7 +84,10 @@ namespace Hprose.RPC {
                     e = e.InnerException;
                 }
                 if (Uris.TryRemove(udpClient, out var uri)) {
-                    UdpClients.TryRemove(uri, out var _);
+                    UdpClients.TryGetValue(uri, out var value);
+                    if (value.Value == udpClient) {
+                        UdpClients.TryRemove(uri, out _);
+                    }
                 }
                 Requests.TryRemove(udpClient, out var requests);
                 if (Results.TryRemove(udpClient, out var results)) {

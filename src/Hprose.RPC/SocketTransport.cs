@@ -8,7 +8,7 @@
 |                                                          |
 |  SocketTransport class for C#.                           |
 |                                                          |
-|  LastModified: May 14, 2020                              |
+|  LastModified: May 17, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -74,20 +74,23 @@ namespace Hprose.RPC {
                     }
                     catch (Exception e) {
                         if (socket != null) {
-                            Close(socket, e);
+                            await Close(socket, e).ConfigureAwait(false);
                         }
                         throw;
                     }
                 });
             };
         }
-        private void Close(Socket socket, Exception e) {
+        private async Task Close(Socket socket, Exception e) {
             try {
                 if (e.InnerException != null) {
                     e = e.InnerException;
                 }
                 if (Uris.TryRemove(socket, out var uri)) {
-                    Sockets.TryRemove(uri, out var _);
+                    Sockets.TryGetValue(uri, out var value);
+                    if (await value.Value.ConfigureAwait(false) == socket) {
+                        Sockets.TryRemove(uri, out _);
+                    }
                 }
                 Requests.TryRemove(socket, out var requests);
                 if (Results.TryRemove(socket, out var results)) {
@@ -139,7 +142,7 @@ namespace Hprose.RPC {
                 }
             }
             catch (Exception e) {
-                Close(socket, e);
+                await Close(socket, e).ConfigureAwait(false);
             }
         }
         private async void Send(Socket socket) {
@@ -167,7 +170,7 @@ namespace Hprose.RPC {
                         await socket.SendAsync(new ArraySegment<byte>[] { new ArraySegment<byte>(header), stream.GetArraySegment() }, SocketFlags.None).ConfigureAwait(false);
                     }
                     catch (Exception e) {
-                        Close(socket, e);
+                        await Close(socket, e).ConfigureAwait(false);
                     }
                     finally {
                         stream.Dispose();
@@ -199,7 +202,7 @@ namespace Hprose.RPC {
                     var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
                     source.Cancel();
                     if (task == timer) {
-                        Close(socket, new TimeoutException());
+                        await Close(socket, new TimeoutException()).ConfigureAwait(false);
                     }
                 }
             }
@@ -209,7 +212,7 @@ namespace Hprose.RPC {
             foreach (var LazySocket in Sockets.Values) {
                 try {
                     var socket = await LazySocket.Value.ConfigureAwait(false);
-                    Close(socket, new SocketException(10053));
+                    await Close(socket, new SocketException(10053)).ConfigureAwait(false);
                 }
                 catch { }
             }

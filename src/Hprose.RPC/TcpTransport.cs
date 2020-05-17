@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpTransport class for C#.                              |
 |                                                          |
-|  LastModified: May 14, 2020                              |
+|  LastModified: May 17, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -102,20 +102,23 @@ namespace Hprose.RPC {
                     }
                     catch (Exception e) {
                         if (tcpClient != null) {
-                            Close(tcpClient, e);
+                            await Close(tcpClient, e).ConfigureAwait(false);
                         }
                         throw;
                     }
                 });
             };
         }
-        private void Close(TcpClient tcpClient, Exception e) {
+        private async Task Close(TcpClient tcpClient, Exception e) {
             try {
                 if (e.InnerException != null) {
                     e = e.InnerException;
                 }
                 if (Uris.TryRemove(tcpClient, out var uri)) {
-                    TcpClients.TryRemove(uri, out var _);
+                    TcpClients.TryGetValue(uri, out var value);
+                    if ((await value.Value.ConfigureAwait(false)).Item1 == tcpClient) {
+                        TcpClients.TryRemove(uri, out _);
+                    }
                 }
                 Requests.TryRemove(tcpClient, out var requests);
                 if (Results.TryRemove(tcpClient, out var results)) {
@@ -165,7 +168,7 @@ namespace Hprose.RPC {
                 }
             }
             catch (Exception e) {
-                Close(tcpClient, e);
+                await Close(tcpClient, e).ConfigureAwait(false);
             }
         }
         private async void Send(TcpClient tcpClient, Stream tcpStream) {
@@ -195,7 +198,7 @@ namespace Hprose.RPC {
                         await tcpStream.FlushAsync().ConfigureAwait(false);
                     }
                     catch (Exception e) {
-                        Close(tcpClient, e);
+                        await Close(tcpClient, e).ConfigureAwait(false);
                     }
                     finally {
                         stream.Dispose();
@@ -230,7 +233,7 @@ namespace Hprose.RPC {
 #endif
                     source.Cancel();
                     if (task == timer) {
-                        Close(tcpClient, new TimeoutException());
+                        await Close(tcpClient, new TimeoutException()).ConfigureAwait(false);
                     }
                 }
             }
@@ -240,7 +243,7 @@ namespace Hprose.RPC {
             foreach (var LazyTcpClient in TcpClients.Values) {
                 try {
                     var (tcpClient, _) = await LazyTcpClient.Value.ConfigureAwait(false);
-                    Close(tcpClient, new SocketException(10053));
+                    await Close(tcpClient, new SocketException(10053)).ConfigureAwait(false);
                 }
                 catch { }
             }
