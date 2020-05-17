@@ -8,7 +8,7 @@
 |                                                          |
 |  Broker plugin for C#.                                   |
 |                                                          |
-|  LastModified: Sep 21, 2019                              |
+|  LastModified: May 16, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -79,12 +79,13 @@ namespace Hprose.RPC.Plugins.Push {
             }
             if (count == 0) return false;
             responder.TrySetResult(result);
-            if (HeartBeat > TimeSpan.Zero) {
-                DoHeartBeat(id);
-            }
+            DoHeartBeat(id);
             return true;
         }
         protected async void DoHeartBeat(string id) {
+            if (HeartBeat <= TimeSpan.Zero) {
+                return;
+            }
             var timer = new TaskCompletionSource<bool>();
             Timers.AddOrUpdate(id, timer, (_, oldtimer) => {
                 oldtimer.TrySetResult(false);
@@ -183,6 +184,7 @@ namespace Hprose.RPC.Plugins.Push {
                         source.Cancel();
                         if (task == delay) {
                             responder.TrySetResult(emptyMessage);
+                            DoHeartBeat(id);
                         }
                     }
                 }
