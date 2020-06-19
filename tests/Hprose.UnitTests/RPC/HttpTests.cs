@@ -18,6 +18,9 @@ namespace Hprose.UnitTests.RPC {
         public Task<int> Sum(int x, int y) {
             return Task<int>.Factory.StartNew(() => x + y);
         }
+        public async Task Sleep(int milliseconds) {
+            await Task.Delay(milliseconds);
+        }
         public string Hello(string name, Context context) {
             return "Hello " + name;
         }
@@ -35,12 +38,14 @@ namespace Hprose.UnitTests.RPC {
                    .Use(Log.InvokeHandler)
                    .Add<string, Context, string>(Hello)
                    .Add<int, int, Task<int>>(Sum)
+                   .Add<int, Task>(Sleep)
                    .Add(() => { return "good"; }, "Good")
                    .Bind(server);
             var client = new Client("http://127.0.0.1:8080/");
             var result = await client.InvokeAsync<string>("hello", new object[] { "world" }).ConfigureAwait(false);
             Assert.AreEqual("Hello world", result);
             Assert.AreEqual(3, await client.InvokeAsync<int>("sum", new object[] { 1, 2 }).ConfigureAwait(false));
+            await client.InvokeAsync("sleep", new object[] { 10 }).ConfigureAwait(false);
             Assert.AreEqual("good", await client.InvokeAsync<string>("good").ConfigureAwait(false));
             server.Stop();
         }
@@ -48,6 +53,7 @@ namespace Hprose.UnitTests.RPC {
             int Sum(int x, int y);
             [Log(false)]
             Task<string> Hello(string name);
+            Task Sleep(int milliseconds);
             [Name("OnewayCall")]
             Task OnewayCallAsync(string name);
             void OnewayCall(string name);
@@ -60,6 +66,7 @@ namespace Hprose.UnitTests.RPC {
             var service = new Service();
             service.AddMethod("Hello", this)
                    .AddMethod("Sum", this)
+                   .AddMethod("Sleep", this)
                    .Add<string>(OnewayCall)
                    .Bind(server);
             var client = new Client("http://127.0.0.1:8081/");
@@ -69,6 +76,7 @@ namespace Hprose.UnitTests.RPC {
             var result = await proxy.Hello("world").ConfigureAwait(false);
             Assert.AreEqual("Hello world", result);
             Assert.AreEqual(3, proxy.Sum(1, 2));
+            await proxy.Sleep(10);
             proxy.OnewayCall("Oneway Sync");
             await proxy.OnewayCallAsync("Oneway Async").ConfigureAwait(false);
             server.Stop();

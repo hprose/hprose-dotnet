@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Serializer class for C#.                         |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Jun 19, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -20,7 +20,9 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Hprose.IO {
     public interface ISerializer {
@@ -205,7 +207,13 @@ namespace Hprose.IO {
                 writer.Stream.WriteByte(Tags.TagNull);
             }
             else {
-                GetInstance(obj.GetType()).Serialize(writer, obj);
+                var type = obj.GetType();
+                if (type.FullName == "System.Threading.Tasks.VoidTaskResult") {
+                    writer.Stream.WriteByte(Tags.TagNull);
+                }
+                else {
+                    GetInstance(type).Serialize(writer, obj);
+                }
             }
         }
 
@@ -214,7 +222,12 @@ namespace Hprose.IO {
                 writer.Stream.WriteByte(Tags.TagNull);
             }
             else {
-                GetInstance(obj.GetType()).Write(writer, obj);
+                var type = obj.GetType();
+                if (type.FullName == "System.Threading.Tasks.VoidTaskResult") {
+                    writer.Stream.WriteByte(Tags.TagNull);
+                } else {
+                    GetInstance(type).Write(writer, obj);
+                }
             }
         }
     }
