@@ -8,11 +8,12 @@
 |                                                          |
 |  ObjectDeserializer class for C#.                        |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 24, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
+using System;
 using System.IO;
 
 namespace Hprose.IO.Deserializers {
@@ -34,7 +35,15 @@ namespace Hprose.IO.Deserializers {
         private static T Read(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            return Read(reader, reader.GetTypeInfo(index).key);
+            var typeInfo = reader.GetTypeInfo(index);
+            var type = typeof(T);
+            if (typeInfo.type == type) {
+                return Read(reader, typeInfo.key);
+            }
+            if (typeInfo.type.IsSubclassOf(type)) {
+                return (T)((IObjectDeserializer)Deserializer.GetInstance(typeInfo.type)).ReadObject(reader, typeInfo.key);
+            }
+            throw new InvalidCastException("Cannot convert " + typeInfo.type.ToString() + " to " + type.ToString() + ".");
         }
         private static T ReadMapAsObject(Reader reader) {
             Stream stream = reader.Stream;
@@ -78,7 +87,15 @@ namespace Hprose.IO.Deserializers {
         private static T Read(Reader reader) {
             Stream stream = reader.Stream;
             int index = ValueReader.ReadInt(stream, TagOpenbrace);
-            return Read(reader, reader.GetTypeInfo(index).key);
+            var typeInfo = reader.GetTypeInfo(index);
+            var type = typeof(T);
+            if (typeInfo.type == type) {
+                return Read(reader, typeInfo.key);
+            }
+            if (typeInfo.type.IsSubclassOf(type)) {
+                return (T)((IObjectDeserializer)Deserializer.GetInstance(typeInfo.type)).ReadObject(reader, typeInfo.key);
+            }
+            throw new InvalidCastException("Cannot convert " + typeInfo.type.ToString() + " to " + type.ToString() + ".");
         }
         private static T ReadMapAsObject(Reader reader) {
             Stream stream = reader.Stream;
