@@ -8,7 +8,7 @@
 |                                                          |
 |  NullableKey class for C#.                               |
 |                                                          |
-|  LastModified: Feb 7, 2019                               |
+|  LastModified: Jun 28, 2020                              |
 |  Authors: Ma Bingyao <andot@hprose.com>                  |
 |                                                          |
 \*________________________________________________________*/
@@ -25,7 +25,7 @@ namespace Hprose.Collections.Generic {
 
         public int CompareTo(NullableKey<T> other) => Comparer<T>.Default.Compare(_value, other._value);
 
-        public override bool Equals(object obj) => obj is NullableKey<T> && Equals((NullableKey<T>)obj);
+        public override bool Equals(object obj) => obj is NullableKey<T> key && Equals(key);
 
         public bool Equals(NullableKey<T> other) => _value?.Equals(other._value) ?? other._value == null;
 
