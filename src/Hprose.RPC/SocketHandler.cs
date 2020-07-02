@@ -8,7 +8,7 @@
 |                                                          |
 |  SocketHandler class for C#.                             |
 |                                                          |
-|  LastModified: Mar 29, 2020                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -89,7 +89,7 @@ namespace Hprose.RPC {
                 header[3] = (byte)(crc32 & 0xFF);
                 await socket.SendAsync(new ArraySegment<byte>[] { new ArraySegment<byte>(header), stream.GetArraySegment() }, SocketFlags.None).ConfigureAwait(false);
                 if ((index & 0x80000000) != 0) {
-                    var data = (stream as MemoryStream).GetArraySegment();
+                    var data = stream.GetArraySegment();
                     var message = Encoding.UTF8.GetString(data.Array, data.Offset, data.Count);
                     stream.Dispose();
                     throw new Exception(message);
@@ -149,12 +149,11 @@ namespace Hprose.RPC {
             try {
                 var responses = new ConcurrentQueue<(int index, MemoryStream stream)>();
                 OnAccept?.Invoke(socket);
-                using (var autoResetEvent = new AutoResetEvent(false)) {
-                    var receive = Receive(socket, responses, autoResetEvent);
-                    var send = Send(socket, responses, autoResetEvent);
-                    await receive.ConfigureAwait(false);
-                    await send.ConfigureAwait(false);
-                }
+                using var autoResetEvent = new AutoResetEvent(false);
+                var receive = Receive(socket, responses, autoResetEvent);
+                var send = Send(socket, responses, autoResetEvent);
+                await receive.ConfigureAwait(false);
+                await send.ConfigureAwait(false);
             }
             catch (Exception e) {
                 if (e.InnerException != null) {

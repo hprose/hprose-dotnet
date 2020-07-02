@@ -8,7 +8,7 @@
 |                                                          |
 |  BooleanDeserializer class for C#.                       |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -17,35 +17,29 @@ namespace Hprose.IO.Deserializers {
     using static Tags;
 
     internal class BooleanDeserializer : Deserializer<bool> {
-        public override bool Read(Reader reader, int tag) {
-            var stream = reader.Stream;
-            switch (tag) {
-                case TagTrue:
-                    return true;
-                case TagFalse:
-                case TagEmpty:
-                case TagNaN:
-                case '0':
-                    return false;
-                case TagInteger:
-                    return ValueReader.ReadInt(stream) != 0;
-                case TagLong:
-                    return !ValueReader.ReadBigInteger(stream).IsZero;
-                case TagDouble:
-                    return ValueReader.ReadDouble(stream) != 0;
-                case TagUTF8Char:
-                    return "0\0".IndexOf(ValueReader.ReadChar(stream)) == -1;
-                case TagString:
-                    return Converter<bool>.Convert(ReferenceReader.ReadString(reader));
-                case TagInfinity:
-                    stream.ReadByte();
-                    return true;
-                default:
-                    if (tag >= '1' && tag <= '9') {
-                        return true;
-                    }
-                    return base.Read(reader, tag);
-            }
-        }
+        public override bool Read(Reader reader, int tag) => tag switch
+        {
+            TagTrue => true,
+            TagFalse => false,
+            TagEmpty => false,
+            TagNaN => false,
+            '0' => false,
+            '1' => true,
+            '2' => true,
+            '3' => true,
+            '4' => true,
+            '5' => true,
+            '6' => true,
+            '7' => true,
+            '8' => true,
+            '9' => true,
+            TagInteger => ValueReader.ReadInt(reader.Stream) != 0,
+            TagLong => !ValueReader.ReadBigInteger(reader.Stream).IsZero,
+            TagDouble => ValueReader.ReadDouble(reader.Stream) != 0,
+            TagUTF8Char => "0\0".IndexOf(ValueReader.ReadChar(reader.Stream)) == -1,
+            TagString => Converter<bool>.Convert(ReferenceReader.ReadString(reader)),
+            TagInfinity => reader.Stream.ReadByte() != -1,
+            _ => base.Read(reader, tag),
+        };
     }
 }

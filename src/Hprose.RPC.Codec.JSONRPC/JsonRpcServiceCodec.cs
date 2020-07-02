@@ -8,7 +8,7 @@
 |                                                          |
 |  JsonRpcServiceCodec class for C#.                       |
 |                                                          |
-|  LastModified: Mar 28, 2020                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -38,39 +38,30 @@ namespace Hprose.RPC.Codec.JSONRPC {
             }
             if (result is Exception) {
                 var error = result as Exception;
-                switch (error.Message) {
-                    case "Parse error":
-                        response["error"] = new Dictionary<string, object> {
+                response["error"] = error.Message switch
+                {
+                    "Parse error" => new Dictionary<string, object> {
                             { "code", -32700 },
                             { "message", "Parse error" }
-                        };
-                        break;
-                    case "Invalid Request":
-                        response["error"] = new Dictionary<string, object> {
+                        },
+                    "Invalid Request" => new Dictionary<string, object> {
                             { "code", -32600 },
                             { "message", "Invalid Request" }
-                        };
-                        break;
-                    case "Method not found":
-                        response["error"] = new Dictionary<string, object> {
+                        },
+                    "Method not found" => new Dictionary<string, object> {
                             { "code", -32601 },
                             { "message", "Method not found" }
-                        };
-                        break;
-                    case "Invalid params":
-                        response["error"] = new Dictionary<string, object> {
+                        },
+                    "Invalid params" => new Dictionary<string, object> {
                             { "code", -32602 },
                             { "message", "Invalid params" }
-                        };
-                        break;
-                    default:
-                        response["error"] = new Dictionary<string, object> {
+                        },
+                    _ => new Dictionary<string, object> {
                             { "code", 0 },
                             { "message",  error.Message },
                             { "data", error.StackTrace }
-                        };
-                        break;
-                }
+                        },
+                };
             }
             else {
                 response["result"] = result;
@@ -85,7 +76,7 @@ namespace Hprose.RPC.Codec.JSONRPC {
             if (!(bool)context["jsonrpc"]) {
                 return ServiceCodec.Instance.Decode(request, context);
             }
-            JObject call = null;
+            JObject call;
             try {
                 var data = request.GetArraySegment();
                 call = JsonConvert.DeserializeObject<JObject>(Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));

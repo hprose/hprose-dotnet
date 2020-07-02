@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose BytesConverter class for C#.                     |
 |                                                          |
-|  LastModified: Feb 8, 2018                               |
+|  LastModified: Jun 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -28,27 +28,16 @@ namespace Hprose.IO.Converters {
             Converter<List<byte>, byte[]>.convert = (value) => value.ToArray();
             Converter<Guid, byte[]>.convert = (value) => value.ToByteArray();
             Converter<BigInteger, byte[]>.convert = (value) => value.ToByteArray();
-            Converter<object, byte[]>.convert = (value) => {
-                switch (value) {
-                    case byte[] bytes:
-                        return bytes;
-                    case string s:
-                        return Encoding.UTF8.GetBytes(s);
-                    case StringBuilder sb:
-                        return Encoding.UTF8.GetBytes(sb.ToString());
-                    case char[] chars:
-                        return Encoding.UTF8.GetBytes(chars);
-                    case List<char> charList:
-                        return Encoding.UTF8.GetBytes(charList.ToArray());
-                    case List<byte> byteList:
-                        return byteList.ToArray();
-                    case Guid guid:
-                        return guid.ToByteArray();
-                    case BigInteger bi:
-                        return bi.ToByteArray();
-                    default:
-                        return Converter<byte[]>.ConvertFromObject(value);
-                }
+            Converter<object, byte[]>.convert = (value) => value switch {
+                byte[] bytes => bytes,
+                string s => Encoding.UTF8.GetBytes(s),
+                StringBuilder sb => Encoding.UTF8.GetBytes(sb.ToString()),
+                char[] chars => Encoding.UTF8.GetBytes(chars),
+                List<char> charList => Encoding.UTF8.GetBytes(charList.ToArray()),
+                List<byte> byteList => byteList.ToArray(),
+                Guid guid => guid.ToByteArray(),
+                BigInteger bi => bi.ToByteArray(),
+                _ => Converter<byte[]>.ConvertFromObject(value),
             };
         }
         internal static void Initialize() { }

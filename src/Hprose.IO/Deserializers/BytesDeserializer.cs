@@ -8,7 +8,7 @@
 |                                                          |
 |  BytesDeserializer class for C#.                         |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Jun 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -18,24 +18,15 @@ namespace Hprose.IO.Deserializers {
 
     internal class BytesDeserializer : Deserializer<byte[]> {
         private static readonly byte[] empty = new byte[0];
-        public override byte[] Read(Reader reader, int tag) {
-            var stream = reader.Stream;
-            switch (tag) {
-                case TagBytes:
-                    return ReferenceReader.ReadBytes(reader);
-                case TagEmpty:
-                    return empty;
-                case TagList:
-                    return ReferenceReader.ReadArray<byte>(reader);
-                case TagUTF8Char:
-                    return Converter<byte[]>.Convert(ValueReader.ReadUTF8Char(stream));
-                case TagString:
-                    return Converter<byte[]>.Convert(ReferenceReader.ReadChars(reader));
-                case TagGuid:
-                    return Converter<byte[]>.Convert(ReferenceReader.ReadGuid(reader));
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override byte[] Read(Reader reader, int tag) => tag switch
+        {
+            TagBytes => ReferenceReader.ReadBytes(reader),
+            TagEmpty => empty,
+            TagList => ReferenceReader.ReadArray<byte>(reader),
+            TagUTF8Char => Converter<byte[]>.Convert(ValueReader.ReadUTF8Char(reader.Stream)),
+            TagString => Converter<byte[]>.Convert(ReferenceReader.ReadChars(reader)),
+            TagGuid => Converter<byte[]>.Convert(ReferenceReader.ReadGuid(reader)),
+            _ => base.Read(reader, tag),
+        };
     }
 }

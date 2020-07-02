@@ -8,7 +8,7 @@
 |                                                          |
 |  Broker plugin for C#.                                   |
 |                                                          |
-|  LastModified: May 16, 2020                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -173,19 +173,18 @@ namespace Hprose.RPC.Plugins.Push {
                     return responder;
                 });
                 if (Timeout > TimeSpan.Zero) {
-                    using (CancellationTokenSource source = new CancellationTokenSource()) {
+                    using CancellationTokenSource source = new CancellationTokenSource();
 #if NET40
-                        var delay = TaskEx.Delay(Timeout, source.Token);
-                        var task = await TaskEx.WhenAny(responder.Task, delay).ConfigureAwait(false);
+                    var delay = TaskEx.Delay(Timeout, source.Token);
+                    var task = await TaskEx.WhenAny(responder.Task, delay).ConfigureAwait(false);
 #else
-                        var delay = Task.Delay(Timeout, source.Token);
-                        var task = await Task.WhenAny(responder.Task, delay).ConfigureAwait(false);
+                    var delay = Task.Delay(Timeout, source.Token);
+                    var task = await Task.WhenAny(responder.Task, delay).ConfigureAwait(false);
 #endif
-                        source.Cancel();
-                        if (task == delay) {
-                            responder.TrySetResult(emptyMessage);
-                            DoHeartBeat(id);
-                        }
+                    source.Cancel();
+                    if (task == delay) {
+                        responder.TrySetResult(emptyMessage);
+                        DoHeartBeat(id);
                     }
                 }
             }

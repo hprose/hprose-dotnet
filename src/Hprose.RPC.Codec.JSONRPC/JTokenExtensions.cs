@@ -27,9 +27,8 @@ namespace Hprose.RPC.Codec.JSONRPC {
         public static T ToObject<T>(this JToken token, JsonSerializer jsonSerializer) => (T)token.ToObject(typeof(T), jsonSerializer);
 
         public static object ToObject(this JToken token, Type objectType, JsonSerializer jsonSerializer) {
-            using (JTokenReader jsonReader = new JTokenReader(token)) {
-                return jsonSerializer.Deserialize(jsonReader, objectType);
-            }
+            using JTokenReader jsonReader = new JTokenReader(token);
+            return jsonSerializer.Deserialize(jsonReader, objectType);
         }
     }
 }

@@ -8,7 +8,7 @@
 |                                                          |
 |  InterfaceDeserializer class for C#.                     |
 |                                                          |
-|  LastModified: Jan 20, 2019                              |
+|  LastModified: Jun 30, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -27,11 +27,11 @@ namespace Hprose.IO.Deserializers {
             var type = typeInfo.type;
             if (type == null) {
                 type = TypeManager.GetType<I>();
+                if (type == null) {
+                    throw new InvalidCastException("Cannot convert " + typeInfo.name + " to " + typeof(I).ToString() + ".");
+                }
             }
-            if (type != null) {
-                return (I)((IObjectDeserializer)Deserializer.GetInstance(type)).ReadObject(reader, typeInfo.key);
-            }
-            throw new InvalidCastException("Cannot convert " + typeInfo.name + " to " + typeof(I).ToString() + ".");
+            return (I)((IObjectDeserializer)Deserializer.GetInstance(type)).ReadObject(reader, typeInfo.key);
         }
         public override I Read(Reader reader, int tag) {
             if (tag == TagMap) {
@@ -40,14 +40,12 @@ namespace Hprose.IO.Deserializers {
                     return (I)Deserializer.GetInstance(type).Read(reader, tag);
                 }
             }
-            switch (tag) {
-                case TagObject:
-                    return Read(reader);
-                case TagEmpty:
-                    return null;
-                default:
-                    return base.Read(reader, tag);
-            }
+            return tag switch
+            {
+                TagObject => Read(reader),
+                TagEmpty => null,
+                _ => base.Read(reader, tag),
+            };
         }
     }
 }

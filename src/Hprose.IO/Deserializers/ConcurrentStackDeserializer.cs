@@ -8,7 +8,7 @@
 |                                                          |
 |  ConcurrentStackDeserializer class for C#.               |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -36,15 +36,11 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return stack;
         }
-        public override ConcurrentStack<T> Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagList:
-                    return Read(reader);
-                case TagEmpty:
-                    return new ConcurrentStack<T>();
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override ConcurrentStack<T> Read(Reader reader, int tag) => tag switch
+        {
+            TagList => Read(reader),
+            TagEmpty => new ConcurrentStack<T>(),
+            _ => base.Read(reader, tag),
+        };
     }
 }

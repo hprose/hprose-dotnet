@@ -4,12 +4,12 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| BigIntegerConverter.cs                                   |
+|  BigIntegerConverter.cs                                  |
 |                                                          |
-| hprose BigIntegerConverter class for C#.                 |
+|  hprose BigIntegerConverter class for C#.                |
 |                                                          |
-| LastModified: Apr 13, 2018                               |
-| Author: Ma Bingyao <andot@hprose.com>                    |
+|  LastModified: Jun 28, 2020                              |
+|  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
@@ -38,23 +38,14 @@ namespace Hprose.IO.Converters {
             Converter<string, BigInteger>.convert = (value) => BigInteger.Parse(value);
             Converter<char[], BigInteger>.convert = (value) => BigInteger.Parse(new string(value));
             Converter<StringBuilder, BigInteger>.convert = (value) => BigInteger.Parse(value.ToString());
-            Converter<object, BigInteger>.convert = (value) => {
-                switch (value) {
-                    case BigInteger bi:
-                        return bi;
-                    case string s:
-                        return BigInteger.Parse(s);
-                    case DateTime dt:
-                        return dt.Ticks;
-                    case TimeSpan ts:
-                        return ts.Ticks;
-                    case char[] chars:
-                        return BigInteger.Parse(new string(chars));
-                    case StringBuilder sb:
-                        return BigInteger.Parse(sb.ToString());
-                    default:
-                        return Converter<BigInteger>.ConvertFromObject(value);
-                }
+            Converter<object, BigInteger>.convert = (value) => value switch {
+                BigInteger bi => bi,
+                string s => BigInteger.Parse(s),
+                DateTime dt => dt.Ticks,
+                TimeSpan ts => ts.Ticks,
+                char[] chars => BigInteger.Parse(new string(chars)),
+                StringBuilder sb => BigInteger.Parse(sb.ToString()),
+                _ => Converter<BigInteger>.ConvertFromObject(value),
             };
         }
         internal static void Initialize() { }

@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpHandler class for C#.                                |
 |                                                          |
-|  LastModified: Mar 29, 2020                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -191,12 +191,11 @@ namespace Hprose.RPC {
                     stream = sslStream;
                 }
 #endif
-                using (var autoResetEvent = new AutoResetEvent(false)) {
-                    var receive = Receive(tcpClient, stream, responses, autoResetEvent);
-                    var send = Send(stream, responses, autoResetEvent);
-                    await receive.ConfigureAwait(false);
-                    await send.ConfigureAwait(false);
-                }
+                using var autoResetEvent = new AutoResetEvent(false);
+                var receive = Receive(tcpClient, stream, responses, autoResetEvent);
+                var send = Send(stream, responses, autoResetEvent);
+                await receive.ConfigureAwait(false);
+                await send.ConfigureAwait(false);
             }
             catch (Exception e) {
                 if (e.InnerException != null) {

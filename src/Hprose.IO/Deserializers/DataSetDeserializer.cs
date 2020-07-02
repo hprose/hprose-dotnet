@@ -8,7 +8,7 @@
 |                                                          |
 |  DataSetDeserializer class for C#.                       |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -32,16 +32,11 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return dataset;
         }
-        public override DataSet Read(Reader reader, int tag) {
-            var stream = reader.Stream;
-            switch (tag) {
-                case TagList:
-                    return Read(reader);
-                case TagEmpty:
-                    return new DataSet();
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override DataSet Read(Reader reader, int tag) => tag switch
+        {
+            TagList => Read(reader),
+            TagEmpty => new DataSet(),
+            _ => base.Read(reader, tag),
+        };
     }
 }

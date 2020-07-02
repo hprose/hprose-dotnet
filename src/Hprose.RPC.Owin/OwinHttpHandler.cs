@@ -76,7 +76,8 @@ namespace Hprose.RPC.Owin {
             var responseHeaders = environment["owin.ResponseHeaders"] as IDictionary<string, string[]>;
             if (context.Contains("httpStatusCode")) {
                 environment["owin.ResponseStatusCode"] = context["httpStatusCode"];
-            } else {
+            }
+            else {
                 environment["owin.ResponseStatusCode"] = 200;
             }
             responseHeaders.Add("Content-Type", new string[] { "text/plain" });
@@ -120,10 +121,9 @@ namespace Hprose.RPC.Owin {
                     responseHeaders.Add("Last-Modified", new string[] { lastModified });
                     responseHeaders.Add("Etag", new string[] { etag });
                     responseHeaders.Add("Content-Type", new string[] { "text/xml" });
-                    using (var fileStream = new FileStream(CrossDomainXmlFile, FileMode.Open, FileAccess.Read)) {
-                        using var outputStream = GetOutputStream(environment);
-                        await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
-                    };
+                    using var fileStream = new FileStream(CrossDomainXmlFile, FileMode.Open, FileAccess.Read);
+                    using var outputStream = GetOutputStream(environment);
+                    await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
                 }
                 else {
                     environment["owin.ResponseStatusCode"] = 404;
@@ -144,10 +144,9 @@ namespace Hprose.RPC.Owin {
                     responseHeaders.Add("Last-Modified", new string[] { lastModified });
                     responseHeaders.Add("Etag", new string[] { etag });
                     responseHeaders.Add("Content-Type", new string[] { "text/xml" });
-                    using (var fileStream = new FileStream(ClientAccessPolicyXmlFile, FileMode.Open, FileAccess.Read)) {
-                        using var outputStream = GetOutputStream(environment);
-                        await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
-                    };
+                    using var fileStream = new FileStream(ClientAccessPolicyXmlFile, FileMode.Open, FileAccess.Read);
+                    using var outputStream = GetOutputStream(environment);
+                    await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
                 }
                 else {
                     environment["owin.ResponseStatusCode"] = 404;
@@ -200,14 +199,15 @@ namespace Hprose.RPC.Owin {
             }
             using var instream = (environment["owin.RequestBody"] as Stream) ?? Stream.Null;
             if (instream.Length > Service.MaxRequestLength) {
-                instream.Dispose();
                 environment["owin.ResponseStatusCode"] = 413;
                 environment["owin.ResponseReasonPhrase"] = "Request Entity Too Large";
                 return;
             }
-            Stream outstream = null;
             try {
-                outstream = await Service.Handle(instream, context).ConfigureAwait(false);
+                using var outstream = await Service.Handle(instream, context).ConfigureAwait(false);
+                SendHeader(environment, context);
+                using var outputStream = GetOutputStream(environment);
+                await outstream.CopyToAsync(outputStream).ConfigureAwait(false);
             }
             catch (Exception e) {
                 environment["owin.ResponseStatusCode"] = 500;
@@ -215,13 +215,6 @@ namespace Hprose.RPC.Owin {
                 var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
                 await outputStream.WriteAsync(stackTrace, 0, stackTrace.Length).ConfigureAwait(false);
                 return;
-            }
-            SendHeader(environment, context);
-            if (outstream != null) {
-                using (var outputStream = GetOutputStream(environment)) {
-                    await outstream.CopyToAsync(outputStream).ConfigureAwait(false);
-                }
-                outstream.Dispose();
             }
         }
     }

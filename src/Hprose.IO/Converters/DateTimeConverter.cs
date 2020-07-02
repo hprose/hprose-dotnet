@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose DateTimeConverter class for C#.                  |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Jun 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -37,21 +37,13 @@ namespace Hprose.IO.Converters {
             Converter<string, DateTime>.convert = (value) => DateTime.Parse(value);
             Converter<StringBuilder, DateTime>.convert = (value) => DateTime.Parse(value.ToString());
             Converter<char[], DateTime>.convert = (value) => DateTime.Parse(new string(value));
-            Converter<object, DateTime>.convert = (value) => {
-                switch (value) {
-                    case DateTime dt:
-                        return dt;
-                    case string s:
-                        return DateTime.Parse(s);
-                    case char[] chars:
-                        return DateTime.Parse(new string(chars));
-                    case StringBuilder sb:
-                        return DateTime.Parse(sb.ToString());
-                    case long l:
-                        return new DateTime(l);
-                    default:
-                        return Converter<DateTime>.ConvertFromObject(value);
-                }
+            Converter<object, DateTime>.convert = (value) => value switch {
+                DateTime dt => dt,
+                string s => DateTime.Parse(s),
+                char[] chars => DateTime.Parse(new string(chars)),
+                StringBuilder sb => DateTime.Parse(sb.ToString()),
+                long l => new DateTime(l),
+                _ => Converter<DateTime>.ConvertFromObject(value),
             };
         }
         internal static void Initialize() { }

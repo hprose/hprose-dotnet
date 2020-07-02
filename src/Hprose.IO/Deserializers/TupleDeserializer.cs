@@ -8,7 +8,7 @@
 |                                                          |
 |  TupleDeserializer class for C#.                         |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 30, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -167,15 +167,11 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return tuple;
         }
-        public override T Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagList:
-                    return Read(reader);
-                case TagEmpty:
-                    return TupleHelper<T>.read(reader, 0);
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override T Read(Reader reader, int tag) => tag switch
+        {
+            TagList => Read(reader),
+            TagEmpty => TupleHelper<T>.read(reader, 0),
+            _ => base.Read(reader, tag),
+        };
     }
  }

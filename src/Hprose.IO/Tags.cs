@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose tags class for C#.                               |
 |                                                          |
-|  LastModified: Apr 10, 2018                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -52,41 +52,40 @@ namespace Hprose.IO {
         public const byte TagError = (byte)'E';
         public const byte TagEnd = (byte)'z';
 
-        public static string ToString(int tag) {
-            switch (tag) {
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                case TagInteger: return "Int32";
-                case TagLong: return "BigInteger";
-                case TagDouble: return "Double";
-                case TagNull: return "Null";
-                case TagEmpty: return "Empty String";
-                case TagTrue: return "Boolean True";
-                case TagFalse: return "Boolean False";
-                case TagNaN: return "NaN";
-                case TagInfinity: return "Infinity";
-                case TagDate: return "DateTime";
-                case TagTime: return "DateTime";
-                case TagBytes: return "Byte[]";
-                case TagUTF8Char: return "Char";
-                case TagString: return "String";
-                case TagGuid: return "Guid";
-                case TagList: return "IList";
-                case TagMap: return "IDictionary";
-                case TagClass: return "Class";
-                case TagObject: return "Object";
-                case TagRef: return "Reference";
-                case TagError: return "Error";
-                default: return "Unexpected Tag: 0x" + (tag & 0xff).ToString("x2");
-            }
-        }
+        public static string ToString(int tag) => tag switch
+        {
+            '0' => "Int32",
+            '1' => "Int32",
+            '2' => "Int32",
+            '3' => "Int32",
+            '4' => "Int32",
+            '5' => "Int32",
+            '6' => "Int32",
+            '7' => "Int32",
+            '8' => "Int32",
+            '9' => "Int32",
+            TagInteger => "Int32",
+            TagLong => "BigInteger",
+            TagDouble => "Double",
+            TagNull => "Null",
+            TagEmpty => "Empty String",
+            TagTrue => "Boolean True",
+            TagFalse => "Boolean False",
+            TagNaN => "NaN",
+            TagInfinity => "Infinity",
+            TagDate => "DateTime",
+            TagTime => "DateTime",
+            TagBytes => "Byte[]",
+            TagUTF8Char => "Char",
+            TagString => "String",
+            TagGuid => "Guid",
+            TagList => "IList",
+            TagMap => "IDictionary",
+            TagClass => "Class",
+            TagObject => "Object",
+            TagRef => "Reference",
+            TagError => "Error",
+            _ => "Unexpected Tag: 0x" + (tag & 0xff).ToString("x2"),
+        };
     }
 }

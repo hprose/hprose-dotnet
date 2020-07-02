@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Converter class for C#.                          |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -32,18 +32,13 @@ namespace Hprose.IO {
 
         internal static TOutput ConvertFromObject(object value) => (TOutput)converter.ConvertFrom(value);
 
-        internal static TOutput ConvertFrom(object value) {
-            switch (value) {
-                case TOutput obj:
-                    return obj;
-                case char[] chars:
-                    return (TOutput)converter.ConvertFromString(new string(chars));
-                case StringBuilder sb:
-                    return (TOutput)converter.ConvertFromString(sb.ToString());
-                default:
-                    return (TOutput)converter.ConvertFrom(value);
-            }
-        }
+        internal static TOutput ConvertFrom(object value) => value switch
+        {
+            TOutput obj => obj,
+            char[] chars => (TOutput)converter.ConvertFromString(new string(chars)),
+            StringBuilder sb => (TOutput)converter.ConvertFromString(sb.ToString()),
+            _ => (TOutput)converter.ConvertFrom(value),
+        };
 #else
         internal static TOutput ConvertFromObject(object value) => (TOutput)value;
         internal static TOutput ConvertFrom(object value) =>(TOutput)value;

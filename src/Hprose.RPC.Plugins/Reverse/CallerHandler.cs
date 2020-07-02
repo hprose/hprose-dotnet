@@ -8,7 +8,7 @@
 |                                                          |
 |  CallerHandler class for C#.                             |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -100,8 +100,8 @@ namespace Hprose.RPC.Plugins.Reverse {
             var returnType = method.ReturnType;
             var attributes = Attribute.GetCustomAttributes(method, true);
             foreach (var attribute in attributes) {
-                if (attribute is NameAttribute) {
-                    name = ((NameAttribute)attribute).Value;
+                if (attribute is NameAttribute attr) {
+                    name = attr.Value;
                 }
             }
             if (!string.IsNullOrEmpty(ns)) {

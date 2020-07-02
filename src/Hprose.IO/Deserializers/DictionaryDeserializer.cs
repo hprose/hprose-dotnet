@@ -8,7 +8,7 @@
 |                                                          |
 |  DictionaryDeserializer class for C#.                    |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -48,18 +48,13 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return dict;
         }
-        public override I Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagMap:
-                    return Read(reader);
-                case TagList:
-                    return ReadListAsMap(reader);
-                case TagEmpty:
-                    return Factory<T>.New();
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override I Read(Reader reader, int tag) => tag switch
+        {
+            TagMap => Read(reader),
+            TagList => ReadListAsMap(reader),
+            TagEmpty => Factory<T>.New(),
+            _ => base.Read(reader, tag),
+        };
     }
 
     internal class DictionaryDeserializer<T, K, V> : DictionaryDeserializer<T, T, K, V> where T : ICollection<KeyValuePair<K, V>> { }
@@ -121,20 +116,14 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return dict;
         }
-        public override I Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagMap:
-                    return Read(reader);
-                case TagList:
-                    return ReadListAsMap(reader);
-                case TagObject:
-                    return ReadObjectAsMap(reader);
-                case TagEmpty:
-                    return Factory<T>.New();
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override I Read(Reader reader, int tag) => tag switch
+        {
+            TagMap => Read(reader),
+            TagList => ReadListAsMap(reader),
+            TagObject => ReadObjectAsMap(reader),
+            TagEmpty => Factory<T>.New(),
+            _ => base.Read(reader, tag),
+        };
     }
 
     internal class DictionaryDeserializer<T> : DictionaryDeserializer<T, T> where T : IDictionary { }

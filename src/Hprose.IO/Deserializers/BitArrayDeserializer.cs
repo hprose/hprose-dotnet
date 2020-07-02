@@ -8,7 +8,7 @@
 |                                                          |
 |  BitArrayDeserializer class for C#.                      |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -32,15 +32,11 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return array;
         }
-        public override BitArray Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagList:
-                    return Read(reader);
-                case TagEmpty:
-                    return new BitArray(0);
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override BitArray Read(Reader reader, int tag) => tag switch
+        {
+            TagList => Read(reader),
+            TagEmpty => new BitArray(0),
+            _ => base.Read(reader, tag),
+        };
     }
 }

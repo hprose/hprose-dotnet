@@ -8,7 +8,7 @@
 |                                                          |
 |  MultiDimArraySerializer class for C#.                   |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -49,12 +49,10 @@ namespace Hprose.IO.Serializers {
             while (loc[0] <= ub[0]) {
                 int n = 0;
                 for (i = maxrank; i > 0; i--) {
-                    if (loc[i] == lb[i]) {
-                        n++;
-                    }
-                    else {
+                    if (loc[i] != lb[i]) {
                         break;
                     }
+                    n++;
                 }
                 for (i = rank - n; i < rank; ++i) {
                     writer.AddReferenceCount(1);

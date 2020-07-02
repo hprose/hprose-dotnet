@@ -8,7 +8,7 @@
 |                                                          |
 |  ExpandoObjectDeserializer class for C#.                 |
 |                                                          |
-|  LastModified: Feb 18, 2019                              |
+|  LastModified: Jun 30, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -68,18 +68,13 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return obj;
         }
-        public override ExpandoObject Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagMap:
-                    return Read(reader);
-                case TagObject:
-                    return ReadObject(reader);
-                case TagEmpty:
-                    return new ExpandoObject();
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override ExpandoObject Read(Reader reader, int tag) => tag switch
+        {
+            TagMap => Read(reader),
+            TagObject => ReadObject(reader),
+            TagEmpty => new ExpandoObject(),
+            _ => base.Read(reader, tag),
+        };
     }
 }
 #endif

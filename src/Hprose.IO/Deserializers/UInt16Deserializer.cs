@@ -8,7 +8,7 @@
 |                                                          |
 |  UInt16Deserializer class for C#.                        |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 30, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -17,30 +17,27 @@ namespace Hprose.IO.Deserializers {
     using static Tags;
 
     internal class UInt16Deserializer : Deserializer<ushort> {
-        public override ushort Read(Reader reader, int tag) {
-            if (tag >= '0' && tag <= '9') {
-                return (ushort)(tag - '0');
-            }
-            var stream = reader.Stream;
-            switch (tag) {
-                case TagInteger:
-                    return (ushort)ValueReader.ReadInt(stream);
-                case TagLong:
-                    return (ushort)ValueReader.ReadLong(stream);
-                case TagDouble:
-                    return (ushort)ValueReader.ReadDouble(stream);
-                case TagTrue:
-                    return 1;
-                case TagFalse:
-                case TagEmpty:
-                    return 0;
-                case TagUTF8Char:
-                    return Converter<ushort>.Convert(ValueReader.ReadUTF8Char(stream));
-                case TagString:
-                    return Converter<ushort>.Convert(ReferenceReader.ReadString(reader));
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override ushort Read(Reader reader, int tag) => tag switch
+        {
+            '0' => 0,
+            '1' => 1,
+            '2' => 2,
+            '3' => 3,
+            '4' => 4,
+            '5' => 5,
+            '6' => 6,
+            '7' => 7,
+            '8' => 8,
+            '9' => 9,
+            TagInteger => (ushort)ValueReader.ReadInt(reader.Stream),
+            TagLong => (ushort)ValueReader.ReadLong(reader.Stream),
+            TagDouble => (ushort)ValueReader.ReadDouble(reader.Stream),
+            TagTrue => 1,
+            TagFalse => 0,
+            TagEmpty => 0,
+            TagUTF8Char => Converter<ushort>.Convert(ValueReader.ReadUTF8Char(reader.Stream)),
+            TagString => Converter<ushort>.Convert(ReferenceReader.ReadString(reader)),
+            _ => base.Read(reader, tag),
+        };
     }
 }

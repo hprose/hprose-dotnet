@@ -8,7 +8,7 @@
 |                                                          |
 |  StringObjectDictionaryDeserializer class for C#.        |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 30, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -50,14 +50,11 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return dict;
         }
-        public override I Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagObject:
-                    return ReadObjectAsMap(reader);
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override I Read(Reader reader, int tag) => tag switch
+        {
+            TagObject => ReadObjectAsMap(reader),
+            _ => base.Read(reader, tag),
+        };
     }
 
     internal class StringObjectDictionaryDeserializer<T> : StringObjectDictionaryDeserializer<T, T> where T : ICollection<KeyValuePair<string, object>> { }

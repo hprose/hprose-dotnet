@@ -8,7 +8,7 @@
 |                                                          |
 |  Provider class for C#.                                  |
 |                                                          |
-|  LastModified: May 14, 2020                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -63,8 +63,8 @@ namespace Hprose.RPC.Plugins.Reverse {
                 args = arglist.ToArray();
             }
             var result = method.MethodInfo.Invoke(method.Target, args);
-            if (result is Task) {
-                return await TaskResult.Get((Task)result).ConfigureAwait(false);
+            if (result is Task task) {
+                return await TaskResult.Get(task).ConfigureAwait(false);
             }
             return result;
         }

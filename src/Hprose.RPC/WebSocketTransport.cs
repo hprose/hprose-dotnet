@@ -8,7 +8,7 @@
 |                                                          |
 |  WebSocketTransport class for C#.                        |
 |                                                          |
-|  LastModified: May 17, 2020                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -202,13 +202,12 @@ namespace Hprose.RPC {
             Send(webSocket);
             var timeout = clientContext.Timeout;
             if (timeout > TimeSpan.Zero) {
-                using (CancellationTokenSource source = new CancellationTokenSource()) {
-                    var timer = Task.Delay(timeout, source.Token);
-                    var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
-                    source.Cancel();
-                    if (task == timer) {
-                        await Close(webSocket, new TimeoutException()).ConfigureAwait(false);
-                    }
+                using CancellationTokenSource source = new CancellationTokenSource();
+                var timer = Task.Delay(timeout, source.Token);
+                var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
+                source.Cancel();
+                if (task == timer) {
+                    await Close(webSocket, new TimeoutException()).ConfigureAwait(false);
                 }
             }
             return await result.Task.ConfigureAwait(false);

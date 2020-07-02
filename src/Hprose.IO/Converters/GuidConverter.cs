@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose GuidConverter class for C#.                      |
 |                                                          |
-|  LastModified: Apr 21, 2018                              |
+|  LastModified: Jun 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -23,21 +23,13 @@ namespace Hprose.IO.Converters {
             Converter<string, Guid>.convert = (value) => new Guid(value);
             Converter<StringBuilder, Guid>.convert = (value) => new Guid(value.ToString());
             Converter<char[], Guid>.convert = (value) => new Guid(new string(value));
-            Converter<object, Guid>.convert = (value) => {
-                switch (value) {
-                    case Guid guid:
-                        return guid;
-                    case byte[] bytes:
-                        return new Guid(bytes);
-                    case string s:
-                        return new Guid(s);
-                    case char[] chars:
-                        return new Guid(new string(chars));
-                    case StringBuilder sb:
-                        return new Guid(sb.ToString());
-                    default:
-                        return Converter<Guid>.ConvertFromObject(value);
-                }
+            Converter<object, Guid>.convert = (value) => value switch {
+                Guid guid => guid,
+                byte[] bytes => new Guid(bytes),
+                string s => new Guid(s),
+                char[] chars => new Guid(new string(chars)),
+                StringBuilder sb => new Guid(sb.ToString()),
+                _ => Converter<Guid>.ConvertFromObject(value),
             };
         }
         internal static void Initialize() { }

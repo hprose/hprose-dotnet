@@ -8,7 +8,7 @@
 |                                                          |
 |  AspNetCoreHttpHandler class for C#.                     |
 |                                                          |
-|  LastModified: Mar 29, 2020                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -116,10 +116,9 @@ namespace Hprose.RPC.AspNetCore {
                     response.Headers.Add("Last-Modified", lastModified);
                     response.Headers.Add("Etag", etag);
                     response.ContentType = "text/xml";
-                    using (var fileStream = new FileStream(CrossDomainXmlFile, FileMode.Open, FileAccess.Read)) {
-                        using var outputStream = GetOutputStream(request, response);
-                        await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
-                    };
+                    using var fileStream = new FileStream(CrossDomainXmlFile, FileMode.Open, FileAccess.Read);
+                    using var outputStream = GetOutputStream(request, response);
+                    await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
                 }
                 else {
                     response.StatusCode = 404;
@@ -138,10 +137,9 @@ namespace Hprose.RPC.AspNetCore {
                     response.Headers.Add("Last-Modified", lastModified);
                     response.Headers.Add("Etag", etag);
                     response.ContentType = "text/xml";
-                    using (var fileStream = new FileStream(ClientAccessPolicyXmlFile, FileMode.Open, FileAccess.Read)) {
-                        using var outputStream = GetOutputStream(request, response);
-                        await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
-                    };
+                    using var fileStream = new FileStream(ClientAccessPolicyXmlFile, FileMode.Open, FileAccess.Read);
+                    using var outputStream = GetOutputStream(request, response);
+                    await fileStream.CopyToAsync(outputStream).ConfigureAwait(false);
                 }
                 else {
                     response.StatusCode = 404;
@@ -194,14 +192,15 @@ namespace Hprose.RPC.AspNetCore {
             }
             using var instream = request.Body;
             if (request.ContentLength > Service.MaxRequestLength) {
-                instream.Dispose();
                 response.StatusCode = 413;
                 return;
             }
             string method = request.Method;
-            Stream outstream = null;
             try {
-                outstream = await Service.Handle(instream, context).ConfigureAwait(false);
+                using var outstream = await Service.Handle(instream, context).ConfigureAwait(false);
+                SendHeader(request, response, context);
+                using var outputStream = GetOutputStream(request, response);
+                await outstream.CopyToAsync(outputStream).ConfigureAwait(false);
             }
             catch (Exception e) {
                 response.StatusCode = 500;
@@ -209,13 +208,6 @@ namespace Hprose.RPC.AspNetCore {
                 var stackTrace = Encoding.UTF8.GetBytes(e.StackTrace);
                 await outputStream.WriteAsync(stackTrace, 0, stackTrace.Length).ConfigureAwait(false);
                 return;
-            }
-            SendHeader(request, response, context);
-            if (outstream != null) {
-                using (var outputStream = GetOutputStream(request, response)) {
-                    await outstream.CopyToAsync(outputStream).ConfigureAwait(false);
-                }
-                outstream.Dispose();
             }
         }
     }

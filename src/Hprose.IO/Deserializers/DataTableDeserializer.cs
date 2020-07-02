@@ -8,7 +8,7 @@
 |                                                          |
 |  DataTableDeserializer class for C#.                     |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -112,7 +112,7 @@ namespace Hprose.IO.Deserializers {
             var row = table.NewRow();
             reader.AddReference(row);
             var stream = reader.Stream;
-            int index = ValueReader.ReadInt(stream, TagOpenbrace);
+            ValueReader.ReadInt(stream, TagOpenbrace);
             var columns = table.Columns;
             var count = columns.Count;
             for (int i = 0; i < count; ++i) {
@@ -137,24 +137,24 @@ namespace Hprose.IO.Deserializers {
                 reader.ReadClass();
                 tag = stream.ReadByte();
             }
-            var deserializer = Deserializer.Instance;
+
             IDeserializer[] deserializers;
             switch (tag) {
                 case TagObject:
                     deserializers = ReadObjectAsFirstRow(reader, table);
-                    tag = stream.ReadByte();
+                    stream.ReadByte();
                     for (int i = 1; i < count; ++i) {
                         ReadObjectAsRow(reader, table, deserializers);
-                        tag = stream.ReadByte();
+                        stream.ReadByte();
                     }
                     break;
                 case TagMap:
                     var strDeserializer = Deserializer<string>.Instance;
                     deserializers = ReadMapAsFirstRow(reader, table, strDeserializer);
-                    tag = stream.ReadByte();
+                    stream.ReadByte();
                     for (int i = 1; i < count; ++i) {
                         ReadMapAsRow(reader, table, strDeserializer, deserializers);
-                        tag = stream.ReadByte();
+                        stream.ReadByte();
                     }
                     break;
                 default:
@@ -163,16 +163,11 @@ namespace Hprose.IO.Deserializers {
             return table;
         }
 
-        public override DataTable Read(Reader reader, int tag) {
-            var stream = reader.Stream;
-            switch (tag) {
-                case TagList:
-                    return Read(reader);
-                case TagEmpty:
-                    return new DataTable();
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override DataTable Read(Reader reader, int tag) => tag switch
+        {
+            TagList => Read(reader),
+            TagEmpty => new DataTable(),
+            _ => base.Read(reader, tag),
+        };
     }
 }

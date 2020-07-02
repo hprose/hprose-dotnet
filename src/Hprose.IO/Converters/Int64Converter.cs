@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Int64Converter class for C#.                     |
 |                                                          |
-|  LastModified: Apr 21, 2018                              |
+|  LastModified: Jun 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -34,17 +34,11 @@ namespace Hprose.IO.Converters {
             Converter<DateTime, long>.convert = (value) => value.Ticks;
             Converter<TimeSpan, long>.convert = (value) => value.Ticks;
             Converter<BigInteger, long>.convert = (value) => (long)value;
-            Converter<object, long>.convert = (value) => {
-                switch (value) {
-                    case long l:
-                        return l;
-                    case DateTime dt:
-                        return dt.Ticks;
-                    case TimeSpan ts:
-                        return ts.Ticks;
-                    default:
-                        return Converter<long>.ConvertFrom(value);
-                }
+            Converter<object, long>.convert = (value) => value switch {
+                long l => l,
+                DateTime dt => dt.Ticks,
+                TimeSpan ts => ts.Ticks,
+                _ => Converter<long>.ConvertFrom(value),
             };
         }
         internal static void Initialize() { }

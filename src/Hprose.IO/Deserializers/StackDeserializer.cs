@@ -8,7 +8,7 @@
 |                                                          |
 |  StackDeserializer class for C#.                         |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 30, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -36,15 +36,11 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return stack;
         }
-        public override Stack<T> Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagList:
-                    return Read(reader);
-                case TagEmpty:
-                    return new Stack<T>();
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override Stack<T> Read(Reader reader, int tag) => tag switch
+        {
+            TagList => Read(reader),
+            TagEmpty => new Stack<T>(),
+            _ => base.Read(reader, tag),
+        };
     }
 }

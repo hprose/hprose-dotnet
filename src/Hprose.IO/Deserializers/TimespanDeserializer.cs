@@ -8,7 +8,7 @@
 |                                                          |
 |  TimeSpanDeserializer class for C#.                      |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 30, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -19,36 +19,29 @@ namespace Hprose.IO.Deserializers {
     using static Tags;
 
     internal class TimeSpanDeserializer : Deserializer<TimeSpan> {
-        public override TimeSpan Read(Reader reader, int tag) {
-            var stream = reader.Stream;
-            switch (tag) {
-                case TagInteger:
-                    return new TimeSpan(ValueReader.ReadInt(stream));
-                case TagLong:
-                    return new TimeSpan(ValueReader.ReadLong(stream));
-                case TagDouble:
-                    return new TimeSpan((long)ValueReader.ReadDouble(stream));
-                case '0':
-                case TagEmpty:
-                case TagFalse:
-                    return TimeSpan.Zero;
-                case '1':
-                case TagTrue:
-                    return new TimeSpan(1);
-                case TagUTF8Char:
-                    return Converter<TimeSpan>.Convert(ValueReader.ReadUTF8Char(stream));
-                case TagString:
-                    return Converter<TimeSpan>.Convert(ReferenceReader.ReadString(reader));
-                case TagDate:
-                    return Converter<TimeSpan>.Convert(ReferenceReader.ReadDateTime(reader));
-                case TagTime:
-                    return Converter<TimeSpan>.Convert(ReferenceReader.ReadTime(reader));
-                default:
-                    if (tag >= '2' && tag <= '9') {
-                        return new TimeSpan(tag - '0');
-                    }
-                    return base.Read(reader, tag);
-            }
-        }
+        public override TimeSpan Read(Reader reader, int tag) => tag switch
+        {
+            TagInteger => new TimeSpan(ValueReader.ReadInt(reader.Stream)),
+            TagLong => new TimeSpan(ValueReader.ReadLong(reader.Stream)),
+            TagDouble => new TimeSpan((long)ValueReader.ReadDouble(reader.Stream)),
+            TagEmpty => TimeSpan.Zero,
+            TagFalse => TimeSpan.Zero,
+            TagTrue => new TimeSpan(1),
+            '0' => TimeSpan.Zero,
+            '1' => new TimeSpan(1),
+            '2' => new TimeSpan(2),
+            '3' => new TimeSpan(3),
+            '4' => new TimeSpan(4),
+            '5' => new TimeSpan(5),
+            '6' => new TimeSpan(6),
+            '7' => new TimeSpan(7),
+            '8' => new TimeSpan(8),
+            '9' => new TimeSpan(9),
+            TagUTF8Char => Converter<TimeSpan>.Convert(ValueReader.ReadUTF8Char(reader.Stream)),
+            TagString => Converter<TimeSpan>.Convert(ReferenceReader.ReadString(reader)),
+            TagDate => Converter<TimeSpan>.Convert(ReferenceReader.ReadDateTime(reader)),
+            TagTime => Converter<TimeSpan>.Convert(ReferenceReader.ReadTime(reader)),
+            _ => base.Read(reader, tag),
+        };
     }
 }

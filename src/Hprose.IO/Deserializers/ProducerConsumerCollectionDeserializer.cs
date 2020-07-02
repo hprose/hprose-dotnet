@@ -8,7 +8,7 @@
 |                                                          |
 |  ProducerConsumerCollectionDeserializer class for C#.    |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 30, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -33,14 +33,12 @@ namespace Hprose.IO.Deserializers {
             return collection;
         }
         public override T Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagList:
-                    return Read(reader);
-                case TagEmpty:
-                    return Factory<T>.New();
-                default:
-                    return base.Read(reader, tag);
-            }
+            return tag switch
+            {
+                TagList => Read(reader),
+                TagEmpty => Factory<T>.New(),
+                _ => base.Read(reader, tag),
+            };
         }
     }
 }

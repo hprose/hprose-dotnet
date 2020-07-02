@@ -8,7 +8,7 @@
 |                                                          |
 |  IntPtrDeserializer class for C#.                        |
 |                                                          |
-|  LastModified: Apr 13, 2018                              |
+|  LastModified: Jun 30, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -17,13 +17,8 @@ using System;
 
 namespace Hprose.IO.Deserializers {
     internal class IntPtrDeserializer : Deserializer<IntPtr> {
-        public override IntPtr Read(Reader reader, int tag) {
-            if (IntPtr.Size == 4) {
-                return (IntPtr)Deserializer<int>.Instance.Read(reader, tag);
-            }
-            else {
-                return (IntPtr)Deserializer<long>.Instance.Read(reader, tag);
-            }
-        }
+        public override IntPtr Read(Reader reader, int tag) => IntPtr.Size == 4
+                ? (IntPtr)Deserializer<int>.Instance.Read(reader, tag)
+                : (IntPtr)Deserializer<long>.Instance.Read(reader, tag);
     }
 }

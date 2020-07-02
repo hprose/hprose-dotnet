@@ -8,7 +8,7 @@
 |                                                          |
 |  MethodManager class for C#.                             |
 |                                                          |
-|  LastModified: Mar 28, 2020                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -40,11 +40,11 @@ namespace Hprose.RPC {
         }
         public void Remove(string name, int paramCount = -1) {
             if (paramCount < 0) {
-                Methods.TryRemove(name, out var temp);
+                Methods.TryRemove(name, out _);
             }
             else {
                 if (Methods.TryGetValue(name, out var methods)) {
-                    methods.TryRemove(paramCount, out var method);
+                    methods.TryRemove(paramCount, out _);
                 }
             }
         }

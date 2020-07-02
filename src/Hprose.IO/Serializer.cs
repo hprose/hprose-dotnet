@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Serializer class for C#.                         |
 |                                                          |
-|  LastModified: Jun 19, 2020                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -20,9 +20,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace Hprose.IO {
     public interface ISerializer {
@@ -95,14 +93,12 @@ namespace Hprose.IO {
                 return typeof(EnumSerializer<>).MakeGenericType(type);
             }
             if (type.IsArray) {
-                switch (type.GetArrayRank()) {
-                    case 1:
-                        return typeof(ArraySerializer<>).MakeGenericType(type.GetElementType());
-                    case 2:
-                        return typeof(Array2Serializer<>).MakeGenericType(type.GetElementType());
-                    default:
-                        return typeof(MultiDimArraySerializer<>).MakeGenericType(type);
-                }
+                return (type.GetArrayRank()) switch
+                {
+                    1 => typeof(ArraySerializer<>).MakeGenericType(type.GetElementType()),
+                    2 => typeof(Array2Serializer<>).MakeGenericType(type.GetElementType()),
+                    _ => typeof(MultiDimArraySerializer<>).MakeGenericType(type),
+                };
             }
             if (type.IsGenericType) {
                 Type genericType = type.GetGenericTypeDefinition();
@@ -225,7 +221,8 @@ namespace Hprose.IO {
                 var type = obj.GetType();
                 if (type.FullName == "System.Threading.Tasks.VoidTaskResult") {
                     writer.Stream.WriteByte(Tags.TagNull);
-                } else {
+                }
+                else {
                     GetInstance(type).Write(writer, obj);
                 }
             }

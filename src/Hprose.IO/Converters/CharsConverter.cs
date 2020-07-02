@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose CharsConverter class for C#.                     |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Jun 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -40,49 +40,15 @@ namespace Hprose.IO.Converters {
                 }
             };
             Converter<List<char>, char[]>.convert = (value) => value.ToArray();
-            Converter<List<byte>, char[]>.convert = (value) => {
-                var bytes = value.ToArray();
-                try {
-                    return Encoding.UTF8.GetChars(bytes);
-                }
-                catch (Exception) {
-                    return Encoding.Default.GetChars(bytes);
-                }
-            };
-            Converter<object, char[]>.convert = (value) => {
-                switch (value) {
-                    case char[] chars:
-                        return chars;
-                    case string s:
-                        return s.ToCharArray();
-                    case StringBuilder sb:
-                        char[] result = new char[sb.Length];
-#if !NET35_CF
-                        sb.CopyTo(0, result, 0, sb.Length);
-#else
-                        sb.ToString().CopyTo(0, result, 0, sb.Length);
-#endif
-                        return result;
-                    case List<char> charList:
-                        return charList.ToArray();
-                    case List<byte> byteList:
-                        var byteArray = byteList.ToArray();
-                        try {
-                            return Encoding.UTF8.GetChars(byteArray);
-                        }
-                        catch (Exception) {
-                            return Encoding.Default.GetChars(byteArray);
-                        }
-                    case byte[] bytes:
-                        try {
-                            return Encoding.UTF8.GetChars(bytes);
-                        }
-                        catch (Exception) {
-                            return Encoding.Default.GetChars(bytes);
-                        }
-                    default:
-                        return value.ToString().ToCharArray();
-                }
+            Converter<List<byte>, char[]>.convert = (value) => Converter<byte[], char[]>.convert(value.ToArray());
+            Converter<object, char[]>.convert = (value) => value switch {
+                char[] chars => chars,
+                string s => s.ToCharArray(),
+                StringBuilder sb => Converter<StringBuilder, char[]>.convert(sb),
+                List<char> charList => charList.ToArray(),
+                List<byte> byteList => Converter<List<byte>, char[]>.convert(byteList),
+                byte[] bytes => Converter<byte[], char[]>.convert(bytes),
+                _ => value.ToString().ToCharArray(),
             };
         }
         internal static void Initialize() { }

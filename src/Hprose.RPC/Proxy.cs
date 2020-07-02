@@ -8,7 +8,7 @@
 |                                                          |
 |  Proxy class for C#.                                     |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -74,9 +74,9 @@ namespace Hprose.RPC {
 
         private static Type GetProxyWithoutCache(Type[] interfaces) {
             interfaces = SumUpInterfaces(interfaces);
-            String strNumber = countAssembly.ToString(NumberFormatInfo.InvariantInfo);
-            String moduleName = "$Module" + strNumber;
-            String proxyTypeName = "$Proxy" + strNumber;
+            string strNumber = countAssembly.ToString(NumberFormatInfo.InvariantInfo);
+            string moduleName = "$Module" + strNumber;
+            string proxyTypeName = "$Proxy" + strNumber;
             Interlocked.Increment(ref countAssembly);
 
             AssemblyName assemblyName = new AssemblyName {

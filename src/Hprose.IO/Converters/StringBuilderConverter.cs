@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose StringBuilderConverter class for C#.             |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Jun 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -32,43 +32,15 @@ namespace Hprose.IO.Converters {
                 }
             };
             Converter<List<char>, StringBuilder>.convert = (value) => new StringBuilder(value.Count).Append(value.ToArray());
-            Converter<List<byte>, StringBuilder>.convert = (value) => {
-                var bytes = value.ToArray();
-                try {
-                    return new StringBuilder(Encoding.UTF8.GetString(bytes, 0, bytes.Length));
-                }
-                catch (Exception) {
-                    return new StringBuilder(Encoding.Default.GetString(bytes, 0, bytes.Length));
-                }
-            };
-            Converter<object, StringBuilder>.convert = (value) => {
-                switch (value) {
-                    case StringBuilder sb:
-                        return sb;
-                    case string s:
-                        return new StringBuilder(s);
-                    case char[] chars:
-                        return new StringBuilder(chars.Length).Append(chars);
-                    case List<char> charList:
-                        return new StringBuilder(charList.Count).Append(charList.ToArray());
-                    case List<byte> byteList:
-                        var byteArray = byteList.ToArray();
-                        try {
-                            return new StringBuilder(Encoding.UTF8.GetString(byteArray, 0, byteArray.Length));
-                        }
-                        catch (Exception) {
-                            return new StringBuilder(Encoding.Default.GetString(byteArray, 0, byteArray.Length));
-                        }
-                    case byte[] bytes:
-                        try {
-                            return new StringBuilder(Encoding.UTF8.GetString(bytes, 0, bytes.Length));
-                        }
-                        catch (Exception) {
-                            return new StringBuilder(Encoding.Default.GetString(bytes, 0, bytes.Length));
-                        }
-                    default:
-                        return new StringBuilder(value.ToString());
-                }
+            Converter<List<byte>, StringBuilder>.convert = (value) => Converter<byte[], StringBuilder>.convert(value.ToArray());
+            Converter<object, StringBuilder>.convert = (value) => value switch {
+                StringBuilder sb => sb,
+                string s => new StringBuilder(s),
+                char[] chars => new StringBuilder(chars.Length).Append(chars),
+                List<char> charList => new StringBuilder(charList.Count).Append(charList.ToArray()),
+                List<byte> byteList => Converter<List<byte>, StringBuilder>.convert(byteList),
+                byte[] bytes => Converter<byte[], StringBuilder>.convert(bytes),
+                _ => new StringBuilder(value.ToString()),
             };
         }
         internal static void Initialize() { }

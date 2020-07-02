@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpTransport class for C#.                              |
 |                                                          |
-|  LastModified: May 17, 2020                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -223,18 +223,17 @@ namespace Hprose.RPC {
             Send(tcpClient, tcpStream);
             var timeout = clientContext.Timeout;
             if (timeout > TimeSpan.Zero) {
-                using (CancellationTokenSource source = new CancellationTokenSource()) {
+                using CancellationTokenSource source = new CancellationTokenSource();
 #if NET40
-                   var timer = TaskEx.Delay(timeout, source.Token);
-                   var task = await TaskEx.WhenAny(timer, result.Task).ConfigureAwait(false);
+                var timer = TaskEx.Delay(timeout, source.Token);
+                var task = await TaskEx.WhenAny(timer, result.Task).ConfigureAwait(false);
 #else
-                    var timer = Task.Delay(timeout, source.Token);
-                    var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
+                var timer = Task.Delay(timeout, source.Token);
+                var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
 #endif
-                    source.Cancel();
-                    if (task == timer) {
-                        await Close(tcpClient, new TimeoutException()).ConfigureAwait(false);
-                    }
+                source.Cancel();
+                if (task == timer) {
+                    await Close(tcpClient, new TimeoutException()).ConfigureAwait(false);
                 }
             }
             return await result.Task.ConfigureAwait(false);

@@ -8,7 +8,7 @@
 |                                                          |
 |  ValueTupleDeserializer class for C#.                    |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 30, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -167,16 +167,12 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return default;
         }
-        public override ValueTuple Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagEmpty:
-                    return default;
-                case TagList:
-                    return Read(reader);
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override ValueTuple Read(Reader reader, int tag) => tag switch
+        {
+            TagEmpty => default,
+            TagList => Read(reader),
+            _ => base.Read(reader, tag),
+        };
     }
 
     internal class ValueTupleDeserializer<T> : Deserializer<T> {
@@ -190,15 +186,11 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return tuple;
         }
-        public override T Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagList:
-                    return Read(reader);
-                case TagEmpty:
-                    return default;
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override T Read(Reader reader, int tag) => tag switch
+        {
+            TagList => Read(reader),
+            TagEmpty => default,
+            _ => base.Read(reader, tag),
+        };
     }
  }

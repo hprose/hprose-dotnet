@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Deserializer class for C#.                       |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -123,14 +123,12 @@ namespace Hprose.IO {
                 return typeof(EnumDeserializer<>).MakeGenericType(type);
             }
             if (type.IsArray) {
-                switch (type.GetArrayRank()) {
-                    case 1:
-                        return typeof(ArrayDeserializer<>).MakeGenericType(type.GetElementType());
-                    case 2:
-                        return typeof(Array2Deserializer<>).MakeGenericType(type.GetElementType());
-                    default:
-                        return typeof(MultiDimArrayDeserializer<,>).MakeGenericType(type, type.GetElementType());
-                }
+                return (type.GetArrayRank()) switch
+                {
+                    1 => typeof(ArrayDeserializer<>).MakeGenericType(type.GetElementType()),
+                    2 => typeof(Array2Deserializer<>).MakeGenericType(type.GetElementType()),
+                    _ => typeof(MultiDimArrayDeserializer<,>).MakeGenericType(type, type.GetElementType()),
+                };
             }
             if (type.IsGenericType) {
                 Type genericType = type.GetGenericTypeDefinition();
@@ -274,101 +272,74 @@ namespace Hprose.IO {
 
         public static IDeserializer GetInstance(Type type) => type == null ? Instance : deserializers.GetOrAdd(type, deserializerFactory).Value;
 
-        public override object Read(Reader reader, int tag) {
-            if (tag >= '0' && tag <= '9') {
-                return digitObject[tag - '0'];
-            }
-            var stream = reader.Stream;
-            switch (tag) {
-                case TagInteger:
-                    return ValueReader.ReadInt(stream);
-                case TagString:
-                    return ReferenceReader.ReadString(reader);
-                case TagBytes:
-                    return ReferenceReader.ReadBytes(reader);
-                case TagTrue:
-                    return trueObject;
-                case TagFalse:
-                    return falseObject;
-                case TagEmpty:
-                    return "";
-                case TagObject:
-                    return Read(reader);
-                case TagRef:
-                    return reader.ReadReference();
-                case TagDate:
-                    return ReferenceReader.ReadDateTime(reader);
-                case TagTime:
-                    return ReferenceReader.ReadTime(reader);
-                case TagGuid:
-                    return ReferenceReader.ReadGuid(reader);
-                case TagLong:
-                    switch (reader.LongType) {
-                        case LongType.Int64:
-                            return ValueReader.ReadLong(stream);
-                        case LongType.UInt64:
-                            return (ulong)ValueReader.ReadLong(stream);
-                        default:
-                            return ValueReader.ReadBigInteger(stream);
-                    }
-                case TagDouble:
-                    switch (reader.RealType) {
-                        case RealType.Single:
-                            return ValueReader.ReadSingle(stream);
-                        case RealType.Decimal:
-                            return ValueReader.ReadDecimal(stream);
-                        default:
-                            return ValueReader.ReadDouble(stream);
-                    }
-                case TagNaN:
-                    switch (reader.RealType) {
-                        case RealType.Single:
-                            return float.NaN;
-                        default:
-                            return double.NaN;
-                    }
-                case TagInfinity:
-                    switch (reader.RealType) {
-                        case RealType.Single:
-                            return ValueReader.ReadSingleInfinity(stream);
-                        default:
-                            return ValueReader.ReadInfinity(stream);
-                    }
-                case TagUTF8Char:
-                    switch (reader.CharType) {
-                        case CharType.Char:
-                            return ValueReader.ReadChar(stream);
-                        default:
-                            return ValueReader.ReadUTF8Char(stream);
-                    }
-                case TagList:
-                    switch (reader.ListType) {
-                        case ListType.Array:
-                            return ReferenceReader.ReadArray<object>(reader);
-                        case ListType.ArrayList:
-                            return ListDeserializer<ArrayList>.Read(reader);
-                        default:
-                            return CollectionDeserializer<List<object>, object>.Read(reader);
-                    }
-                case TagMap:
-                    switch (reader.DictType) {
-                        case DictType.Dictionary:
-                            return DictionaryDeserializer<Dictionary<object, object>, object, object>.Read(reader);
+        public override object Read(Reader reader, int tag) => tag switch
+        {
+            '0' => digitObject[0],
+            '1' => digitObject[1],
+            '2' => digitObject[2],
+            '3' => digitObject[3],
+            '4' => digitObject[4],
+            '5' => digitObject[5],
+            '6' => digitObject[6],
+            '7' => digitObject[7],
+            '8' => digitObject[8],
+            '9' => digitObject[9],
+            TagInteger => ValueReader.ReadInt(reader.Stream),
+            TagString => ReferenceReader.ReadString(reader),
+            TagBytes => ReferenceReader.ReadBytes(reader),
+            TagTrue => trueObject,
+            TagFalse => falseObject,
+            TagEmpty => "",
+            TagObject => Read(reader),
+            TagRef => reader.ReadReference(),
+            TagDate => ReferenceReader.ReadDateTime(reader),
+            TagTime => ReferenceReader.ReadTime(reader),
+            TagGuid => ReferenceReader.ReadGuid(reader),
+            TagLong => reader.LongType switch
+            {
+                LongType.Int64 => ValueReader.ReadLong(reader.Stream),
+                LongType.UInt64 => (ulong)ValueReader.ReadLong(reader.Stream),
+                _ => ValueReader.ReadBigInteger(reader.Stream),
+            },
+            TagDouble => reader.RealType switch
+            {
+                RealType.Single => ValueReader.ReadSingle(reader.Stream),
+                RealType.Decimal => ValueReader.ReadDecimal(reader.Stream),
+                _ => ValueReader.ReadDouble(reader.Stream),
+            },
+            TagNaN => reader.RealType switch
+            {
+                RealType.Single => float.NaN,
+                _ => double.NaN,
+            },
+            TagInfinity => reader.RealType switch
+            {
+                RealType.Single => ValueReader.ReadSingleInfinity(reader.Stream),
+                _ => ValueReader.ReadInfinity(reader.Stream),
+            },
+            TagUTF8Char => reader.CharType switch
+            {
+                CharType.Char => ValueReader.ReadChar(reader.Stream),
+                _ => ValueReader.ReadUTF8Char(reader.Stream),
+            },
+            TagList => reader.ListType switch
+            {
+                ListType.Array => ReferenceReader.ReadArray<object>(reader),
+                ListType.ArrayList => ListDeserializer<ArrayList>.Read(reader),
+                _ => CollectionDeserializer<List<object>, object>.Read(reader),
+            },
+            TagMap => reader.DictType switch
+            {
+                DictType.Dictionary => DictionaryDeserializer<Dictionary<object, object>, object, object>.Read(reader),
 #if !NET35
-                        case DictType.ExpandoObject:
-                            return ExpandoObjectDeserializer.Read(reader);
+                DictType.ExpandoObject => ExpandoObjectDeserializer.Read(reader),
 #endif
-                        case DictType.Hashtable:
-                            return DictionaryDeserializer<Hashtable>.Read(reader);
-                        default:
-                            return DictionaryDeserializer<NullableKeyDictionary<object, object>, object, object>.Read(reader);
-                    }
-                case TagError:
-                    return new Exception(reader.Deserialize<string>());
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+                DictType.Hashtable => DictionaryDeserializer<Hashtable>.Read(reader),
+                _ => DictionaryDeserializer<NullableKeyDictionary<object, object>, object, object>.Read(reader),
+            },
+            TagError => new Exception(reader.Deserialize<string>()),
+            _ => base.Read(reader, tag),
+        };
 
         private object Read(Reader reader) {
             Stream stream = reader.Stream;

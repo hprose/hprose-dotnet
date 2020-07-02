@@ -8,7 +8,7 @@
 |                                                          |
 |  ArrayDeserializer class for C#.                         |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -21,16 +21,12 @@ namespace Hprose.IO.Deserializers {
 
     internal class ArrayDeserializer<T> : Deserializer<T[]> {
         private static readonly T[] empty = new T[0];
-        public override T[] Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagList:
-                    return ReferenceReader.ReadArray<T>(reader);
-                case TagEmpty:
-                    return empty;
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override T[] Read(Reader reader, int tag) => tag switch
+        {
+            TagList => ReferenceReader.ReadArray<T>(reader),
+            TagEmpty => empty,
+            _ => base.Read(reader, tag),
+        };
     }
 
     internal class Array2Deserializer<T> : Deserializer<T[,]> {
@@ -62,15 +58,11 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return a;
         }
-        public override T[,] Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagList:
-                    return Read(reader);
-                case TagEmpty:
-                    return empty;
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override T[,] Read(Reader reader, int tag) => tag switch
+        {
+            TagList => Read(reader),
+            TagEmpty => empty,
+            _ => base.Read(reader, tag),
+        };
     }
 }

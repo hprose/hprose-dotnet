@@ -8,7 +8,7 @@
 |                                                          |
 |  DateTimeDeserializer class for C#.                      |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -19,34 +19,28 @@ namespace Hprose.IO.Deserializers {
     using static Tags;
 
     internal class DateTimeDeserializer : Deserializer<DateTime> {
-        public override DateTime Read(Reader reader, int tag) {
-            var stream = reader.Stream;
-            switch (tag) {
-                case TagDate:
-                    return ReferenceReader.ReadDateTime(reader);
-                case TagTime:
-                    return ReferenceReader.ReadTime(reader);
-                case TagInteger:
-                    return new DateTime(ValueReader.ReadInt(stream));
-                case TagLong:
-                    return new DateTime(ValueReader.ReadLong(stream));
-                case TagDouble:
-                    return new DateTime((long)ValueReader.ReadDouble(stream));
-                case '0':
-                case TagEmpty:
-                case TagFalse:
-                    return new DateTime(0);
-                case '1':
-                case TagTrue:
-                    return new DateTime(1);
-                case TagString:
-                    return Converter<DateTime>.Convert(ReferenceReader.ReadString(reader));
-                default:
-                    if (tag >= '2' && tag <= '9') {
-                        return new DateTime(tag - '0');
-                    }
-                    return base.Read(reader, tag);
-            }
-        }
+        public override DateTime Read(Reader reader, int tag) => tag switch
+        {
+            TagDate => ReferenceReader.ReadDateTime(reader),
+            TagTime => ReferenceReader.ReadTime(reader),
+            TagInteger => new DateTime(ValueReader.ReadInt(reader.Stream)),
+            TagLong => new DateTime(ValueReader.ReadLong(reader.Stream)),
+            TagDouble => new DateTime((long)ValueReader.ReadDouble(reader.Stream)),
+            '0' => new DateTime(0),
+            '1' => new DateTime(1),
+            '2' => new DateTime(2),
+            '3' => new DateTime(3),
+            '4' => new DateTime(4),
+            '5' => new DateTime(5),
+            '6' => new DateTime(6),
+            '7' => new DateTime(7),
+            '8' => new DateTime(8),
+            '9' => new DateTime(9),
+            TagEmpty => new DateTime(0),
+            TagFalse => new DateTime(0),
+            TagTrue => new DateTime(1),
+            TagString => Converter<DateTime>.Convert(ReferenceReader.ReadString(reader)),
+            _ => base.Read(reader, tag),
+        };
     }
 }

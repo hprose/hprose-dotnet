@@ -8,7 +8,7 @@
 |                                                          |
 |  Caller class for C#.                                    |
 |                                                          |
-|  LastModified: Mar 28, 2020                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -75,7 +75,7 @@ namespace Hprose.RPC.Plugins.Reverse {
         }
         private void Close(ServiceContext context) {
             var id = Stop(context);
-            Onlines.TryRemove(id, out var _);
+            Onlines.TryRemove(id, out _);
         }
         private async Task<(int, string, object[])[]> Begin(ServiceContext context) {
             var id = Stop(context);
@@ -87,18 +87,17 @@ namespace Hprose.RPC.Plugins.Reverse {
                     return responder;
                 });
                 if (HeartBeat > TimeSpan.Zero) {
-                    using (CancellationTokenSource source = new CancellationTokenSource()) {
+                    using CancellationTokenSource source = new CancellationTokenSource();
 #if NET40
-                        var delay = TaskEx.Delay(HeartBeat, source.Token);
-                        var task = await TaskEx.WhenAny(responder.Task, delay).ConfigureAwait(false);
+                    var delay = TaskEx.Delay(HeartBeat, source.Token);
+                    var task = await TaskEx.WhenAny(responder.Task, delay).ConfigureAwait(false);
 #else
-                        var delay = Task.Delay(HeartBeat, source.Token);
-                        var task = await Task.WhenAny(responder.Task, delay).ConfigureAwait(false);
+                    var delay = Task.Delay(HeartBeat, source.Token);
+                    var task = await Task.WhenAny(responder.Task, delay).ConfigureAwait(false);
 #endif
-                        source.Cancel();
-                        if (task == delay) {
-                            responder.TrySetResult(emptyCall);
-                        }
+                    source.Cancel();
+                    if (task == delay) {
+                        responder.TrySetResult(emptyCall);
                     }
                 }
             }
@@ -141,28 +140,27 @@ namespace Hprose.RPC.Plugins.Reverse {
             results[index] = result;
             Response(id);
             if (Timeout > TimeSpan.Zero) {
-                using (CancellationTokenSource source = new CancellationTokenSource()) {
+                using CancellationTokenSource source = new CancellationTokenSource();
 #if NET40
-                    var delay = TaskEx.Delay(Timeout, source.Token);
-                    var task = await TaskEx.WhenAny(result.Task, delay).ConfigureAwait(false);
+                var delay = TaskEx.Delay(Timeout, source.Token);
+                var task = await TaskEx.WhenAny(result.Task, delay).ConfigureAwait(false);
 #else
-                    var delay = Task.Delay(Timeout, source.Token);
-                    var task = await Task.WhenAny(result.Task, delay).ConfigureAwait(false);
+                var delay = Task.Delay(Timeout, source.Token);
+                var task = await Task.WhenAny(result.Task, delay).ConfigureAwait(false);
 #endif
-                    source.Cancel();
-                    if (task == delay) {
-                        lock(calls) {
-                            for (var i = 0; i < calls.Count; i++) {
-                                if (calls.TryDequeue(out (int index, string name, object[] args) call)) {
-                                    if (index != call.index) {
-                                        calls.Enqueue(call);
-                                    }
+                source.Cancel();
+                if (task == delay) {
+                    lock (calls) {
+                        for (var i = 0; i < calls.Count; i++) {
+                            if (calls.TryDequeue(out (int index, string name, object[] args) call)) {
+                                if (index != call.index) {
+                                    calls.Enqueue(call);
                                 }
                             }
                         }
-                        results.TryRemove(index, out var _);
-                        result.TrySetException(new TimeoutException());
                     }
+                    results.TryRemove(index, out var _);
+                    result.TrySetException(new TimeoutException());
                 }
             }
             await result.Task.ContinueWith((_) => { }, TaskScheduler.Current).ConfigureAwait(false);

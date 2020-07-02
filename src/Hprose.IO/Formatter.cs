@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose Formatter for C#.                                |
 |                                                          |
-|  LastModified: Feb 7, 2019                               |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -50,47 +50,39 @@ namespace Hprose.IO {
         }
         public static T Deserialize<T>(Stream stream, Mode mode = Mode.MemberMode) => new Reader(stream, mode).Deserialize<T>();
         public static T Deserialize<T>(byte[] data, Mode mode = Mode.MemberMode) {
-            using (MemoryStream stream = new MemoryStream(data, 0, data.Length, false, true)) {
-                return Deserialize<T>(stream, mode);
-            }
+            using MemoryStream stream = new MemoryStream(data, 0, data.Length, false, true);
+            return Deserialize<T>(stream, mode);
         }
         public static T Deserialize<T>(ArraySegment<byte> data, Mode mode = Mode.MemberMode) {
-            using(MemoryStream stream = new MemoryStream(data.Array, data.Offset, data.Count, false, true)) {
-                return Deserialize<T>(stream, mode);
-            }
+            using MemoryStream stream = new MemoryStream(data.Array, data.Offset, data.Count, false, true);
+            return Deserialize<T>(stream, mode);
         }
         public static T Deserialize<T>(Stream stream, bool simple, Mode mode = Mode.MemberMode) => new Reader(stream, simple, mode).Deserialize<T>();
         public static T Deserialize<T>(byte[] data, bool simple, Mode mode = Mode.MemberMode) {
-            using (MemoryStream stream = new MemoryStream(data, 0, data.Length, false, true)) {
-                return Deserialize<T>(stream, simple, mode);
-            }
+            using MemoryStream stream = new MemoryStream(data, 0, data.Length, false, true);
+            return Deserialize<T>(stream, simple, mode);
         }
         public static T Deserialize<T>(ArraySegment<byte> data, bool simple, Mode mode = Mode.MemberMode) {
-            using (MemoryStream stream = new MemoryStream(data.Array, data.Offset, data.Count, false, true)) {
-                return Deserialize<T>(stream, simple, mode);
-            }
+            using MemoryStream stream = new MemoryStream(data.Array, data.Offset, data.Count, false, true);
+            return Deserialize<T>(stream, simple, mode);
         }
         public static object Deserialize(Stream stream, Type type = null, Mode mode = Mode.MemberMode) => new Reader(stream, mode).Deserialize(type);
         public static object Deserialize(byte[] data, Type type = null, Mode mode = Mode.MemberMode) {
-            using (MemoryStream stream = new MemoryStream(data, 0, data.Length, false, true)) {
-                return Deserialize(stream, type, mode);
-            }
+            using MemoryStream stream = new MemoryStream(data, 0, data.Length, false, true);
+            return Deserialize(stream, type, mode);
         }
         public static object Deserialize(ArraySegment<byte> data, Type type = null, Mode mode = Mode.MemberMode) {
-            using (MemoryStream stream = new MemoryStream(data.Array, data.Offset, data.Count, false, true)) {
-                return Deserialize(stream, type, mode);
-            }
+            using MemoryStream stream = new MemoryStream(data.Array, data.Offset, data.Count, false, true);
+            return Deserialize(stream, type, mode);
         }
         public static object Deserialize(Stream stream, Type type, bool simple, Mode mode = Mode.MemberMode) => new Reader(stream, simple, mode).Deserialize(type);
         public static object Deserialize(byte[] data, Type type, bool simple, Mode mode = Mode.MemberMode) {
-            using (MemoryStream stream = new MemoryStream(data, 0, data.Length, false, true)) {
-                return Deserialize(stream, type, simple, mode);
-            }
+            using MemoryStream stream = new MemoryStream(data, 0, data.Length, false, true);
+            return Deserialize(stream, type, simple, mode);
         }
         public static object Deserialize(ArraySegment<byte> data, Type type, bool simple, Mode mode = Mode.MemberMode) {
-            using (MemoryStream stream = new MemoryStream(data.Array, data.Offset, data.Count, false, true)) {
-                return Deserialize(stream, type, simple, mode);
-            }
+            using MemoryStream stream = new MemoryStream(data.Array, data.Offset, data.Count, false, true);
+            return Deserialize(stream, type, simple, mode);
         }
     }
 }

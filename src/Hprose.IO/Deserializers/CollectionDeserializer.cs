@@ -8,7 +8,7 @@
 |                                                          |
 |  CollectionDeserializer class for C#.                    |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 29, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -32,16 +32,12 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return collection;
         }
-        public override I Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagList:
-                    return Read(reader);
-                case TagEmpty:
-                    return Factory<T>.New();
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override I Read(Reader reader, int tag) => tag switch
+        {
+            TagList => Read(reader),
+            TagEmpty => Factory<T>.New(),
+            _ => base.Read(reader, tag),
+        };
     }
     class CollectionDeserializer<T, E> : CollectionDeserializer<T, T, E> where T : ICollection<E> { }
 }

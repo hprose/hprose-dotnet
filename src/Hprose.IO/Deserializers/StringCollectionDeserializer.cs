@@ -8,7 +8,7 @@
 |                                                          |
 |  StringCollectionDeserializer class for C#.              |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Jun 30, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -33,16 +33,12 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return collection;
         }
-        public override StringCollection Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagList:
-                    return Read(reader);
-                case TagEmpty:
-                    return new StringCollection();
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override StringCollection Read(Reader reader, int tag) => tag switch
+        {
+            TagList => Read(reader),
+            TagEmpty => new StringCollection(),
+            _ => base.Read(reader, tag),
+        };
     }
 }
 #endif

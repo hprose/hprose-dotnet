@@ -8,7 +8,7 @@
 |                                                          |
 |  StreamDeserializer class for C#.                        |
 |                                                          |
-|  LastModified: Feb 8, 2019                               |
+|  LastModified: Jun 30, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -20,22 +20,14 @@ namespace Hprose.IO.Deserializers {
 
     internal class StreamDeserializer<T> : Deserializer<T> where T : Stream {
         private static readonly byte[] empty = new byte[0];
-        public override T Read(Reader reader, int tag) {
-            var stream = reader.Stream;
-            switch (tag) {
-                case TagBytes:
-                    return Converter<T>.Convert(ReferenceReader.ReadBytes(reader));
-                case TagEmpty:
-                    return Converter<T>.Convert(empty);
-                case TagList:
-                    return Converter<T>.Convert(ReferenceReader.ReadArray<byte>(reader));
-                case TagUTF8Char:
-                    return Converter<T>.Convert(ValueReader.ReadUTF8Char(stream));
-                case TagString:
-                    return Converter<T>.Convert(ReferenceReader.ReadChars(reader));
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override T Read(Reader reader, int tag) => tag switch
+        {
+            TagBytes => Converter<T>.Convert(ReferenceReader.ReadBytes(reader)),
+            TagEmpty => Converter<T>.Convert(empty),
+            TagList => Converter<T>.Convert(ReferenceReader.ReadArray<byte>(reader)),
+            TagUTF8Char => Converter<T>.Convert(ValueReader.ReadUTF8Char(reader.Stream)),
+            TagString => Converter<T>.Convert(ReferenceReader.ReadChars(reader)),
+            _ => base.Read(reader, tag),
+        };
     }
 }

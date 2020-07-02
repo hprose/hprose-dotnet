@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose StreamConverter class for C#.                    |
 |                                                          |
-|  LastModified: Feb 18, 2018                              |
+|  LastModified: Jun 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -25,13 +25,9 @@ namespace Hprose.IO.Converters {
             Converter<char[], Stream>.convert = (value) => Converter<char[], MemoryStream>.convert(value);
             Converter<List<char>, Stream>.convert = (value) => Converter<List<char>, MemoryStream>.convert(value);
             Converter<List<byte>, Stream>.convert = (value) => Converter<List<byte>, MemoryStream>.convert(value);
-            Converter<object, Stream>.convert = (value) => {
-                switch (value) {
-                    case Stream stream:
-                        return stream;
-                    default:
-                        return Converter<object, MemoryStream>.convert(value);
-                }
+            Converter<object, Stream>.convert = (value) => value switch {
+                Stream stream => stream,
+                _ => Converter<object, MemoryStream>.convert(value),
             };
         }
         internal static void Initialize() { }

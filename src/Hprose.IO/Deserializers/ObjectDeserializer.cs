@@ -8,7 +8,7 @@
 |                                                          |
 |  ObjectDeserializer class for C#.                        |
 |                                                          |
-|  LastModified: Jun 24, 2020                              |
+|  LastModified: Jun 30, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -58,18 +58,13 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return obj;
         }
-        public override T Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagObject:
-                    return Read(reader);
-                case TagMap:
-                    return ReadMapAsObject(reader);
-                case TagEmpty:
-                    return Factory<T>.New();
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override T Read(Reader reader, int tag) => tag switch
+        {
+            TagObject => Read(reader),
+            TagMap => ReadMapAsObject(reader),
+            TagEmpty => Factory<T>.New(),
+            _ => base.Read(reader, tag),
+        };
         public object ReadObject(Reader reader, string key) => Read(reader, key);
     }
 
@@ -112,18 +107,13 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return obj;
         }
-        public override T Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagObject:
-                    return Read(reader);
-                case TagMap:
-                    return ReadMapAsObject(reader);
-                case TagEmpty:
-                    return Factory<T>.New();
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override T Read(Reader reader, int tag) => tag switch
+        {
+            TagObject => Read(reader),
+            TagMap => ReadMapAsObject(reader),
+            TagEmpty => Factory<T>.New(),
+            _ => base.Read(reader, tag),
+        };
 
         public object ReadObject(Reader reader, string key) => Read(reader, key);
     }

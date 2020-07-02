@@ -8,7 +8,7 @@
 |                                                          |
 |  MultiDimArrayDeserializer class for C#.                 |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: Jun 30, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -57,12 +57,10 @@ namespace Hprose.IO.Deserializers {
                 }
                 int n = 0;
                 for (int i = maxrank; i > 0; i--) {
-                    if (loc[i] == 0) {
-                        n++;
-                    }
-                    else {
+                    if (loc[i] != 0) {
                         break;
                     }
+                    n++;
                 }
                 for (int i = rank - n; i < rank; ++i) {
                     stream.ReadByte();
@@ -73,15 +71,11 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return (T)(object)a;
         }
-        public override T Read(Reader reader, int tag) {
-            switch (tag) {
-                case TagList:
-                    return Read(reader);
-                case TagEmpty:
-                    return empty;
-                default:
-                    return base.Read(reader, tag);
-            }
-        }
+        public override T Read(Reader reader, int tag) => tag switch
+        {
+            TagList => Read(reader),
+            TagEmpty => empty,
+            _ => base.Read(reader, tag),
+        };
     }
 }

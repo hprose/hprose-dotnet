@@ -8,7 +8,7 @@
 |                                                          |
 |  hprose TimeSpanConverter class for C#.                  |
 |                                                          |
-|  LastModified: Apr 21, 2018                              |
+|  LastModified: Jun 28, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -24,23 +24,14 @@ namespace Hprose.IO.Converters {
             Converter<string, TimeSpan>.convert = (value) => TimeSpan.Parse(value);
             Converter<StringBuilder, TimeSpan>.convert = (value) => TimeSpan.Parse(value.ToString());
             Converter<char[], TimeSpan>.convert = (value) => TimeSpan.Parse(new string(value));
-            Converter<object, TimeSpan>.convert = (value) => {
-                switch (value) {
-                    case TimeSpan ts:
-                        return ts;
-                    case DateTime dt:
-                        return new TimeSpan(dt.Ticks);
-                    case string s:
-                        return TimeSpan.Parse(s);
-                    case char[] chars:
-                        return TimeSpan.Parse(new string(chars));
-                    case StringBuilder sb:
-                        return TimeSpan.Parse(sb.ToString());
-                    case long l:
-                        return new TimeSpan(l);
-                    default:
-                        return Converter<TimeSpan>.ConvertFromObject(value);
-                }
+            Converter<object, TimeSpan>.convert = (value) => value switch {
+                TimeSpan ts => ts,
+                DateTime dt => new TimeSpan(dt.Ticks),
+                string s => TimeSpan.Parse(s),
+                char[] chars => TimeSpan.Parse(new string(chars)),
+                StringBuilder sb => TimeSpan.Parse(sb.ToString()),
+                long l => new TimeSpan(l),
+                _ => Converter<TimeSpan>.ConvertFromObject(value),
             };
         }
         internal static void Initialize() { }

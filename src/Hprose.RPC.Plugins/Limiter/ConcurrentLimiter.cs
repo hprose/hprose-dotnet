@@ -8,7 +8,7 @@
 |                                                          |
 |  ConcurrentLimiter plugin for C#.                        |
 |                                                          |
-|  LastModified: Mar 26, 2020                              |
+|  LastModified: Jul 2, 2020                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -34,18 +34,17 @@ namespace Hprose.RPC.Plugins.Limiter {
             var deferred = new TaskCompletionSource<bool>();
             tasks.Enqueue(deferred);
             if (Timeout > TimeSpan.Zero) {
-                using (CancellationTokenSource source = new CancellationTokenSource()) {
+                using CancellationTokenSource source = new CancellationTokenSource();
 #if NET40
-                    var timer = TaskEx.Delay(Timeout, source.Token);
-                    var task = await TaskEx.WhenAny(timer, deferred.Task).ConfigureAwait(false);
+                var timer = TaskEx.Delay(Timeout, source.Token);
+                var task = await TaskEx.WhenAny(timer, deferred.Task).ConfigureAwait(false);
 #else
-                    var timer = Task.Delay(Timeout, source.Token);
-                    var task = await Task.WhenAny(timer, deferred.Task).ConfigureAwait(false);
+                var timer = Task.Delay(Timeout, source.Token);
+                var task = await Task.WhenAny(timer, deferred.Task).ConfigureAwait(false);
 #endif
-                    source.Cancel();
-                    if (task == timer) {
-                        deferred.TrySetException(new TimeoutException());
-                    }
+                source.Cancel();
+                if (task == timer) {
+                    deferred.TrySetException(new TimeoutException());
                 }
             }
             await deferred.Task.ConfigureAwait(false);
