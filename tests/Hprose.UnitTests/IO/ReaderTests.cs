@@ -1568,7 +1568,7 @@ namespace Hprose.UnitTests.IO {
         }
         [TestMethod]
         public void TestDeserializeObject4() {
-            TypeManager.Register<Person, IPerson>();
+            TypeManager.Register(typeof(Person), typeof(IPerson));
             using (MemoryStream stream = new MemoryStream()) {
                 Writer writer = new Writer(stream);
                 var o = new Person {

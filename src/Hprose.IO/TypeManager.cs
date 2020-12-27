@@ -35,20 +35,10 @@ namespace Hprose.IO {
 #else
         private static readonly Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
 #endif
+        private static readonly MethodInfo registerMethod1 = typeof(TypeManager).GetMethod(nameof(Register1), BindingFlags.NonPublic | BindingFlags.Static);
+        private static readonly MethodInfo registerMethod2 = typeof(TypeManager).GetMethod(nameof(Register2), BindingFlags.NonPublic | BindingFlags.Static);
         private static readonly ConcurrentDictionary<string, Lazy<Type>> typeCache = new ConcurrentDictionary<string, Lazy<Type>>();
         private static readonly ConcurrentDictionary<Type, Type> intfCache = new ConcurrentDictionary<Type, Type>();
-        public static void Register<T, I>(string name = null) where T : I {
-            Type type = typeof(T);
-            Type intf = typeof(I);
-            if (type.IsInterface) {
-                throw new ArgumentException("T must be a class or struct.");
-            }
-            if (!intf.IsInterface) {
-                throw new ArgumentException("I must be a interface.");
-            }
-            intfCache.AddOrUpdate(intf, (i) => type, (i, _) => type);
-            Register<T>(name);
-        }
         public static void Register<T>(string name = null) {
             Type type = typeof(T);
             if (name == null || name.Length == 0) {
@@ -63,6 +53,30 @@ namespace Hprose.IO {
                 (alias) => { TypeName<T>.Name = alias; return new Lazy<Type>(() => type); },
                 (alias, _) => { TypeName<T>.Name = alias; return new Lazy<Type>(() => type); }
             );
+        }
+        public static void Register<T, I>(string name = null) where T : I {
+            Type type = typeof(T);
+            Type intf = typeof(I);
+            if (type.IsInterface) {
+                throw new ArgumentException("T must be a class or struct.");
+            }
+            if (!intf.IsInterface) {
+                throw new ArgumentException("I must be a interface.");
+            }
+            intfCache.AddOrUpdate(intf, (i) => type, (i, _) => type);
+            Register<T>(name);
+        }
+        private static void Register1<T>(string name)  {
+            Register<T>(name);
+        }
+        private static void Register2<T, I>(string name) where T : I {
+            Register<T, I>(name);
+        }
+        public static void Register(Type type, string name = null) {
+            registerMethod1.MakeGenericMethod(type).Invoke(null, new object[] { name });
+        }
+        public static void Register(Type type, Type intf, string name = null) {
+            registerMethod2.MakeGenericMethod(type, intf).Invoke(null, new object[] { name });
         }
         public static bool IsRegistered(string name) => typeCache.ContainsKey(name);
         public static string GetName<T>() {
