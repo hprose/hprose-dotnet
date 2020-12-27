@@ -92,6 +92,9 @@ namespace Hprose.IO {
         }
         public static Type GetType(string name) => typeCache.GetOrAdd(name, typeFactory).Value;
         private static Type LoadType(string alias) {
+            if (alias == null || alias == "") {
+                return null;
+            }
             Type type;
             int length = alias.Length - alias.Replace("_", "").Length;
             if (length > 0) {

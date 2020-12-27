@@ -8,7 +8,7 @@
 |                                                          |
 |  ValueReader class for C#.                               |
 |                                                          |
-|  LastModified: Jan 17, 2019                              |
+|  LastModified: Dec 27, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -304,6 +304,10 @@ namespace Hprose.IO {
 #if NETSTANDARD2_1 || NETCOREAPP2_1_UP
         public static string ReadString(Stream stream) {
             int len = ReadLength(stream);
+            if (len == 0) {
+                stream.ReadByte();
+                return string.Empty;
+            }
             return string.Create<Stream>(len, stream, ReadChars);
         }
 #else
