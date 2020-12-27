@@ -8,7 +8,7 @@
 |                                                          |
 |  DataTableDeserializer class for C#.                     |
 |                                                          |
-|  LastModified: Jun 29, 2020                              |
+|  LastModified: Dec 27, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -16,6 +16,7 @@
 using System;
 using System.Data;
 using System.IO;
+using System.Reflection;
 
 namespace Hprose.IO.Deserializers {
     using static Tags;
@@ -59,8 +60,7 @@ namespace Hprose.IO.Deserializers {
                 var members = Accessor.GetMembers(typeInfo.type, reader.Mode);
                 for (int i = 0; i < count; ++i) {
                     var name = names[i];
-                    var member = members[name];
-                    if (member != null) {
+                    if (members.TryGetValue(name, out MemberInfo member)) {
                         var type = Accessor.GetMemberType(member);
                         deserializers[i] = Deserializer.GetInstance(type);
                         var value = deserializers[i].Deserialize(reader);
@@ -72,7 +72,7 @@ namespace Hprose.IO.Deserializers {
                         var value = deserializer.Deserialize(reader);
                         var type = value?.GetType() ?? typeof(string);
                         deserializers[i] = Deserializer.GetInstance(type);
-                        var column = new DataColumn(name, type);
+                        var column = new DataColumn(Accessor.TitleCaseName(name), type);
                         columns.Add(column);
                         row[column] = value ?? DBNull.Value;
                     }
@@ -84,7 +84,7 @@ namespace Hprose.IO.Deserializers {
                     var value = deserializer.Deserialize(reader);
                     var type = value?.GetType() ?? typeof(string);
                     deserializers[i] = Deserializer.GetInstance(type);
-                    var column = new DataColumn(name, type);
+                    var column = new DataColumn(Accessor.TitleCaseName(name), type);
                     columns.Add(column);
                     row[column] = value ?? DBNull.Value;
                 }

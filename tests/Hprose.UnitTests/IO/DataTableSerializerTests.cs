@@ -16,12 +16,12 @@ namespace Hprose.UnitTests.IO {
                 writer.Serialize(table);
                 writer.Serialize(table);
                 var data = stream.GetArraySegment();
-                Assert.AreEqual("a3{c9\"TestTable\"3{s2\"id\"s4\"name\"s3\"age\"}o0{0s5\"Mario\"i45;}o0{1s5\"Luigi\"i42;}o0{2s5\"Peach\"i28;}}r0;", Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
+                Assert.AreEqual("a3{c10\"Test_Table\"3{s2\"id\"s4\"name\"s3\"age\"}o0{0s5\"Mario\"i45;}o0{1s5\"Luigi\"i42;}o0{2s5\"Peach\"i28;}}r0;", Encoding.UTF8.GetString(data.Array, data.Offset, data.Count));
             }
         }
 
         private DataTable MakeTable() {
-            DataTable table = new DataTable("TestTable");
+            DataTable table = new DataTable("Test_Table");
 
             table.Columns.Add(new DataColumn("Id", typeof(int)));
             table.Columns.Add(new DataColumn("Name", typeof(string)));

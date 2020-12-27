@@ -34,7 +34,7 @@ namespace Hprose.UnitTests.IO {
         }
 
         private DataTable MakeTable() {
-            DataTable table = new DataTable("TestTable");
+            DataTable table = new DataTable("Test_Table");
 
             table.Columns.Add(new DataColumn("Id", typeof(int)));
             table.Columns.Add(new DataColumn("Name", typeof(string)));
