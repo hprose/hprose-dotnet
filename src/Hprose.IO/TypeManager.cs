@@ -141,7 +141,7 @@ namespace Hprose.IO {
                 }
             }
             else {
-                type = GetTypeFromAssemblies(name.ToString());
+                type = GetTypeFromAssemblies(new string(name));
             }
             return type;
         }
@@ -165,7 +165,7 @@ namespace Hprose.IO {
                 }
             }
             else {
-                type = GetTypeFromAssemblies(name.ToString());
+                type = GetTypeFromAssemblies(new string(name));
             }
             return type;
         }
