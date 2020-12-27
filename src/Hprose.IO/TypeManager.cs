@@ -44,11 +44,7 @@ namespace Hprose.IO {
             if (name == null || name.Length == 0) {
                 name = (Attribute.GetCustomAttribute(type, typeof(DataContractAttribute), false) as DataContractAttribute)?.Name ?? type.ToString();
             }
-            name = name.Replace('.', '_').Replace('+', '_');
-            int index = name.IndexOf('`');
-            if (index > 0) {
-                name = name.Substring(0, index);
-            }
+            name = name.Replace('.', '_').Replace('+', '_').Replace('`', '_').Replace('[', '_').Replace(']', '_');
             typeCache.AddOrUpdate(name,
                 (alias) => { TypeName<T>.Name = alias; return new Lazy<Type>(() => type); },
                 (alias, _) => { TypeName<T>.Name = alias; return new Lazy<Type>(() => type); }
