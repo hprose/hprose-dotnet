@@ -8,7 +8,7 @@
 |                                                          |
 |  MembersReader class for C#.                             |
 |                                                          |
-|  LastModified: Feb 21, 2019                              |
+|  LastModified: Dec 27, 2020                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
