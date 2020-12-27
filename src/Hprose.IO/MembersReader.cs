@@ -34,7 +34,7 @@ namespace Hprose.IO {
             }
             Expression[] expressions = new Expression[length + 1];
             for (var i = 0; i < length; ++i) {
-                expressions[i] = CreateReadMemberExpression(members[names[i]], reader, obj);
+                expressions[i] = members.ContainsKey(names[i]) ? CreateReadMemberExpression(members[names[i]], reader, obj) : Expression.Empty();
             }
             expressions[length] = Expression.Empty();
             return Expression.Block(expressions);
