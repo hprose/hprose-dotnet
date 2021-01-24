@@ -8,7 +8,7 @@
 |                                                          |
 |  PluginManager class for C#.                             |
 |                                                          |
-|  LastModified: Feb 16, 2020                              |
+|  LastModified: Jan 24, 2021                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -47,7 +47,9 @@ namespace Hprose.RPC {
             bool rebuild = false;
             rwlock.EnterWriteLock();
             for (int i = 0, n = handlers.Length; i < n; ++i) {
-                rebuild = rebuild || this.handlers.Remove(handlers[i]);
+                if (this.handlers.Remove(handlers[i])) {
+                    rebuild = true;
+                }
             }
             rwlock.ExitWriteLock();
             if (rebuild) RebuildHandler();
