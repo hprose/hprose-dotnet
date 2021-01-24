@@ -8,12 +8,13 @@
 |                                                          |
 |  Method class for C#.                                    |
 |                                                          |
-|  LastModified: Mar 28, 2020                              |
+|  LastModified: Jan 24, 2021                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -25,7 +26,7 @@ namespace Hprose.RPC {
         public MethodInfo MethodInfo { get; private set; }
         public ParameterInfo[] Parameters { get; private set; }
         public object Target { get; private set; }
-        public IDictionary<string, object> Options { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+        public IDictionary<string, object> Options { get; private set; } = new ConcurrentDictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public object this[string name] {
             get => Options[name];
             set => Options[name] = value;
