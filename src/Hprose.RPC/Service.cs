@@ -8,12 +8,13 @@
 |                                                          |
 |  Service class for C#.                                   |
 |                                                          |
-|  LastModified: Jul 2, 2020                               |
+|  LastModified: Jan 24, 2021                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,8 +28,8 @@ namespace Hprose.RPC {
         Task Bind(T server);
     }
     public class Service : IDisposable {
-        private readonly static Dictionary<string, Type> handlerTypes = new Dictionary<string, Type>();
-        private readonly static Dictionary<Type, string> serverTypes = new Dictionary<Type, string>();
+        private readonly static ConcurrentDictionary<string, Type> handlerTypes = new ConcurrentDictionary<string, Type>();
+        private readonly static ConcurrentDictionary<Type, string> serverTypes = new ConcurrentDictionary<Type, string>();
         public static void Register<T, S>(string name) where T : IHandler<S> {
             handlerTypes[name] = typeof(T);
             serverTypes[typeof(S)] = name;
@@ -66,10 +67,10 @@ namespace Hprose.RPC {
         private readonly InvokeManager invokeManager;
         private readonly IOManager ioManager;
         private readonly MethodManager methodManager = new MethodManager();
-        private readonly Dictionary<string, object> handlers = new Dictionary<string, object>();
+        private readonly ConcurrentDictionary<string, object> handlers = new ConcurrentDictionary<string, object>();
         public object this[string name] => handlers[name];
         public List<string> Names => new List<string>(methodManager.GetNames());
-        public IDictionary<string, object> Options { get; private set; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+        public IDictionary<string, object> Options { get; private set; } = new ConcurrentDictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public Service() {
             invokeManager = new InvokeManager(Execute);
             ioManager = new IOManager(Process);

@@ -8,12 +8,13 @@
 |                                                          |
 |  Client class for C#.                                    |
 |                                                          |
-|  LastModified: Mar 28, 2020                              |
+|  LastModified: Jan 24, 2021                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -29,8 +30,8 @@ namespace Hprose.RPC {
     public class Client : IDisposable {
         private static readonly object[] emptyArgs = new object[0];
         private static readonly Random random = new Random(Guid.NewGuid().GetHashCode());
-        private static readonly Dictionary<string, Type> transTypes = new Dictionary<string, Type>();
-        private static readonly Dictionary<string, string> schemes = new Dictionary<string, string>();
+        private static readonly ConcurrentDictionary<string, Type> transTypes = new ConcurrentDictionary<string, Type>();
+        private static readonly ConcurrentDictionary<string, string> schemes = new ConcurrentDictionary<string, string>();
         public static void Register<T>(string name) where T : ITransport, new() {
             var type = typeof(T);
             var schemes = type.GetProperty("Schemes", BindingFlags.Public | BindingFlags.Static).GetValue(type, null) as string[];
@@ -61,9 +62,9 @@ namespace Hprose.RPC {
 #if !NET35_CF && !NET40
         public WebSocketTransport WebSocket => (WebSocketTransport)this["websocket"];
 #endif
-        private readonly Dictionary<string, ITransport> transports = new Dictionary<string, ITransport>();
+        private readonly ConcurrentDictionary<string, ITransport> transports = new ConcurrentDictionary<string, ITransport>();
         public ITransport this[string name] => transports[name];
-        public IDictionary<string, object> RequestHeaders { get; } = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+        public IDictionary<string, object> RequestHeaders { get; } = new ConcurrentDictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public IClientCodec Codec { get; set; } = ClientCodec.Instance;
         private List<Uri> urilist = new List<Uri>();
         public List<Uri> Uris {
