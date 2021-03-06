@@ -8,7 +8,7 @@
 |                                                          |
 |  Cluster class for C#.                                   |
 |                                                          |
-|  LastModified: Mar 26, 2020                              |
+|  LastModified: Mar 6, 2021                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -35,8 +35,8 @@ namespace Hprose.RPC.Plugins.Cluster {
             catch (Exception) {
                 Config.OnFailure?.Invoke(context);
                 if (Config.OnRetry != null) {
-                    bool idempotent = context.Contains("idempotent") ? Config.Idempotent : (bool)context["idempotent"];
-                    int retry = context.Contains("retry") ? Config.Retry :(int)context["retry"];
+                    bool idempotent = context.Contains("idempotent") ? (bool)context["idempotent"] : Config.Idempotent;
+                    int retry = context.Contains("retry") ? (int)context["retry"] : Config.Retry;
                     if (!context.Contains("retried")) {
                         context["retried"] = 0;
                     }
