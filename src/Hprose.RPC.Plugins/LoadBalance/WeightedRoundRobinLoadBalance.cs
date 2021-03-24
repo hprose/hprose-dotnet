@@ -8,7 +8,7 @@
 |                                                          |
 |  Weighted RoundRobin LoadBalance plugin for C#.          |
 |                                                          |
-|  LastModified: Mar 20, 2019                              |
+|  LastModified: Mar 24, 2021                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -54,10 +54,10 @@ namespace Hprose.RPC.Plugins.LoadBalance {
                         if (currentWeight <= 0) {
                             currentWeight = maxWeight;
                         }
-                        if (weights[index] >= currentWeight) {
-                            (context as ClientContext).Uri = uris[index];
-                            break;
-                        }
+                    }
+                    if (weights[index] >= currentWeight) {
+                        (context as ClientContext).Uri = uris[index];
+                        break;
                     }
                 }
             }
