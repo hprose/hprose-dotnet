@@ -42,7 +42,7 @@ namespace Hprose.RPC.AspNetCore {
                     }
                 }
                 int index = response.index;
-                MemoryStream stream = response.stream;
+                var stream = response.stream;
                 int n = (int)stream.Length;
                 var buffer = ArrayPool<byte>.Shared.Rent(4 + n);
                 try {
@@ -84,7 +84,7 @@ namespace Hprose.RPC.AspNetCore {
             }
         }
         private async Task<(int, MemoryStream)> ReadAsync(WebSocket webSocket, ConcurrentQueue<(int index, MemoryStream stream)> responses, AutoResetEvent autoResetEvent) {
-            MemoryStream stream = new MemoryStream();
+            var stream = new MemoryStream();
             var buffer = ArrayPool<byte>.Shared.Rent(16384);
             var index = -1;
             try {

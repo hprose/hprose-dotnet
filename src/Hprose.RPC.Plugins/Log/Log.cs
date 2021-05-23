@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.Log {
     public class Log {
-        private static readonly Log instance = new Log();
+        private static readonly Log instance = new();
         public bool Enabled { get; set; }
         public Log(bool enabled = true) {
             Enabled = enabled;

@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 namespace Hprose.RPC.Plugins.Limiter {
     public class ConcurrentLimiter {
         private volatile int counter = 0;
-        private readonly ConcurrentQueue<TaskCompletionSource<bool>> tasks = new ConcurrentQueue<TaskCompletionSource<bool>>();
+        private readonly ConcurrentQueue<TaskCompletionSource<bool>> tasks = new();
         public int MaxConcurrentRequests { get; private set; }
         public TimeSpan Timeout { get; private set; }
         public ConcurrentLimiter(int maxConcurrentRequests, TimeSpan timeout = default) {
@@ -34,7 +34,7 @@ namespace Hprose.RPC.Plugins.Limiter {
             var deferred = new TaskCompletionSource<bool>();
             tasks.Enqueue(deferred);
             if (Timeout > TimeSpan.Zero) {
-                using CancellationTokenSource source = new CancellationTokenSource();
+                using var source = new CancellationTokenSource();
 #if NET40
                 var timer = TaskEx.Delay(Timeout, source.Token);
                 var task = await TaskEx.WhenAny(timer, deferred.Task).ConfigureAwait(false);

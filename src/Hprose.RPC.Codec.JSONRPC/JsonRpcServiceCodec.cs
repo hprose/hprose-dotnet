@@ -22,7 +22,7 @@ using System.Text;
 
 namespace Hprose.RPC.Codec.JSONRPC {
     public class JsonRpcServiceCodec : IServiceCodec {
-        public static JsonRpcServiceCodec Instance { get; } = new JsonRpcServiceCodec();
+        public static JsonRpcServiceCodec Instance { get; } = new();
         public MemoryStream Encode(object result, ServiceContext context) {
             if (!context.Contains("jsonrpc") || !(bool)context["jsonrpc"]) {
                 return ServiceCodec.Instance.Encode(result, context);

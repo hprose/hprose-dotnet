@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC.Codec.JSONRPC {
     public class JsonRpcClientCodec : IClientCodec {
-        public static JsonRpcClientCodec Instance { get; } = new JsonRpcClientCodec();
+        public static JsonRpcClientCodec Instance { get; } = new();
         private volatile int counter = 0;
         public MemoryStream Encode(string name, object[] args, ClientContext context) {
             var id = Interlocked.Increment(ref counter) & 0x7FFFFFFF;

@@ -81,7 +81,7 @@ namespace Hprose.RPC.Plugins.Reverse {
     }
 
     internal class CallerHandler : IInvocationHandler {
-        private readonly ConcurrentDictionary<MethodInfo, Lazy<IInvoker>> invokers = new ConcurrentDictionary<MethodInfo, Lazy<IInvoker>>();
+        private readonly ConcurrentDictionary<MethodInfo, Lazy<IInvoker>> invokers = new();
         private readonly string id;
         private readonly string ns;
         private readonly Caller caller;

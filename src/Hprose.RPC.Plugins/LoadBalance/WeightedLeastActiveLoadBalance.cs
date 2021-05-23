@@ -22,10 +22,10 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.LoadBalance {
     public class WeightedLeastActiveLoadBalance : WeightedLoadBalance, IDisposable {
-        private readonly ThreadLocal<Random> random = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
+        private readonly ThreadLocal<Random> random = new(() => new Random(Guid.NewGuid().GetHashCode()));
         private readonly int[] actives = null;
         private readonly int[] effectiveWeights;
-        private readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
+        private readonly ReaderWriterLockSlim rwlock = new();
         public WeightedLeastActiveLoadBalance(IDictionary<string, int> uriList) : base(uriList) {
             int n = uriList.Count;
             effectiveWeights = new int[n];

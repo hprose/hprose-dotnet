@@ -22,9 +22,9 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.LoadBalance {
     public class LeastActiveLoadBalance : IDisposable {
-        private readonly ThreadLocal<Random> random = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
+        private readonly ThreadLocal<Random> random = new(() => new Random(Guid.NewGuid().GetHashCode()));
         private int[] actives = new int[0];
-        private readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
+        private readonly ReaderWriterLockSlim rwlock = new();
         public async Task<Stream> Handler(Stream request, Context context, NextIOHandler next) {
             var clientContext = context as ClientContext;
             var uris = clientContext.Client.Uris;

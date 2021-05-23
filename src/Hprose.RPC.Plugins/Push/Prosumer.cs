@@ -25,8 +25,8 @@ namespace Hprose.RPC.Plugins.Push {
         static Prosumer() {
             TypeManager.Register<Message>("@");
         }
-        private readonly ConcurrentDictionary<string, Action<Message>> callbacks = new ConcurrentDictionary<string, Action<Message>>();
-        public TimeSpan RetryInterval { get; set; } = new TimeSpan(0, 0, 1);
+        private readonly ConcurrentDictionary<string, Action<Message>> callbacks = new();
+        public TimeSpan RetryInterval { get; set; } = new(0, 0, 1);
         public event Action<Exception> OnError;
         public event Action<string> OnSubscribe;
         public event Action<string> OnUnsubscribe;

@@ -26,7 +26,7 @@ namespace Hprose.RPC.Plugins.Cluster {
                 var clientContext = context as ClientContext;
                 int retried = (int)context["retried"];
                 context["retried"] = ++retried;
-                TimeSpan interval = new TimeSpan(minInterval.Ticks * retried);
+                var interval = new TimeSpan(minInterval.Ticks * retried);
                 if (interval > maxInterval) {
                     interval = maxInterval;
                 }

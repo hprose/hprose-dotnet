@@ -24,7 +24,7 @@ namespace Hprose.RPC.Plugins.LoadBalance {
     public class NginxRoundRobinLoadBalance : WeightedLoadBalance {
         // SpinLock can't store in readonly field.
         private SpinLock spanlock = new SpinLock();
-        private readonly ThreadLocal<Random> random = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
+        private readonly ThreadLocal<Random> random = new(() => new Random(Guid.NewGuid().GetHashCode()));
         private readonly int[] effectiveWeights;
         private readonly int[] currentWeights;
         public NginxRoundRobinLoadBalance(IDictionary<string, int> uriList) : base(uriList) {

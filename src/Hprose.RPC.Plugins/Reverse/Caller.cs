@@ -25,13 +25,13 @@ namespace Hprose.RPC.Plugins.Reverse {
         private static readonly object[] emptyArgs = new object[0];
         private static readonly (int, string, object[])[] emptyCall = new (int, string, object[])[0];
         private volatile int counter = 0;
-        private ConcurrentDictionary<string, ConcurrentQueue<(int, string, object[])>> Calls { get; } = new ConcurrentDictionary<string, ConcurrentQueue<(int, string, object[])>>();
-        private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>> Results { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>>();
-        private ConcurrentDictionary<string, TaskCompletionSource<(int, string, object[])[]>> Responders { get; } = new ConcurrentDictionary<string, TaskCompletionSource<(int, string, object[])[]>>();
-        private ConcurrentDictionary<string, bool> Onlines { get; } = new ConcurrentDictionary<string, bool>();
+        private ConcurrentDictionary<string, ConcurrentQueue<(int, string, object[])>> Calls { get; } = new();
+        private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>> Results { get; } = new();
+        private ConcurrentDictionary<string, TaskCompletionSource<(int, string, object[])[]>> Responders { get; } = new();
+        private ConcurrentDictionary<string, bool> Onlines { get; } = new();
         public Service Service { get; private set; }
-        public TimeSpan HeartBeat { get; set; } = new TimeSpan(0, 2, 0);
-        public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
+        public TimeSpan HeartBeat { get; set; } = new(0, 2, 0);
+        public TimeSpan Timeout { get; set; } = new(0, 0, 30);
         public Caller(Service service) {
             Service = service;
             Service.Add<ServiceContext>(Close, "!!")
@@ -87,7 +87,7 @@ namespace Hprose.RPC.Plugins.Reverse {
                     return responder;
                 });
                 if (HeartBeat > TimeSpan.Zero) {
-                    using CancellationTokenSource source = new CancellationTokenSource();
+                    using var source = new CancellationTokenSource();
 #if NET40
                     var delay = TaskEx.Delay(HeartBeat, source.Token);
                     var task = await TaskEx.WhenAny(responder.Task, delay).ConfigureAwait(false);
@@ -140,7 +140,7 @@ namespace Hprose.RPC.Plugins.Reverse {
             results[index] = result;
             Response(id);
             if (Timeout > TimeSpan.Zero) {
-                using CancellationTokenSource source = new CancellationTokenSource();
+                using var source = new CancellationTokenSource();
 #if NET40
                 var delay = TaskEx.Delay(Timeout, source.Token);
                 var task = await TaskEx.WhenAny(result.Task, delay).ConfigureAwait(false);
@@ -177,8 +177,8 @@ namespace Hprose.RPC.Plugins.Reverse {
         }
 #if !NET35_CF
         public T UseService<T>(string id, string ns = "") {
-            Type type = typeof(T);
-            CallerHandler handler = new CallerHandler(this, id, ns);
+            var type = typeof(T);
+            var handler = new CallerHandler(this, id, ns);
             if (type.IsInterface) {
                 return (T)Proxy.NewInstance(new Type[] { type }, handler);
             }

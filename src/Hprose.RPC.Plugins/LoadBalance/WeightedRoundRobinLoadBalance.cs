@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 namespace Hprose.RPC.Plugins.LoadBalance {
     public class WeightedRoundRobinLoadBalance : WeightedLoadBalance {
         // SpinLock can't store in readonly field.
-        private SpinLock spanlock = new SpinLock();
+        private SpinLock spanlock = new();
         private readonly int maxWeight;
         private readonly int gcdWeight;
         private volatile int index;

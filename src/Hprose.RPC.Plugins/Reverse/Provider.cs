@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 namespace Hprose.RPC.Plugins.Reverse {
     public class Provider : IDisposable {
         private volatile int closed = 1;
-        private readonly MethodManager methodManager = new MethodManager();
+        private readonly MethodManager methodManager = new();
         private readonly InvokeManager invokeManager;
         public bool Debug { get; set; } = false;
         public event Action<Exception> OnError;

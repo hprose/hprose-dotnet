@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.LoadBalance {
     public class RandomLoadBalance : IDisposable {
-        private readonly ThreadLocal<Random> random = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
+        private readonly ThreadLocal<Random> random = new(() => new Random(Guid.NewGuid().GetHashCode()));
         public Task<Stream> Handler(Stream request, Context context, NextIOHandler next) {
             var clientContext = context as ClientContext;
             var uris = clientContext.Client.Uris;

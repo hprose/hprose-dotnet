@@ -25,10 +25,10 @@ namespace Hprose.RPC.Plugins.Push {
         static Broker() {
             TypeManager.Register<Message>("@");
         }
-        private static readonly Dictionary<string, Message[]> emptyMessage = new Dictionary<string, Message[]>(0);
-        protected ConcurrentDictionary<string, ConcurrentDictionary<string, BlockingCollection<Message>>> Messages { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<string, BlockingCollection<Message>>>();
-        protected ConcurrentDictionary<string, TaskCompletionSource<Dictionary<string, Message[]>>> Responders { get; } = new ConcurrentDictionary<string, TaskCompletionSource<Dictionary<string, Message[]>>>();
-        protected ConcurrentDictionary<string, TaskCompletionSource<bool>> Timers { get; } = new ConcurrentDictionary<string, TaskCompletionSource<bool>>();
+        private static readonly Dictionary<string, Message[]> emptyMessage = new(0);
+        protected ConcurrentDictionary<string, ConcurrentDictionary<string, BlockingCollection<Message>>> Messages { get; } = new();
+        protected ConcurrentDictionary<string, TaskCompletionSource<Dictionary<string, Message[]>>> Responders { get; } = new();
+        protected ConcurrentDictionary<string, TaskCompletionSource<bool>> Timers { get; } = new();
         public Service Service { get; private set; }
         public int MessageQueueMaxLength { get; set; } = 10;
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 2, 0);
@@ -61,20 +61,20 @@ namespace Hprose.RPC.Plugins.Push {
             foreach (var topic in topics) {
                 var name = topic.Key;
                 var messages = topic.Value;
-                if (messages == null || messages.Count > 0) {
+                if (messages == null) {
                     ++count;
-                    result.Add(name, messages?.ToArray());
-                    if (messages == null) {
-                        topics.TryRemove(name, out var temp);
-                        temp?.Dispose();
+                    result.Add(name, null);
+                    topics.TryRemove(name, out var temp);
+                    temp?.Dispose();
+                }
+                else if (messages.Count > 0) {
+                    ++count;
+                    var newmessages = new BlockingCollection<Message>(MessageQueueMaxLength);
+                    if (!topics.TryUpdate(name, newmessages, messages)) {
+                        newmessages.Dispose();
                     }
-                    else {
-                        var newmessages = new BlockingCollection<Message>(MessageQueueMaxLength);
-                        if (!topics.TryUpdate(name, newmessages, messages)) {
-                            newmessages.Dispose();
-                        }
-                        messages.Dispose();
-                    }
+                    result.Add(name, messages.ToArray());
+                    messages.Dispose();
                 }
             }
             if (count == 0) return false;
@@ -91,7 +91,7 @@ namespace Hprose.RPC.Plugins.Push {
                 oldtimer.TrySetResult(false);
                 return timer;
             });
-            using (CancellationTokenSource source = new CancellationTokenSource()) {
+            using (var source = new CancellationTokenSource()) {
 #if NET40
                 var delay = TaskEx.Delay(HeartBeat, source.Token);
                 var task = await TaskEx.WhenAny(timer.Task, delay).ConfigureAwait(false);
@@ -173,7 +173,7 @@ namespace Hprose.RPC.Plugins.Push {
                     return responder;
                 });
                 if (Timeout > TimeSpan.Zero) {
-                    using CancellationTokenSource source = new CancellationTokenSource();
+                    using var source = new CancellationTokenSource();
 #if NET40
                     var delay = TaskEx.Delay(Timeout, source.Token);
                     var task = await TaskEx.WhenAny(responder.Task, delay).ConfigureAwait(false);
@@ -219,10 +219,9 @@ namespace Hprose.RPC.Plugins.Push {
                     if (messages.TryAdd(new Message() { Data = data, From = from })) {
                         Response(id);
                         result.Add(id, true);
+                        continue;
                     }
-                    else {
-                        result.Add(id, false);
-                    }
+                    result.Add(id, false);
                 }
             }
             return result;

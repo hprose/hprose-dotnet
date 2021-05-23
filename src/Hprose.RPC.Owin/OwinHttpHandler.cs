@@ -29,12 +29,12 @@ namespace Hprose.RPC.Owin {
         public bool P3P { get; set; } = true;
         public bool Get { get; set; } = true;
         public bool Compress { get; set; } = false;
-        public NameValueCollection HttpHeaders { get; set; } = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
+        public NameValueCollection HttpHeaders { get; set; } = new(StringComparer.InvariantCultureIgnoreCase);
         public string CrossDomainXmlFile { get; set; } = null;
         public string ClientAccessPolicyXmlFile { get; set; } = null;
         private readonly string lastModified;
         private readonly string etag;
-        private readonly Dictionary<string, bool> origins = new Dictionary<string, bool>();
+        private readonly Dictionary<string, bool> origins = new();
         public Service Service { get; private set; }
         public OwinHttpHandler(Service service) {
             Service = service;
