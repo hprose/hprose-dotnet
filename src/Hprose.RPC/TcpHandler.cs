@@ -182,7 +182,7 @@ namespace Hprose.RPC {
                 Stream stream = tcpClient.GetStream();
 #if !NET35_CF
                 if (ServerCertificate != null) {
-                    SslStream sslStream = new SslStream(stream, false);
+                    var sslStream = new SslStream(stream, false);
 #if NET40
                     await sslStream.AuthenticateAsServerAsync(ServerCertificate).ConfigureAwait(false);
 #else

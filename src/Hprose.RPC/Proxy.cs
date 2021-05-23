@@ -24,7 +24,7 @@ using System.Threading;
 namespace Hprose.RPC {
     public class Proxy {
         protected IInvocationHandler handler;
-        private static readonly List<MethodInfo> methodsTable = new List<MethodInfo>();
+        private static readonly List<MethodInfo> methodsTable = new();
         private static readonly Type typeofInt8 = typeof(sbyte);
         private static readonly Type typeofUInt8 = typeof(byte);
         private static readonly Type typeofBoolean = typeof(bool);
@@ -51,7 +51,7 @@ namespace Hprose.RPC {
         private static readonly MethodInfo MethodInfo_GetMethod = typeofProxy.GetMethod("GetMethod", BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { typeofInt32 }, null);
 
         private static int countAssembly = 0;
-        private static readonly ConcurrentDictionary<ProxyKey, Type> proxyCache = new ConcurrentDictionary<ProxyKey, Type>();
+        private static readonly ConcurrentDictionary<ProxyKey, Type> proxyCache = new();
 
         protected Proxy(IInvocationHandler handler) => this.handler = handler;
 
@@ -68,7 +68,7 @@ namespace Hprose.RPC {
         }
 
         public static Type GetProxy(params Type[] interfaces) {
-            ProxyKey proxyKey = new ProxyKey(interfaces);
+            ProxyKey proxyKey = new(interfaces);
             return proxyCache.GetOrAdd(proxyKey, (proxykey) => GetProxyWithoutCache(proxykey.interfaces));
         }
 
@@ -115,7 +115,7 @@ namespace Hprose.RPC {
         }
 
         private static Type[] SumUpInterfaces(Type[] interfaces) {
-            List<Type> flattenedInterfaces = new List<Type>();
+            List<Type> flattenedInterfaces = new();
             SumUpInterfaces(flattenedInterfaces, interfaces);
             return flattenedInterfaces.ToArray();
         }
@@ -144,7 +144,7 @@ namespace Hprose.RPC {
         }
 
         private static void MakeMethods(TypeBuilder typeBuilder, Type type, bool createPublic) {
-            Dictionary<MethodInfo, MethodBuilder> methodToMB = new Dictionary<MethodInfo, MethodBuilder>();
+            Dictionary<MethodInfo, MethodBuilder> methodToMB = new();
             foreach (MethodInfo method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public)) {
                 MethodBuilder mdb = MakeMethod(typeBuilder, method, createPublic);
                 methodToMB.Add(method, mdb);

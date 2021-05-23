@@ -19,8 +19,8 @@ using System.Threading;
 
 namespace Hprose.RPC {
     public abstract class PluginManager<THandler, TNextHandler> : IDisposable {
-        private readonly List<THandler> handlers = new List<THandler>();
-        private readonly ReaderWriterLockSlim rwlock = new ReaderWriterLockSlim();
+        private readonly List<THandler> handlers = new();
+        private readonly ReaderWriterLockSlim rwlock = new();
         private readonly TNextHandler defaultHandler;
         public TNextHandler Handler { get; private set; }
         public PluginManager(TNextHandler handler) {

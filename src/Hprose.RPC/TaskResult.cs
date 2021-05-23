@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     public static class TaskResult {
-        private static readonly ConcurrentDictionary<Type, Lazy<Func<Task, Task<object>>>> cache = new ConcurrentDictionary<Type, Lazy<Func<Task, Task<object>>>>();
+        private static readonly ConcurrentDictionary<Type, Lazy<Func<Task, Task<object>>>> cache = new();
         private static Func<Task, Task<object>> GetFunc(Type type) {
             var resultType = type.GetGenericArguments()[0];
             var method = typeof(TaskResult).GetMethod(nameof(GetTask), BindingFlags.NonPublic | BindingFlags.Static).MakeGenericMethod(resultType);

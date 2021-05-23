@@ -21,7 +21,7 @@ using System.Text;
 
 namespace Hprose.RPC {
     public class ClientCodec : IClientCodec {
-        public static ClientCodec Instance { get; } = new ClientCodec();
+        public static ClientCodec Instance { get; } = new();
         public bool Simple { get; set; } = false;
         public Mode Mode { get; set; } = Mode.MemberMode;
         public LongType LongType { get; set; } = LongType.Int64;

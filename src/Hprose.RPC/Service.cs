@@ -28,8 +28,8 @@ namespace Hprose.RPC {
         Task Bind(T server);
     }
     public class Service : IDisposable {
-        private readonly static ConcurrentDictionary<string, Type> handlerTypes = new ConcurrentDictionary<string, Type>();
-        private readonly static ConcurrentDictionary<Type, string> serverTypes = new ConcurrentDictionary<Type, string>();
+        private readonly static ConcurrentDictionary<string, Type> handlerTypes = new();
+        private readonly static ConcurrentDictionary<Type, string> serverTypes = new();
         public static void Register<T, S>(string name) where T : IHandler<S> {
             handlerTypes[name] = typeof(T);
             serverTypes[typeof(S)] = name;
@@ -66,8 +66,8 @@ namespace Hprose.RPC {
         public int MaxRequestLength { get; set; } = 0x7FFFFFFF;
         private readonly InvokeManager invokeManager;
         private readonly IOManager ioManager;
-        private readonly MethodManager methodManager = new MethodManager();
-        private readonly ConcurrentDictionary<string, object> handlers = new ConcurrentDictionary<string, object>();
+        private readonly MethodManager methodManager = new();
+        private readonly ConcurrentDictionary<string, object> handlers = new();
         public object this[string name] => handlers[name];
         public List<string> Names => new List<string>(methodManager.GetNames());
         public IDictionary<string, object> Options { get; private set; } = new ConcurrentDictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);

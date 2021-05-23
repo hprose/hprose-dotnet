@@ -30,11 +30,11 @@ namespace Hprose.RPC {
         public bool NoDelay { get; set; } = true;
         public int ReceiveBufferSize { get; set; } = 8192;
         public int SendBufferSize { get; set; } = 8192;
-        private ConcurrentDictionary<Socket, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<Socket, ConcurrentQueue<(int, MemoryStream)>>();
-        private ConcurrentDictionary<Socket, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<Socket, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
-        private ConcurrentDictionary<Socket, byte> Lock { get; } = new ConcurrentDictionary<Socket, byte>();
-        private ConcurrentDictionary<Socket, Uri> Uris { get; } = new ConcurrentDictionary<Socket, Uri>();
-        private ConcurrentDictionary<Uri, Lazy<Task<Socket>>> Sockets { get; } = new ConcurrentDictionary<Uri, Lazy<Task<Socket>>>();
+        private ConcurrentDictionary<Socket, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new();
+        private ConcurrentDictionary<Socket, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new();
+        private ConcurrentDictionary<Socket, byte> Lock { get; } = new();
+        private ConcurrentDictionary<Socket, Uri> Uris { get; } = new();
+        private ConcurrentDictionary<Uri, Lazy<Task<Socket>>> Sockets { get; } = new();
         private readonly Func<Uri, Lazy<Task<Socket>>> socketFactory;
         public SocketTransport() {
             socketFactory = (uri) => {
@@ -197,7 +197,7 @@ namespace Hprose.RPC {
             Send(socket);
             var timeout = clientContext.Timeout;
             if (timeout > TimeSpan.Zero) {
-                using CancellationTokenSource source = new CancellationTokenSource();
+                using CancellationTokenSource source = new();
                 var timer = Task.Delay(timeout, source.Token);
                 var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
                 source.Cancel();

@@ -30,11 +30,11 @@ namespace Hprose.RPC {
         public bool EnableBroadcast { get; set; } = true;
         public short Ttl { get; set; } = 0;
 #endif
-        private ConcurrentDictionary<UdpClient, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<UdpClient, ConcurrentQueue<(int, MemoryStream)>>();
-        private ConcurrentDictionary<UdpClient, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<UdpClient, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
-        private ConcurrentDictionary<UdpClient, byte> Lock { get; } = new ConcurrentDictionary<UdpClient, byte>();
-        private ConcurrentDictionary<UdpClient, Uri> Uris { get; } = new ConcurrentDictionary<UdpClient, Uri>();
-        private ConcurrentDictionary<Uri, Lazy<UdpClient>> UdpClients { get; } = new ConcurrentDictionary<Uri, Lazy<UdpClient>>();
+        private ConcurrentDictionary<UdpClient, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new();
+        private ConcurrentDictionary<UdpClient, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new();
+        private ConcurrentDictionary<UdpClient, byte> Lock { get; } = new();
+        private ConcurrentDictionary<UdpClient, Uri> Uris { get; } = new();
+        private ConcurrentDictionary<Uri, Lazy<UdpClient>> UdpClients { get; } = new();
 #if !NET35_CF
         private readonly Func<Uri, Lazy<UdpClient>> udpClientFactory;
 #else
@@ -187,7 +187,7 @@ namespace Hprose.RPC {
             Send(udpClient);
             var timeout = clientContext.Timeout;
             if (timeout > TimeSpan.Zero) {
-                using CancellationTokenSource source = new CancellationTokenSource();
+                using CancellationTokenSource source = new();
 #if NET40
                 var timer = TaskEx.Delay(timeout, source.Token);
                 var task = await TaskEx.WhenAny(timer, result.Task).ConfigureAwait(false);

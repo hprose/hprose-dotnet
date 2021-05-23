@@ -24,8 +24,8 @@ using System.Threading.Tasks;
 namespace Hprose.RPC {
     public class HttpTransport : ITransport, IDisposable {
         public static string[] Schemes { get; } = new string[] { "http", "https" };
-        private readonly HttpClient httpClient = new HttpClient();
-        public NameValueCollection HttpRequestHeaders { get; } = new NameValueCollection(StringComparer.InvariantCultureIgnoreCase);
+        private readonly HttpClient httpClient = new();
+        public NameValueCollection HttpRequestHeaders { get; } = new(StringComparer.InvariantCultureIgnoreCase);
         public HttpTransport() {
             httpClient.Timeout = new TimeSpan(0, 0, 0, 0, Timeout.Infinite);
         }
@@ -61,7 +61,7 @@ namespace Hprose.RPC {
             HttpResponseMessage response;
             var timeout = clientContext.Timeout;
             if (timeout > TimeSpan.Zero) {
-                using CancellationTokenSource source = new CancellationTokenSource();
+                using CancellationTokenSource source = new();
                 var responseTask = httpClient.PostAsync(clientContext.Uri, httpContext, source.Token);
 #if NET40
                 var timer = TaskEx.Delay(timeout, source.Token);

@@ -29,9 +29,9 @@ namespace Hprose.RPC {
 
     public class Client : IDisposable {
         private static readonly object[] emptyArgs = new object[0];
-        private static readonly Random random = new Random(Guid.NewGuid().GetHashCode());
-        private static readonly ConcurrentDictionary<string, Type> transTypes = new ConcurrentDictionary<string, Type>();
-        private static readonly ConcurrentDictionary<string, string> schemes = new ConcurrentDictionary<string, string>();
+        private static readonly Random random = new(Guid.NewGuid().GetHashCode());
+        private static readonly ConcurrentDictionary<string, Type> transTypes = new();
+        private static readonly ConcurrentDictionary<string, string> schemes = new();
         public static void Register<T>(string name) where T : ITransport, new() {
             var type = typeof(T);
             var schemes = type.GetProperty("Schemes", BindingFlags.Public | BindingFlags.Static).GetValue(type, null) as string[];
@@ -62,11 +62,11 @@ namespace Hprose.RPC {
 #if !NET35_CF && !NET40
         public WebSocketTransport WebSocket => (WebSocketTransport)this["websocket"];
 #endif
-        private readonly ConcurrentDictionary<string, ITransport> transports = new ConcurrentDictionary<string, ITransport>();
+        private readonly ConcurrentDictionary<string, ITransport> transports = new();
         public ITransport this[string name] => transports[name];
         public IDictionary<string, object> RequestHeaders { get; } = new ConcurrentDictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         public IClientCodec Codec { get; set; } = ClientCodec.Instance;
-        private List<Uri> urilist = new List<Uri>();
+        private List<Uri> urilist = new();
         public List<Uri> Uris {
             get => urilist;
             set {
@@ -75,7 +75,7 @@ namespace Hprose.RPC {
                 }
             }
         }
-        public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
+        public TimeSpan Timeout { get; set; } = new(0, 0, 30);
         private readonly InvokeManager invokeManager;
         private readonly IOManager ioManager;
         public Client() {

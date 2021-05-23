@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC {
     class MockAgent {
-        private static readonly ConcurrentDictionary<string, Func<string, Stream, Task<Stream>>> handlers = new ConcurrentDictionary<string, Func<string, Stream, Task<Stream>>>();
+        private static readonly ConcurrentDictionary<string, Func<string, Stream, Task<Stream>>> handlers = new();
         public static void Register(string address, Func<string, Stream, Task<Stream>> handler) {
             handlers[address] = handler;
         }

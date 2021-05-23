@@ -36,11 +36,11 @@ namespace Hprose.RPC {
         public bool UseDefaultCredentials { get; set; } = true;
         public int ReceiveBufferSize { get; set; } = 16384;
         public int SendBufferSize { get; set; } = 16384;
-        private ConcurrentDictionary<ClientWebSocket, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<ClientWebSocket, ConcurrentQueue<(int, MemoryStream)>>();
-        private ConcurrentDictionary<ClientWebSocket, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<ClientWebSocket, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
-        private ConcurrentDictionary<ClientWebSocket, byte> Lock { get; } = new ConcurrentDictionary<ClientWebSocket, byte>();
-        private ConcurrentDictionary<ClientWebSocket, Uri> Uris { get; } = new ConcurrentDictionary<ClientWebSocket, Uri>();
-        private ConcurrentDictionary<Uri, Lazy<Task<ClientWebSocket>>> WebSockets { get; } = new ConcurrentDictionary<Uri, Lazy<Task<ClientWebSocket>>>();
+        private ConcurrentDictionary<ClientWebSocket, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new();
+        private ConcurrentDictionary<ClientWebSocket, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new();
+        private ConcurrentDictionary<ClientWebSocket, byte> Lock { get; } = new();
+        private ConcurrentDictionary<ClientWebSocket, Uri> Uris { get; } = new();
+        private ConcurrentDictionary<Uri, Lazy<Task<ClientWebSocket>>> WebSockets { get; } = new();
         private readonly Func<Uri, Lazy<Task<ClientWebSocket>>> webSocketFactory;
         public WebSocketTransport() {
             webSocketFactory = (uri) => {
@@ -110,7 +110,7 @@ namespace Hprose.RPC {
             catch { }
         }
         private async Task<(int, MemoryStream)> ReadAsync(ClientWebSocket webSocket) {
-            MemoryStream stream = new MemoryStream();
+            var stream = new MemoryStream();
             var buffer = ArrayPool<byte>.Shared.Rent(ReceiveBufferSize);
             var index = -1;
             try {

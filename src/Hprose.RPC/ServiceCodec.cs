@@ -22,7 +22,7 @@ using System.Text;
 namespace Hprose.RPC {
     public class ServiceCodec : IServiceCodec {
         private static readonly object[] emptyArgs = { };
-        public static ServiceCodec Instance { get; } = new ServiceCodec();
+        public static ServiceCodec Instance { get; } = new();
         public bool Debug { get; set; } = false;
         public bool Simple { get; set; } = false;
         public Mode Mode { get; set; } = Mode.MemberMode;

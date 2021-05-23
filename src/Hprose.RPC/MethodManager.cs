@@ -23,7 +23,7 @@ namespace Hprose.RPC {
     public class MethodManager {
         private readonly string[] instanceMethodsOnObject = { "Equals", "GetHashCode", "GetType", "ToString" };
         private readonly string[] staticMethodsOnObject = { "Equals", "ReferenceEquals" };
-        public ConcurrentDictionary<string, ConcurrentDictionary<int, Method>> Methods { get; } = new ConcurrentDictionary<string, ConcurrentDictionary<int, Method>>(StringComparer.OrdinalIgnoreCase);
+        public ConcurrentDictionary<string, ConcurrentDictionary<int, Method>> Methods { get; } = new(StringComparer.OrdinalIgnoreCase);
         public Method Get(string name, int paramCount) {
             if (Methods.TryGetValue(name, out var methods)) {
                 if (methods.TryGetValue(paramCount, out var method)) {

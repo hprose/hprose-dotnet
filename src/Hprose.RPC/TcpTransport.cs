@@ -33,7 +33,7 @@ namespace Hprose.RPC {
         public static string[] Schemes { get; } = new string[] { "tcp", "tcp4", "tcp6" };
 #endif
         private volatile int counter = 0;
-        public TimeSpan Timeout { get; set; } = new TimeSpan(0, 0, 30);
+        public TimeSpan Timeout { get; set; } = new(0, 0, 30);
 #if !NET35_CF
         public LingerOption LingerState { get; set; } = null;
         public bool NoDelay { get; set; } = true;
@@ -44,11 +44,11 @@ namespace Hprose.RPC {
         public EncryptionPolicy EncryptionPolicy { get; set; } = EncryptionPolicy.RequireEncryption;
         public string ServerCertificateName { get; set; } = null;
 #endif
-        private ConcurrentDictionary<TcpClient, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new ConcurrentDictionary<TcpClient, ConcurrentQueue<(int, MemoryStream)>>();
-        private ConcurrentDictionary<TcpClient, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new ConcurrentDictionary<TcpClient, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>>();
-        private ConcurrentDictionary<TcpClient, byte> Lock { get; } = new ConcurrentDictionary<TcpClient, byte>();
-        private ConcurrentDictionary<TcpClient, Uri> Uris { get; } = new ConcurrentDictionary<TcpClient, Uri>();
-        private ConcurrentDictionary<Uri, Lazy<Task<(TcpClient, Stream)>>> TcpClients { get; } = new ConcurrentDictionary<Uri, Lazy<Task<(TcpClient, Stream)>>>();
+        private ConcurrentDictionary<TcpClient, ConcurrentQueue<(int, MemoryStream)>> Requests { get; } = new();
+        private ConcurrentDictionary<TcpClient, ConcurrentDictionary<int, TaskCompletionSource<MemoryStream>>> Results { get; } = new();
+        private ConcurrentDictionary<TcpClient, byte> Lock { get; } = new();
+        private ConcurrentDictionary<TcpClient, Uri> Uris { get; } = new();
+        private ConcurrentDictionary<Uri, Lazy<Task<(TcpClient, Stream)>>> TcpClients { get; } = new();
 #if !NET35_CF
         private readonly Func<Uri, Lazy<Task<(TcpClient, Stream)>>> tcpClientFactory;
 #else
@@ -89,7 +89,7 @@ namespace Hprose.RPC {
                             case "ssl":
                             case "ssl4":
                             case "ssl6":
-                                SslStream sslstream = new SslStream(tcpStream, false, ValidateServerCertificate, CertificateSelection, EncryptionPolicy);
+                                SslStream sslstream = new(tcpStream, false, ValidateServerCertificate, CertificateSelection, EncryptionPolicy);
                                 await sslstream.AuthenticateAsClientAsync(ServerCertificateName ?? uri.Host).ConfigureAwait(false);
                                 tcpStream = sslstream;
                                 break;
@@ -223,7 +223,7 @@ namespace Hprose.RPC {
             Send(tcpClient, tcpStream);
             var timeout = clientContext.Timeout;
             if (timeout > TimeSpan.Zero) {
-                using CancellationTokenSource source = new CancellationTokenSource();
+                using CancellationTokenSource source = new();
 #if NET40
                 var timer = TaskEx.Delay(timeout, source.Token);
                 var task = await TaskEx.WhenAny(timer, result.Task).ConfigureAwait(false);

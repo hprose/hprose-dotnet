@@ -81,7 +81,7 @@ namespace Hprose.RPC {
     }
 
     internal class InvocationHandler : IInvocationHandler {
-        private readonly ConcurrentDictionary<MethodInfo, Lazy<IInvoker>> invokers = new ConcurrentDictionary<MethodInfo, Lazy<IInvoker>>();
+        private readonly ConcurrentDictionary<MethodInfo, Lazy<IInvoker>> invokers = new();
         private readonly string ns;
         private readonly Client client;
         private readonly Func<MethodInfo, Lazy<IInvoker>> invokerFactory;
@@ -104,23 +104,23 @@ namespace Hprose.RPC {
                         name = nameAttr.Value;
                         break;
                     case HeaderAttribute headerAttr: {
-                            if (context == null) context = new ClientContext();
-                            var headers = context.RequestHeaders;
-                            var (key, value) = headerAttr.Value;
-                            headers[key] = value;
-                        }
-                        break;
+                        if (context == null) context = new ClientContext();
+                        var headers = context.RequestHeaders;
+                        var (key, value) = headerAttr.Value;
+                        headers[key] = value;
+                    }
+                    break;
                     case ContextAttribute contextAttr: {
-                            if (context == null) context = new ClientContext();
-                            var (key, value) = contextAttr.Value;
-                            context[key] = value;
-                        }
-                        break;
+                        if (context == null) context = new ClientContext();
+                        var (key, value) = contextAttr.Value;
+                        context[key] = value;
+                    }
+                    break;
                     case TimeoutAttribute timeoutAttr: {
-                            if (context == null) context = new ClientContext();
-                            context.Timeout = timeoutAttr.Value;
-                        }
-                        break;
+                        if (context == null) context = new ClientContext();
+                        context.Timeout = timeoutAttr.Value;
+                    }
+                    break;
                 }
             }
             if (!string.IsNullOrEmpty(ns)) {
