@@ -138,7 +138,9 @@ namespace Hprose.RPC.Plugins.Reverse {
             }
         }
         public async Task Listen() {
-            Interlocked.Exchange(ref closed, 0);
+            if (Interlocked.Exchange(ref closed, 0) == 0) {
+                return;
+            }
             while(closed == 0) {
                 try {
                     var calls = await Client.InvokeAsync<(int index, string name, object[] args)[]>("!").ConfigureAwait(false);
@@ -159,8 +161,9 @@ namespace Hprose.RPC.Plugins.Reverse {
             }
         }
         public async Task Close() {
-            Interlocked.Exchange(ref closed, 1);
-            await Client.InvokeAsync("!!").ConfigureAwait(false);
+            if (Interlocked.Exchange(ref closed, 1) == 0) {
+                await Client.InvokeAsync("!!").ConfigureAwait(false);
+            }
         }
         public Provider Use(params InvokeHandler[] handlers) {
             invokeManager.Use(handlers);

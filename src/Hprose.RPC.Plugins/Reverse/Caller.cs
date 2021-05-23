@@ -28,10 +28,11 @@ namespace Hprose.RPC.Plugins.Reverse {
         private ConcurrentDictionary<string, ConcurrentQueue<(int, string, object[])>> Calls { get; } = new();
         private ConcurrentDictionary<string, ConcurrentDictionary<int, TaskCompletionSource<object>>> Results { get; } = new();
         private ConcurrentDictionary<string, TaskCompletionSource<(int, string, object[])[]>> Responders { get; } = new();
-        private ConcurrentDictionary<string, bool> Onlines { get; } = new();
+        private ConcurrentDictionary<string, TaskCompletionSource<bool>> Onlines { get; } = new();
         public Service Service { get; private set; }
-        public TimeSpan HeartBeat { get; set; } = new(0, 2, 0);
+        public TimeSpan IdleTimeout { get; set; } = new(0, 2, 0);
         public TimeSpan Timeout { get; set; } = new(0, 0, 30);
+        public TimeSpan HeartBeat { get; set; } = new(0, 0, 3);
         public Caller(Service service) {
             Service = service;
             Service.Add<ServiceContext>(Close, "!!")
@@ -58,10 +59,10 @@ namespace Hprose.RPC.Plugins.Reverse {
             return false;
         }
         private void Response(string id) {
-            if (Responders.TryGetValue(id, out var responder)) {
-                if (responder != null) {
-                    if (Send(id, responder)) {
-                        Responders.TryUpdate(id, null, responder);
+            if (Responders.TryRemove(id, out var responder) && responder != null) {
+                if (!Send(id, responder)) {
+                    if (!Responders.TryAdd(id, responder)) {
+                        responder.TrySetResult(null);
                     }
                 }
             }
@@ -77,31 +78,60 @@ namespace Hprose.RPC.Plugins.Reverse {
             var id = Stop(context);
             Onlines.TryRemove(id, out _);
         }
-        private async Task<(int, string, object[])[]> Begin(ServiceContext context) {
-            var id = Stop(context);
-            Onlines.TryAdd(id, true);
-            var responder = new TaskCompletionSource<(int, string, object[])[]>();
-            if (!Send(id, responder)) {
-                Responders.AddOrUpdate(id, responder, (_, oldResponder) => {
-                    oldResponder?.TrySetResult(null);
-                    return responder;
-                });
-                if (HeartBeat > TimeSpan.Zero) {
-                    using var source = new CancellationTokenSource();
+        protected async void DoHeartBeat(string id, TaskCompletionSource<bool> online) {
+            if (HeartBeat > TimeSpan.Zero) {
+                using (var source = new CancellationTokenSource()) {
 #if NET40
                     var delay = TaskEx.Delay(HeartBeat, source.Token);
-                    var task = await TaskEx.WhenAny(responder.Task, delay).ConfigureAwait(false);
+                    var task = await TaskEx.WhenAny(online.Task, delay).ConfigureAwait(false);
 #else
                     var delay = Task.Delay(HeartBeat, source.Token);
-                    var task = await Task.WhenAny(responder.Task, delay).ConfigureAwait(false);
+                    var task = await Task.WhenAny(online.Task, delay).ConfigureAwait(false);
 #endif
                     source.Cancel();
                     if (task == delay) {
-                        responder.TrySetResult(emptyCall);
+                        online.TrySetResult(false);
                     }
                 }
+                if (!await online.Task.ConfigureAwait(false)) {
+                    Onlines.TryRemove(id, out _);
+                }
             }
-            return await responder.Task.ConfigureAwait(false);
+        }
+        private async Task<(int, string, object[])[]> Begin(ServiceContext context) {
+            var id = Stop(context);
+            var online = new TaskCompletionSource<bool>();
+            Onlines.AddOrUpdate(id, online, (_, oldonline) => {
+                oldonline.TrySetResult(true);
+                return online;
+            });
+            try {
+                var responder = new TaskCompletionSource<(int, string, object[])[]>();
+                if (!Send(id, responder)) {
+                    Responders.AddOrUpdate(id, responder, (_, oldResponder) => {
+                        oldResponder?.TrySetResult(null);
+                        return responder;
+                    });
+                    if (IdleTimeout > TimeSpan.Zero) {
+                        using var source = new CancellationTokenSource();
+#if NET40
+                        var delay = TaskEx.Delay(IdleTimeout, source.Token);
+                        var task = await TaskEx.WhenAny(responder.Task, delay).ConfigureAwait(false);
+#else
+                        var delay = Task.Delay(IdleTimeout, source.Token);
+                        var task = await Task.WhenAny(responder.Task, delay).ConfigureAwait(false);
+#endif
+                        source.Cancel();
+                        if (task == delay) {
+                            responder.TrySetResult(emptyCall);
+                        }
+                    }
+                }
+                return await responder.Task.ConfigureAwait(false);
+            }
+            finally {
+                DoHeartBeat(id, online);
+            }
         }
         private void End((int, object, string)[] results, ServiceContext context) {
             var id = GetId(context);
