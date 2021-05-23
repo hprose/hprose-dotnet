@@ -8,7 +8,7 @@
 |                                                          |
 |  CircuitBreaker plugin for C#.                           |
 |                                                          |
-|  LastModified: Feb 6, 2019                               |
+|  LastModified: Apr 18, 2021                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Hprose.RPC.Plugins.CircuitBreaker {
     public class CircuitBreaker {
-        private DateTime lastFailTime = new DateTime(0);
+        private long lastFailTime = 0;
         private volatile int failCount = 0;
         public int Threshold { get; private set; }
         public TimeSpan RecoverTime { get; private set; }
@@ -35,7 +35,11 @@ namespace Hprose.RPC.Plugins.CircuitBreaker {
         }
         public async Task<Stream> IOHandler(Stream request, Context context, NextIOHandler next) {
             if (failCount > Threshold) {
-                var interval = DateTime.Now - lastFailTime;
+#if !NET35_CF
+                var interval = new TimeSpan(DateTime.Now.Ticks - Interlocked.Read(ref lastFailTime));
+#else
+                var interval = new TimeSpan(DateTime.Now.Ticks - lastFailTime);
+#endif
                 if (interval < RecoverTime) {
                     throw new BreakerException();
                 }
@@ -48,7 +52,11 @@ namespace Hprose.RPC.Plugins.CircuitBreaker {
             }
             catch (Exception) {
                 Interlocked.Increment(ref failCount);
-                lastFailTime = DateTime.Now;
+#if !NET35_CF
+                Interlocked.Exchange(ref lastFailTime, DateTime.Now.Ticks);
+#else
+               lastFailTime = DateTime.Now.Ticks;
+#endif
                 throw;
             }
         }
