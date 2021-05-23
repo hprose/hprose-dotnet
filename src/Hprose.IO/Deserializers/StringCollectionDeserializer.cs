@@ -33,8 +33,7 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return collection;
         }
-        public override StringCollection Read(Reader reader, int tag) => tag switch
-        {
+        public override StringCollection Read(Reader reader, int tag) => tag switch {
             TagList => Read(reader),
             TagEmpty => new StringCollection(),
             _ => base.Read(reader, tag),

@@ -19,8 +19,7 @@ namespace Hprose.IO.Deserializers {
     using static Tags;
 
     internal class BigIntegerDeserializer : Deserializer<BigInteger> {
-        public override BigInteger Read(Reader reader, int tag) => tag switch
-        {
+        public override BigInteger Read(Reader reader, int tag) => tag switch {
             '0' => 0,
             '1' => 1,
             '2' => 2,

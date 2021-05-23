@@ -62,7 +62,7 @@ namespace Hprose.IO {
             intfCache.AddOrUpdate(intf, (i) => type, (i, _) => type);
             Register<T>(name);
         }
-        private static void Register1<T>(string name)  {
+        private static void Register1<T>(string name) {
             Register<T>(name);
         }
         private static void Register2<T, I>(string name) where T : I {

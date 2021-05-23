@@ -149,8 +149,8 @@ namespace Hprose.IO {
     }
 
     internal static class MembersReader<T> {
-        private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
-        private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readMemberActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
+        private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readActions = new();
+        private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readMemberActions = new();
 #if !NET35_CF
         private static readonly Func<string, Lazy<ReadAction<T>>> readActionFactory = (key) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(MembersAccessor<T>.Members, key.Split(' ')));
         private static readonly Func<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction<T>(MembersAccessor<T>.Members[name]));
@@ -163,8 +163,8 @@ namespace Hprose.IO {
     }
 
     internal static class FieldsReader<T> {
-        private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
-        private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readMemberActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
+        private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readActions = new();
+        private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readMemberActions = new();
 #if !NET35_CF
         private static readonly Func<string, Lazy<ReadAction<T>>> readActionFactory = (key) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(FieldsAccessor<T>.Fields, key.Split(' ')));
         private static readonly Func<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction<T>(FieldsAccessor<T>.Fields[name]));
@@ -177,8 +177,8 @@ namespace Hprose.IO {
     }
 
     internal static class PropertiesReader<T> {
-        private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
-        private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readMemberActions = new ConcurrentDictionary<string, Lazy<ReadAction<T>>>();
+        private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readActions = new();
+        private static readonly ConcurrentDictionary<string, Lazy<ReadAction<T>>> readMemberActions = new();
 #if !NET35_CF
         private static readonly Func<string, Lazy<ReadAction<T>>> readActionFactory = (key) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadAction<T>(PropertiesAccessor<T>.Properties, key.Split(' ')));
         private static readonly Func<string, Lazy<ReadAction<T>>> readMemberActionFactory = (name) => new Lazy<ReadAction<T>>(() => MembersReader.CreateReadMemberAction<T>(PropertiesAccessor<T>.Properties[name]));

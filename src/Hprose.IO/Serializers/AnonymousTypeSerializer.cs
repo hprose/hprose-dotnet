@@ -31,7 +31,7 @@ namespace Hprose.IO.Serializers {
             var obj = Expression.Variable(typeof(T), "obj");
             Type strSerializerType = typeof(Serializer<string>);
             var strSerializer = Expression.Property(null, strSerializerType, "Instance");
-            List<Expression> expressions = new List<Expression>();
+            List<Expression> expressions = new();
             foreach (PropertyInfo property in properties) {
                 expressions.Add(
                     Expression.Call(

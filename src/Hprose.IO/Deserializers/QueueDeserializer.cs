@@ -33,8 +33,7 @@ namespace Hprose.IO.Deserializers {
             return queue;
         }
         public override Queue<T> Read(Reader reader, int tag) {
-            return tag switch
-            {
+            return tag switch {
                 TagList => Read(reader),
                 TagEmpty => new Queue<T>(),
                 _ => base.Read(reader, tag),

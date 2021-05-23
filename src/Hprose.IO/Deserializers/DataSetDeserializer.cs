@@ -32,8 +32,7 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return dataset;
         }
-        public override DataSet Read(Reader reader, int tag) => tag switch
-        {
+        public override DataSet Read(Reader reader, int tag) => tag switch {
             TagList => Read(reader),
             TagEmpty => new DataSet(),
             _ => base.Read(reader, tag),

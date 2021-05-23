@@ -18,8 +18,7 @@ namespace Hprose.IO.Deserializers {
 
     internal class CharsDeserializer : Deserializer<char[]> {
         private static readonly char[] empty = new char[0];
-        public override char[] Read(Reader reader, int tag) => tag switch
-        {
+        public override char[] Read(Reader reader, int tag) => tag switch {
             TagString => ReferenceReader.ReadChars(reader),
             TagUTF8Char => new char[] { ValueReader.ReadChar(reader.Stream) },
             TagList => ReferenceReader.ReadArray<char>(reader),

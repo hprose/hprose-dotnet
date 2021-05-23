@@ -17,8 +17,7 @@ namespace Hprose.IO.Deserializers {
     using static Tags;
 
     internal class SingleDeserializer : Deserializer<float> {
-        public override float Read(Reader reader, int tag) => tag switch
-        {
+        public override float Read(Reader reader, int tag) => tag switch {
             '0' => 0,
             '1' => 1,
             '2' => 2,

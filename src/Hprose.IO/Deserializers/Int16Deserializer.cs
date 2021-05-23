@@ -18,8 +18,7 @@ namespace Hprose.IO.Deserializers {
 
     internal class Int16Deserializer : Deserializer<short> {
         public override short Read(Reader reader, int tag) {
-            return tag switch
-            {
+            return tag switch {
                 '0' => 0,
                 '1' => 1,
                 '2' => 2,

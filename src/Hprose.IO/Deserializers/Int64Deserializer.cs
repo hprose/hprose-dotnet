@@ -17,8 +17,7 @@ namespace Hprose.IO.Deserializers {
     using static Tags;
 
     internal class Int64Deserializer : Deserializer<long> {
-        public override long Read(Reader reader, int tag) => tag switch
-        {
+        public override long Read(Reader reader, int tag) => tag switch {
             '0' => 0,
             '1' => 1,
             '2' => 2,

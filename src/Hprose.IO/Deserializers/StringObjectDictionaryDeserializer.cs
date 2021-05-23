@@ -50,8 +50,7 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return dict;
         }
-        public override I Read(Reader reader, int tag) => tag switch
-        {
+        public override I Read(Reader reader, int tag) => tag switch {
             TagObject => ReadObjectAsMap(reader),
             _ => base.Read(reader, tag),
         };

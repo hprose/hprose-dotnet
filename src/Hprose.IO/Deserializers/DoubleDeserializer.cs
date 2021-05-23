@@ -17,8 +17,7 @@ namespace Hprose.IO.Deserializers {
     using static Tags;
 
     internal class DoubleDeserializer : Deserializer<double> {
-        public override double Read(Reader reader, int tag) => tag switch
-        {
+        public override double Read(Reader reader, int tag) => tag switch {
             '0' => 0,
             '1' => 1,
             '2' => 2,

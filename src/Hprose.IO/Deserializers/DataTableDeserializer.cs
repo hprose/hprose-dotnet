@@ -163,8 +163,7 @@ namespace Hprose.IO.Deserializers {
             return table;
         }
 
-        public override DataTable Read(Reader reader, int tag) => tag switch
-        {
+        public override DataTable Read(Reader reader, int tag) => tag switch {
             TagList => Read(reader),
             TagEmpty => new DataTable(),
             _ => base.Read(reader, tag),

@@ -68,7 +68,7 @@ namespace Hprose.IO {
         private static readonly object falseObject = false;
         private static readonly object[] digitObject = new object[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-        static readonly ConcurrentDictionary<Type, Lazy<IDeserializer>> deserializers = new ConcurrentDictionary<Type, Lazy<IDeserializer>>();
+        static readonly ConcurrentDictionary<Type, Lazy<IDeserializer>> deserializers = new();
 
         static Deserializer() {
             Register(() => new Deserializer());
@@ -123,8 +123,7 @@ namespace Hprose.IO {
                 return typeof(EnumDeserializer<>).MakeGenericType(type);
             }
             if (type.IsArray) {
-                return (type.GetArrayRank()) switch
-                {
+                return (type.GetArrayRank()) switch {
                     1 => typeof(ArrayDeserializer<>).MakeGenericType(type.GetElementType()),
                     2 => typeof(Array2Deserializer<>).MakeGenericType(type.GetElementType()),
                     _ => typeof(MultiDimArrayDeserializer<,>).MakeGenericType(type, type.GetElementType()),
@@ -272,8 +271,7 @@ namespace Hprose.IO {
 
         public static IDeserializer GetInstance(Type type) => type == null ? Instance : deserializers.GetOrAdd(type, deserializerFactory).Value;
 
-        public override object Read(Reader reader, int tag) => tag switch
-        {
+        public override object Read(Reader reader, int tag) => tag switch {
             '0' => digitObject[0],
             '1' => digitObject[1],
             '2' => digitObject[2],
@@ -295,41 +293,34 @@ namespace Hprose.IO {
             TagDate => ReferenceReader.ReadDateTime(reader),
             TagTime => ReferenceReader.ReadTime(reader),
             TagGuid => ReferenceReader.ReadGuid(reader),
-            TagLong => reader.LongType switch
-            {
+            TagLong => reader.LongType switch {
                 LongType.Int64 => ValueReader.ReadLong(reader.Stream),
                 LongType.UInt64 => (ulong)ValueReader.ReadLong(reader.Stream),
                 _ => ValueReader.ReadBigInteger(reader.Stream),
             },
-            TagDouble => reader.RealType switch
-            {
+            TagDouble => reader.RealType switch {
                 RealType.Single => ValueReader.ReadSingle(reader.Stream),
                 RealType.Decimal => ValueReader.ReadDecimal(reader.Stream),
                 _ => ValueReader.ReadDouble(reader.Stream),
             },
-            TagNaN => reader.RealType switch
-            {
+            TagNaN => reader.RealType switch {
                 RealType.Single => float.NaN,
                 _ => double.NaN,
             },
-            TagInfinity => reader.RealType switch
-            {
+            TagInfinity => reader.RealType switch {
                 RealType.Single => ValueReader.ReadSingleInfinity(reader.Stream),
                 _ => ValueReader.ReadInfinity(reader.Stream),
             },
-            TagUTF8Char => reader.CharType switch
-            {
+            TagUTF8Char => reader.CharType switch {
                 CharType.Char => ValueReader.ReadChar(reader.Stream),
                 _ => ValueReader.ReadUTF8Char(reader.Stream),
             },
-            TagList => reader.ListType switch
-            {
+            TagList => reader.ListType switch {
                 ListType.Array => ReferenceReader.ReadArray<object>(reader),
                 ListType.ArrayList => ListDeserializer<ArrayList>.Read(reader),
                 _ => CollectionDeserializer<List<object>, object>.Read(reader),
             },
-            TagMap => reader.DictType switch
-            {
+            TagMap => reader.DictType switch {
                 DictType.Dictionary => DictionaryDeserializer<Dictionary<object, object>, object, object>.Read(reader),
 #if !NET35
                 DictType.ExpandoObject => ExpandoObjectDeserializer.Read(reader),

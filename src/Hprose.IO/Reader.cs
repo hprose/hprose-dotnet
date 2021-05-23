@@ -19,7 +19,7 @@ using System.IO;
 
 namespace Hprose.IO {
     internal sealed class ReaderRefer {
-        private readonly List<object> @ref = new List<object>();
+        private readonly List<object> @ref = new();
         public int LastIndex => @ref.Count - 1;
         public void Add(object obj) => @ref.Add(obj);
         public void Set(int index, object obj) => @ref[index] = obj;
@@ -28,7 +28,7 @@ namespace Hprose.IO {
     }
 
     public class Reader {
-        private readonly List<TypeInfo> @ref = new List<TypeInfo>();
+        private readonly List<TypeInfo> @ref = new();
         private volatile ReaderRefer refer;
         private volatile LongType longType = LongType.Int64;
         private volatile RealType realType = RealType.Double;

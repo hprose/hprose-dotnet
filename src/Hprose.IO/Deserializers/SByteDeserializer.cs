@@ -17,8 +17,7 @@ namespace Hprose.IO.Deserializers {
     using static Tags;
 
     internal class SByteDeserializer : Deserializer<sbyte> {
-        public override sbyte Read(Reader reader, int tag) => tag switch
-        {
+        public override sbyte Read(Reader reader, int tag) => tag switch {
             '0' => 0,
             '1' => 1,
             '2' => 2,

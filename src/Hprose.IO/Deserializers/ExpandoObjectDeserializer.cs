@@ -68,8 +68,7 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return obj;
         }
-        public override ExpandoObject Read(Reader reader, int tag) => tag switch
-        {
+        public override ExpandoObject Read(Reader reader, int tag) => tag switch {
             TagMap => Read(reader),
             TagObject => ReadObject(reader),
             TagEmpty => new ExpandoObject(),

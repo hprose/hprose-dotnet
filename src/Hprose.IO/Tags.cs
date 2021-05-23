@@ -52,8 +52,7 @@ namespace Hprose.IO {
         public const byte TagError = (byte)'E';
         public const byte TagEnd = (byte)'z';
 
-        public static string ToString(int tag) => tag switch
-        {
+        public static string ToString(int tag) => tag switch {
             '0' => "Int32",
             '1' => "Int32",
             '2' => "Int32",

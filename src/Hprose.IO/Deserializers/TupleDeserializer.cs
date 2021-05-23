@@ -167,11 +167,10 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return tuple;
         }
-        public override T Read(Reader reader, int tag) => tag switch
-        {
+        public override T Read(Reader reader, int tag) => tag switch {
             TagList => Read(reader),
             TagEmpty => TupleHelper<T>.read(reader, 0),
             _ => base.Read(reader, tag),
         };
     }
- }
+}

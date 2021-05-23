@@ -17,8 +17,7 @@ namespace Hprose.IO.Deserializers {
     using static Tags;
 
     internal class UInt64Deserializer : Deserializer<ulong> {
-        public override ulong Read(Reader reader, int tag) => tag switch
-        {
+        public override ulong Read(Reader reader, int tag) => tag switch {
             '0' => 0,
             '1' => 1,
             '2' => 2,

@@ -40,8 +40,7 @@ namespace Hprose.IO.Deserializers {
                     return (I)Deserializer.GetInstance(type).Read(reader, tag);
                 }
             }
-            return tag switch
-            {
+            return tag switch {
                 TagObject => Read(reader),
                 TagEmpty => null,
                 _ => base.Read(reader, tag),

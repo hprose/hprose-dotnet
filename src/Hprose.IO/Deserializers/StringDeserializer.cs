@@ -17,8 +17,7 @@ namespace Hprose.IO.Deserializers {
     using static Tags;
 
     internal class StringDeserializer : Deserializer<string> {
-        public override string Read(Reader reader, int tag) => tag switch
-        {
+        public override string Read(Reader reader, int tag) => tag switch {
             TagString => ReferenceReader.ReadString(reader),
             TagUTF8Char => ValueReader.ReadUTF8Char(reader.Stream),
             '0' => "0",

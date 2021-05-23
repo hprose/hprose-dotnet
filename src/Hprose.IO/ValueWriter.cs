@@ -8,7 +8,7 @@
 |                                                          |
 |  ValueWriter class for C#.                               |
 |                                                          |
-|  LastModified: Jan 11, 2019                              |
+|  LastModified: May 9, 2019                               |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -54,8 +54,8 @@ namespace Hprose.IO {
         private static readonly byte[] minLongBuf = GetASCII("-9223372036854775808");
 
 #if !(NETSTANDARD2_1 || NETCOREAPP2_1_UP)
-        private static readonly ThreadLocal<byte[]> intBuf = new ThreadLocal<byte[]>(() => new byte[INT_SIZE]);
-        private static readonly ThreadLocal<byte[]> longBuf = new ThreadLocal<byte[]>(() => new byte[LONG_SIZE]);
+        private static readonly ThreadLocal<byte[]> intBuf = new(() => new byte[INT_SIZE]);
+        private static readonly ThreadLocal<byte[]> longBuf = new(() => new byte[LONG_SIZE]);
         public static void WriteASCII(Stream stream, string s) {
             byte[] buf = GetASCII(s);
             stream.Write(buf, 0, buf.Length);
@@ -81,7 +81,7 @@ namespace Hprose.IO {
         }
 
         public static void WriteInt(Stream stream, int i) {
-            if ((i >= 0) && (i <= 9)) {
+            if (i >= 0 && i <= 9) {
                 stream.WriteByte(digits[i]);
             }
             else if (i == int.MinValue) {
@@ -106,7 +106,7 @@ namespace Hprose.IO {
         }
 
         public static void WriteInt(Stream stream, uint i) {
-            if ((i >= 0) && (i <= 9)) {
+            if (i <= 9) {
                 stream.WriteByte(digits[i]);
             }
             else {
@@ -115,7 +115,7 @@ namespace Hprose.IO {
                 int off = ToBytes(i, buf, INT_SIZE);
                 stream.Write(buf.Slice(off, INT_SIZE - off));
 #else
-                byte[] buf =intBuf.Value;
+                byte[] buf = intBuf.Value;
                 int off = ToBytes(i, buf, INT_SIZE);
                 stream.Write(buf, off, INT_SIZE - off);
 #endif
@@ -123,7 +123,7 @@ namespace Hprose.IO {
         }
 
         public static void WriteInt(Stream stream, long i) {
-            if ((i >= 0) && (i <= 9)) {
+            if (i >= 0 && i <= 9) {
                 stream.WriteByte(digits[i]);
             }
             else if (i == long.MinValue) {
@@ -148,7 +148,7 @@ namespace Hprose.IO {
         }
 
         public static void WriteInt(Stream stream, ulong i) {
-            if ((i >= 0) && (i <= 9)) {
+            if (i <= 9) {
                 stream.WriteByte(digits[i]);
             }
             else {
@@ -215,7 +215,7 @@ namespace Hprose.IO {
         }
 
         public static void Write(Stream stream, uint i) {
-            if (i >= 0 && i <= 9) {
+            if (i <= 9) {
                 stream.WriteByte(digits[i]);
             }
             else {
@@ -226,25 +226,15 @@ namespace Hprose.IO {
         }
 
         public static void Write(Stream stream, long i) {
-            if (i >= 0 && i <= 9) {
-                stream.WriteByte(digits[i]);
-            }
-            else {
-                stream.WriteByte(TagLong);
-                WriteInt(stream, i);
-                stream.WriteByte(TagSemicolon);
-            }
+            stream.WriteByte(TagLong);
+            WriteInt(stream, i);
+            stream.WriteByte(TagSemicolon);
         }
 
         public static void Write(Stream stream, ulong i) {
-            if (i >= 0 && i <= 9) {
-                stream.WriteByte(digits[i]);
-            }
-            else {
-                stream.WriteByte(TagLong);
-                WriteInt(stream, i);
-                stream.WriteByte(TagSemicolon);
-            }
+            stream.WriteByte(TagLong);
+            WriteInt(stream, i);
+            stream.WriteByte(TagSemicolon);
         }
 
         public static void Write(Stream stream, bool b) => stream.WriteByte(b ? TagTrue : TagFalse);

@@ -19,8 +19,7 @@ namespace Hprose.IO.Deserializers {
     using static Tags;
 
     internal class EnumDeserializer<T> : Deserializer<T> where T : struct, IComparable, IConvertible, IFormattable {
-        public override T Read(Reader reader, int tag) => tag switch
-        {
+        public override T Read(Reader reader, int tag) => tag switch {
             '0' => (T)Enum.ToObject(typeof(T), 0),
             '1' => (T)Enum.ToObject(typeof(T), 1),
             '2' => (T)Enum.ToObject(typeof(T), 2),

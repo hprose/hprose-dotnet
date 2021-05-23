@@ -32,8 +32,7 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return collection;
         }
-        public override BlockingCollection<T> Read(Reader reader, int tag) => tag switch
-        {
+        public override BlockingCollection<T> Read(Reader reader, int tag) => tag switch {
             TagList => Read(reader),
             TagEmpty => new BlockingCollection<T>(),
             _ => base.Read(reader, tag),

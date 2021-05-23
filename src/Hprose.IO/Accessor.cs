@@ -38,9 +38,9 @@ namespace Hprose.IO {
 #endif
         public static Type GetMemberType(MemberInfo member) => member is FieldInfo ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType;
 
-        private static readonly ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>> members = new ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>>();
-        private static readonly ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>> fields = new ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>>();
-        private static readonly ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>> properties = new ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>>();
+        private static readonly ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>> members = new();
+        private static readonly ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>> fields = new();
+        private static readonly ConcurrentDictionary<Type, Lazy<Dictionary<string, MemberInfo>>> properties = new();
 
 #if !NET35_CF
         private static readonly Func<Type, Lazy<Dictionary<string, MemberInfo>>> fieldsFactory = (type) => new Lazy<Dictionary<string, MemberInfo>>(() => FieldsAccessor.GetFields(type));

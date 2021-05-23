@@ -20,8 +20,7 @@ namespace Hprose.IO.Deserializers {
 
     internal class ArraySegmentDeserializer<T> : Deserializer<ArraySegment<T>> {
         private static readonly T[] empty = new T[0];
-        public override ArraySegment<T> Read(Reader reader, int tag) => tag switch
-        {
+        public override ArraySegment<T> Read(Reader reader, int tag) => tag switch {
             TagList => new ArraySegment<T>(ReferenceReader.ReadArray<T>(reader)),
             TagEmpty => new ArraySegment<T>(empty),
             TagRef => ReadReference(reader),

@@ -58,8 +58,7 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return obj;
         }
-        public override T Read(Reader reader, int tag) => tag switch
-        {
+        public override T Read(Reader reader, int tag) => tag switch {
             TagObject => Read(reader),
             TagMap => ReadMapAsObject(reader),
             TagEmpty => Factory<T>.New(),
@@ -107,8 +106,7 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return obj;
         }
-        public override T Read(Reader reader, int tag) => tag switch
-        {
+        public override T Read(Reader reader, int tag) => tag switch {
             TagObject => Read(reader),
             TagMap => ReadMapAsObject(reader),
             TagEmpty => Factory<T>.New(),

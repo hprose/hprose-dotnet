@@ -20,8 +20,7 @@ namespace Hprose.IO.Deserializers {
     using static Tags;
 
     internal class ExceptionDeserializer<T> : Deserializer<T> where T : Exception {
-        public override T Read(Reader reader, int tag) => tag switch
-        {
+        public override T Read(Reader reader, int tag) => tag switch {
 #if !NET35_CF
             TagError => (T)Activator.CreateInstance(typeof(T), new object[] { reader.Deserialize<string>() }),
 #else

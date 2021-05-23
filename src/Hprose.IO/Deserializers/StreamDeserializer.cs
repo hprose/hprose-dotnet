@@ -20,8 +20,7 @@ namespace Hprose.IO.Deserializers {
 
     internal class StreamDeserializer<T> : Deserializer<T> where T : Stream {
         private static readonly byte[] empty = new byte[0];
-        public override T Read(Reader reader, int tag) => tag switch
-        {
+        public override T Read(Reader reader, int tag) => tag switch {
             TagBytes => Converter<T>.Convert(ReferenceReader.ReadBytes(reader)),
             TagEmpty => Converter<T>.Convert(empty),
             TagList => Converter<T>.Convert(ReferenceReader.ReadArray<byte>(reader)),

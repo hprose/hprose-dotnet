@@ -18,8 +18,7 @@ namespace Hprose.IO.Deserializers {
 
     internal class BytesDeserializer : Deserializer<byte[]> {
         private static readonly byte[] empty = new byte[0];
-        public override byte[] Read(Reader reader, int tag) => tag switch
-        {
+        public override byte[] Read(Reader reader, int tag) => tag switch {
             TagBytes => ReferenceReader.ReadBytes(reader),
             TagEmpty => empty,
             TagList => ReferenceReader.ReadArray<byte>(reader),

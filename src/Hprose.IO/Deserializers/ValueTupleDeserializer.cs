@@ -167,8 +167,7 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return default;
         }
-        public override ValueTuple Read(Reader reader, int tag) => tag switch
-        {
+        public override ValueTuple Read(Reader reader, int tag) => tag switch {
             TagEmpty => default,
             TagList => Read(reader),
             _ => base.Read(reader, tag),
@@ -186,11 +185,10 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return tuple;
         }
-        public override T Read(Reader reader, int tag) => tag switch
-        {
+        public override T Read(Reader reader, int tag) => tag switch {
             TagList => Read(reader),
             TagEmpty => default,
             _ => base.Read(reader, tag),
         };
     }
- }
+}

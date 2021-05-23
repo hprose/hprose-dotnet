@@ -36,8 +36,7 @@ namespace Hprose.IO.Deserializers {
             stream.ReadByte();
             return stack;
         }
-        public override Stack<T> Read(Reader reader, int tag) => tag switch
-        {
+        public override Stack<T> Read(Reader reader, int tag) => tag switch {
             TagList => Read(reader),
             TagEmpty => new Stack<T>(),
             _ => base.Read(reader, tag),

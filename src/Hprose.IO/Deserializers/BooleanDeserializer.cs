@@ -17,8 +17,7 @@ namespace Hprose.IO.Deserializers {
     using static Tags;
 
     internal class BooleanDeserializer : Deserializer<bool> {
-        public override bool Read(Reader reader, int tag) => tag switch
-        {
+        public override bool Read(Reader reader, int tag) => tag switch {
             TagTrue => true,
             TagFalse => false,
             TagEmpty => false,

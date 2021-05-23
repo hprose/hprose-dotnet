@@ -46,7 +46,7 @@ namespace Hprose.IO {
     }
 
     public class Serializer : Serializer<object> {
-        private static readonly ConcurrentDictionary<Type, Lazy<ISerializer>> serializers = new ConcurrentDictionary<Type, Lazy<ISerializer>>();
+        private static readonly ConcurrentDictionary<Type, Lazy<ISerializer>> serializers = new();
         static Serializer() {
             Register(() => new Serializer());
             Register(() => new DBNullSerializer());
@@ -93,8 +93,7 @@ namespace Hprose.IO {
                 return typeof(EnumSerializer<>).MakeGenericType(type);
             }
             if (type.IsArray) {
-                return (type.GetArrayRank()) switch
-                {
+                return (type.GetArrayRank()) switch {
                     1 => typeof(ArraySerializer<>).MakeGenericType(type.GetElementType()),
                     2 => typeof(Array2Serializer<>).MakeGenericType(type.GetElementType()),
                     _ => typeof(MultiDimArraySerializer<>).MakeGenericType(type),

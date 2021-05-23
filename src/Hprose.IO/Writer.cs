@@ -21,7 +21,7 @@ namespace Hprose.IO {
     using static Tags;
 
     internal sealed class WriterRefer {
-        private readonly Dictionary<object, int> @ref = new Dictionary<object, int>();
+        private readonly Dictionary<object, int> @ref = new();
         private int last = 0;
         public void AddCount(int count) => last += count;
         public void Set(object obj) => @ref[obj] = last++;
@@ -42,7 +42,7 @@ namespace Hprose.IO {
 
     public class Writer {
         private volatile WriterRefer refer;
-        private readonly Dictionary<object, int> @ref = new Dictionary<object, int>();
+        private readonly Dictionary<object, int> @ref = new();
         private int last = 0;
 
         public Stream Stream { get; private set; }

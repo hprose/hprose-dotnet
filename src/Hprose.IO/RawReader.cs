@@ -45,24 +45,24 @@ namespace Hprose.IO {
                 case 5:
                 case 6:
                 case 7: {
-                        // 0xxx xxxx
-                        ostream.WriteByte((byte)tag);
-                        break;
-                    }
+                    // 0xxx xxxx
+                    ostream.WriteByte((byte)tag);
+                    break;
+                }
                 case 12:
                 case 13: {
-                        // 110x xxxx   10xx xxxx
-                        ostream.WriteByte((byte)tag);
-                        ostream.WriteByte((byte)stream.ReadByte());
-                        break;
-                    }
+                    // 110x xxxx   10xx xxxx
+                    ostream.WriteByte((byte)tag);
+                    ostream.WriteByte((byte)stream.ReadByte());
+                    break;
+                }
                 case 14: {
-                        // 1110 xxxx  10xx xxxx  10xx xxxx
-                        ostream.WriteByte((byte)tag);
-                        ostream.WriteByte((byte)stream.ReadByte());
-                        ostream.WriteByte((byte)stream.ReadByte());
-                        break;
-                    }
+                    // 1110 xxxx  10xx xxxx  10xx xxxx
+                    ostream.WriteByte((byte)tag);
+                    ostream.WriteByte((byte)stream.ReadByte());
+                    ostream.WriteByte((byte)stream.ReadByte());
+                    break;
+                }
                 default:
                     throw ValueReader.BadEncoding(tag);
             }
@@ -108,37 +108,37 @@ namespace Hprose.IO {
                     case 5:
                     case 6:
                     case 7: {
-                            // 0xxx xxxx
-                            ostream.WriteByte((byte)tag);
-                            break;
-                        }
+                        // 0xxx xxxx
+                        ostream.WriteByte((byte)tag);
+                        break;
+                    }
                     case 12:
                     case 13: {
-                            // 110x xxxx   10xx xxxx
-                            ostream.WriteByte((byte)tag);
-                            ostream.WriteByte((byte)stream.ReadByte());
-                            break;
-                        }
+                        // 110x xxxx   10xx xxxx
+                        ostream.WriteByte((byte)tag);
+                        ostream.WriteByte((byte)stream.ReadByte());
+                        break;
+                    }
                     case 14: {
-                            // 1110 xxxx  10xx xxxx  10xx xxxx
+                        // 1110 xxxx  10xx xxxx  10xx xxxx
+                        ostream.WriteByte((byte)tag);
+                        ostream.WriteByte((byte)stream.ReadByte());
+                        ostream.WriteByte((byte)stream.ReadByte());
+                        break;
+                    }
+                    case 15: {
+                        // 1111 0xxx  10xx xxxx  10xx xxxx  10xx xxxx
+                        if ((tag & 0xf) <= 4) {
                             ostream.WriteByte((byte)tag);
                             ostream.WriteByte((byte)stream.ReadByte());
                             ostream.WriteByte((byte)stream.ReadByte());
+                            ostream.WriteByte((byte)stream.ReadByte());
+                            ++i;
                             break;
                         }
-                    case 15: {
-                            // 1111 0xxx  10xx xxxx  10xx xxxx  10xx xxxx
-                            if ((tag & 0xf) <= 4) {
-                                ostream.WriteByte((byte)tag);
-                                ostream.WriteByte((byte)stream.ReadByte());
-                                ostream.WriteByte((byte)stream.ReadByte());
-                                ostream.WriteByte((byte)stream.ReadByte());
-                                ++i;
-                                break;
-                            }
-                            goto default;
-                            // no break here!! here need throw exception.
-                        }
+                        goto default;
+                        // no break here!! here need throw exception.
+                    }
                     default:
                         throw ValueReader.BadEncoding(tag);
                 }
@@ -220,7 +220,7 @@ namespace Hprose.IO {
         }
         public static void ReadRaw(Stream stream, Stream ostream) => ReadRaw(stream, ostream, stream.ReadByte());
         public static MemoryStream ReadRaw(Stream stream) {
-            MemoryStream ostream = new MemoryStream();
+            var ostream = new MemoryStream();
             ReadRaw(stream, ostream);
             ostream.Position = 0;
             return ostream;

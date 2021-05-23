@@ -19,8 +19,7 @@ namespace Hprose.IO.Deserializers {
     using static Tags;
 
     internal class GuidDeserializer : Deserializer<Guid> {
-        public override Guid Read(Reader reader, int tag) => tag switch
-        {
+        public override Guid Read(Reader reader, int tag) => tag switch {
             TagGuid => ReferenceReader.ReadGuid(reader),
             TagBytes => Converter<Guid>.Convert(ReferenceReader.ReadBytes(reader)),
             TagString => Converter<Guid>.Convert(ReferenceReader.ReadString(reader)),

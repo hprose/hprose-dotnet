@@ -33,8 +33,7 @@ namespace Hprose.IO.Deserializers {
             return collection;
         }
         public override T Read(Reader reader, int tag) {
-            return tag switch
-            {
+            return tag switch {
                 TagList => Read(reader),
                 TagEmpty => Factory<T>.New(),
                 _ => base.Read(reader, tag),

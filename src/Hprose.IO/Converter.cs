@@ -32,8 +32,7 @@ namespace Hprose.IO {
 
         internal static TOutput ConvertFromObject(object value) => (TOutput)converter.ConvertFrom(value);
 
-        internal static TOutput ConvertFrom(object value) => value switch
-        {
+        internal static TOutput ConvertFrom(object value) => value switch {
             TOutput obj => obj,
             char[] chars => (TOutput)converter.ConvertFromString(new string(chars)),
             StringBuilder sb => (TOutput)converter.ConvertFromString(sb.ToString()),
