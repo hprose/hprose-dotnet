@@ -8,7 +8,7 @@
 |                                                          |
 |  Broker plugin for C#.                                   |
 |                                                          |
-|  LastModified: Jul 2, 2020                               |
+|  LastModified: May 24, 2021                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -25,12 +25,11 @@ namespace Hprose.RPC.Plugins.Push {
         static Broker() {
             TypeManager.Register<Message>("@");
         }
-        private static readonly Dictionary<string, Message[]> emptyMessage = new(0);
-        protected ConcurrentDictionary<string, ConcurrentDictionary<string, BlockingCollection<Message>>> Messages { get; } = new();
-        protected ConcurrentDictionary<string, TaskCompletionSource<Dictionary<string, Message[]>>> Responders { get; } = new();
+        private static readonly Dictionary<string, List<Message>> emptyMessage = new(0);
+        protected ConcurrentDictionary<string, ConcurrentDictionary<string, ConcurrentQueue<Message>>> Messages { get; } = new();
+        protected ConcurrentDictionary<string, TaskCompletionSource<Dictionary<string, List<Message>>>> Responders { get; } = new();
         protected ConcurrentDictionary<string, TaskCompletionSource<bool>> Timers { get; } = new();
         public Service Service { get; private set; }
-        public int MessageQueueMaxLength { get; set; } = 10;
         public TimeSpan Timeout { get; set; } = new TimeSpan(0, 2, 0);
         public TimeSpan HeartBeat { get; set; } = new TimeSpan(0, 0, 10);
         public event Action<string, string, ServiceContext> OnSubscribe;
@@ -39,7 +38,7 @@ namespace Hprose.RPC.Plugins.Push {
             Service = service;
             Service.Add<string, ServiceContext, bool>(Subscribe, "+")
                    .Add<string, ServiceContext, bool>(Unsubscribe, "-")
-                   .Add<ServiceContext, Task<Dictionary<string, Message[]>>>(Message, "<")
+                   .Add<ServiceContext, Task<Dictionary<string, List<Message>>>>(Message, "<")
                    .Add<object, string, string, string, bool>(Unicast, ">")
                    .Add<object, string, IEnumerable<string>, string, IDictionary<string, bool>>(Multicast, ">?")
                    .Add<object, string, string, IDictionary<string, bool>>(Broadcast, ">*")
@@ -47,37 +46,28 @@ namespace Hprose.RPC.Plugins.Push {
                    .Add<string, IList<string>>(IdList, "|")
                    .Use(Handler);
         }
-        protected bool Send(string id, TaskCompletionSource<Dictionary<string, Message[]>> responder) {
-            if (!Messages.TryGetValue(id, out var topics)) {
+        protected bool Send(string id, TaskCompletionSource<Dictionary<string, List<Message>>> responder) {
+            if (!Messages.TryGetValue(id, out var topics) || topics.IsEmpty) {
                 responder.TrySetResult(null);
                 return true;
             }
-            if (topics.IsEmpty) {
-                responder.TrySetResult(null);
-                return true;
-            }
-            var result = new Dictionary<string, Message[]>();
-            int count = 0;
+            var result = new Dictionary<string, List<Message>>();
             foreach (var topic in topics) {
                 var name = topic.Key;
                 var messages = topic.Value;
                 if (messages == null) {
-                    ++count;
                     result.Add(name, null);
-                    topics.TryRemove(name, out var temp);
-                    temp?.Dispose();
+                    topics.TryRemove(name, out _);
                 }
                 else if (messages.Count > 0) {
-                    ++count;
-                    var newmessages = new BlockingCollection<Message>(MessageQueueMaxLength);
-                    if (!topics.TryUpdate(name, newmessages, messages)) {
-                        newmessages.Dispose();
+                    var messageList = new List<Message>(messages.Count);
+                    while (messages.TryDequeue(out Message message)) {
+                        messageList.Add(message);
                     }
-                    result.Add(name, messages.ToArray());
-                    messages.Dispose();
+                    result.Add(name, messageList);
                 }
             }
-            if (count == 0) return false;
+            if (result.Count == 0) return false;
             responder.TrySetResult(result);
             DoHeartBeat(id);
             return true;
@@ -118,34 +108,30 @@ namespace Hprose.RPC.Plugins.Push {
         }
         protected bool Subscribe(string topic, ServiceContext context) {
             var id = GetId(context);
-            var topics = Messages.GetOrAdd(id, (_) => new ConcurrentDictionary<string, BlockingCollection<Message>>());
+            var topics = Messages.GetOrAdd(id, (_) => new ConcurrentDictionary<string, ConcurrentQueue<Message>>());
             if (topics.TryGetValue(topic, out var messages)) {
                 if (messages != null) return false;
             }
-            messages = new BlockingCollection<Message>(MessageQueueMaxLength);
-            topics.AddOrUpdate(topic, messages, (_, oldmessages) => {
-                if (oldmessages != null) {
-                    messages.Dispose();
-                    return oldmessages;
-                }
-                return messages;
+            var success = false;
+            topics.GetOrAdd(topic, (_) => {
+                success = true;
+                return new ConcurrentQueue<Message>();
             });
-            OnSubscribe?.Invoke(id, topic, context);
-            return true;
+            if (success) OnSubscribe?.Invoke(id, topic, context);
+            return success;
         }
         protected void Response(string id) {
-            if (Responders.TryGetValue(id, out var responder)) {
-                if (responder != null) {
-                    if (Send(id, responder)) {
-                        Responders.TryUpdate(id, null, responder);
+            if (Responders.TryRemove(id, out var responder) && responder != null) {
+                if (!Send(id, responder)) {
+                    if (!Responders.TryAdd(id, responder)) {
+                        responder.SetResult(null);
                     }
                 }
             }
         }
-        protected bool Offline(ConcurrentDictionary<string, BlockingCollection<Message>> topics, string id, string topic, ServiceContext context) {
+        protected bool Offline(ConcurrentDictionary<string, ConcurrentQueue<Message>> topics, string id, string topic, ServiceContext context) {
             if (topics.TryRemove(topic, out var messages)) {
                 OnUnsubscribe?.Invoke(id, topic, messages?.ToArray(), context);
-                messages?.Dispose();
                 Response(id);
                 return true;
             }
@@ -158,7 +144,7 @@ namespace Hprose.RPC.Plugins.Push {
             }
             return false;
         }
-        protected async Task<Dictionary<string, Message[]>> Message(ServiceContext context) {
+        protected async Task<Dictionary<string, List<Message>>> Message(ServiceContext context) {
             var id = GetId(context);
             if (Responders.TryRemove(id, out var responder)) {
                 responder?.TrySetResult(null);
@@ -166,7 +152,7 @@ namespace Hprose.RPC.Plugins.Push {
             if (Timers.TryRemove(id, out var timer)) {
                 timer.TrySetResult(false);
             }
-            responder = new TaskCompletionSource<Dictionary<string, Message[]>>();
+            responder = new TaskCompletionSource<Dictionary<string, List<Message>>>();
             if (!Send(id, responder)) {
                 Responders.AddOrUpdate(id, responder, (_, oldResponder) => {
                     oldResponder?.TrySetResult(null);
@@ -194,10 +180,9 @@ namespace Hprose.RPC.Plugins.Push {
             try {
                 if (Messages.TryGetValue(id, out var topics)) {
                     if (topics.TryGetValue(topic, out var messages)) {
-                        if (messages.TryAdd(new Message() { Data = data, From = from })) {
-                            Response(id);
-                            return true;
-                        }
+                        messages.Enqueue(new Message() { Data = data, From = from });
+                        Response(id);
+                        return true;
                     }
                 }
             }
@@ -214,13 +199,12 @@ namespace Hprose.RPC.Plugins.Push {
         public IDictionary<string, bool> Broadcast(object data, string topic, string from = "") {
             var result = new Dictionary<string, bool>();
             foreach (var topics in Messages) {
+                var id = topics.Key;
                 if (topics.Value.TryGetValue(topic, out var messages)) {
-                    var id = topics.Key;
-                    if (messages.TryAdd(new Message() { Data = data, From = from })) {
-                        Response(id);
-                        result.Add(id, true);
-                        continue;
-                    }
+                    messages.Enqueue(new Message() { Data = data, From = from });
+                    Response(id);
+                    result.Add(id, true);
+                } else {
                     result.Add(id, false);
                 }
             }
@@ -240,13 +224,11 @@ namespace Hprose.RPC.Plugins.Push {
                 if (topic != null && topic.Length > 0) {
                     if (topics.TryGetValue(topic, out var messages)) {
                         topics.TryUpdate(topic, null, messages);
-                        messages.Dispose();
                     }
                 }
                 else {
                     foreach (var pair in topics) {
                         topics.TryUpdate(pair.Key, null, pair.Value);
-                        pair.Value.Dispose();
                     }
                 }
                 Response(id);

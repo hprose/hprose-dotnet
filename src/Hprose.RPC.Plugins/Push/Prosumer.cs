@@ -8,7 +8,7 @@
 |                                                          |
 |  Prosumer plugin for C#.                                 |
 |                                                          |
-|  LastModified: May 14, 2020                              |
+|  LastModified: May 24, 2021                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -60,7 +60,7 @@ namespace Hprose.RPC.Plugins.Push {
 #endif
                 if (callbacks.TryGetValue(topic.Key, out var callback)) {
                     if (topic.Value == null) {
-                        callbacks.TryRemove(topic.Key, out callback);
+                        callbacks.TryRemove(topic.Key, out _);
                         OnUnsubscribe?.Invoke(topic.Key);
                     }
                     else {
@@ -72,23 +72,38 @@ namespace Hprose.RPC.Plugins.Push {
             }
         }
         private async void Message() {
-            while(true) {
+            for (; ; ) {
+                Exception err = null;
                 try {
                     var topics = await Client.InvokeAsync<Dictionary<string, Message[]>>("<").ConfigureAwait(false);
                     if (topics == null) return;
                     Dispatch(topics);
-                }
-                catch (TimeoutException) {
+                    continue;
                 }
                 catch (Exception e) {
-                    if (RetryInterval != default) {
+                    err = e;
+                }
+                while (err != null) {
+                    if (!(err is TimeoutException)) {
+                        if (RetryInterval != default) {
 #if NET40
                         await TaskEx.Delay(RetryInterval);
 #else
-                        await Task.Delay(RetryInterval);
+                            await Task.Delay(RetryInterval);
 #endif
+                        }
+                        OnError?.Invoke(err);
                     }
-                    OnError?.Invoke(e);
+                    err = null;
+                    foreach (var callback in callbacks) {
+                        try {
+                            await Client.InvokeAsync<bool>("+", new object[] { callback.Key }).ConfigureAwait(false);
+                        }
+                        catch (Exception e) {
+                            err = e;
+                            break;
+                        }
+                    }
                 }
             }
         }
