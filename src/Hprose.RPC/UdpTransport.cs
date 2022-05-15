@@ -8,7 +8,7 @@
 |                                                          |
 |  UdpTransport class for C#.                              |
 |                                                          |
-|  LastModified: May 17, 2020                              |
+|  LastModified: May 15, 2022                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -179,26 +179,30 @@ namespace Hprose.RPC {
                 throw new Exception("request too large");
             }
             var clientContext = context as ClientContext;
-            var index = Interlocked.Increment(ref counter) & 0x7FFF;
+            var timeout = clientContext.Timeout;
+            if (timeout <= TimeSpan.Zero) {
+                timeout = TimeSpan.MaxValue;
+            }
+            using CancellationTokenSource source = new();
+#if NET40
+            var timer = TaskEx.Delay(timeout, source.Token);
+#else
+            var timer = Task.Delay(timeout, source.Token);
+#endif
             var udpClient = GetUdpClient(clientContext.Uri);
             var result = new TaskCompletionSource<MemoryStream>();
+            var index = Interlocked.Increment(ref counter) & 0x7FFF;
             Results[udpClient][index] = result;
             Requests[udpClient].Enqueue((index, stream));
             Send(udpClient);
-            var timeout = clientContext.Timeout;
-            if (timeout > TimeSpan.Zero) {
-                using CancellationTokenSource source = new();
 #if NET40
-                var timer = TaskEx.Delay(timeout, source.Token);
-                var task = await TaskEx.WhenAny(timer, result.Task).ConfigureAwait(false);
+            var task = await TaskEx.WhenAny(timer, result.Task).ConfigureAwait(false);
 #else
-                var timer = Task.Delay(timeout, source.Token);
-                var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
+            var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
 #endif
-                source.Cancel();
-                if (task == timer) {
-                    Close(udpClient, new TimeoutException());
-                }
+            source.Cancel();
+            if (task == timer) {
+                Close(udpClient, new TimeoutException());
             }
             return await result.Task.ConfigureAwait(false);
         }

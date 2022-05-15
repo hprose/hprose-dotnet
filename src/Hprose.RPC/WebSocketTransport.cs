@@ -8,7 +8,7 @@
 |                                                          |
 |  WebSocketTransport class for C#.                        |
 |                                                          |
-|  LastModified: Jul 2, 2020                               |
+|  LastModified: May 15, 2022                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -192,23 +192,30 @@ namespace Hprose.RPC {
         public async Task<Stream> Transport(Stream request, Context context) {
             var stream = await request.ToMemoryStream().ConfigureAwait(false);
             var clientContext = context as ClientContext;
-            var index = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
-            var webSocket = await GetWebSocket(clientContext.Uri).ConfigureAwait(false);
+            var timeout = clientContext.Timeout;
+            if (timeout <= TimeSpan.Zero) {
+                timeout = TimeSpan.MaxValue;
+            }
+            using CancellationTokenSource source = new();
+            var timer = Task.Delay(timeout, source.Token);
+            var getWebSocket = GetWebSocket(clientContext.Uri);
+            var task = await Task.WhenAny(timer, getWebSocket).ConfigureAwait(false);
+            if (task == timer) {
+                source.Cancel();
+                throw new TimeoutException();
+            }
+            var webSocket = await getWebSocket.ConfigureAwait(false);
             var results = Results[webSocket];
             var result = new TaskCompletionSource<MemoryStream>();
+            var index = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
             results[index] = result;
             var requests = Requests[webSocket];
             requests.Enqueue((index, stream));
             Send(webSocket);
-            var timeout = clientContext.Timeout;
-            if (timeout > TimeSpan.Zero) {
-                using CancellationTokenSource source = new CancellationTokenSource();
-                var timer = Task.Delay(timeout, source.Token);
-                var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
-                source.Cancel();
-                if (task == timer) {
-                    await Close(webSocket, new TimeoutException()).ConfigureAwait(false);
-                }
+            task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
+            source.Cancel();
+            if (task == timer) {
+                await Close(webSocket, new TimeoutException()).ConfigureAwait(false);
             }
             return await result.Task.ConfigureAwait(false);
         }

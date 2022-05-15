@@ -8,7 +8,7 @@
 |                                                          |
 |  SocketTransport class for C#.                           |
 |                                                          |
-|  LastModified: Jul 2, 2020                               |
+|  LastModified: May 15, 2022                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -187,23 +187,30 @@ namespace Hprose.RPC {
         public async Task<Stream> Transport(Stream request, Context context) {
             var stream = await request.ToMemoryStream().ConfigureAwait(false);
             var clientContext = context as ClientContext;
-            var index = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
-            var socket = await GetSocket(clientContext.Uri).ConfigureAwait(false);
+            var timeout = clientContext.Timeout;
+            if (timeout <= TimeSpan.Zero) {
+                timeout = TimeSpan.MaxValue;
+            }
+            using CancellationTokenSource source = new();
+            var timer = Task.Delay(timeout, source.Token);
+            var getSocket = GetSocket(clientContext.Uri);
+            var task = await Task.WhenAny(timer, getSocket).ConfigureAwait(false);
+            if (task == timer) {
+                source.Cancel();
+                throw new TimeoutException();
+            }
+            var socket = await getSocket.ConfigureAwait(false);
             var results = Results[socket];
             var result = new TaskCompletionSource<MemoryStream>();
+            var index = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
             results[index] = result;
             var requests = Requests[socket];
             requests.Enqueue((index, stream));
             Send(socket);
-            var timeout = clientContext.Timeout;
-            if (timeout > TimeSpan.Zero) {
-                using CancellationTokenSource source = new();
-                var timer = Task.Delay(timeout, source.Token);
-                var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
-                source.Cancel();
-                if (task == timer) {
-                    await Close(socket, new TimeoutException()).ConfigureAwait(false);
-                }
+            task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
+            source.Cancel();
+            if (task == timer) {
+                await Close(socket, new TimeoutException()).ConfigureAwait(false);
             }
             return await result.Task.ConfigureAwait(false);
         }

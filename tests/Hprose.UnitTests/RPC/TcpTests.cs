@@ -34,6 +34,16 @@ namespace Hprose.UnitTests.RPC {
             Console.WriteLine(name);
         }
         [TestMethod]
+        public async Task Test0() {
+            var client = new Client("tcp://127.0.0.1") {
+                Timeout = TimeSpan.FromMilliseconds(100)
+            };
+            await Assert.ThrowsExceptionAsync<TimeoutException>(async () => {
+                var result = await client.InvokeAsync<string>("hello", new object[] { "world" }).ConfigureAwait(false);
+                Console.WriteLine(result);
+            });
+        }
+        [TestMethod]
         public async Task Test1() {
             IPAddress iPAddress = (await Dns.GetHostAddressesAsync("127.0.0.1").ConfigureAwait(false))[0];
             TcpListener server = new TcpListener(iPAddress, 8412);

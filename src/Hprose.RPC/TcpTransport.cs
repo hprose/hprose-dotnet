@@ -8,7 +8,7 @@
 |                                                          |
 |  TcpTransport class for C#.                              |
 |                                                          |
-|  LastModified: Jul 2, 2020                               |
+|  LastModified: May 15, 2022                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -215,26 +215,37 @@ namespace Hprose.RPC {
         public async Task<Stream> Transport(Stream request, Context context) {
             var stream = await request.ToMemoryStream().ConfigureAwait(false);
             var clientContext = context as ClientContext;
-            var index = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
-            var (tcpClient, tcpStream) = await GetTcpClient(clientContext.Uri).ConfigureAwait(false);
+            var timeout = clientContext.Timeout;
+            if (timeout <= TimeSpan.Zero) {
+                timeout = TimeSpan.MaxValue;
+            }
+            using CancellationTokenSource source = new();
+            var getTcpClient = GetTcpClient(clientContext.Uri);
+#if NET40
+            var timer = TaskEx.Delay(timeout, source.Token);
+            var task = await TaskEx.WhenAny(timer, getTcpClient).ConfigureAwait(false);
+#else
+            var timer = Task.Delay(timeout, source.Token);
+            var task = await Task.WhenAny(timer, getTcpClient).ConfigureAwait(false);
+#endif
+            if (task == timer) {
+                source.Cancel();
+                throw new TimeoutException();
+            }
+            var (tcpClient, tcpStream) = await getTcpClient.ConfigureAwait(false);
             var result = new TaskCompletionSource<MemoryStream>();
+            var index = Interlocked.Increment(ref counter) & 0x7FFFFFFF;
             Results[tcpClient][index] = result;
             Requests[tcpClient].Enqueue((index, stream));
             Send(tcpClient, tcpStream);
-            var timeout = clientContext.Timeout;
-            if (timeout > TimeSpan.Zero) {
-                using CancellationTokenSource source = new();
 #if NET40
-                var timer = TaskEx.Delay(timeout, source.Token);
-                var task = await TaskEx.WhenAny(timer, result.Task).ConfigureAwait(false);
+            task = await TaskEx.WhenAny(timer, result.Task).ConfigureAwait(false);
 #else
-                var timer = Task.Delay(timeout, source.Token);
-                var task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
+            task = await Task.WhenAny(timer, result.Task).ConfigureAwait(false);
 #endif
-                source.Cancel();
-                if (task == timer) {
-                    await Close(tcpClient, new TimeoutException()).ConfigureAwait(false);
-                }
+            source.Cancel();
+            if (task == timer) {
+                await Close(tcpClient, new TimeoutException()).ConfigureAwait(false);
             }
             return await result.Task.ConfigureAwait(false);
         }

@@ -26,6 +26,16 @@ namespace Hprose.UnitTests.RPC {
             Console.WriteLine(name);
         }
         [TestMethod]
+        public async Task Test0() {
+            var client = new Client("udp://127.0.0.1") {
+                Timeout = TimeSpan.FromMilliseconds(100)
+            };
+            await Assert.ThrowsExceptionAsync<SocketException>(async () => {
+                var result = await client.InvokeAsync<string>("hello", new object[] { "world" }).ConfigureAwait(false);
+                Console.WriteLine(result);
+            });
+        }
+        [TestMethod]
         public async Task Test1() {
             UdpClient server = new UdpClient(8412);
             var service = new Service();

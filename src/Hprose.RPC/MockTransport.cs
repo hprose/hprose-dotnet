@@ -8,7 +8,7 @@
 |                                                          |
 | MockTransport for C#.                                    |
 |                                                          |
-| LastModified: Feb 27, 2019                               |
+|  LastModified: May 15, 2022                              |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -25,20 +25,20 @@ namespace Hprose.RPC {
             var clientContext = context as ClientContext;
             var result = MockAgent.Handler(clientContext.Uri.Host, request);
             var timeout = clientContext.Timeout;
-            if (timeout > TimeSpan.Zero) {
-                using (CancellationTokenSource source = new CancellationTokenSource()) {
+            if (timeout <= TimeSpan.Zero) {
+                timeout = TimeSpan.MaxValue;
+            }
+            using CancellationTokenSource source = new();
 #if NET40
-                   var timer = TaskEx.Delay(timeout, source.Token);
-                   var task = await TaskEx.WhenAny(timer, result).ConfigureAwait(false);
+            var timer = TaskEx.Delay(timeout, source.Token);
+            var task = await TaskEx.WhenAny(timer, result).ConfigureAwait(false);
 #else
-                    var timer = Task.Delay(timeout, source.Token);
-                    var task = await Task.WhenAny(timer, result).ConfigureAwait(false);
+            var timer = Task.Delay(timeout, source.Token);
+            var task = await Task.WhenAny(timer, result).ConfigureAwait(false);
 #endif
-                    source.Cancel();
-                    if (task == timer) {
-                        throw new TimeoutException();
-                    }
-                }
+            source.Cancel();
+            if (task == timer) {
+                throw new TimeoutException();
             }
             return await result;
         }
