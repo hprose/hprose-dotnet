@@ -45,7 +45,7 @@ namespace Hprose.IO {
             stream.WriteByte(TagClosebrace);
             return stream.ToArray();
         }
-#if !NET35
+#if !NET35 && !ENABLE_IL2CPP
         public static Action<Writer, T> CreateWriteAction<T>(IEnumerable<MemberInfo> members) {
             var writer = Expression.Variable(typeof(Writer), "writer");
             var obj = Expression.Variable(typeof(T), "obj");

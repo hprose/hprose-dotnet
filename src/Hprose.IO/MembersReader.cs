@@ -26,7 +26,7 @@ namespace Hprose.IO {
 
     internal static class MembersReader {
         private const BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.Public;
-#if !NET35
+#if !NET35 && !ENABLE_IL2CPP
         private static BlockExpression CreateReadBlock(Dictionary<string, MemberInfo> members, string[] names, ParameterExpression reader, ParameterExpression obj) {
             var length = names.Length;
             if (length == 1 && names[0].Length == 0) {
