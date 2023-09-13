@@ -28,6 +28,7 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -76,6 +77,7 @@
 
   <ItemGroup>
     <None Include="..\..\icon.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net45')) Or $(TargetFramework.StartsWith('net46')) ">
