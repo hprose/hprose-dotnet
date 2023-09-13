@@ -8,7 +8,7 @@
 |                                                          |
 |  Service class for C#.                                   |
 |                                                          |
-|  LastModified: Jan 24, 2021                              |
+|  LastModified: Dec 13, 2023                              |
 |  Author: Ma Bingyao <andot@hprose.com>                   |
 |                                                          |
 \*________________________________________________________*/
@@ -95,17 +95,22 @@ namespace Hprose.RPC {
             }
             return this;
         }
-        public Task<Stream> Handle(Stream request, Context context) => ioManager.Handler(request, context);
-        public async Task<Stream> Process(Stream request, Context context) {
-            object result;
+        public async Task<Stream> Handle(Stream request, Context context) {
             try {
-                var stream = await request.ToMemoryStream().ConfigureAwait(false);
-                var (name, args) = Codec.Decode(stream, context as ServiceContext);
-                result = await invokeManager.Handler(name, args, context).ConfigureAwait(false);
+                var response = await ioManager.Handler(request, context).ConfigureAwait(false);
+                if (response == null) {
+                    response = Codec.Encode(null, context as ServiceContext);
+                }
+                return response;
             }
             catch (Exception e) {
-                result = e.InnerException ?? e;
+                return Codec.Encode(e.InnerException ?? e, context as ServiceContext);
             }
+        }
+        public async Task<Stream> Process(Stream request, Context context) {
+            var stream = await request.ToMemoryStream().ConfigureAwait(false);
+            var (name, args) = Codec.Decode(stream, context as ServiceContext);
+            var result = await invokeManager.Handler(name, args, context).ConfigureAwait(false);
             return Codec.Encode(result, context as ServiceContext);
         }
 
