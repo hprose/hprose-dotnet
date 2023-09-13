@@ -1,4 +1,4 @@
-![Hprose](https://hprose.com/banner.@2x.png)
+![Hprose](https://raw.githubusercontent.com/hprose/hprose-dotnet/master/banner.@2x.png)
 
 # Hprose 3.0 for .NET
 
